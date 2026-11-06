@@ -19,8 +19,10 @@ Lưu ý:
 ## Duyệt bản cập nhật
 
 1. Sáng thứ Hai hằng tuần, hệ thống kiểm tra Javis OS. Nếu có bản mới, tab **Pull requests** sẽ có yêu cầu tên "Cập nhật từ Javis OS …".
-2. Bạn chờ phần **Checks** chạy xong và hiện dấu xanh.
+2. Mở yêu cầu đó. Nếu thấy nút **Approve and run workflows**, bấm nút này rồi chờ phần **Checks** chạy xong và hiện dấu xanh, khoảng 15 phút.
 3. Bấm **Merge pull request**. Mọi bản đã cài sẽ thấy có bản mới.
+
+Nếu có nhiều yêu cầu đang chờ, chỉ gộp yêu cầu mới nhất và đóng các yêu cầu cũ.
 
 Khi có tin vá lỗi bảo mật gấp, vào tab **Actions**, chọn **Cập nhật từ Javis OS**, bấm **Run workflow** để kiểm tra ngay.
 
