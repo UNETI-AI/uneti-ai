@@ -8,7 +8,6 @@ Installed copies follow main, so nothing lands there until a person merges the p
 commits are not added as parents and workflows stay ours: GITHUB_TOKEN may not push workflow changes,
 and upstream CI should not gain write access to this repository unreviewed.
 """
-import json
 import shutil
 import subprocess
 import sys
@@ -30,16 +29,6 @@ def fetch(ref):
     return run("git", "rev-parse", "FETCH_HEAD")
 
 
-def merged_notices(ours, upstream):
-    """Keep the school's notices and add upstream security notices, which concern every copy."""
-    data = json.loads(ours)
-    known = {row.get("id") for row in data["announcements"]}
-    for row in json.loads(upstream).get("announcements", []):
-        if row.get("kind") == "security" and row.get("id") not in known:
-            data["announcements"].append(json.loads(apply_brand.rename_display(json.dumps(row, ensure_ascii=False))))
-    return json.dumps(data, ensure_ascii=False, indent=2) + "\n"
-
-
 def build_commit(newest, version):
     with tempfile.TemporaryDirectory() as tmp:
         tree = Path(tmp) / "tree"
@@ -50,7 +39,7 @@ def build_commit(newest, version):
         shutil.rmtree(tree / ".github" / "workflows")
         shutil.copytree(ROOT / ".github" / "workflows", tree / ".github" / "workflows")
         ours = (ROOT / "ANNOUNCEMENTS.json").read_text(encoding="utf-8")
-        (tree / "ANNOUNCEMENTS.json").write_text(merged_notices(ours, upstream_notices), encoding="utf-8")
+        (tree / "ANNOUNCEMENTS.json").write_text(apply_brand.merged_notices(ours, upstream_notices), encoding="utf-8")
         (tree / "uneti" / "upstream.txt").write_text(newest + "\n", encoding="utf-8")
         run(sys.executable, "uneti/test_brand.py", cwd=tree)
         run("git", "add", "-A", cwd=tree)

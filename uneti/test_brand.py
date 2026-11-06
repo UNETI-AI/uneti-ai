@@ -71,7 +71,14 @@ class Branding(unittest.TestCase):
 
     def test_support_card_opens_the_contribution_page(self):
         self.assertIn(BRAND["site_url"], text("dashboard/console.js"))
-        self.assertIn("Xem cách đóng góp", text("dashboard/star-nudge.js"))
+        self.assertIn('t("star.support_go")', text("dashboard/star-nudge.js"))
+        for path in (ROOT / "dashboard" / "i18n").glob("*.json"):
+            self.assertIn("star.support_go", json.loads(path.read_text(encoding="utf-8")), path.name)
+        self.assertEqual(json.loads(text("dashboard/i18n/vi.json"))["star.support_go"], "Xem cách đóng góp")
+
+    def test_bell_notices_kept_from_upstream(self):
+        ids = [row["id"] for row in json.loads(text("ANNOUNCEMENTS.json"))["announcements"]]
+        self.assertIn("community-notification-inbox-launch", ids)
 
 
 class Notices(unittest.TestCase):

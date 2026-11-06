@@ -1,0 +1,11 @@
+# Bài kiểm thử của bản gốc không áp dụng cho UNETI AI, được bỏ khi chạy trên GitHub.
+# Chỉ thêm vào đây bài kiểm tra văn phong hoặc nội dung riêng của Javis OS, không thêm bài kiểm tra chức năng.
+
+# README của UNETI AI là tiếng Việt và ngắn, không có các bản dịch đi kèm như README gốc.
+tests/python/test_machine_translations.py
+tests/python/test_tai_lieu_song_ngu.py
+
+# Quy tắc văn phong của bản gốc: câu dưới 100 ký tự, và viết "A.I." có dấu chấm. Tên UNETI AI dài hơn và chứa chữ AI.
+tests/python/test_info_tip_rule.py
+tests/js/test_hoi_thoai_bo_loc.js
+tests/js/test_inbox_tabs.js

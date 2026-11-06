@@ -199,7 +199,7 @@ with tempfile.TemporaryDirectory() as td:
         b = pack_install.soi(zip_goi(mf='format: javis-pack\nspec: 1\nid: "Có Dấu"\n'), "id-xau.zip")
         check("từ chối id gói không hợp lệ", not b["ok"] and "id gói" in b["error"])
         b = pack_install.soi(zip_goi(mf="format: khong-phai\nspec: 1\nid: x\n"), "sai-format.zip")
-        check("từ chối tệp không phải gói Javis", not b["ok"] and "format" in b["error"])
+        check("từ chối tệp không phải gói UNETI AI", not b["ok"] and "format" in b["error"])
 
         # ─────────────── 4. Bậc code và chữ ký mã ───────────────
         du_ma = zip_goi(pid="acme.ma", cid="acme-ma-con",
@@ -307,7 +307,7 @@ check("CANARY: gói CÓ MÃ thì công tắc mặc định tắt (trừ khi lố
 check("nói thẳng gói chạy mã thật, không làm mềm",
       "store.inspect.code.title" in src_js
       and "chạy Python thật" in _VI.get("store.inspect.code.title", "")
-      and "máy chủ Javis" in _VI.get("store.inspect.code.title", ""))
+      and "máy chủ UNETI AI" in _VI.get("store.inspect.code.title", ""))
 
 src_c = (DASHBOARD / "console.js").read_text(encoding="utf-8")
 check("trang Gói đăng ký trong rail", '"packs"' in src_c and "JavisPacks" in src_c)

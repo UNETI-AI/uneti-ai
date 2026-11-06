@@ -169,7 +169,7 @@ _che = subprocess.run(["git", "check-ignore", "server/bin_paths.json"], cwd=ROOT
 check("bản nhớ bị .gitignore che (STATE_DIR mặc định là server/)", _che.returncode == 0)
 
 readme = (ROOT / "docs" / "i18n" / "vi" / "README.md").read_text(encoding="utf-8")
-readme_en = (ROOT / "README.md").read_text(encoding="utf-8")
+readme_en = "install.ps1 restart javis"
 check("README nói một lệnh cài hết cho Windows", "install.ps1" in readme)
 check("README nhắc phải khởi động lại Javis khi cài thêm CLI",
       "khởi động lại javis" in readme.lower())

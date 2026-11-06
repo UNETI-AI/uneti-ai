@@ -272,7 +272,7 @@
   function theUngHo() {
     return '<div class="sn-ho"><div class="sn-lv">' + linhVat("vui") + "</div>"
       + '<div class="sn-ho-chu"><b>' + esc(t("star.support_title")) + "</b><span>" + esc(t("star.support_body")) + "</span></div>"
-      + '<button type="button" class="sn-go">' + ic("star") + " Xem cách đóng góp</button></div>";
+      + '<button type="button" class="sn-go">' + ic("star") + " " + esc(t("star.support_go")) + "</button></div>";
   }
 
   window.JavisStar = { moment: moment, open: function () { moment("manual"); }, theUngHo: theUngHo };

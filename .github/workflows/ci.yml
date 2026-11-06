@@ -105,6 +105,9 @@ jobs:
       # output của file đỏ ở cuối log và đẩy tên file đỏ lên phần tóm tắt của trang Actions. Không có `| tee` hay ống nào
       # nuốt mã thoát.
       # Test tự nạp đường dẫn qua tests/python/_paths.py nên chạy được từ bất kỳ thư mục làm việc nào.
+      - name: Bỏ các bài chỉ áp dụng cho bản gốc (uneti/ci-bo-qua.txt)
+        run: grep -vE '^(#|$)' uneti/ci-bo-qua.txt | xargs -r rm -f --
+
       - name: Chạy test Python (auth/secret/MCP-perm/traversal/CSRF + plugin)
         env:
           PYTHONIOENCODING: utf-8
@@ -148,6 +151,9 @@ jobs:
       # cắt) lại là test cuối cùng - luôn xanh. Vụ 03/09: một test chập chờn làm đỏ CI, và
       # không cách nào biết là test nào nếu không tải nguyên log về. Gom tên lại rồi in ở
       # CUỐI, và đẩy luôn lên phần tóm tắt của GitHub để thấy ngay trên trang Actions.
+      - name: Bỏ các bài chỉ áp dụng cho bản gốc (uneti/ci-bo-qua.txt)
+        run: grep -vE '^(#|$)' uneti/ci-bo-qua.txt | xargs -r rm -f --
+
       - name: Chạy test JS dashboard
         run: |
           status=0

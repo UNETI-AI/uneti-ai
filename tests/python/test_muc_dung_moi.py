@@ -485,10 +485,10 @@ for _pv in ("groq", "gemini", "openrouter", "openai", "anthropic-api", "ollama")
     check(f"nhánh API '{_pv}' được indexer nhận", _pv in ui._API_PROVIDERS)
 
 # Mẫu số của tiết kiệm phải là lượt CỦA JAVIS. Lượt người dùng tự gõ `claude` trong terminal
-# không đi qua prompt của Javis nên chế độ tiết kiệm không làm chúng rẻ đi.
-# Neo MỘT lượt Javis đúng thời điểm hiện tại: mọi seed phía trên đều lùi 1-4 giờ, và ở
+# không đi qua prompt của UNETI AI nên chế độ tiết kiệm không làm chúng rẻ đi.
+# Neo MỘT lượt UNETI AI đúng thời điểm hiện tại: mọi seed phía trên đều lùi 1-4 giờ, và ở
 # khung 0h-4h sáng (giờ locale) chúng rơi sang NGÀY HÔM TRƯỚC - "today" hết sạch lượt
-# Javis và check "_tong_moi > 0" đỏ oan mỗi đêm (bắt được 17/08 lúc 00:24 +07, test đỏ
+# UNETI AI và check "_tong_moi > 0" đỏ oan mỗi đêm (bắt được 17/08 lúc 00:24 +07, test đỏ
 # cả trên bản sạch). Neo tại _now thì bất biến đúng ở mọi giờ chạy.
 _seed(_now, 1000, 7, path="p-neo-hom-nay")
 _seed(_now, 5000, 100, provider="claude", path="p-manual", activity="manual", source="manual")
@@ -496,9 +496,9 @@ _luot = ui.luot_theo_ngay("today")
 _tong_moi = sum(x["turns"] for x in _luot)
 _tong_tat = sum(x["turns"] for x in ui.summary("today")["timeseries"])
 check("CANARY: lượt người dùng tự gõ KHÔNG được tính vào tiết kiệm", _tong_moi < _tong_tat)
-check("và lượt của Javis thì vẫn được tính", _tong_moi > 0)
+check("và lượt của UNETI AI thì vẫn được tính", _tong_moi > 0)
 
-# Người tự chỉnh tay từng đường (preset 'custom'): Javis không biết cấu hình đó tốn bao nhiêu
+# Người tự chỉnh tay từng đường (preset 'custom'): UNETI AI không biết cấu hình đó tốn bao nhiêu
 # mỗi lượt. Báo "tiết kiệm 0" kèm du_du_lieu=True là nói "chế độ của anh chẳng đáng gì".
 _tk_custom = us.tiet_kiem([{"day": "2026-08-12", "turns": 10}], _PHI, "custom")
 check("CANARY: cấu hình tự chỉnh thì nói KHÔNG ĐO ĐƯỢC, không nói tiết kiệm 0",
@@ -533,8 +533,8 @@ check("CANARY: thông báo tan sau khi hiện, không dính lại mãi",
       'state.toast = "";' in _USAGE and 'state.nsToast = "";' in _USAGE)
 check("số đang gõ dở trong form không bị xoá khi trang vẽ lại",
       "function nhoForm(" in _USAGE and "state.nsForm" in _USAGE)
-check("nói rõ chỉ đếm lượt của Javis",
-      "usage.tk.qua_luot" in _USAGE and "lượt của Javis" in _VI.get("usage.tk.qua_luot", ""))
+check("nói rõ chỉ đếm lượt của UNETI AI",
+      "usage.tk.qua_luot" in _USAGE and "lượt của UNETI AI" in _VI.get("usage.tk.qua_luot", ""))
 
 # Việc nền chạy bằng API key phải ghi mức dùng, không thì trần tiền không thấy chính khoản
 # chi mà nó sinh ra để chặn.

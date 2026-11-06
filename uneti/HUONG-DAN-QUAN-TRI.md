@@ -26,6 +26,8 @@ Khi có tin vá lỗi bảo mật gấp, vào tab **Actions**, chọn **Cập nh
 
 Nếu lượt chạy báo lỗi "Không thấy đoạn cần sửa", nghĩa là bản gốc đã đổi chỗ mà công cụ đổi tên cần sửa. Các bản đã cài không bị ảnh hưởng. Người kỹ thuật cần sửa `uneti/apply_brand.py`.
 
+Nếu **Checks** hiện dấu đỏ, không bấm Merge và nhờ người kỹ thuật xem. Bản gốc thỉnh thoảng thêm bài kiểm thử mới kiểm tra đúng chữ "Javis", khi đó cần cập nhật `uneti/apply_brand.py`.
+
 ## Đóng góp kinh phí
 
 Trang đóng góp nằm ở `uneti/site/index.html`, đang nhận qua tài khoản MB 221268686868 của HOI SINH VIEN UNETI.

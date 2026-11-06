@@ -1,9 +1,9 @@
-/* Linh vật Javis (dashboard/pet.js) - khoá những dây nối hỏng LẶNG LẼ.
+/* Linh vật UNETI AI (dashboard/pet.js) - khoá những dây nối hỏng LẶNG LẼ.
 
        node tests/js/test_linh_vat.js
 
    Con pet không có lỗi nào lên console khi nó sai: nó chỉ đơn giản là ngồi im, hay nhìn thẳng
-   thay vì liếc, hay trơ ra một biểu cảm trong khi Javis đang nghĩ. Nên những thứ dưới đây phải
+   thay vì liếc, hay trơ ra một biểu cảm trong khi UNETI AI đang nghĩ. Nên những thứ dưới đây phải
    có test, không thể trông vào việc nhìn màn hình:
 
      1. MỌI lớp trạng thái mà app.js có thể bắn qua setOrbState đều có mục trong STATES.
@@ -107,12 +107,12 @@ check("css: menu neo tuyệt đối, không nằm trong flex 56px", /\.pet-menu 
 check("bật linh vật + chưa có logo riêng thì mới thay logo",
   /function dungDauAn\(\) \{ return !!cfg\.enabled && !_logoRieng; \}/.test(pet));
 check("tắt dấu ấn thì trả lại thẻ <img> nguyên bản", /o\.innerHTML = o\.dataset\.brandGoc;/.test(pet));
-// Chữ "JAVIS OS" nằm CẠNH dấu ấn trong cùng khối .rail-brand. Nếu pet.js thay ruột của cả
+// Chữ "UNETI AI" nằm CẠNH dấu ấn trong cùng khối .rail-brand. Nếu pet.js thay ruột của cả
 // khối thì mỗi lần đổi hình dáng hay bảng màu là chữ bị xoá theo - nên nó phải nhắm vào ô
 // con .brand-mark, và index.html phải có sẵn ô con đó.
 check("dấu ấn thay ruột ô .brand-mark, không thay cả khối thương hiệu",
   /var LO_DAU_AN = "\.rail-brand \.brand-mark, \.brand \.brand-icon";/.test(pet));
-check("index.html: .rail-brand có ô dấu ấn riêng và chữ JAVIS OS",
+check("index.html: .rail-brand có ô dấu ấn riêng và chữ UNETI AI",
   /<div class="rail-brand"><span class="brand-mark">/.test(html)
   && /<span class="rail-brand-text">JAVIS <i>OS<\/i><\/span>/.test(html));
 check("css: thu gọn thanh bên thì giấu chữ, chỉ còn dấu ấn",
@@ -163,7 +163,7 @@ check("i18n: không còn khoá nhóm tro_ly", vi["nav.group.tro_ly"] === undefin
 check("i18n: trang home tên là Mạng nơ-ron / Neural network",
   vi["page.home.label"] === "Mạng nơ-ron" && en["page.home.label"] === "Neural network");
 check("console.js: Tự học có icon riêng (brain-cog), không trùng bộ não của nhóm", /learn: "brain-cog",/.test(console_js));
-check("console.js: icon trang home là neural-net riêng của Javis", /home: "neural-net",/.test(console_js) && /"neural-net":/.test(read("dashboard/icons.js")));
+check("console.js: icon trang home là neural-net riêng của UNETI AI", /home: "neural-net",/.test(console_js) && /"neural-net":/.test(read("dashboard/icons.js")));
 
 // ---- 8. Nạp file và từ điển ----
 const iApp = html.indexOf("/static/app.js"), iPet = html.indexOf("/static/pet.js");
@@ -444,4 +444,4 @@ check("menu dùng icon lucide chứ không phải emoji",
   && /ic: icon\("message-circle"\)/.test(pet));
 
 if (fails.length) { console.log("\nFAIL:", fails.length, fails); process.exit(1); }
-console.log("\nOK - linh vật Javis");
+console.log("\nOK - linh vật UNETI AI");

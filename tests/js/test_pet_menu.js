@@ -99,7 +99,7 @@ check("the module exposes JavisPetMenu", !!(PM && PM.renderSettings && PM.menuEn
   win.navigator.mediaDevices = undefined;
   check("mic without browser permission is unavailable, with the reason", PM.entry("mic").why === vi["petmenu.why_mic"]);
   win.navigator.mediaDevices = { getUserMedia() {} };
-  check("a page this Javis lacks is unavailable, with the reason", PM.entry("account").why === vi["petmenu.why_page"]);
+  check("a page this UNETI AI lacks is unavailable, with the reason", PM.entry("account").why === vi["petmenu.why_page"]);
   check("a page takes the icon of its rail item", PM.entry("tasks").icon.indexOf("list-checks") >= 0);
   check("an unknown id is shown as no longer available", PM.entry("old-thing").gone && PM.entry("old-thing").why === vi["petmenu.why_gone"]);
 
@@ -162,7 +162,7 @@ check("the module exposes JavisPetMenu", !!(PM && PM.renderSettings && PM.menuEn
   check("picker lists the catalog features", (ph.match(/data-pm-pick=/g) || []).length === H.CATALOG.length);
   check("a feature already on the menu says Added and cannot be picked",
     /data-pm-pick="teams" disabled[^>]*>[\s\S]*?Đã thêm/.test(ph));
-  check("an unavailable feature shows why and cannot be picked", /data-pm-pick="account" disabled[\s\S]*?Bản Javis này không có trang này/.test(ph));
+  check("an unavailable feature shows why and cannot be picked", /data-pm-pick="account" disabled[\s\S]*?Bản UNETI AI này không có trang này/.test(ph));
   check("the picker has a search box", pick.innerHTML.indexOf("data-pm-q") >= 0);
   const pickBtn = (id) => ({ disabled: false, getAttribute: () => id });
   pick.listeners.click[0]({ target: { closest: (s) => (s === "[data-pm-pick]" ? pickBtn("teams") : null) } });

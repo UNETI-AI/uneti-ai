@@ -1,12 +1,12 @@
-"""Report routing to Javis Core, no guessed recipient (0.186.0).
+"""Report routing to UNETI AI Core, no guessed recipient (0.186.0).
 
     python tests/python/test_javis_core_routing.py
 
-Spec: owner, 16/10/2026 (Javis Core goal, sections 6 and 8; acceptance groups "Định tuyến" and "Thông báo đẩy").
+Spec: owner, 16/10/2026 (UNETI AI Core goal, sections 6 and 8; acceptance groups "Định tuyến" and "Thông báo đẩy").
 
-- a report for a chat that exists goes to that chat and is not copied to Javis Core;
-- no target chat: the Javis Core chat of the brain the WORK belongs to, never the brain on screen;
-- a deleted origin chat: the source brain's Javis Core when the brain is known, else kept in the bell only;
+- a report for a chat that exists goes to that chat and is not copied to UNETI AI Core;
+- no target chat: the UNETI AI Core chat of the brain the WORK belongs to, never the brain on screen;
+- a deleted origin chat: the source brain's UNETI AI Core when the brain is known, else kept in the bell only;
 - neither target nor brain: not guessed, kept in the bell marked no_target, sent nowhere;
 - no "first Telegram id" and no broadcast to every id: only the owner's own linked chat, or the single id;
 - a retry with the same key is filed once and rings once; one channel failing does not lose the report.
@@ -24,7 +24,7 @@ import inbox  # noqa: E402
 import javis_core  # noqa: E402
 import main  # noqa: E402
 
-# 0.403.0: Javis Core rings only urgent notices by default (that default is tested in test_notify_commander.py). This
+# 0.403.0: UNETI AI Core rings only urgent notices by default (that default is tested in test_notify_commander.py). This
 # file checks how important notices are routed, so every group rings from "important" up, as before 0.403.0.
 import notify_policy  # noqa: E402
 for _g in notify_policy.GROUPS:
@@ -93,19 +93,19 @@ check("settings store a valid owner link", main.cfgmod.read_settings()["telegram
 set_tg("111,222")
 web_a = store.create_session(brain=KA, channel="web")
 rt = main._report_route(f"web:{web_a}", str(B), "answer")
-check("an existing chat: that chat, nothing copied to Javis Core", rt["chat"] == web_a and not rt["external"])
+check("an existing chat: that chat, nothing copied to UNETI AI Core", rt["chat"] == web_a and not rt["external"])
 rt = main._report_route("", str(A), "report")
 core_a = javis_core.current_default(KA)
-check("no target: the Javis Core chat of the work's brain", rt["chat"] and rt["chat"] == core_a
+check("no target: the UNETI AI Core chat of the work's brain", rt["chat"] and rt["chat"] == core_a
       and (store.get_session(core_a) or {}).get("channel") == "agent:javis-core" and rt["brain"] == KA)
 rt_b = main._report_route("", str(B), "report")
-check("another brain's work goes to that brain's Javis Core", rt_b["chat"] == javis_core.current_default(KB)
+check("another brain's work goes to that brain's UNETI AI Core", rt_b["chat"] == javis_core.current_default(KB)
       and rt_b["chat"] != core_a)
 check("several Telegram ids and no link: no outside channel", rt["external"] == "")
 gone = store.create_session(brain=KA, channel="web")
 store.delete(gone)
 rt = main._report_route(f"web:{gone}", str(A), "answer")
-check("a deleted origin chat with a known brain: that brain's Javis Core", rt["chat"] == core_a and rt.get("lost_origin"))
+check("a deleted origin chat with a known brain: that brain's UNETI AI Core", rt["chat"] == core_a and rt.get("lost_origin"))
 rt = main._report_route(f"web:{gone}", "", "answer")
 check("a deleted origin chat and no brain: not guessed", rt["chat"] == "" and rt.get("routing") == "lost_origin")
 rt = main._report_route("", "", "report")
@@ -114,12 +114,12 @@ set_tg("111")
 rt = main._report_route("", "", "system")
 check("a system notice: the bell plus the owner's own Telegram, no chat", rt["chat"] == "" and rt["external"] == "111")
 rt = main._report_route("777", str(A), "answer")
-check("0.188.0: someone else's outside chat keeps its channel and is NOT copied into the owner's Javis Core",
+check("0.188.0: someone else's outside chat keeps its channel and is NOT copied into the owner's UNETI AI Core",
       rt["external"] == "777" and rt["chat"] == "")
 rt = main._report_route("111", str(A), "answer")
-check("the owner's own Telegram: also in Javis Core on the dashboard", rt["external"] == "111" and rt["chat"] == core_a)
+check("the owner's own Telegram: also in UNETI AI Core on the dashboard", rt["external"] == "111" and rt["chat"] == core_a)
 rt = main._report_route("111", str(A), "answer", quiet=True)
-check("0.188.0: a run that went fine stays out of the Javis Core chat", rt["external"] == "111" and rt["chat"] == "")
+check("0.188.0: a run that went fine stays out of the UNETI AI Core chat", rt["external"] == "111" and rt["chat"] == "")
 rt = main._report_route("", str(A), "report", quiet=True)
 check("0.188.0: an untargeted run that went fine: bell (and owner's Telegram) only, not the chat, not an error",
       rt["chat"] == "" and rt["external"] == "111" and not rt.get("routing") and rt["brain"] == KA)
@@ -132,8 +132,8 @@ try:
     ok, err = run(main._notify_owner("", "✅ Việc 'Báo cáo tuần' đã hoàn thành.", kind="report", brain=str(A),
                                      dedup="task:t1:done:r1"))
     items = inbox.danh_sach(50)
-    check("untargeted report: Javis Core chat and the owner's Telegram", ok and sent == [f"web:{core_a}", "111"], sent)
-    check("the bell item carries the source brain and opens Javis Core",
+    check("untargeted report: UNETI AI Core chat and the owner's Telegram", ok and sent == [f"web:{core_a}", "111"], sent)
+    check("the bell item carries the source brain and opens UNETI AI Core",
           items and items[0]["brain"] == KA and items[0]["session_id"] == core_a
           and items[0]["channel"] == "agent:javis-core", items[:1])
     sent.clear()
@@ -212,7 +212,7 @@ check("blocked-job batches are kept per recipient AND brain",
       'chat_id = str(task.get("chat_id") or "") + _BUCKET_SEP + str(task.get("brain_root") or "")' in tk)
 cl = (ROOT / "CLAUDE.md").read_text(encoding="utf-8")
 check("the prompt no longer teaches the first-Telegram fallback",
-      "first Telegram ID" not in cl and "Left empty → the Javis Core chat of the work's brain." in cl)
+      "first Telegram ID" not in cl and "Left empty → the UNETI AI Core chat of the work's brain." in cl)
 
 print()
 if fails:

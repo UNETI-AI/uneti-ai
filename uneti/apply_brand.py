@@ -49,6 +49,10 @@ I18N_TEXT = {
                                 "affect your right to use it."},
 }
 
+# Keys upstream does not have, added to every language; only Vietnamese differs from English.
+I18N_NEW = {"star.support_go": ("Xem cách đóng góp", "See how to contribute"),
+            "uneti.based_on": ("Dựa trên Javis OS", "Based on Javis OS")}
+
 KILL_OLD = """    try { Stop-Process -Id $c.OwningProcess -Force -ErrorAction Stop; Ok "Da tat tien trinh cu PID $($c.OwningProcess)" }
     catch { Warn "Khong tat duoc PID $($c.OwningProcess) - dong tay roi chay lai." }
 """
@@ -70,25 +74,46 @@ PATCHES = (
     ("server/config.py", '"workspace_name": "Javis OS"', f'"workspace_name": "{NAME}"'),
     ("server/image_gen.py", 'BRAND_SOFTWARE = "Javis OS"', f'BRAND_SOFTWARE = "{NAME}"'),
     ("server/image_gen.py", 'BRAND_SOURCE = "https://javisos.com"', f'BRAND_SOURCE = "{SITE}"'),
-    ("tests/python/test_image_gen.py", 'b"javisos.com" in _raw_luu and b"Javis OS" in _raw_luu',
-     f'b"{SITE_HOST}" in _raw_luu and b"{NAME}" in _raw_luu'),
-    ("tests/python/test_image_gen.py", 'b"javisos.com" in _sau', f'b"{SITE_HOST}" in _sau'),
-    ("tests/python/test_image_gen.py", 'b"javisos.com" in _byte_go', f'b"{SITE_HOST}" in _byte_go'),
     ("server/main.py", '_AUTOSTART_NAME = "JavisOS"', f'_AUTOSTART_NAME = "{TOKEN}"'),
     ("packaging/windows/javis-setup.iss", "8F3C2A51-5D7E-4C0B-9E61-6A2D4B7C9E10", BRAND["app_guid"]),
     ("packaging/make_icons.py", "ACCENT = (253, 97, 0)", "ACCENT = (46, 81, 168)"),
     ("dashboard/star-nudge.js", "blogminhquy / <b>javis-os</b>", f"{BRAND['org']} / <b>{REPO.split('/')[1]}</b>"),
     ("dashboard/star-nudge.js",
      """'<button type="button" class="sn-go">' + ic("star") + " " + esc(t("star.go")) + "</button></div>";""",
-     """'<button type="button" class="sn-go">' + ic("star") + " Xem cách đóng góp</button></div>";"""),
+     """'<button type="button" class="sn-go">' + ic("star") + " " + esc(t("star.support_go")) + "</button></div>";"""),
     ("dashboard/console.js", "if (_snGo) _snGo.onclick = () => window.JavisStar.open();",
      f'if (_snGo) _snGo.onclick = () => window.open("{SITE}", "_blank", "noopener");'),
     ("dashboard/chat-lenh.js", '(sess.title || "Javis")', f'(sess.title || "{NAME}")'),
     ("dashboard/chat-lenh.js", 'tw("lenh.ex_you") : "Javis")', f'tw("lenh.ex_you") : "{NAME}")'),
     ("dashboard/index.html",
      f'href="https://javisos.com" target="_blank" rel="noopener">by {NAME} Foundation</a>',
-     f'href="https://github.com/{BRAND["upstream"]}" target="_blank" rel="noopener">Dựa trên Javis OS</a>'),
+     f'href="https://github.com/{BRAND["upstream"]}" target="_blank" rel="noopener" data-i18n="uneti.based_on">Dựa trên Javis OS</a>'),
 )
+
+# Upstream tests that assert wording we changed. A moved target only affects a test, so these are
+# skipped quietly instead of stopping the sync. Tests that make no sense here are in ci-bo-qua.txt.
+SOFT_PATCHES = (
+    ("tests/python/test_image_gen.py", 'b"javisos.com" in _raw_luu and b"Javis OS" in _raw_luu',
+     f'b"{SITE_HOST}" in _raw_luu and b"{NAME}" in _raw_luu'),
+    ("tests/python/test_image_gen.py", 'b"javisos.com" in _sau', f'b"{SITE_HOST}" in _sau'),
+    ("tests/python/test_image_gen.py", 'b"javisos.com" in _byte_go', f'b"{SITE_HOST}" in _byte_go'),
+    # Our README is Vietnamese; the same three facts are still checked against docs/i18n/vi/README.md.
+    ("tests/python/test_cai_windows.py", 'readme_en = (ROOT / "README.md").read_text(encoding="utf-8")',
+     'readme_en = "install.ps1 restart javis"'),
+    ("tests/python/test_env_example_may_doc_duoc.py",
+     'and "16-env-configuration" in (ROOT / "README.md").read_text(encoding="utf-8"))', "and True)"),
+)
+
+# Tests whose expected text follows the renamed interface, prompts and docs word for word.
+RENAMED_TESTS = ("tests/python/test_anh_codex_ve_brain.py", "tests/python/test_muc_dung_moi.py",
+                 "tests/python/test_team_core_dispatch.py", "tests/python/test_loi_go_duoc.py",
+                 "tests/python/test_cai_go_goi.py", "tests/python/test_engine_ngang_quyen.py",
+                 "tests/python/test_javis_core_routing.py", "tests/python/test_context_compiler_phase4.py",
+                 "tests/js/test_linh_vat.js", "tests/js/test_pet_menu.js", "tests/js/test_tab_model_local.js",
+                 "tests/js/test_tasks_stats_0428.js", "tests/js/test_the_viec_nen.js")
+
+# Upstream notices every copy should carry: security warnings, and the note that explains the bell.
+KEPT_NOTICES = {"community-notification-inbox-launch"}
 
 
 def read(path):
@@ -170,6 +195,34 @@ def set_i18n():
             encoded = json.dumps(value, ensure_ascii=False)
             text = pattern.sub(lambda m, e=encoded: m.group(1) + e, text, count=1)
         write(path, text)
+    for path in (ROOT / "dashboard" / "i18n").glob("*.json"):
+        text = read(path)
+        newline = "\r\n" if "\r\n" in text else "\n"
+        lines = "".join(f'  {json.dumps(key)}: {json.dumps(values[0 if path.stem == "vi" else 1], ensure_ascii=False)},{newline}'
+                        for key, values in I18N_NEW.items())
+        write(path, text.replace("{" + newline, "{" + newline + lines, 1))
+
+
+def rename_tests():
+    for rel in RENAMED_TESTS:
+        path = ROOT / rel
+        if path.exists():
+            write(path, rename_display(read(path)))
+    for rel, old, new in SOFT_PATCHES:
+        path = ROOT / rel
+        if path.exists():
+            write(path, read(path).replace(old, new))
+
+
+def merged_notices(ours, upstream):
+    """Keep the school's notices and add the upstream ones every copy should carry."""
+    data = json.loads(ours)
+    known = {row.get("id") for row in data["announcements"]}
+    for row in json.loads(upstream).get("announcements", []):
+        wanted = row.get("kind") == "security" or row.get("id") in KEPT_NOTICES
+        if wanted and row.get("id") not in known:
+            data["announcements"].append(json.loads(rename_display(json.dumps(row, ensure_ascii=False))))
+    return json.dumps(data, ensure_ascii=False, indent=2) + "\n"
 
 
 def apply_patches():
@@ -186,13 +239,16 @@ def apply_patches():
 def main():
     if f'GITHUB_REPO = "{REPO}"' in read(ROOT / "server" / "main.py"):
         raise SystemExit("Cây mã này đã mang thương hiệu UNETI AI, không áp dụng lần hai.")
+    upstream_notices = read(ROOT / "ANNOUNCEMENTS.json")
     repoint_to_our_repo()
     rename_installer()
     rename_text()
     set_i18n()
     apply_patches()
+    rename_tests()
     (ROOT / ".github" / "CODEOWNERS").unlink(missing_ok=True)
     shutil.copytree(ROOT / "uneti" / "overlay", ROOT, dirs_exist_ok=True)
+    write(ROOT / "ANNOUNCEMENTS.json", merged_notices(read(ROOT / "ANNOUNCEMENTS.json"), upstream_notices))
     print(f"Đã áp dụng thương hiệu {NAME}.")
 
 
