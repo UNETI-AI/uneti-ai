@@ -14,11 +14,11 @@ import sys
 import tempfile
 from pathlib import Path
 
-_STATE = tempfile.mkdtemp(prefix="javis-cbv5n-")
-os.environ["JAVIS_STATE_DIR"] = _STATE
-os.environ["JAVIS_SESSIONS_DB"] = str(Path(_STATE) / "sessions.db")
+_STATE = tempfile.mkdtemp(prefix="uneti-cbv5n-")
+os.environ["UNETI_STATE_DIR"] = _STATE
+os.environ["UNETI_SESSIONS_DB"] = str(Path(_STATE) / "sessions.db")
 os.environ["BRAINS_DIR"] = str(Path(_STATE) / "brains")
-os.environ["JAVIS_ALLOWED_HOSTS"] = "testserver"
+os.environ["UNETI_ALLOWED_HOSTS"] = "testserver"
 try:
     sys.stdout.reconfigure(encoding="utf-8")
 except Exception:

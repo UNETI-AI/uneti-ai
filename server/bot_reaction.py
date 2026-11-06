@@ -1,6 +1,6 @@
 """Emoji reactions on personal Zalo (0.334.0): read the ones customers put on messages, and let the bot put one.
 
-Owner request 2026-10-26: "khách hàng đọc được emoji reaction trên zalo và javis thả được reaction vào". Decided the
+Owner request 2026-10-26: "khách hàng đọc được emoji reaction trên zalo và uneti thả được reaction vào". Decided the
 same day: whether a reaction alone deserves an answer is learned by the judge, never hard-coded ("phần này tự học trong
 bộ phán xử, đừng fix cứng"), and the bot reacts on the judge's say too ("bot được tự thả dựa theo bộ phán xử luôn").
 
@@ -10,7 +10,7 @@ on, and adds the tool `zalo_add_reaction`. Here:
   - `pick` takes the bot's own `[CAM_XUC:<name>]` marker out of an answer (Agent turns, private chats included);
   - `NAMES` is the one list both the judge and the Agent choose from.
 
-Javis never decides on its own to answer or to react: the judge (group chats in "Tự đánh giá") or the Agent does.
+UNETI AI never decides on its own to answer or to react: the judge (group chats in "Tự đánh giá") or the Agent does.
 """
 from __future__ import annotations
 

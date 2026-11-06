@@ -15,7 +15,7 @@ Một plugin là **một thư mục** gồm 2 file:
 
 Plugin cho UNETI AI hai thứ:
 
-- **Tool**: một công cụ engine gọi được, ví dụ `javis_now` (hỏi bây giờ mấy giờ theo giờ Việt Nam) hay `javis_generate_image` (tạo ảnh). Tool của plugin đi qua MCP Hub nên **mọi engine đều dùng được**, không riêng Claude Code.
+- **Tool**: một công cụ engine gọi được, ví dụ `uneti_now` (hỏi bây giờ mấy giờ theo giờ Việt Nam) hay `uneti_generate_image` (tạo ảnh). Tool của plugin đi qua MCP Hub nên **mọi engine đều dùng được**, không riêng Claude Code.
 - **Hook**: đoạn mã chạy **quanh mỗi lần gọi tool**. Bản hiện tại hỗ trợ hai sự kiện quanh tool: `pre_tool_call` (trước khi tool chạy) và `post_tool_call` (sau khi tool chạy xong). Khi không plugin nào đăng ký hook thì UNETI AI không bọc gì cả, nên không tốn thêm gì. Sự kiện thứ ba, `chatbot_turn_context`, chạy một lần mỗi lượt bot chuyên trách và cho plugin thêm một dòng ngữ cảnh (xem [bên dưới](#hook-ngữ-cảnh-lượt-chatbot-chatbot_turn_context)).
 
 Tool của plugin **tôn trọng đúng 3 mức quyền** của UNETI AI y như tool khác, nên một loop đang ở chế độ chỉ-đọc sẽ không tự gọi được tool ghi của plugin.
@@ -39,7 +39,7 @@ Mở dashboard (mặc định tại cổng 7777), nhìn thanh điều hướng b
 Ngay dưới tiêu đề là ba khối giới thiệu:
 
 1. Dòng mô tả: "Plugin thêm **tool** (công cụ engine gọi được) và **hook** native cho UNETI AI mà không sửa lõi - dùng được ở MỌI engine (Claude Code, Codex, API) qua hub, tôn trọng 3 mức quyền như tool khác."
-2. Khung cảnh báo màu cam (chỉ hiện khi máy này tắt plugin người dùng): "**⚠ Plugin do bạn cài đang bị tắt trên máy này.** Máy này đặt biến môi trường `JAVIS_ENABLE_USER_PLUGINS=false` nên plugin toàn cục/brain không chạy. Bỏ biến đó (hoặc đặt true) rồi khởi động lại UNETI AI. Plugin có sẵn (bundled) vẫn chạy bình thường."
+2. Khung cảnh báo màu cam (chỉ hiện khi máy này tắt plugin người dùng): "**⚠ Plugin do bạn cài đang bị tắt trên máy này.** Máy này đặt biến môi trường `UNETI_ENABLE_USER_PLUGINS=false` nên plugin toàn cục/brain không chạy. Bỏ biến đó (hoặc đặt true) rồi khởi động lại UNETI AI. Plugin có sẵn (bundled) vẫn chạy bình thường."
 3. Dòng chỉ đường xám: "Thả plugin TOÀN CỤC (dùng cho MỌI brain) vào `<đường dẫn thật trên máy bạn>` · mỗi plugin gồm `plugin.yaml` + `plugin.py`. Hoặc bảo UNETI AI trong khung chat: "tạo plugin ..."."
 
 Đường dẫn trong dòng thứ 3 là đường dẫn **thật** trên máy đang chạy UNETI AI, cứ sao chép từ màn hình ra chứ đừng gõ tay theo tài liệu.
@@ -55,8 +55,8 @@ Mỗi plugin là một thẻ. Đọc từ trên xuống:
 | Nhãn nguồn | Nghĩa là | Nằm ở đâu |
 |---|---|---|
 | **Có sẵn** (xanh lá) | Plugin đi kèm app, do UNETI AI phát hành, tin cậy | `system/plugins/<slug>/` trong thư mục cài đặt |
-| **Toàn cục** (xanh dương) | Plugin bạn tự cài, dùng chung cho **mọi brain** | Thư mục state của UNETI AI, `<JAVIS_STATE_DIR>/plugins/<slug>/` |
-| **Brain này** (cam) | Plugin bạn tự cài, chỉ dùng cho **một brain** | `<brain>/plugins/<slug>/` (brain cũ có thể là `<brain>/Javis/plugins/<slug>/`) |
+| **Toàn cục** (xanh dương) | Plugin bạn tự cài, dùng chung cho **mọi brain** | Thư mục state của UNETI AI, `<UNETI_STATE_DIR>/plugins/<slug>/` |
+| **Brain này** (cam) | Plugin bạn tự cài, chỉ dùng cho **một brain** | `<brain>/plugins/<slug>/` (brain cũ có thể là `<brain>/UNETI/plugins/<slug>/`) |
 
 Trùng slug thì nguồn sau đè nguồn trước: một plugin "Brain này" tên `datetime-vn` sẽ thay chỗ bản "Có sẵn" cùng tên.
 
@@ -88,9 +88,9 @@ Với plugin **Có sẵn**, UNETI AI không sửa file của app: lựa chọn b
 
 Với plugin **Toàn cục** và **Brain này**, UNETI AI ghi thẳng `enabled: true/false` vào `plugin.yaml` của plugin đó.
 
-Bật/tắt có hiệu lực ngay, không cần khởi động lại: UNETI AI làm mới bộ nhớ đệm của hub nên tool xuất hiện hoặc biến mất ở lượt chat kế tiếp, và chỉ mục năng lực `Javis/index.md` của brain cũng được dựng lại.
+Bật/tắt có hiệu lực ngay, không cần khởi động lại: UNETI AI làm mới bộ nhớ đệm của hub nên tool xuất hiện hoặc biến mất ở lượt chat kế tiếp, và chỉ mục năng lực `UNETI/index.md` của brain cũng được dựng lại.
 
-Ngoại lệ duy nhất: nếu bạn bật một plugin **Toàn cục/Brain này** trên máy đặt `JAVIS_ENABLE_USER_PLUGINS=false`, UNETI AI hiện hộp thoại báo: "Đã bật trong manifest NHƯNG máy này đang tắt plugin do người dùng cài bằng JAVIS_ENABLE_USER_PLUGINS=false. Bỏ biến đó (hoặc đặt true) rồi khởi động lại để chạy." Thẻ khi đó chuyển sang **⚠ tắt bằng env**.
+Ngoại lệ duy nhất: nếu bạn bật một plugin **Toàn cục/Brain này** trên máy đặt `UNETI_ENABLE_USER_PLUGINS=false`, UNETI AI hiện hộp thoại báo: "Đã bật trong manifest NHƯNG máy này đang tắt plugin do người dùng cài bằng UNETI_ENABLE_USER_PLUGINS=false. Bỏ biến đó (hoặc đặt true) rồi khởi động lại để chạy." Thẻ khi đó chuyển sang **⚠ tắt bằng env**.
 
 ### Bước 3: Kiểm tra tool đã ra tới engine chưa
 
@@ -104,17 +104,17 @@ Nếu tool bị chặn vì mức quyền, câu trả lời sẽ chứa nguyên v
 
 | Tên trên thẻ | slug | Tool cung cấp | Quyền tối thiểu | Mặc định |
 |---|---|---|---|---|
-| Thời gian & ngày (múi giờ chọn ở Cài đặt) | `datetime-vn` | `javis_now`, `javis_date_add` | chỉ đọc | Bật |
-| Đặt việc định kỳ & nhắc hẹn | `javis-schedule` | `javis_schedule` | ghi (safe) | Bật |
-| Giao việc Kanban | `javis-task` | `javis_task` | ghi (safe) | Bật |
-| Quản lý nhóm chat | `javis-team` | `javis_team` | ghi (safe), chỉ chủ | Bật |
-| Đấu thêm MCP | `javis-connect` | `javis_add_mcp` | ghi (safe) | Bật |
-| Tạo và xem ảnh (ChatGPT) | `image-chatgpt` | `javis_generate_image`, `javis_describe_image` | ghi (safe); xem ảnh: chỉ đọc | Bật |
-| Đọc video YouTube | `youtube-read` | `javis_youtube_read` | chỉ đọc | Bật |
+| Thời gian & ngày (múi giờ chọn ở Cài đặt) | `datetime-vn` | `uneti_now`, `uneti_date_add` | chỉ đọc | Bật |
+| Đặt việc định kỳ & nhắc hẹn | `uneti-schedule` | `uneti_schedule` | ghi (safe) | Bật |
+| Giao việc Kanban | `uneti-task` | `uneti_task` | ghi (safe) | Bật |
+| Quản lý nhóm chat | `uneti-team` | `uneti_team` | ghi (safe), chỉ chủ | Bật |
+| Đấu thêm MCP | `uneti-connect` | `uneti_add_mcp` | ghi (safe) | Bật |
+| Tạo và xem ảnh (ChatGPT) | `image-chatgpt` | `uneti_generate_image`, `uneti_describe_image` | ghi (safe); xem ảnh: chỉ đọc | Bật |
+| Đọc video YouTube | `youtube-read` | `uneti_youtube_read` | chỉ đọc | Bật |
 | Meta Ads (Graph API) | `meta-ads-graph` | `meta_ads_accounts`, `meta_ads_insights`, `meta_ads_campaigns`, `meta_ads_get` | chỉ đọc | Bật |
 | Facebook Trang (Graph API) | `meta-pages-graph` | `fb_pages_list`, `fb_page_posts`, `fb_page_comments`, `fb_page_post`, `fb_page_photo`, `fb_page_album`, `fb_page_video`, `fb_page_edit`, `fb_page_delete`, `fb_page_reply` | toàn quyền | Bật |
 | Theo dõi Facebook (Apify) | `fb-monitor-apify` | `fb_monitor` | chỉ đọc | Bật |
-| Nhật ký dùng tool | `tool-audit` | `javis_tool_stats` + hook `post_tool_call` | chỉ đọc | **Tắt** |
+| Nhật ký dùng tool | `tool-audit` | `uneti_tool_stats` + hook `post_tool_call` | chỉ đọc | **Tắt** |
 
 Từng cái làm được gì:
 
@@ -123,10 +123,10 @@ Từng cái làm được gì:
 - **Đấu thêm MCP**: nhờ UNETI AI ngay trong chat đấu một nguồn MCP mới, và nó **hiện ra trang Kết nối** ở khu "Đã kết nối" như tài khoản bạn tự thêm bằng tay, dùng chung cho mọi bộ não. Trước plugin này UNETI AI không có đường nào ghi vào kho kết nối, nên nó chỉ còn cách chạy `claude mcp add` - server đó rơi vào cấu hình riêng của Claude Code, sáu bộ não còn lại không thấy, và trên trang Kết nối nó không nằm ở khu "Đã kết nối" mà lọt xuống khu gập "Kết nối sẵn của Claude Code và Codex" (mặc định đóng), nên nhìn vào tưởng như chẳng có gì được thêm. Ba rào an toàn: mức quyền mặc định là **chỉ đọc** (muốn cho ghi thì bạn tự nâng ở trang Kết nối); nguồn chạy bằng **lệnh trên máy** (stdio) được thêm ở trạng thái **tắt** để bạn tự đọc lệnh rồi mới bật; dịch vụ đã có sẵn trong Kho kết nối (Gmail, Lịch, POS...) thì UNETI AI chỉ tay sang đúng card chứ không đẻ một bản tự khai song song. Thử kết nối hỏng thì mục đó **vẫn nằm lại** trang Kết nối kèm lý do, chứ không biến mất im lặng.
 - **Zalo mở rộng (gói `javis.zalo` trên UNETI AI Store)**: từ 0.73.0 các tool Zalo bù chỗ MCP chuẩn còn thiếu không còn đi sẵn trong app nữa, để ai không dùng Zalo thì không phải mang theo. Gói gồm gửi ảnh và file (`zalo_send_image`), tag đúng người, ghi chú, nhắc hẹn, poll trong nhóm (`zalo_group_members`, `zalo_send_mention`, `zalo_create_note`, `zalo_create_reminder`, `zalo_create_poll`) và đọc ảnh trong nhóm (`zalo_read_images`). Quét QR Zalo xong là UNETI AI mời cài; máy đã dùng Zalo từ trước thì trang Kết nối hiện nút cài. Chi tiết ở [Zalo](12-zalo.md).
 - **Thời gian & ngày (VN)**: cho UNETI AI biết hôm nay là ngày nào, mấy giờ, thứ mấy theo giờ Việt Nam (UTC+7), và tính ngày tương đối ("3 ngày nữa", "tuần trước"). Thuần thư viện chuẩn, không cần mạng. Đây cũng là plugin mẫu đơn giản nhất để đọc khi bạn muốn tự viết plugin.
-- **Đặt việc định kỳ & nhắc hẹn**: cho phép tạo, liệt kê, huỷ việc định kỳ và nhắc hẹn **ngay trong câu chat**, khỏi gõ YAML tay. Việc lặp và bền được ghi ra `Javis/loops/<slug>.md` (mở sửa được trong Obsidian); nhắc một lần hoặc lịch cron thì vào kho nhắc hẹn. Chi tiết ở [Việc định kỳ & Nhắc hẹn](08-viec-dinh-ky.md).
+- **Đặt việc định kỳ & nhắc hẹn**: cho phép tạo, liệt kê, huỷ việc định kỳ và nhắc hẹn **ngay trong câu chat**, khỏi gõ YAML tay. Việc lặp và bền được ghi ra `UNETI/loops/<slug>.md` (mở sửa được trong Obsidian); nhắc một lần hoặc lịch cron thì vào kho nhắc hẹn. Chi tiết ở [Việc định kỳ & Nhắc hẹn](08-viec-dinh-ky.md).
 - **Tạo ảnh (ChatGPT)**: tạo ảnh từ mô tả bằng chính **gói ChatGPT** bạn đang đăng nhập (OAuth), không cần khoá API OpenAI. Ảnh lưu vào `attachments/` của brain rồi nhúng thẳng vào câu trả lời. Cần đã kết nối ChatGPT ở trang **Models**; chưa kết nối thì tool trả về câu "Chưa kết nối ChatGPT (OAuth). Vào trang Model đăng nhập ChatGPT rồi thử lại...".
 - **Đọc video YouTube**: dán link video vào chat rồi nhờ tóm tắt. Plugin lấy **phụ đề thật** của video (đường mà trình phát YouTube dùng) nên UNETI AI đọc được lời thoại chứ không đoán theo tiêu đề. Không cần khoá API, không cần đăng nhập YouTube, chạy trên **mọi engine** kể cả engine API vốn không mở được URL. Khi YouTube chặn máy chủ, nó tự đổi lần lượt qua sáu kiểu trình phát rồi mới nhờ tới yt-dlp, nên vượt được phần lớn ca bị nghi là robot. Video không có phụ đề, video riêng tư hoặc bị YouTube chặn thì tool nói thẳng lý do để UNETI AI khỏi bịa. Video dài bị cắt bớt thì nhờ "đọc tiếp" là nó đọc khúc sau. Chi tiết ở [Trò chuyện](02-tro-chuyen-va-giong-noi.md).
-- **Luật cho từng cuộc chat Zalo**: đặt cách ứng xử cho từng nhóm hoặc từng khách trên Zalo bằng lời (im lặng, báo mọi tin, báo theo từ khoá, nhắc khi quên trả lời quá N phút). Luật ghi ra `Javis/zalo/<slug>.md` nên xem và sửa lại được.
+- **Luật cho từng cuộc chat Zalo**: đặt cách ứng xử cho từng nhóm hoặc từng khách trên Zalo bằng lời (im lặng, báo mọi tin, báo theo từ khoá, nhắc khi quên trả lời quá N phút). Luật ghi ra `UNETI/zalo/<slug>.md` nên xem và sửa lại được.
 - **Gửi tin Zalo an toàn**: gửi tin Zalo thay cho tool thô. Nó khoá cứng vào tài khoản đang nghe và chỉ gửi được cho cuộc chat trong danh sách đang theo dõi; tên khớp nhiều người thì từ chối và bắt hỏi lại. Hai plugin Zalo dùng chung với [Kênh Zalo](12-zalo.md).
 - **Meta Ads (Graph API)**: đọc số liệu quảng cáo Facebook/Instagram (danh sách tài khoản ads, chiến dịch, hiệu suất). **Chỉ đọc, không tiêu tiền.** Cần đã đấu kết nối "Meta Ads (Facebook & Instagram)" ở trang Kết nối.
 - **Facebook Trang (Graph API)**: quản lý Trang/Fanpage. Đọc danh sách Trang, bài và bình luận là chỉ-đọc; đăng bài, đăng ảnh, đăng album, đăng video, sửa chữ, xoá bài, trả lời bình luận là hành động **thật, công khai** và cần mức toàn quyền. Dùng Fanpage đã nối ở thẻ Facebook Messenger trang Kết nối (hoặc kết nối "Facebook Trang" trong Kho nếu đã cài từ trước).
@@ -142,7 +142,7 @@ Từ 0.55.23, một **Gói** cài ở trang **Năng lực > Kho cài đặt** ma
 Khác ba nguồn kia ở ba điểm:
 
 - **Bật, tắt và gỡ đều làm ở Kho cài đặt**, không làm ở đây. Plugin đi theo cả gói, nên tách ra bật lẻ chỉ gây nhầm. Thẻ ở trang này có nút dẫn thẳng sang đó.
-- **Biến môi trường `JAVIS_ENABLE_USER_PLUGINS` không áp cho gói.** Gói đi qua trình cài, tức bạn đã xem màn hình liệt kê từng tệp mã rồi mới bấm đồng ý, và chữ ký mã được đối chiếu mỗi lần nạp.
+- **Biến môi trường `UNETI_ENABLE_USER_PLUGINS` không áp cho gói.** Gói đi qua trình cài, tức bạn đã xem màn hình liệt kê từng tệp mã rồi mới bấm đồng ý, và chữ ký mã được đối chiếu mỗi lần nạp.
 - **Mã trong gói bị khoá theo nội dung.** Lúc cài, UNETI AI ghi lại một dấu vân tay của toàn bộ mã trong gói. Mỗi lần nạp, nó tính lại và đối chiếu: lệch một byte là plugin **không chạy**, và thẻ nói rõ "mã trong gói đã đổi so với lúc bạn đồng ý cài". Muốn dùng tiếp thì cài lại ở Kho cài đặt để xem và xác nhận lại.
 
 Lưu ý khi tự sửa: mở tệp `plugin.py` của một gói bằng trình soạn thảo trên Windows rồi lưu là đủ để dấu vân tay lệch, vì nhiều trình soạn thảo tự đổi ký tự xuống dòng. Đó không phải lỗi, chỉ là nội dung tệp thật sự đã khác. Sửa plugin thì nên sửa trong thư mục plugin của bạn chứ không sửa trong gói.
@@ -175,7 +175,7 @@ Khung chat bạn gõ tay chạy ở mức đầy đủ nên gọi được cả 
 
 Có hai chỗ, tuỳ bạn muốn plugin dùng chung hay dùng riêng:
 
-- **Toàn cục** (khuyên dùng): `<JAVIS_STATE_DIR>/plugins/<slug>/`. Mọi brain đều thấy plugin này, và mọi engine đều gọi được. Đường dẫn thật đang hiện sẵn ở dòng chỉ đường trên trang Plugins, cứ sao chép từ đó. Mặc định `JAVIS_STATE_DIR` là thư mục `server/` của dự án; trên Docker/VPS thường là `/data/state`.
+- **Toàn cục** (khuyên dùng): `<UNETI_STATE_DIR>/plugins/<slug>/`. Mọi brain đều thấy plugin này, và mọi engine đều gọi được. Đường dẫn thật đang hiện sẵn ở dòng chỉ đường trên trang Plugins, cứ sao chép từ đó. Mặc định `UNETI_STATE_DIR` là thư mục `server/` của dự án; trên Docker/VPS thường là `/data/state`.
 - **Riêng một brain**: `<brain>/plugins/<slug>/`. Chỉ brain đó dùng được. Hợp khi plugin gắn chặt với dữ liệu của một brain cụ thể.
 
 `<slug>` là tên thư mục, phải là chữ thường ASCII không dấu, bắt đầu bằng chữ hoặc số, chỉ chứa chữ số, dấu chấm, gạch dưới, gạch nối. Sai kiểu chữ thì UNETI AI bỏ qua plugin và báo "slug không hợp lệ".
@@ -231,17 +231,17 @@ Từ 0.162.0, UNETI AI **tải plugin do bạn cài theo mặc định**: plugin
 Muốn chặn hẳn plugin người dùng trên một máy (ví dụ máy chủ dùng chung):
 
 1. Mở file `.env` ở thư mục gốc dự án (chưa có thì tạo, xem [Cấu hình .env](16-cau-hinh-env.md)).
-2. Thêm một dòng: `JAVIS_ENABLE_USER_PLUGINS=false`
+2. Thêm một dòng: `UNETI_ENABLE_USER_PLUGINS=false`
 3. Lưu file và **khởi động lại UNETI AI**.
 
-Giá trị tắt nhận `0`, `false`, `no` hoặc `off` (không phân biệt hoa thường). Tên cũ `JAVIS_ENABLE_VAULT_PLUGINS` vẫn còn tác dụng, nhưng nếu đặt cả hai thì tên mới thắng.
+Giá trị tắt nhận `0`, `false`, `no` hoặc `off` (không phân biệt hoa thường). Tên cũ `UNETI_ENABLE_VAULT_PLUGINS` vẫn còn tác dụng, nhưng nếu đặt cả hai thì tên mới thắng.
 
 ## Rào an toàn (đọc trước khi cài plugin lạ)
 
 Đây là phần quan trọng nhất của trang này.
 
 - **Plugin do bạn cài chạy mã Python thật, trong chính tiến trình server của UNETI AI.** Nó có quyền của tiến trình đó: đọc ghi file, gọi mạng, đọc biến môi trường. Từ 0.162.0 chủ dự án quyết định **cho tải mặc định**; chốt chặn còn lại là công tắc **Bật** của từng plugin (`enabled: true` trong `plugin.yaml`).
-- **Chỉ bật plugin khi bạn đã tự đọc mã của nó.** Lưu ý: ai ghi được vào thư mục `plugins/` (kể cả model, vì nó ghi được vào brain) cũng có thể ghi `enabled: true`. Máy chủ dùng chung hoặc chạy bot cho người lạ thì nên đặt `JAVIS_ENABLE_USER_PLUGINS=false`.
+- **Chỉ bật plugin khi bạn đã tự đọc mã của nó.** Lưu ý: ai ghi được vào thư mục `plugins/` (kể cả model, vì nó ghi được vào brain) cũng có thể ghi `enabled: true`. Máy chủ dùng chung hoặc chạy bot cho người lạ thì nên đặt `UNETI_ENABLE_USER_PLUGINS=false`.
 - **Plugin có sẵn (nhãn "Có sẵn") không chịu công tắc này** vì chúng đi kèm bản phát hành UNETI AI. Chúng vẫn chạy bình thường kể cả khi máy đặt `false`.
 - **Plugin do UNETI AI tạo qua chat luôn ở trạng thái tắt** (`enabled: false`) và mức `readonly`. UNETI AI không tự bật hộ; bạn phải đọc mã rồi tự bấm **Bật**.
 - **Đừng viết plugin để làm hành động tiền bạc, tạo đơn, gửi tin hay đăng bài.** Những việc đó nên đi qua kết nối MCP và hệ mức quyền, nơi đã có lớp chặn và nhật ký. Plugin nên để `min_mode: readonly` trừ khi bạn cố ý cần khác.
@@ -304,9 +304,9 @@ Rào UNETI AI tự giữ, plugin không nới được:
 - Callback ném lỗi hoặc chạy quá **2 giây** thì bị bỏ qua và ghi log, lượt trả lời vẫn đi tiếp. Callback đồng bộ chạy ở luồng riêng nên không chặn các cuộc chat khác.
 - Mỗi callback nhận **bản sao riêng** của các khoá: plugin trước sửa gì cũng không đổi thứ plugin sau thấy.
 
-Ba loại lượt đều bắn hook: lượt thật, lượt **Trả lời giúp tin này / Gợi ý câu trả lời** ở Hộp thư (người gửi là người nhắn tin cuối của cuộc chat), và lượt **Thử bot**. Lượt thử mang `trial: true` và người gửi giả của trang thử (`javis-try-user`, cuộc chat `javis-try`), cùng người gửi giả mà lượt thử vẫn dùng cho mọi kiểm tra theo người. Mã giả đó không khớp ai thật, nên plugin kiểu sổ danh sách sẽ cho thấy nhánh "người lạ". Muốn xử lý lượt thử khác đi thì plugin tự đọc `trial`.
+Ba loại lượt đều bắn hook: lượt thật, lượt **Trả lời giúp tin này / Gợi ý câu trả lời** ở Hộp thư (người gửi là người nhắn tin cuối của cuộc chat), và lượt **Thử bot**. Lượt thử mang `trial: true` và người gửi giả của trang thử (`uneti-try-user`, cuộc chat `uneti-try`), cùng người gửi giả mà lượt thử vẫn dùng cho mọi kiểm tra theo người. Mã giả đó không khớp ai thật, nên plugin kiểu sổ danh sách sẽ cho thấy nhánh "người lạ". Muốn xử lý lượt thử khác đi thì plugin tự đọc `trial`.
 
-Plugin dùng hook này vẫn chịu đúng rào chung: plugin người dùng tự cài chỉ chạy khi đặt `JAVIS_ENABLE_USER_PLUGINS=true`, plugin của Gói đi qua trình cài, và nên khai `min_mode: readonly` nếu nó chỉ đọc.
+Plugin dùng hook này vẫn chịu đúng rào chung: plugin người dùng tự cài chỉ chạy khi đặt `UNETI_ENABLE_USER_PLUGINS=true`, plugin của Gói đi qua trình cài, và nên khai `min_mode: readonly` nếu nó chỉ đọc.
 
 ## Trang riêng và đường HTTP (từ 0.64.26)
 
@@ -334,11 +334,11 @@ cụ UNETI AI đã có, cửa này có thêm năm công cụ chỉ AI bên ngoà
 
 | Công cụ | Việc | Mức quyền |
 |---|---|---|
-| `javis_chat_find` | Tìm hội thoại theo tên (không phân biệt dấu) hoặc nội dung | Mọi mức |
-| `javis_chat_read` | Đọc các tin cuối của một hội thoại | Mọi mức |
-| `javis_chat_send` | Nhắn vào hội thoại như chủ gõ, chờ câu trả lời | Chỉ Toàn quyền |
-| `javis_chat_result` | Đọc câu trả lời khi UNETI AI làm lâu | Mọi mức |
-| `javis_chat_note` | Ghi lại cuộc chat bên ngoài: chủ nói gì, đã chốt gì (từ 0.441.0) | Ghi nháp, Toàn quyền |
+| `uneti_chat_find` | Tìm hội thoại theo tên (không phân biệt dấu) hoặc nội dung | Mọi mức |
+| `uneti_chat_read` | Đọc các tin cuối của một hội thoại | Mọi mức |
+| `uneti_chat_send` | Nhắn vào hội thoại như chủ gõ, chờ câu trả lời | Chỉ Toàn quyền |
+| `uneti_chat_result` | Đọc câu trả lời khi UNETI AI làm lâu | Mọi mức |
+| `uneti_chat_note` | Ghi lại cuộc chat bên ngoài: chủ nói gì, đã chốt gì (từ 0.441.0) | Ghi nháp, Toàn quyền |
 
 - **Tin nhắn chạy đúng như chủ gõ:** đi qua chính vòng chat của dashboard, nên chữ chạy trên mọi tab
   đang mở, có nút Dừng, lưu vào Lịch sử, ghi `memory/conversations` và vào vòng tự học. Bong bóng
@@ -346,7 +346,7 @@ cụ UNETI AI đã có, cửa này có thêm năm công cụ chỉ AI bên ngoà
 - **Hội thoại đang trả lời** thì tin thành tin gõ thêm, như khi chủ gõ thêm lúc UNETI AI đang làm.
 - **Chỉ hội thoại của chủ** (khung Trò chuyện, chat với Cộng sự). Hội thoại của khách và nhóm chat thì
   không đọc, không nhắn được.
-- **Ghi chép không chạy UNETI AI:** `javis_chat_note` chỉ lưu, không tốn hạn mức bộ não của UNETI AI, nhưng đi
+- **Ghi chép không chạy UNETI AI:** `uneti_chat_note` chỉ lưu, không tốn hạn mức bộ não của UNETI AI, nhưng đi
   qua đúng đường lưu lượt chat nên vẫn vào Lịch sử, nhật ký và vòng tự học. Mỗi cuộc chat bên ngoài có một
   hội thoại riêng **Từ ChatGPT: <tên>** (hay **Từ Claude: ...**); đưa `id` thì ghi thẳng vào hội thoại đó
   của UNETI AI. UNETI AI không đọc được lịch sử chat của ChatGPT hay Claude, nên đây là cách AI bên ngoài tự gửi
@@ -359,7 +359,7 @@ cụ UNETI AI đã có, cửa này có thêm năm công cụ chỉ AI bên ngoà
 | Bạn thấy | Ý nghĩa / thao tác |
 |---|---|
 | **● đang chạy** (xanh lá) | Plugin đã nạp, tool của nó đang có mặt cho engine |
-| **⚠ tắt bằng env** (cam) | Bạn đã bật plugin nhưng máy này đặt `JAVIS_ENABLE_USER_PLUGINS=false` |
+| **⚠ tắt bằng env** (cam) | Bạn đã bật plugin nhưng máy này đặt `UNETI_ENABLE_USER_PLUGINS=false` |
 | **⚠ lỗi** (đỏ) | Manifest hỏng hoặc mã nạp không được; lý do hiện ngay dưới hàng chip |
 | **○ tắt** (xám) | Plugin có mặt nhưng đang tắt, không có tool nào ra |
 | **● bật (chưa nạp)** (cam) | Trạng thái hiếm: đã bật nhưng chưa nạp được vì lý do khác. Tải lại trang, nếu vẫn vậy thì xem log server |
@@ -379,18 +379,18 @@ cụ UNETI AI đã có, cửa này có thêm năm công cụ chỉ AI bên ngoà
 - Đặt plugin ở **Toàn cục** trừ khi có lý do rõ ràng để buộc vào một brain. Toàn cục không phụ thuộc brain nên bạn đổi brain vẫn dùng được.
 - Không dùng plugin nào thì **tắt** thay vì xoá thư mục, để lần sau bật lại là xong.
 - Tắt bớt plugin không dùng cũng làm gọn danh sách tool đưa cho model, giúp nó chọn tool đúng hơn.
-- Muốn biết UNETI AI đang thấy những năng lực gì (agent, skill, workflow, loop, plugin) thì mở file `Javis/index.md` trong brain bằng trang **Tệp tin**; file này tự dựng lại mỗi khi bạn bật/tắt plugin.
+- Muốn biết UNETI AI đang thấy những năng lực gì (agent, skill, workflow, loop, plugin) thì mở file `UNETI/index.md` trong brain bằng trang **Tệp tin**; file này tự dựng lại mỗi khi bạn bật/tắt plugin.
 
 ## Sự cố thường gặp
 
-- **Thẻ ghi "⚠ tắt bằng env":** máy này đặt `JAVIS_ENABLE_USER_PLUGINS=false`. Bỏ dòng đó trong `.env` (hoặc đặt `true`) rồi khởi động lại UNETI AI. Biến này chỉ được đọc lúc khởi động.
+- **Thẻ ghi "⚠ tắt bằng env":** máy này đặt `UNETI_ENABLE_USER_PLUGINS=false`. Bỏ dòng đó trong `.env` (hoặc đặt `true`) rồi khởi động lại UNETI AI. Biến này chỉ được đọc lúc khởi động.
 - **Đã đặt biến môi trường mà vẫn bị chặn:** kiểm tra file `.env` nằm đúng thư mục gốc dự án, dòng biến không bị dấu `#` ở đầu, và giá trị là `true` (hoặc `1`/`yes`/`on`). Trên Docker thì đặt biến ở phần Environment của container chứ không phải trong file trên máy chủ.
 - **Plugin mới thả vào mà không hiện trên trang:** thư mục phải nằm **trực tiếp** trong thư mục plugins (không lồng thêm cấp), và bên trong phải có `plugin.py` (hoặc `__init__.py`). Thiếu thì UNETI AI không coi đó là plugin. Tên thư mục cũng phải là slug hợp lệ (chữ thường không dấu).
 - **Thẻ ghi "⚠ lỗi" kèm "thiếu plugin.py":** thư mục chỉ có `plugin.yaml`. Thêm file mã vào.
 - **Thẻ ghi "⚠ lỗi" kèm "manifest lỗi: ...":** `plugin.yaml` sai cú pháp YAML. Hay gặp nhất là mô tả có dấu hai chấm mà không bọc nháy.
 - **Thẻ ghi "⚠ lỗi" kèm "thiếu hàm register(ctx)":** `plugin.py` chưa có hàm `register`, hoặc bạn đặt tên khác. Hàm phải tên đúng là `register` và nhận một tham số.
 - **Thẻ ghi "⚠ lỗi" kèm tên một lỗi Python (ví dụ `ModuleNotFoundError`):** mã plugin dùng thư viện chưa cài trong môi trường Python của UNETI AI. Cài thư viện đó vào đúng môi trường ảo UNETI AI đang chạy, rồi khởi động lại.
-- **Plugin đang chạy nhưng engine không thấy tool:** nhiều khả năng tên tool **trùng** với một tool đã có của MCP hoặc tool lõi. UNETI AI không cho plugin chiếm chỗ tool lõi, nó bỏ qua tool trùng và ghi một dòng vào log server. Đổi tên tool trong `plugin.py` cho khác đi (đặt tiền tố riêng là cách chắc nhất). Các tên lõi không được dùng lại: `javis_connections`, `javis_read_file`, `javis_list_dir`, `javis_write_file`, `javis_use_skill`.
+- **Plugin đang chạy nhưng engine không thấy tool:** nhiều khả năng tên tool **trùng** với một tool đã có của MCP hoặc tool lõi. UNETI AI không cho plugin chiếm chỗ tool lõi, nó bỏ qua tool trùng và ghi một dòng vào log server. Đổi tên tool trong `plugin.py` cho khác đi (đặt tiền tố riêng là cách chắc nhất). Các tên lõi không được dùng lại: `uneti_connections`, `uneti_read_file`, `uneti_list_dir`, `uneti_write_file`, `uneti_use_skill`.
 - **Tool trả về `ERROR: tool '<tên>' cần mức quyền cao hơn`:** lượt chạy đang bị hạn chế mức quyền. Nếu là việc định kỳ, nâng chế độ của việc đó (xem [Việc định kỳ & Nhắc hẹn](08-viec-dinh-ky.md)); nếu là plugin của bạn thì xem lại `min_mode` khai trong `register_tool`.
 - **Tool trả về "Chưa kết nối ...":** plugin cần một kết nối mà bạn chưa đấu. Làm theo đúng câu hướng dẫn trong lỗi, thường là vào trang **Kết nối** (hoặc **Models** với plugin tạo ảnh).
 - **Bấm Bật báo "không tìm thấy plugin":** danh sách trên màn hình đã cũ so với đĩa (bạn vừa xoá hoặc đổi tên thư mục). Tải lại trang.
@@ -401,7 +401,7 @@ cụ UNETI AI đã có, cửa này có thêm năm công cụ chỉ AI bên ngoà
 - [Skills](06-skills.md) - khi cái bạn thiếu là tri thức cách làm chứ không phải mã chạy.
 - [Kết nối & số liệu kinh doanh](09-mcp-va-so-lieu.md) - đấu nguồn dữ liệu ngoài; các plugin Meta Ads, Facebook Trang và Apify lấy token từ đây.
 - [Models & engine](10-models-va-engine.md) - vì sao mọi engine đều gọi được tool của plugin.
-- [Việc định kỳ & Nhắc hẹn](08-viec-dinh-ky.md) - ba mức quyền của việc chạy nền, và plugin `javis-schedule`.
+- [Việc định kỳ & Nhắc hẹn](08-viec-dinh-ky.md) - ba mức quyền của việc chạy nền, và plugin `uneti-schedule`.
 - [Zalo Agent MCP](12-zalo.md) - Zalo nay dùng MCP của CLI riêng `javis-zalo`, không còn plugin riêng.
 - [Cấu hình .env](16-cau-hinh-env.md) - cách đặt biến môi trường và khởi động lại.
 - [Agents & Workflows](07-agents-va-workflows.md) - các loại năng lực khác của UNETI AI.

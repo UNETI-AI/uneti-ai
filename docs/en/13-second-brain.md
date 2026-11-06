@@ -17,7 +17,7 @@ A Second Brain (a "brain" or "vault" for short) is a folder on your machine or V
 | Memory | `memory/` | Living memory: what UNETI AI remembers about you and the business. |
 | Agents / Workflows | `agents/`, `workflows/` | The operating layer (see [Agents and Workflows](07-agents-and-workflows.md)). |
 | Skills | `skills/` | The canonical copy of each skill, one folder per skill at `skills/<slug>/SKILL.md`. UNETI AI mirrors them into `.claude/skills` so Claude Code loads them natively (see [Skills](06-skills.md)). |
-| Operating layer | `Javis/` | Whatever chat creates: loops at `Javis/loops/<slug>.md`, per-chat Zalo rules at `Javis/zalo/<slug>.md`, reminders at `Javis/reminders.json`, and the capability index `Javis/index.md` (auto-generated from files, do not edit by hand). |
+| Operating layer | `UNETI/` | Whatever chat creates: loops at `UNETI/loops/<slug>.md`, per-chat Zalo rules at `UNETI/zalo/<slug>.md`, reminders at `UNETI/reminders.json`, and the capability index `UNETI/index.md` (auto-generated from files, do not edit by hand). |
 | Bullet journal | `00 - Dashboard/`, `01 - Daily Log/`, `02 - Weekly Log/`... | Where daily notes and tasks live; Dataview blocks pull from here (see [Tasks and Dataview in notes](19-tasks-and-dataview.md)). |
 | Cache area | `attachments/`, `inbox/` | Images and attachments; `inbox/telegram/` is where files sent over Telegram land. **Both folders are caches and expire on their own**, read the dedicated section below before leaving anything valuable here. |
 
@@ -103,7 +103,7 @@ Deleting a brain is **not permanent loss**. UNETI AI moves the whole folder to a
 3. The dialog that appears states clearly: the brain will be moved to the TRASH (kept 30 days, then deleted for good), and the deletion will SYNC to every other machine. It requires you to **type the brain name EXACTLY** to confirm.
 4. Type it correctly and the brain goes to the trash, UNETI AI returns to Brain Default, and a notice says the brain was deleted (moved to the 30-day trash, deletion synced to other machines). Type it wrong and you get "the name does not match, deletion cancelled".
 
-The trash is the `brain-trash` folder inside UNETI AI's state folder (`JAVIS_STATE_DIR`; the local install uses the `server/` folder, Docker uses the state volume). Each deletion creates a subfolder shaped like `Brain name__20260729-153012`. Clearing trash older than 30 days runs alongside each brain sync to GitHub.
+The trash is the `brain-trash` folder inside UNETI AI's state folder (`UNETI_STATE_DIR`; the local install uses the `server/` folder, Docker uses the state volume). Each deletion creates a subfolder shaped like `Brain name__20260729-153012`. Clearing trash older than 30 days runs alongside each brain sync to GitHub.
 
 **Brain Default** cannot be deleted; clicking 🗑 while it is selected reports that the default brain (the starting brain) cannot be removed.
 
@@ -111,13 +111,13 @@ For an external folder (📁), the 🗑 button behaves entirely differently: it 
 
 ### Normalising a brain's structure
 
-If a brain has the old structure (notes under `Javis/agents`, `Memory` capitalised, skills in `.claude/skills`), you can collapse it into the uniform flat layout:
+If a brain has the old structure (notes under `UNETI/agents`, `Memory` capitalised, skills in `.claude/skills`), you can collapse it into the uniform flat layout:
 
 1. Go to **Settings** (**System** group on the rail).
 2. Open the **Interface and Brain** group and scroll to **Brain structure**.
-3. Click **Normalise the selected brain**, then confirm the dialog, which explains it moves `Javis/agents`→`agents`, `Javis/workflows`→`workflows`, `Memory`→`memory`, with a git backup.
+3. Click **Normalise the selected brain**, then confirm the dialog, which explains it moves `UNETI/agents`→`agents`, `UNETI/workflows`→`workflows`, `Memory`→`memory`, with a git backup.
 
-The operation is safe: it only moves when the destination folder does not exist yet, never overwriting. It folds `Javis/agents` into `agents/`, `Javis/workflows` into `workflows/`, `Memory` into `memory/`, and moves old skills from `.claude/skills` into `skills/` (including the disabled-skill branch, so skills you turned off do not come back on).
+The operation is safe: it only moves when the destination folder does not exist yet, never overwriting. It folds `UNETI/agents` into `agents/`, `UNETI/workflows` into `workflows/`, `Memory` into `memory/`, and moves old skills from `.claude/skills` into `skills/` (including the disabled-skill branch, so skills you turned off do not come back on).
 
 ## `attachments/` and `inbox/` are cache, not storage
 
@@ -144,7 +144,7 @@ UNETI AI sorts memories into 4 kinds: information about you (`user`), how you li
 
 ### The MEMORY.md index has a context ceiling
 
-Because `MEMORY.md` is loaded into **every** chat turn, it has a ceiling of about **20,000 characters** (change it with the `JAVIS_MEMORY_INDEX_MAX` environment variable). When a thickening brain goes over the ceiling, UNETI AI steps down gradually, favouring keeping the memory count intact:
+Because `MEMORY.md` is loaded into **every** chat turn, it has a ceiling of about **20,000 characters** (change it with the `UNETI_MEMORY_INDEX_MAX` environment variable). When a thickening brain goes over the ceiling, UNETI AI steps down gradually, favouring keeping the memory count intact:
 
 1. Shorten each line's description to 100 characters, then to 60.
 2. Keep only the title and file path, dropping the description.
@@ -281,4 +281,4 @@ The result changes nothing, it only pours into the **Learning log** block as "Wi
 - [Agents and Workflows](07-agents-and-workflows.md) - the operating layer in `agents/` and `workflows/`.
 - [Recurring jobs and reminders](08-recurring-jobs.md) - assigning a loop that digests sources on a schedule.
 - [Tasks and Dataview in notes](19-tasks-and-dataview.md) - the bullet journal set inside the brain.
-- [.env configuration](16-env-configuration.md) - the `BRAINS_DIR`, `JAVIS_STATE_DIR` and `JAVIS_MEMORY_INDEX_MAX` variables.
+- [.env configuration](16-env-configuration.md) - the `BRAINS_DIR`, `UNETI_STATE_DIR` and `UNETI_MEMORY_INDEX_MAX` variables.

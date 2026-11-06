@@ -13,9 +13,9 @@ import sqlite3
 import tempfile
 from pathlib import Path
 
-os.environ["JAVIS_STATE_DIR"] = tempfile.mkdtemp(prefix="javis-team-deps-")
-os.environ.pop("JAVIS_TEAM_AUTO_RETRIES", None)
-STATE = Path(os.environ["JAVIS_STATE_DIR"])
+os.environ["UNETI_STATE_DIR"] = tempfile.mkdtemp(prefix="uneti-team-deps-")
+os.environ.pop("UNETI_TEAM_AUTO_RETRIES", None)
+STATE = Path(os.environ["UNETI_STATE_DIR"])
 
 import sessions  # noqa: E402
 import task_store  # noqa: E402
@@ -32,7 +32,7 @@ def check(name, cond, extra=""):
 
 
 def directive(**op):
-    return f"\n<!-- JAVIS_TEAM: {json.dumps(op, ensure_ascii=False)} -->"
+    return f"\n<!-- UNETI_TEAM: {json.dumps(op, ensure_ascii=False)} -->"
 
 
 AGENTS = {"ag_lan": ("lan", "Lan"), "ag_minh": ("minh", "Minh"), "ag_hoa": ("hoa", "Hoa"), "ag_tu": ("tu", "Tú")}

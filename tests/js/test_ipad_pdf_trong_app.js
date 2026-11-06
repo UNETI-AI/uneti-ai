@@ -3,7 +3,7 @@
        node tests/js/test_ipad_pdf_trong_app.js
 
    Video chủ repo 05/11/2026 (iPad, app cài ra màn hình chính): bấm link "Tải slide PDF" trong
-   chat thì PDF đè lên cả Javis, không nút quay lại, không nút tải, phải tắt app. Link đó là
+   chat thì PDF đè lên cả UNETI AI, không nút quay lại, không nút tải, phải tắt app. Link đó là
    <a download href="/files/raw?...&dl=1">; bộ chặn iOS cũ mở nó bằng window.open(..., "_blank"),
    và trên iPad kiểu app này iOS KHÔNG mở lớp Safari có nút Xong mà thay luôn cả app. Link có
    target="_blank" (URL đầy đủ) thì bộ chặn bỏ qua, kết quả y hệt.
@@ -18,7 +18,7 @@ const ROOT = path.resolve(__dirname, "..", "..");
 const fails = [];
 function check(name, cond) { console.log((cond ? "ok   " : "FAIL ") + name); if (!cond) fails.push(name); }
 
-global.window = { location: { href: "https://javis.example/", origin: "https://javis.example" } };
+global.window = { location: { href: "https://uneti.example/", origin: "https://uneti.example" } };
 const CR = require(path.join(ROOT, "dashboard", "chat-render.js"));
 const src = fs.readFileSync(path.join(ROOT, "dashboard", "chat-render.js"), "utf8");
 const fe = fs.readFileSync(path.join(ROOT, "dashboard", "file-editor.js"), "utf8");
@@ -26,7 +26,7 @@ const fe = fs.readFileSync(path.join(ROOT, "dashboard", "file-editor.js"), "utf8
 // ---- 1. Bộ chặn iOS: PDF vào khung xem trong app, TRƯỚC nhánh target="_blank" và window.open ----
 const chan = src.slice(src.indexOf("// TAI FILE TREN IPHONE"), src.indexOf("// Checkbox task"));
 const iPdf = chan.indexOf("moPdf(xem, ten)");
-check("PDF mở bằng khung xem trong app", iPdf > 0 && /JavisFileEditor\.openPdf/.test(chan));
+check("PDF mở bằng khung xem trong app", iPdf > 0 && /UnetiFileEditor\.openPdf/.test(chan));
 check("nhánh PDF chạy TRƯỚC khi bỏ qua link target=_blank", iPdf > 0 && iPdf < chan.indexOf('if (a.target === "_blank") return;'));
 check("nhánh PDF chạy TRƯỚC window.open", iPdf < chan.lastIndexOf("window.open("));
 check("nhánh PDF chặn điều hướng của trình duyệt", /e\.preventDefault\(\);\s*e\.stopPropagation\(\);\s*moPdf\(xem, ten\);/.test(chan));
@@ -44,7 +44,7 @@ check("tự đóng bảng chia sẻ thì thôi, không mở gì thêm", /err\.na
 check("iOS chặn vì quá cú bấm: báo bấm lại", /NotAllowedError/.test(tv) && /fedit\.dl_tap_again/.test(tv));
 const op = (fe.match(/function openPdf\([\s\S]*?\n  \}/) || [""])[0];
 check("openPdf dùng chung modal (nút Back của máy đóng được)", /moModal\(ten\)/.test(op) && /history\.pushState\(\{ jvfe: 1 \}/.test(fe));
-check("openPdf được xuất ra cho chat-render.js", /JavisFileEditor = \{ open: open, close: close, openPdf: openPdf \}/.test(fe));
+check("openPdf được xuất ra cho chat-render.js", /UnetiFileEditor = \{ open: open, close: close, openPdf: openPdf \}/.test(fe));
 
 const vi = JSON.parse(fs.readFileSync(path.join(ROOT, "dashboard/i18n/vi.json"), "utf8"));
 const en = JSON.parse(fs.readFileSync(path.join(ROOT, "dashboard/i18n/en.json"), "utf8"));

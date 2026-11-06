@@ -13,9 +13,9 @@ import tempfile
 from contextlib import closing
 from pathlib import Path
 
-os.environ["JAVIS_STATE_DIR"] = tempfile.mkdtemp(prefix="javis-pulse-policy-")
-os.environ.pop("JAVIS_RESONANCE_CALL_CEILING", None)
-TEMP = Path(tempfile.mkdtemp(prefix="javis-pulse-policy-w-"))
+os.environ["UNETI_STATE_DIR"] = tempfile.mkdtemp(prefix="uneti-pulse-policy-")
+os.environ.pop("UNETI_RESONANCE_CALL_CEILING", None)
+TEMP = Path(tempfile.mkdtemp(prefix="uneti-pulse-policy-w-"))
 
 import agent_pulse as AP  # noqa: E402
 import resonance_store as RS  # noqa: E402

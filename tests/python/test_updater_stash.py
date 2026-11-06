@@ -11,7 +11,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "server"))
 import _paths  # noqa: E402,F401  - thư mục tạm riêng, tự xoá khi thoát (xem _paths.py)
 
-os.environ["JAVIS_STATE_DIR"] = tempfile.mkdtemp(prefix="javis-stash-state-")
+os.environ["UNETI_STATE_DIR"] = tempfile.mkdtemp(prefix="uneti-stash-state-")
 import updater  # noqa: E402
 
 
@@ -22,11 +22,11 @@ def git(repo, *args):
     return result.stdout.strip()
 
 
-with tempfile.TemporaryDirectory(prefix="javis-updater-stash-") as temp:
+with tempfile.TemporaryDirectory(prefix="uneti-updater-stash-") as temp:
     repo = Path(temp)
     git(repo, "init")
-    git(repo, "config", "user.name", "Javis Test")
-    git(repo, "config", "user.email", "javis-test@example.invalid")
+    git(repo, "config", "user.name", "UNETI AI Test")
+    git(repo, "config", "user.email", "uneti-test@example.invalid")
     target = repo / "config.txt"
     target.write_text("base\n", encoding="utf-8")
     git(repo, "add", "config.txt")

@@ -15,11 +15,11 @@ Hướng dẫn từng bước nằm ở [trang tải về](https://uneti-ai.gith
 
 Nếu máy đã dùng cổng 7777 cho chương trình khác, bộ cài sẽ dừng lại và báo, không tự tắt chương trình đó.
 
-Trên Windows, bấm đúp `UNETI AI.bat` trong thư mục cài đặt để mở phần mềm. Muốn phần mềm tự chạy khi mở máy, chạy `javis-autostart.bat`.
+Trên Windows, bấm đúp `UNETI AI.bat` trong thư mục cài đặt để mở phần mềm. Muốn phần mềm tự chạy khi mở máy, chạy `uneti-autostart.bat`.
 
 ## Cập nhật
 
-Bản mới được lấy từ Javis OS, chạy kiểm thử rồi quản trị viên duyệt mới phát hành. Phần mềm báo có bản mới ở trang Cài đặt → Cập nhật.
+Bản mới được lấy từ phần mềm gốc, chạy kiểm thử rồi quản trị viên duyệt mới phát hành. Phần mềm báo có bản mới ở trang Cài đặt → Cập nhật.
 
 ## Tin Nhà trường
 

@@ -1,4 +1,4 @@
-/* pet-menu.js - the owner's own MASCOT MENU: which Javis features the pet opens, in which order.
+/* pet-menu.js - the owner's own MASCOT MENU: which UNETI AI features the pet opens, in which order.
 
    Owner, 2026-11-05: "Chỉ cần thêm và sắp xếp vị trí thôi là ok rồi. Và cho phần này vào trong phần cài đặt linh vật."
    So this file only lets the owner ADD a feature and REORDER the list. No renaming, no icon or action change, no
@@ -18,7 +18,7 @@
        why it cannot run right now. Ids are what is saved, never the shown name (names change with language and,
        for the mic, with its state).
      - the store: GET / POST /pet/menu, cached in localStorage so the menu is right before the server answers, kept
-       in step across windows by the `storage` event. Every change fires "javis:pet-menu"; pet.js closes an open
+       in step across windows by the `storage` event. Every change fires "uneti:pet-menu"; pet.js closes an open
        menu on it, and builds the new one the next time it opens.
      - the "Mascot menu" card of Settings > Mascot (renderSettings): a draft list, Add feature, Discard, Save.
 
@@ -28,10 +28,10 @@
   "use strict";
 
   var DEFAULT_ITEMS = ["chat", "agent", "workflow", "mic", "pet", "teams"];
-  var CACHE_KEY = "javis.pet.menu";
+  var CACHE_KEY = "uneti.pet.menu";
 
   // label/sub: i18n keys written out in full (the i18n scanner only sees whole keys). icon: Lucide name; a page takes
-  // the icon of its rail item from JavisNav.iconName first, so the two can never drift apart.
+  // the icon of its rail item from UnetiNav.iconName first, so the two can never drift apart.
   // Must list the same ids as KNOWN_ACTIONS in server/pet_menu.py (tests/js/test_pet_menu.js checks).
   var CATALOG = [
     { id: "chat", label: "pet.menu.chat", fb: "Chat", icon: "message-circle", sub: "page.chat.sub" },
@@ -113,7 +113,7 @@
   };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   if (!root || typeof document === "undefined") return;
-  root.JavisPetMenu = api;
+  root.UnetiPetMenu = api;
 
   function t(key, vars, fb) {
     try {
@@ -131,13 +131,13 @@
   // ---- what one item looks like and whether it can run ----
   function iconName(c) {
     var n = "";
-    try { if (c.page && root.JavisNav && root.JavisNav.iconName) n = root.JavisNav.iconName(c.id) || ""; } catch (e) {}
+    try { if (c.page && root.UnetiNav && root.UnetiNav.iconName) n = root.UnetiNav.iconName(c.id) || ""; } catch (e) {}
     return n || c.icon || "circle";
   }
   // "" when the feature can run now, else the reason in the owner's language.
   function why(id) {
     var c = BY_ID[id];
-    if (!c) return t("petmenu.why_gone", null, "This feature is no longer in Javis");
+    if (!c) return t("petmenu.why_gone", null, "This feature is no longer in UNETI AI");
     if (id === "mic") {
       var md = root.navigator && root.navigator.mediaDevices;
       if (!md || typeof md.getUserMedia !== "function" || !document.getElementById("voiceBtn")) {
@@ -146,7 +146,7 @@
     }
     if (c.page) {
       try {
-        if (root.JavisNav && root.JavisNav.has && !root.JavisNav.has(id)) return t("petmenu.why_page", null, "This Javis has no such page");
+        if (root.UnetiNav && root.UnetiNav.has && !root.UnetiNav.has(id)) return t("petmenu.why_page", null, "This UNETI AI has no such page");
       } catch (e) {}
     }
     return "";
@@ -173,7 +173,7 @@
     if (cached) menu = normalize(cached);
   } catch (e) {}
   function announce(remote) {
-    try { root.dispatchEvent(new CustomEvent("javis:pet-menu", { detail: { menu: snapshot(), remote: !!remote } })); } catch (e) {}
+    try { root.dispatchEvent(new CustomEvent("uneti:pet-menu", { detail: { menu: snapshot(), remote: !!remote } })); } catch (e) {}
   }
   function snapshot() { return { state: menu.state, rev: menu.rev, items: menu.items.slice(), hidden: menu.hidden.slice() }; }
   function adopt(m, remote) {
@@ -239,8 +239,8 @@
       if (!host.isConnected) { clearGuard(); return ""; }
       return dirty() ? t("petmenu.leave", null, "The mascot menu has unsaved changes.") : "";
     }
-    function clearGuard() { try { root.JavisLeaveGuard && root.JavisLeaveGuard.clear(guard); } catch (e) {} }
-    try { root.JavisLeaveGuard && root.JavisLeaveGuard.set(guard); } catch (e) {}
+    function clearGuard() { try { root.UnetiLeaveGuard && root.UnetiLeaveGuard.clear(guard); } catch (e) {} }
+    try { root.UnetiLeaveGuard && root.UnetiLeaveGuard.set(guard); } catch (e) {}
 
     function row(id, i) {
       var m = entry(id), lock = locked() || saving;
@@ -318,10 +318,10 @@
       if (el.hasAttribute("data-pm-save")) doSave();
     };
     host.onpointerdown = function (e) {
-      if (locked() || saving || !root.JavisReorder || !root.JavisReorder.dragRow) return;
+      if (locked() || saving || !root.UnetiReorder || !root.UnetiReorder.dragRow) return;
       var list = host.querySelector(".pm-list");
       if (!list) return;
-      root.JavisReorder.dragRow(e, list, function (from, to) { draft = moveItem(draft, from, to); note = null; }, function () { draw(); });
+      root.UnetiReorder.dragRow(e, list, function (from, to) { draft = moveItem(draft, from, to); note = null; }, function () { draw(); });
     };
     // PHONE: press and hold anywhere on a row (owner: "làm chức năng nhấn giữ ở điện thoại"), then drag. A quick swipe
     // stays a page scroll: only a finger that holds still for LONG_PRESS ms picks the row up. The handle still drags
@@ -420,13 +420,13 @@
 
     // Another window saved a newer menu while this card is open.
     function onRemote(e) {
-      if (!host.isConnected) { root.removeEventListener("javis:pet-menu", onRemote); return; }
+      if (!host.isConnected) { root.removeEventListener("uneti:pet-menu", onRemote); return; }
       if (!e.detail || !e.detail.remote || saving) return;
       if (!dirty()) { saved = snapshot(); reset(); note = null; draw(); return; }
       note = { kind: "err", text: t("petmenu.conflict", null, "The mascot menu was changed in another window."), reload: true };
       draw();
     }
-    root.addEventListener("javis:pet-menu", onRemote);
+    root.addEventListener("uneti:pet-menu", onRemote);
 
     // ---- Add feature: the catalog with a search box. Added ones say so; unavailable ones say why. ----
     function openPicker() {

@@ -4,7 +4,7 @@
  * conversation (team.session_id), so it uses the same server routes as the main composer (github-connect.js):
  *   GET  /github/session/{sid}?brain=       repos attached to the team chat, with branch and status icon
  *   POST /github/session/{sid}/repos        set them (clone what is missing, one worktree each)
- * Work/Help steps of a job edit the team's worktree, and Javis checks, commits, pushes and opens the PR once the JOB is
+ * Work/Help steps of a job edit the team's worktree, and UNETI AI checks, commits, pushes and opens the PR once the JOB is
  * done (server: main._team_job_done). This file draws the picker that teams.js opens from its "+" menu and the chip.
  * Pure helpers are exported for node tests. Never use the em dash character here.
  */
@@ -164,8 +164,8 @@
 
   // The status of the team chat's pushed work, in the same detail box as a private chat (github-connect.js).
   function openStatus(sid) {
-    if (window.JavisGithubRepos && window.JavisGithubRepos.openDetail) window.JavisGithubRepos.openDetail(sid);
+    if (window.UnetiGithubRepos && window.UnetiGithubRepos.openDetail) window.UnetiGithubRepos.openDetail(sid);
   }
 
-  window.JavisTeamGithub = { load: load, panel: panel, openStatus: openStatus, chipText: chipText, shortName: shortName };
+  window.UnetiTeamGithub = { load: load, panel: panel, openStatus: openStatus, chipText: chipText, shortName: shortName };
 })();

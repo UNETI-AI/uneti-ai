@@ -8,7 +8,7 @@ UNETI AI is a personal AI agent plus a Second Brain. Its "brain" is the **Claude
 > ⚠️ **Safety:** UNETI AI runs Claude with full power on the machine. When running public
 > (Docker/VPS/Hostinger), UNETI AI **turns forced login on by itself**, so opening the app gives the
 > **create admin / sign in** screen and nobody can drive it before a password exists. (To turn that
-> off for internal use: `JAVIS_REQUIRE_LOGIN=0`.)
+> off for internal use: `UNETI_REQUIRE_LOGIN=0`.)
 
 ---
 
@@ -24,18 +24,18 @@ Hostinger pulls the image and runs it. Open the app at `http://<vps-ip>:7777` (t
 hPanel → VPS) and you get the **create admin account** screen.
 
 > 🌐 **Want a PRIVATE LINK with HTTPS (dropping `:7777` so the mic and voice work) WITHOUT buying a
-> domain?** Use `docker-compose.hostinger.yml` and set `DOMAIN_NAME=javis.<vps-hostname>.hstgr.cloud`;
+> domain?** Use `docker-compose.hostinger.yml` and set `DOMAIN_NAME=uneti.<vps-hostname>.hstgr.cloud`;
 > see **"The default link + HTTPS on Hostinger"** in the HTTPS section below. This base compose file
 > is only reachable by IP:7777.
 
 **3 things to do once:**
-1. **Set the GHCR image to Public:** GitHub → the `javis-os` repo → **Packages** → `javis-os`
+1. **Set the GHCR image to Public:** GitHub → the `uneti-ai` repo → **Packages** → `uneti-ai`
    → *Package settings* → Visibility = **Public** (so Hostinger can pull without a registry login).
    The image is built by CI on every push to `main` (see the Updates section).
 2. **Create the admin account safely** (Claude runs at full power, so account creation must not be
    open to everyone):
    - **Way A (recommended):** in the Hostinger compose, fill the two existing fields
-     `JAVIS_ADMIN_USER` + `JAVIS_ADMIN_PASSWORD`, and the admin is created at startup so opening
+     `UNETI_ADMIN_USER` + `UNETI_ADMIN_PASSWORD`, and the admin is created at startup so opening
      the app takes you **straight to sign-in**.
    - **Way B:** leave them empty, open the app **right after deploying** and set a username and
      password (at least 8 characters) yourself. Note: while no admin exists, **whoever opens the link
@@ -53,10 +53,10 @@ hPanel → VPS) and you get the **create admin account** screen.
 
 Docker is required. Do not have it? `curl -fsSL https://get.docker.com | sh`
 ```bash
-mkdir javis && cd javis
+mkdir uneti && cd uneti
 curl -fsSLO https://raw.githubusercontent.com/uneti-ai/uneti-ai/main/docker-compose.yml
 
-docker compose run --rm javis claude auth login --claudeai   # SIGN CLAUDE IN ONCE (link + code)
+docker compose run --rm uneti claude auth login --claudeai   # SIGN CLAUDE IN ONCE (link + code)
 docker compose up -d                                          # pull the GHCR image and run
 ```
 Open `http://<vps-ip>:7777` (or through a tunnel, below) and you get the create-admin screen.
@@ -71,7 +71,7 @@ docker compose down        # stop
 docker compose build --pull && docker compose up -d   # update
 ```
 
-Every note, vault and setting lives in Docker volumes (`javis-data`, `claude-auth`), so
+Every note, vault and setting lives in Docker volumes (`uneti-data`, `claude-auth`), so
 **nothing is lost** on a restart or an update.
 
 ### 🔒 Automatic HTTPS
@@ -103,21 +103,21 @@ you **must set a `DOMAIN_NAME` variable**:
    https://raw.githubusercontent.com/uneti-ai/uneti-ai/main/docker-compose.hostinger.yml
    ```
 3. The new template's **Environment** box has only 3 meaningful fields:
-   - `DOMAIN_NAME`: set `javis.<vps-hostname>.hstgr.cloud`
-     (for example `javis.srv1782015.hstgr.cloud`), or your own domain with an A record pointed at the
+   - `DOMAIN_NAME`: set `uneti.<vps-hostname>.hstgr.cloud`
+     (for example `uneti.srv1782015.hstgr.cloud`), or your own domain with an A record pointed at the
      VPS IP.
-   - `JAVIS_ADMIN_USER`: the username, `admin` by default.
-   - `JAVIS_ADMIN_PASSWORD`: a strong password you choose; leaving it empty means creating the
+   - `UNETI_ADMIN_USER`: the username, `admin` by default.
+   - `UNETI_ADMIN_PASSWORD`: a strong password you choose; leaving it empty means creating the
      account yourself on the first-run screen right after deploying (whoever opens the link first
      can create the admin).
 
-   The older technical fields such as `JAVIS_HOST`, `JAVIS_PORT`, the state and brain paths and
+   The older technical fields such as `UNETI_HOST`, `UNETI_PORT`, the state and brain paths and
    `CLAUDE_CWD` have been cleared from the form; the Docker image still uses the right defaults.
 4. **Deploy**, wait 1-3 minutes for Traefik to issue SSL, then open `https://<DOMAIN_NAME>`.
 
 > **A VPS link right after install (since 0.302.0):** on a VPS without Traefik (plain Ubuntu 26) `DOMAIN_NAME` can
 > stay empty. The gateway reads the VPS name (`srvXXXX.hstgr.cloud`) and issues HTTPS for both
-> `javis.srvXXXX.hstgr.cloud` and `srvXXXX.hstgr.cloud` itself (since 0.304.0; whichever points at the machine gets a
+> `uneti.srvXXXX.hstgr.cloud` and `srvXXXX.hstgr.cloud` itself (since 0.304.0; whichever points at the machine gets a
 > certificate). **Settings → Domain** says whether the link works yet or is still waiting for its certificate. **Open** reaches
 > `http://<ip>:7777`, and the page moves to that HTTPS link as soon as it works and answers as this UNETI AI. Add
 > `?stay=1` to the IP link to stay. Apps installed from Hostinger's Catalog (e.g. `omniroute-xxxx.srv....hstgr.cloud`)
@@ -126,22 +126,22 @@ you **must set a `DOMAIN_NAME` variable**:
 > the line to copy.
 >
 > **Hostinger VPS on Ubuntu 26 (or any plain OS without Traefik), since 0.300.0:** paste the SAME link, nothing to
-> change. The compose now carries a `javis-gateway` container (Caddy): when ports 80/443 are free it requests and
+> change. The compose now carries a `uneti-gateway` container (Caddy): when ports 80/443 are free it requests and
 > renews the Let's Encrypt certificate for `DOMAIN_NAME` itself; on a VPS with Hostinger's Traefik it stays idle and
 > leaves HTTPS to Traefik. Two requirements: Docker installed (Docker Manager does it, or
 > `curl -fsSL https://get.docker.com | sh`), and ports 80 + 443 open in the firewall. Before deploying, check the
-> name points at the VPS: `ping javis.<vps-hostname>.hstgr.cloud` must show the VPS IP (for your own domain, an A
-> record to the VPS IP). The `javis-gateway` log says what it is doing.
+> name points at the VPS: `ping uneti.<vps-hostname>.hstgr.cloud` must show the VPS IP (for your own domain, an A
+> record to the VPS IP). The `uneti-gateway` log says what it is doing.
 >
 > **Traefik does not handle updates.** Traefik (or Caddy) only provides HTTPS for the domain. Updates are done by the
-> bundled `javis-watchtower` container, so the **⬆ Update now** button works the same on Ubuntu 24 and 26.
+> bundled `uneti-watchtower` container, so the **⬆ Update now** button works the same on Ubuntu 24 and 26.
 
 > Without `DOMAIN_NAME` it still deploys (running temporarily on `:7777` with no HTTPS), and since 0.302.0 the
 > **Open** button goes to `http://<vps-ip>:7777` instead of `localhost` (Open follows the domain in the Traefik
 > label, which used to say `localhost`). Don't know the VPS hostname? Open UNETI AI by IP → **Settings → Domain**: UNETI AI
-> looks it up and shows the line `DOMAIN_NAME=javis.srvXXXX.hstgr.cloud` with a copy button. No Environment box?
+> looks it up and shows the line `DOMAIN_NAME=uneti.srvXXXX.hstgr.cloud` with a copy button. No Environment box?
 > Click **Manage → edit the .yaml** and change the two label lines to `- traefik.enable=true` and
-> `- traefik.http.routers.javis.rule=Host(\`javis.srv1782015.hstgr.cloud\`)`.
+> `- traefik.http.routers.uneti.rule=Host(\`uneti.srv1782015.hstgr.cloud\`)`.
 > **The key point:** the Traefik labels attach straight to the service, with **NO
 > `networks:` / `external: traefik-proxy` declaration** (that is what used to make the deploy report
 > "network not found").
@@ -156,10 +156,10 @@ You no longer set `DOMAIN` at run time; enable Caddy once then declare the domai
 1. Enable Caddy (On-Demand TLS): `docker compose -f docker-compose.yml -f docker-compose.https.yml up -d`
    *(needs Docker Compose v2.23.1+, check with `docker compose version`)*
 2. Open `http://<vps-ip>:7777` → **Settings → Voice, branding and access → Domain and SSL** → enter
-   `javis.yourname.com` → **Save and check**.
-3. The wizard shows the exact DNS record to create (A: `javis.yourname.com → <vps-ip>`) with a copy
+   `uneti.yourname.com` → **Save and check**.
+3. The wizard shows the exact DNS record to create (A: `uneti.yourname.com → <vps-ip>`) with a copy
    button. Point the DNS then wait for propagation.
-4. Open `https://javis.yourname.com` and Caddy **obtains and renews** the certificate on the first
+4. Open `https://uneti.yourname.com` and Caddy **obtains and renews** the certificate on the first
    visit, with the Secure cookie turned on automatically. Done.
 
 > Safety: Caddy asks the backend (`/tls-check`) before requesting a certificate, so it **only** issues
@@ -180,11 +180,11 @@ and no instance sees another's brain or accounts.
 
 | Variable | Why it must differ | What a collision causes |
 |---|---|---|
-| `JAVIS_NAME` | Docker names containers machine-wide | `name is already in use`, the second instance never starts |
-| `JAVIS_HOST_PORT` | One host port can only be held by one container | `port is already allocated` |
+| `UNETI_NAME` | Docker names containers machine-wide | `name is already in use`, the second instance never starts |
+| `UNETI_HOST_PORT` | One host port can only be held by one container | `port is already allocated` |
 | `DOMAIN_NAME` | Each link must point at exactly one instance | Two instances fighting over one link |
 
-Leaving all three empty gives `javis` plus port `7777`, which is **exactly the old install**, so
+Leaving all three empty gives `uneti` plus port `7777`, which is **exactly the old install**, so
 running a single instance needs no change at all.
 
 ### On Hostinger Docker Manager
@@ -192,8 +192,8 @@ running a single instance needs no change at all.
 Deploy `docker-compose.hostinger.yml` **once more** as a new stack, filling in the Environment:
 
 ```
-Stack 1:  DOMAIN_NAME=shop.srv1782015.hstgr.cloud     (JAVIS_NAME, JAVIS_HOST_PORT left empty)
-Stack 2:  DOMAIN_NAME=canhan.srv1782015.hstgr.cloud   JAVIS_NAME=javis-canhan   JAVIS_HOST_PORT=7778
+Stack 1:  DOMAIN_NAME=shop.srv1782015.hstgr.cloud     (UNETI_NAME, UNETI_HOST_PORT left empty)
+Stack 2:  DOMAIN_NAME=canhan.srv1782015.hstgr.cloud   UNETI_NAME=uneti-canhan   UNETI_HOST_PORT=7778
 ```
 
 The wildcard DNS `*.hstgr.cloud` is already there so any subdomain resolves immediately, and Traefik
@@ -205,42 +205,42 @@ A machine has only **one port 443**, so Caddy must live OUTSIDE every instance. 
 for the whole machine**:
 
 ```bash
-docker network create javis-web
+docker network create uneti-web
 curl -fsSLO https://raw.githubusercontent.com/uneti-ai/uneti-ai/main/docker-compose.proxy.yml
-docker compose -f docker-compose.proxy.yml -p javis-proxy up -d
+docker compose -f docker-compose.proxy.yml -p uneti-proxy up -d
 ```
 
 Then give each instance **its own folder**:
 
 ```bash
-mkdir -p ~/javis-shop && cd ~/javis-shop
+mkdir -p ~/uneti-shop && cd ~/uneti-shop
 curl -fsSLO https://raw.githubusercontent.com/uneti-ai/uneti-ai/main/docker-compose.yml
 curl -fsSLO https://raw.githubusercontent.com/uneti-ai/uneti-ai/main/docker-compose.multi.yml
 cat > .env <<'EOF'
-JAVIS_NAME=javis-shop
-JAVIS_HOST_PORT=7777
-JAVIS_BIND=127.0.0.1
+UNETI_NAME=uneti-shop
+UNETI_HOST_PORT=7777
+UNETI_BIND=127.0.0.1
 DOMAIN_NAME=shop.yourname.com
-JAVIS_ADMIN_USER=admin
-JAVIS_ADMIN_PASSWORD=your-strong-password
+UNETI_ADMIN_USER=admin
+UNETI_ADMIN_PASSWORD=your-strong-password
 EOF
 chmod 600 .env
 
 CF="-f docker-compose.yml -f docker-compose.multi.yml"
-docker compose $CF run --rm javis claude auth login --claudeai   # sign Claude in for THIS instance
+docker compose $CF run --rm uneti claude auth login --claudeai   # sign Claude in for THIS instance
 docker compose $CF up -d
 ```
 
-Do the same for the second instance in `~/javis-canhan`, changing `.env` to `javis-canhan` / `7778` /
+Do the same for the second instance in `~/uneti-canhan`, changing `.env` to `uneti-canhan` / `7778` /
 `canhan.yourname.com`. Point an A record for each subdomain at the VPS IP and you are done: the proxy
 **discovers new instances through Docker labels**, so nothing on the proxy needs editing and it does
 not need restarting.
 
-> Each instance has its own admin account, so set `JAVIS_ADMIN_*` in **each** `.env` (with different
+> Each instance has its own admin account, so set `UNETI_ADMIN_*` in **each** `.env` (with different
 > passwords). Leaving them empty opens that instance on the create-account screen, where whoever
 > opens the link first can create the admin, so create it right after starting.
 
-> `JAVIS_BIND=127.0.0.1` pulls the port back to loopback because the proxy handles HTTPS. You can
+> `UNETI_BIND=127.0.0.1` pulls the port back to loopback because the proxy handles HTTPS. You can
 > still get in to debug with `ssh -L 7777:localhost:7777 user@<vps-ip>` while DNS has not propagated.
 
 **Updating** is still `./update.sh` in each folder; the script reads the `.env` of the folder you are
@@ -253,11 +253,11 @@ one, or two Caddys will fight over port 443.
 Clone into a different folder then set two variables before running:
 
 ```bash
-JAVIS_NAME=javis-shop JAVIS_PORT=7778 ./install.sh
+UNETI_NAME=uneti-shop UNETI_PORT=7778 ./install.sh
 ```
 
-The systemd service becomes `javis-shop.service` (`journalctl -u javis-shop -f`) rather than
-overwriting the previous instance's `javis.service`. HTTPS is handled by whichever nginx or Caddy the
+The systemd service becomes `uneti-shop.service` (`journalctl -u uneti-shop -f`) rather than
+overwriting the previous instance's `uneti.service`. HTTPS is handled by whichever nginx or Caddy the
 machine already runs.
 
 ### What is shared and what is private
@@ -287,14 +287,14 @@ Open the UNETI AI interface from another machine with NO open ports and NO domai
 **A stable URL (your own domain, `*.hstgr.cloud` style):** create a *named tunnel* in Cloudflare Zero
 Trust (free), take the token, put `TUNNEL_TOKEN=...` into `.env`, change the `tunnel` service's
 `command` line to the `run --token` variant (commented out in `docker-compose.yml`), and point it at
-`http://javis:7777`. A quick tunnel changes its URL on every restart; a named tunnel gives a stable one.
+`http://uneti:7777`. A quick tunnel changes its URL on every restart; a named tunnel gives a stable one.
 
 ---
 
 ## Way 2 - Installing directly on Linux/macOS (no Docker)
 
 ```bash
-git clone https://github.com/uneti-ai/uneti-ai.git javis && cd javis
+git clone https://github.com/uneti-ai/uneti-ai.git uneti && cd uneti
 chmod +x install.sh && ./install.sh
 ```
 
@@ -304,14 +304,14 @@ in, run once:
 ```bash
 claude auth login --claudeai
 ```
-Managing the service: `journalctl -u javis -f` · `sudo systemctl restart javis`
+Managing the service: `journalctl -u uneti -f` · `sudo systemctl restart uneti`
 
 ---
 
 ## Way 3 - Windows (a personal machine)
 
-Double-click `setup.bat` (which shows a window) or `start-javis.vbs` (which runs in the background).
-Stop it with `stop-javis.bat`. Open http://localhost:7777
+Double-click `setup.bat` (which shows a window) or `start-uneti.vbs` (which runs in the background).
+Stop it with `stop-uneti.bat`. Open http://localhost:7777
 
 ---
 
@@ -319,9 +319,9 @@ Stop it with `stop-javis.bat`. Open http://localhost:7777
 
 | Variable | Meaning | Default |
 |---|---|---|
-| `JAVIS_HOST` | The listening address. `127.0.0.1` = this machine only; `0.0.0.0` = everywhere (Docker sets this itself) | `127.0.0.1` |
-| `JAVIS_PORT` | The port | `7777` |
-| `JAVIS_STATE_DIR` | Where UNETI AI writes state (settings, sessions, loop configuration) | `server/` (Docker: `/data/state`) |
+| `UNETI_HOST` | The listening address. `127.0.0.1` = this machine only; `0.0.0.0` = everywhere (Docker sets this itself) | `127.0.0.1` |
+| `UNETI_PORT` | The port | `7777` |
+| `UNETI_STATE_DIR` | Where UNETI AI writes state (settings, sessions, loop configuration) | `server/` (Docker: `/data/state`) |
 | `OBSIDIAN_VAULT_PATH` | The main Second Brain vault | `vault/` in the repo (Docker: `/data/vault`) |
 | `BRAIN_PATH` | The brain folder | `brain/` in the repo (Docker: `/data/brain`) |
 | `CLAUDE_CWD` | Fallback folder for the Claude CLI (chat runs inside the brain folder) | the repo root |
@@ -347,22 +347,22 @@ Stop it with `stop-javis.bat`. Open http://localhost:7777
 >   Only Watchtower is granted Docker access (the socket); the UNETI AI app is NOT, which is what makes it
 >   safe. Going without it is fine too, and the panel then only *reports a new version* and explains how
 >   to update by hand.
-> - **The button is there but does nothing, and `javis-watchtower` keeps Restarting:** a stack
+> - **The button is there but does nothing, and `uneti-watchtower` keeps Restarting:** a stack
 >   built from a compose file older than 0.65.20 uses the `containrrr/watchtower` image (no
 >   longer maintained), whose log says `client version 1.25 is too old`. Newer Docker rejects it.
 >   Redeploy ONCE from the new compose (Hostinger: Docker Manager, paste the compose URL again and
 >   Deploy; VPS: the two commands above); it uses the maintained fork
 >   `ghcr.io/nicholas-fedor/watchtower:1`, which negotiates the API version with Docker.
 > - **You press update and stay on the old version, and `image:` in the compose file is an odd name**
->   (for example `javis-cwi:pc-0.206.0`, with no `ghcr.io/...`): this is a self-built image, common when
+>   (for example `uneti-cwi:pc-0.206.0`, with no `ghcr.io/...`): this is a self-built image, common when
 >   an AI moved UNETI AI from a computer to a VPS with `docker save` then `docker load`. It lives in no
 >   registry, so pulling or Redeploying brings back the same old version (since 0.267.0 the Updates page
 >   says so). Switch to the official image ONCE; your data stays because it lives in the mounted folders:
 >   ```bash
->   cd /opt/javis                      # the folder with the compose file
+>   cd /opt/uneti                      # the folder with the compose file
 >   cp compose.yml compose.yml.bak     # the file may be called docker-compose.yml
 >   docker compose config | grep -A1 "target:"   # the paths inside must be /data, /brains,
->                                                 # /home/javis/.claude, /home/javis/.codex
+>                                                 # /home/uneti/.claude, /home/uneti/.codex
 >   sed -i 's#^\(\s*image:\s*\).*#\1ghcr.io/uneti-ai/uneti-ai:latest#' compose.yml
 >   docker compose up -d --pull always
 >   ```
@@ -371,10 +371,10 @@ Stop it with `stop-javis.bat`. Open http://localhost:7777
 >   `watchtower` service exactly as in [`docker-compose.yml`](docker-compose.yml). Write errors after the
 >   switch: the mounted folders must belong to the container's user 10001, so run
 >   `sudo chown -R 10001:10001 brains data claude-auth codex-auth`.
-> - **Want it fully automatic, with no button:** set `JAVIS_AUTO_UPDATE=true` in `.env`
+> - **Want it fully automatic, with no button:** set `UNETI_AUTO_UPDATE=true` in `.env`
 >   (Hostinger: the Environment box) and bring the stack up again. It is off by default because
 >   auto-updating means the app restarts itself whenever a new version lands, cutting across
->   background work. Change the cadence with `JAVIS_AUTO_UPDATE_INTERVAL` (seconds).
+>   background work. Change the cadence with `UNETI_AUTO_UPDATE_INTERVAL` (seconds).
 > - **Native/Windows:** the button runs `update.sh` (git pull plus restart) for you.
 
 The repo and the GHCR image are both **Public**, so `git clone`/`pull` and `docker pull` need no login.
@@ -382,17 +382,17 @@ The repo and the GHCR image are both **Public**, so `git clone`/`pull` and `dock
 Whenever you push new code, on the VPS all you need is:
 
 ```bash
-cd javis && ./update.sh
+cd uneti && ./update.sh
 ```
 
 The script runs `git pull` then:
 - **Docker**: `docker compose build && docker compose up -d`, and data in the volumes is NOT lost.
-- **Native (systemd)**: `pip install -r requirements.txt` plus `systemctl restart javis`.
+- **Native (systemd)**: `pip install -r requirements.txt` plus `systemctl restart uneti`.
 
 To force a mode: `./update.sh docker` or `./update.sh native`. The manual equivalent:
 ```bash
 git pull && docker compose build && docker compose up -d          # Docker
-git pull && ./.venv/bin/pip install -r requirements.txt && sudo systemctl restart javis   # Native
+git pull && ./.venv/bin/pip install -r requirements.txt && sudo systemctl restart uneti   # Native
 ```
 
 On your Windows machine, pushing code to GitHub: `git add -A && git commit -m "..." && git push`

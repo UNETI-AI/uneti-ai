@@ -14,9 +14,9 @@ import random
 import tempfile
 from pathlib import Path
 
-os.environ["JAVIS_STATE_DIR"] = tempfile.mkdtemp(prefix="javis-contrib-")
-os.environ.pop("JAVIS_RESONANCE_CALL_CEILING", None)
-TEMP = Path(tempfile.mkdtemp(prefix="javis-contrib-w-"))
+os.environ["UNETI_STATE_DIR"] = tempfile.mkdtemp(prefix="uneti-contrib-")
+os.environ.pop("UNETI_RESONANCE_CALL_CEILING", None)
+TEMP = Path(tempfile.mkdtemp(prefix="uneti-contrib-w-"))
 
 import agent_pulse as AP  # noqa: E402
 import feedback_projector as FP  # noqa: E402

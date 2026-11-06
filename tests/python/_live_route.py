@@ -2,7 +2,7 @@
 
 The route is a closure-heavy async function inside server/main.py, so the tests compile just that
 function out of the module and run it in a namespace of fakes: a provider that records what the
-route says to it, a brain (`_voice_ask_javis`) the test releases by hand, a browser socket, and a
+route says to it, a brain (`_voice_ask_uneti`) the test releases by hand, a browser socket, and a
 real SessionStore in a temp directory.
 
     class MyTests(LiveRouteMixin, unittest.IsolatedAsyncioTestCase):
@@ -176,7 +176,7 @@ class LiveRouteMixin:
             openai_oauth=types.SimpleNamespace(write_codex_auth=lambda: None),
             _brain_memory_dir=lambda root: Path(directory), _brain_root=lambda b: directory,
             _fit_memory_index=lambda mem, cap=None: mem[:cap],
-            _voice_ask_javis=ask, get_store=lambda: store, _brain_key=lambda b: b,
+            _voice_ask_uneti=ask, get_store=lambda: store, _brain_key=lambda b: b,
             _voice_persona=lambda sid, b: None,
             voice_call=types.SimpleNamespace(live_settings=lambda c: c, select_call_engine=lambda c: {"engine": "live"}))
         exec(compile(route_tree(), "live-route", "exec"), namespace)

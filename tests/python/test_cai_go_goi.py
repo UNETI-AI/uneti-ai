@@ -310,7 +310,7 @@ check("nói thẳng gói chạy mã thật, không làm mềm",
       and "máy chủ UNETI AI" in _VI.get("store.inspect.code.title", ""))
 
 src_c = (DASHBOARD / "console.js").read_text(encoding="utf-8")
-check("trang Gói đăng ký trong rail", '"packs"' in src_c and "JavisPacks" in src_c)
+check("trang Gói đăng ký trong rail", '"packs"' in src_c and "UnetiPacks" in src_c)
 for f in ("vi", "en"):
     d = json.loads((DASHBOARD / "i18n" / f"{f}.json").read_text(encoding="utf-8"))
     check(f"từ điển {f} có nhãn trang Gói", bool(d.get("page.packs.label")))

@@ -26,7 +26,7 @@ import os
 import sys
 import tempfile
 
-os.environ["JAVIS_STATE_DIR"] = tempfile.mkdtemp(prefix="javis-dago-test-")
+os.environ["UNETI_STATE_DIR"] = tempfile.mkdtemp(prefix="uneti-dago-test-")
 
 import config as cfgmod   # noqa: E402
 import main               # noqa: E402

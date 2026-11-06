@@ -82,5 +82,5 @@
     "All exact-source qualification must match current source closure; historical proofs remain scoped and cannot qualify changed sources",
     "Exact-final-head full CI, remaining D2/E/F and M3-M8 code, then all required Phase2 evidence remain open"
   ],
-  "upstream_reuse": "Goal14 assessment inspected pinned substrate/base and core/context; keep existing Javis M0/runtime/turn owner. No upstream code imported/copied into this unit. Goal15 prompt adaptation queued separately."
+  "upstream_reuse": "Goal14 assessment inspected pinned substrate/base and core/context; keep existing UNETI AI M0/runtime/turn owner. No upstream code imported/copied into this unit. Goal15 prompt adaptation queued separately."
 }

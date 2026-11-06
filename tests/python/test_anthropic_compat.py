@@ -3,8 +3,8 @@
     python tests/run.py anthropic_compat     (no network: a fake gateway runs on localhost)
 
 Owner, 20/10/2026: a reseller told a customer their Claude access is more stable over the
-"Anthropic compatible" endpoint than the "OpenAI compatible" one, and Javis had no way to use it.
-Javis sent every Anthropic request to a hard-coded https://api.anthropic.com/v1/messages.
+"Anthropic compatible" endpoint than the "OpenAI compatible" one, and UNETI AI had no way to use it.
+UNETI AI sent every Anthropic request to a hard-coded https://api.anthropic.com/v1/messages.
 
 The fake gateway below behaves like the real ones this targets:
 - `/anthropic/...` has no /v1/models (DeepSeek's and Kimi's "anthropic" endpoints, most resellers);
@@ -18,12 +18,12 @@ import json
 import os
 # 0.438.5: vòng tool mặc định gọi model dạng stream. File này thử logic vòng tool trên đường non-stream
 # (giả lập client.post / máy chủ trả JSON), đường đó vẫn là đường lui. Đường stream: test_api_stream_vong.py.
-os.environ["JAVIS_API_STREAM_TOOLS"] = "0"
+os.environ["UNETI_API_STREAM_TOOLS"] = "0"
 import tempfile
 import threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
-os.environ["JAVIS_STATE_DIR"] = tempfile.mkdtemp(prefix="javis-ac-")
+os.environ["UNETI_STATE_DIR"] = tempfile.mkdtemp(prefix="uneti-ac-")
 
 import config as cfgmod  # noqa: E402
 import engine  # noqa: E402

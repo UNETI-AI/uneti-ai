@@ -20,7 +20,7 @@ function check(name, cond) {
 }
 
 const WIDE = ".bubble:has(.md-table tr > :nth-child(4))";
-const at = CSS.indexOf("#chatPage .msg-javis > " + WIDE + ",");
+const at = CSS.indexOf("#chatPage .msg-uneti > " + WIDE + ",");
 check("a widening rule exists for answers with a 4+ column table", at > 0);
 
 const mediaStart = CSS.lastIndexOf("@media", at);
@@ -29,15 +29,15 @@ check("the widening only applies on a desktop (min-width media query)", /@media\
 
 const block = CSS.slice(at, CSS.indexOf("\n}\n", at));
 check("the answer and its reaction row widen together",
-  block.includes("#chatPage .msg-javis:has(> .bubble .md-table tr > :nth-child(4)) > .jr-chat"));
+  block.includes("#chatPage .msg-uneti:has(> .bubble .md-table tr > :nth-child(4)) > .jr-chat"));
 check("the cap is min(1200px, 100%) so a narrow pane never overflows", block.includes("max-width: min(1200px, 100%)"));
 check("prose inside a widened answer keeps the 72ch measure",
-  /#chatPage \.msg-javis > \.bubble:has\(\.md-table tr > :nth-child\(4\)\) > :not\(\.md-tablewrap\):not\(pre\):not\(\.code-wrap\) \{\s*max-width: 72ch;/.test(block));
+  /#chatPage \.msg-uneti > \.bubble:has\(\.md-table tr > :nth-child\(4\)\) > :not\(\.md-tablewrap\):not\(pre\):not\(\.code-wrap\) \{\s*max-width: 72ch;/.test(block));
 
 // No rule widens every answer on the Chat page (the PR #958 shape).
-check("no unconditional widening of .msg-javis .bubble on #chatPage",
-  !/#chatPage \.msg-javis \.bubble\s*[,{]/.test(CSS) && !/#chatPage \.msg-javis > \.jr-chat\s*[,{]/.test(CSS));
-check("the base answer bubble is still 72ch", /\.msg-javis \.bubble \{ max-width: min\(72ch, 100%\); \}/.test(CSS));
+check("no unconditional widening of .msg-uneti .bubble on #chatPage",
+  !/#chatPage \.msg-uneti \.bubble\s*[,{]/.test(CSS) && !/#chatPage \.msg-uneti > \.jr-chat\s*[,{]/.test(CSS));
+check("the base answer bubble is still 72ch", /\.msg-uneti \.bubble \{ max-width: min\(72ch, 100%\); \}/.test(CSS));
 check("style.css cache key is past 156 so browsers fetch the new rule",
   (Number((HTML.match(/style\.css\?v=(\d+)/) || [])[1]) || 0) > 156);
 

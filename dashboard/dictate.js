@@ -350,6 +350,6 @@
   var api = { create: create, joinText: joinText, addPiece: addPiece, plan: plan, isPhone: isPhone, isIOS: isIOS,
     isAndroid: isAndroid,
     ear: function () { return earKind; }, warm: askEar };
-  if (typeof window !== "undefined") window.JavisDictate = api;
+  if (typeof window !== "undefined") window.UnetiDictate = api;
   if (typeof module !== "undefined" && module.exports) module.exports = api;
 })();

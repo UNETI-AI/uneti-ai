@@ -1,6 +1,6 @@
-"""Stdio MCP processes that outlived the Javis server which started them.
+"""Stdio MCP processes that outlived the UNETI AI server which started them.
 
-Why this exists (field report 2026-10-13, bot "Javis Vũ"): the bot stopped answering a Zalo group at
+Why this exists (field report 2026-10-13, bot "UNETI AI Vũ"): the bot stopped answering a Zalo group at
 21:09. The account had TWO `javis-zalo mcp start` processes: one from 20:49, one the server started
 when it came back at 21:10. Zalo pushes each message to one socket only, the bot read the new process,
 and the new process received almost nothing (one sticker in two hours).
@@ -58,7 +58,7 @@ def _proc_start(pid: int) -> str:
 # Start time of this server process (0.283.0). A recorded owner pid that is alive is only the same server when its
 # start time matches: after a restart the old server's pid is often handed to another process (a container hands out
 # small pids again), and the old reaper then read "its server still runs" and left the survivor alive. Field report
-# 22/10/2026 (Javis Vũ): after an update, an old `mcp start` kept evicting the new one every few minutes.
+# 22/10/2026 (UNETI AI Vũ): after an update, an old `mcp start` kept evicting the new one every few minutes.
 _SERVER_START = _proc_start(os.getpid())
 
 

@@ -26,7 +26,7 @@ check("thawing ends on the habit's flame sound", /kind === "thaw"[\s\S]*sfxPlay\
 const pl = snd.slice(snd.indexOf("function play(kind)"), snd.indexOf("function sync()"));
 check("silent when switched off or on a hidden tab", /if \(!on\(\) \|\| document\.hidden\) return/.test(pl));
 check("a browser without Web Audio stays silent, no error", /AC_ = false/.test(snd) && /catch \(e\) \{ \/\* no sound is fine \*\/ \}/.test(pl));
-check("tasks.js plays through the shared switch", /function sfx\(kind\) \{ try \{ if \(window\.JavisSound\) window\.JavisSound\.play\(kind\)/.test(src) && !/AudioContext/.test(src));
+check("tasks.js plays through the shared switch", /function sfx\(kind\) \{ try \{ if \(window\.UnetiSound\) window\.UnetiSound\.play\(kind\)/.test(src) && !/AudioContext/.test(src));
 
 // The switch (owner: "để bật tắt âm thanh vào chỗ gần với chỗ sáng tối, không cần có volume chỉnh chỉ cần nút thôi").
 const iS = html.indexOf('id="soundToggle"'), iT = html.indexOf('id="themeToggle"');
@@ -35,7 +35,7 @@ check("only a button, no volume slider", !/type="range"/.test(html.slice(iS, iT)
 check("ui-sound.js loads right after theme.js", /static\/theme\.js\?v=\d+"><\/script>\n  <script src="\/static\/ui-sound\.js/.test(html));
 check("speaker with waves when on, crossed out when off", /\.sound-toggle\[aria-pressed="false"\] \.ic-son \{ display: none; \}/.test(style) && /\.sound-toggle \.ic-soff \{ display: none; \}/.test(style));
 check("on a phone it moves to the drawer foot beside light/dark", /moveEl\(document\.getElementById\("soundToggle"\), true, true\);[^\n]*\n\s*moveEl\(document\.getElementById\("themeToggle"\)/.test(mob) && /\.rail-foot #soundToggle \+ #themeToggle/.test(ccss));
-check("the setting is one key on this device, default on", /KEY = "javis\.sound"/.test(snd) && /getItem\(KEY\) !== "off"/.test(snd));
+check("the setting is one key on this device, default on", /KEY = "uneti\.sound"/.test(snd) && /getItem\(KEY\) !== "off"/.test(snd));
 check("tooltips in vi and en", !!vi["top.sound_on"] && !!vi["top.sound_off"] && !!en["top.sound_on"] && !!en["top.sound_off"]);
 
 const reward = src.slice(src.indexOf("async function checkWithReward"), src.indexOf("// ---- sounds"));

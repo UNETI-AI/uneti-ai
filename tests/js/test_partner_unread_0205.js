@@ -20,7 +20,7 @@ check("newest message moves a partner up (re-sort)", /a\.last_chat_at = Number\(
 const td = ws.slice(ws.indexOf("function onTurnDone(sid) {"), ws.indexOf("function onTurnDone(sid) {") + 900);
 check("a reply just written re-sorts too", /S\.agents = sapXep\(S\.agents, "last_chat_at"\);/.test(td) && /else if \(sid && S\.loai === "agent"\) henUnread\(\);/.test(td));
 // 2026-11-05: a plain chat switch (reason "open") does not recount; every other event still does.
-check("events read the counts again", /\["javis:sessions-changed", "javis:agent-read"\]\.forEach\(function \(ev\) \{\s*window\.addEventListener\(ev, function \(e\) \{ if \(!laDoiPhien\(e\)\) henUnread\(\); \}\);/.test(ws)
+check("events read the counts again", /\["uneti:sessions-changed", "uneti:agent-read"\]\.forEach\(function \(ev\) \{\s*window\.addEventListener\(ev, function \(e\) \{ if \(!laDoiPhien\(e\)\) henUnread\(\); \}\);/.test(ws)
   && /data\.type === "agent_read"/.test(app));
 // 2026-11-05: only when something is unread (or the counts are not loaded yet): a zero count skips the POST.
 check("opening a partner's chat reads it", /if \(S\.loai === "agent" && coTinChuaDoc\(item\.slug\)\) daDoc\(item\.slug\);/.test(ws) && ws.includes('api("/agents/opened"'));
@@ -38,7 +38,7 @@ check("unread rows read in full ink", css.includes(".ws-item-wrap.has-unread .ws
 global.window = { addEventListener() {}, t: (k, v) => (k === "ws.unread_n" ? v.n + " unread" : k) };
 global.document = { hidden: false, addEventListener() {} };
 require(path.join(R, "dashboard/workspace.js"));
-const W = window.JavisWorkspace;
+const W = window.UnetiWorkspace;
 const S = W.state();
 S.un = { a: { n: 3, last_at: 1, muted_until: 0 }, b: { n: 120, last_at: 1, muted_until: -1 }, c: { n: 0, muted_until: 0 } };
 const a = W.tinHtml({ slug: "a" }), b = W.tinHtml({ slug: "b" }), c = W.tinHtml({ slug: "c" });

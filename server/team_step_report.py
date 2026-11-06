@@ -1,7 +1,7 @@
 """The structured end-of-step report of a team Work/Help step (0.436.0).
 
-A step ends with one directive, the same shape as every JAVIS_TEAM block:
-    <!-- JAVIS_TEAM: {"op": "done", "outcome": "succeeded", "summary": "...", "files": ["..."]} -->
+A step ends with one directive, the same shape as every UNETI_TEAM block:
+    <!-- UNETI_TEAM: {"op": "done", "outcome": "succeeded", "summary": "...", "files": ["..."]} -->
 
 Taken from stablyai/orca's `worker_done` (an explicit outcome and a three-sentence body: what was done, what was found,
 what is left). Two things it buys:
@@ -23,7 +23,7 @@ FILES_MAX = 20
 FILE_CHARS = 300
 # Appended to the Work/Help system note (stable text, so prompt caching keeps it). Prompt text stays Vietnamese like
 # the rest of the team prompts (docs/dev/them-mot-ngon-ngu.md).
-HINT = ('Kết thúc bước bằng MỘT khối báo cáo: <!-- JAVIS_TEAM: {"op": "done", "outcome": "succeeded", '
+HINT = ('Kết thúc bước bằng MỘT khối báo cáo: <!-- UNETI_TEAM: {"op": "done", "outcome": "succeeded", '
         '"summary": "<tối đa 3 câu: đã làm gì, thấy gì, còn gì>", "files": ["<đường dẫn file đã ghi>"]} -->. '
         'Chỉ ghi "outcome": "failed" khi bước KHÔNG làm ra được kết quả dùng được (thiếu quyền, thiếu dữ liệu, lỗi '
         'không vượt qua được); làm được một phần thì vẫn "succeeded" và ghi phần còn lại vào summary. Đừng giấu thất bại '

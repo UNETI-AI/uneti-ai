@@ -1,8 +1,8 @@
-"""The chat shows which model REALLY answers when Javis falls back (owner, 05/11/2026).
+"""The chat shows which model REALLY answers when UNETI AI falls back (owner, 05/11/2026).
 
     python tests/run.py route_fallback_chip      (no network, no real CLI)
 
-A customer's report: Antigravity ran out of quota, Javis moved to ChatGPT, then to Claude Code, and the model chip under
+A customer's report: Antigravity ran out of quota, UNETI AI moved to ChatGPT, then to Claude Code, and the model chip under
 the chat still said "Gemini 3.8 Flash" with a green dot. The server now says, for a chat, what the owner chose and
 where the turn really runs (`_route_view`): in `/sessions/{id}/meta`, in `/chat/route` for an empty chat, and in a
 "route" frame at the start of every turn. Nothing saved changes, so the chosen model comes back once its quota does.
@@ -14,7 +14,7 @@ import tempfile
 import time
 from pathlib import Path
 
-os.environ["JAVIS_STATE_DIR"] = tempfile.mkdtemp(prefix="javis-routechip-")
+os.environ["UNETI_STATE_DIR"] = tempfile.mkdtemp(prefix="uneti-routechip-")
 
 import config as cfgmod  # noqa: E402
 import main  # noqa: E402

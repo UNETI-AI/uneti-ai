@@ -4,10 +4,10 @@ slug: datetime-vn
 version: 1.0.1
 description: Xem ngày giờ hiện tại theo múi giờ chọn ở Cài đặt và tính ngày tương đối (mai, mốt, N ngày nữa, tuần trước). Thuần stdlib, chỉ đọc, không cần mạng.
 description_en: "Shows the current date and time in the timezone picked in Settings and works out relative dates (tomorrow, in N days, last week). Pure stdlib, read-only, no network needed."
-author: Javis (bundled)
+author: UNETI AI (bundled)
 enabled: true
 min_mode: readonly
 tools:
-  - javis_now
-  - javis_date_add
+  - uneti_now
+  - uneti_date_add
 hooks: []

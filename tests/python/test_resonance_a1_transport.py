@@ -6,7 +6,7 @@
    HTTP của nhà cung cấp được giả lập ở `engine.httpx.AsyncClient`, nên vòng tool THẬT (`engine._cc_tool_loop`,
    `mcp_client.call_route`, hub và plugin) chạy nguyên. Bắt system prompt và danh sách tool đúng như gửi đi:
    phiên trợ lý bật, phiên trợ lý tắt, chat thường.
-2. Đường tool engine API: "model" giả gọi javis_goal; hai lượt của hai trợ lý chạy xen nhau. Mỗi mục tiêu phải gắn
+2. Đường tool engine API: "model" giả gọi uneti_goal; hai lượt của hai trợ lý chạy xen nhau. Mỗi mục tiêu phải gắn
    đúng trợ lý, đúng phiên, đúng tin.
 3. Đường tool Claude SDK: server MCP trong tiến trình THẬT (`ClaudeSDK._plugins_server`) gọi qua bộ điều phối
    `CallToolRequest` của chính server đó, trong hai lượt chạy xen nhau.
@@ -20,14 +20,14 @@ import json
 import os
 # 0.438.5: vòng tool mặc định gọi model dạng stream. File này thử logic vòng tool trên đường non-stream
 # (giả lập client.post / máy chủ trả JSON), đường đó vẫn là đường lui. Đường stream: test_api_stream_vong.py.
-os.environ["JAVIS_API_STREAM_TOOLS"] = "0"
+os.environ["UNETI_API_STREAM_TOOLS"] = "0"
 import sys
 import tempfile
 import time
 from pathlib import Path
 
-_STATE = tempfile.mkdtemp(prefix="javis-resonance-a1x-")
-os.environ["JAVIS_STATE_DIR"] = _STATE
+_STATE = tempfile.mkdtemp(prefix="uneti-resonance-a1x-")
+os.environ["UNETI_STATE_DIR"] = _STATE
 
 import main  # noqa: E402
 import engine  # noqa: E402
@@ -77,7 +77,7 @@ class _Resp:
 
 
 class _FakeClient:
-    """Thay httpx.AsyncClient trong engine: trả như OpenRouter. Lượt đầu "model" gọi javis_goal nếu tool có trong
+    """Thay httpx.AsyncClient trong engine: trả như OpenRouter. Lượt đầu "model" gọi uneti_goal nếu tool có trong
     danh sách, lượt sau trả chữ. Ngủ một nhịp để hai lượt chat chạy xen nhau."""
 
     def __init__(self, *a, **kw):
@@ -97,21 +97,21 @@ class _FakeClient:
                      "tools": names, "has_result": has_result, "user": msgs[-1].get("content") if msgs else ""})
         await asyncio.sleep(0.02)
         n_results = sum(1 for m in msgs if m.get("role") == "tool")
-        found = any("javis_goal" in str(m.get("content") or "") for m in msgs if m.get("role") == "tool")
+        found = any("uneti_goal" in str(m.get("content") or "") for m in msgs if m.get("role") == "tool")
 
         def _call(fn, args):
             return _Resp({"choices": [{"message": {"content": "", "tool_calls": [{
                 "id": f"call_{n_results}", "type": "function",
                 "function": {"name": fn, "arguments": __import__("json").dumps(args)}}]}}],
                 "usage": {"prompt_tokens": 1, "completion_tokens": 1}})
-        # Như model theo đúng dòng gợi ý: engine API nạp lười chỉ thấy tool lõi, nên TÌM javis_goal rồi CHẠY qua
-        # javis_run_tool. Tool có sẵn trong danh sách thì gọi thẳng.
-        if "javis_goal" in names and not has_result:
-            return _call("javis_goal", PROPOSAL)
-        if "javis_search_tools" in names and n_results == 0:
-            return _call("javis_search_tools", {"query": "javis_goal mục tiêu"})
-        if "javis_run_tool" in names and n_results == 1 and found:
-            return _call("javis_run_tool", {"name": "javis_goal", "args": PROPOSAL})
+        # Như model theo đúng dòng gợi ý: engine API nạp lười chỉ thấy tool lõi, nên TÌM uneti_goal rồi CHẠY qua
+        # uneti_run_tool. Tool có sẵn trong danh sách thì gọi thẳng.
+        if "uneti_goal" in names and not has_result:
+            return _call("uneti_goal", PROPOSAL)
+        if "uneti_search_tools" in names and n_results == 0:
+            return _call("uneti_search_tools", {"query": "uneti_goal mục tiêu"})
+        if "uneti_run_tool" in names and n_results == 1 and found:
+            return _call("uneti_run_tool", {"name": "uneti_goal", "args": PROPOSAL})
         tool_out = next((m.get("content") for m in reversed(msgs) if m.get("role") == "tool"), "")
         return _Resp({"choices": [{"message": {"content": "xong. " + str(tool_out)[:200]}}],
                       "usage": {"prompt_tokens": 1, "completion_tokens": 1}})
@@ -190,13 +190,13 @@ gB = [g for g in store.list_open(OWNER, session_id=SB)]
 uA = [m for m in ss.get_messages(SA) if m["role"] == "user"]
 uB = [m for m in ss.get_messages(SB) if m["role"] == "user"]
 first = [s for s in SEEN if not s["has_result"]]
-check("1 phiên trợ lý bật: prompt engine nhận có dòng gợi ý javis_goal và câu BA lối, không còn 'chỉ hai lối'",
-      len(first) >= 2 and all("javis_goal op=create" in s["system"] and "Ba lối đúng" in s["system"]
+check("1 phiên trợ lý bật: prompt engine nhận có dòng gợi ý uneti_goal và câu BA lối, không còn 'chỉ hai lối'",
+      len(first) >= 2 and all("uneti_goal op=create" in s["system"] and "Ba lối đúng" in s["system"]
                                and "Chỉ hai lối đúng" not in s["system"] for s in first),
       [s["system"][:80] for s in first])
-searched = [x for x in SEEN if x["has_result"] and "javis_goal" in x["user"] + str(x)]
-check("1 phiên trợ lý bật: engine API (nạp lười) tìm thấy javis_goal qua javis_search_tools",
-      all("javis_search_tools" in s["tools"] and "javis_run_tool" in s["tools"] for s in first) and searched)
+searched = [x for x in SEEN if x["has_result"] and "uneti_goal" in x["user"] + str(x)]
+check("1 phiên trợ lý bật: engine API (nạp lười) tìm thấy uneti_goal qua uneti_search_tools",
+      all("uneti_search_tools" in s["tools"] and "uneti_run_tool" in s["tools"] for s in first) and searched)
 check("2 engine API, hai lượt xen nhau: mỗi phiên đúng một mục tiêu, gắn đúng trợ lý và đúng tin",
       len(gA) == 1 and len(gB) == 1 and gA[0].agent_key == A["agent_key"] and gB[0].agent_key == B["agent_key"]
       and gA[0].request_ref == R.message_ref(SA, uA[-1]["id"]) and gB[0].request_ref == R.message_ref(SB, uB[-1]["id"]),
@@ -207,20 +207,20 @@ check("2 tool trả về đúng mục tiêu cho đúng lượt (không lẫn k�
 
 SEEN.clear()
 turns((SC, USER))
-check("1 phiên trợ lý TẮT: prompt như trước A1 (chỉ hai lối, không gợi ý), danh sách tool đầu không có javis_goal, không mục tiêu",
-      SEEN and "Chỉ hai lối đúng" in SEEN[0]["system"] and "javis_goal op=create" not in SEEN[0]["system"]
-      and "javis_goal" not in SEEN[0]["tools"] and not store.list_open(OWNER, session_id=SC),
+check("1 phiên trợ lý TẮT: prompt như trước A1 (chỉ hai lối, không gợi ý), danh sách tool đầu không có uneti_goal, không mục tiêu",
+      SEEN and "Chỉ hai lối đúng" in SEEN[0]["system"] and "uneti_goal op=create" not in SEEN[0]["system"]
+      and "uneti_goal" not in SEEN[0]["tools"] and not store.list_open(OWNER, session_id=SC),
       SEEN[0]["system"][:80] if SEEN else None)
 SEEN.clear()
 turns((SN, USER))
-check("1 chat thường: không có dòng gợi ý, danh sách tool đầu không có javis_goal, không lập mục tiêu",
-      SEEN and "javis_goal op=create" not in SEEN[0]["system"] and "javis_goal" not in SEEN[0]["tools"]
+check("1 chat thường: không có dòng gợi ý, danh sách tool đầu không có uneti_goal, không lập mục tiêu",
+      SEEN and "uneti_goal op=create" not in SEEN[0]["system"] and "uneti_goal" not in SEEN[0]["tools"]
       and not store.list_open(OWNER, session_id=SN))
 
 _sc = [m.get("content") or "" for m in ss.get_messages(SC) if m["role"] == "assistant"]
-check("1 phiên trợ lý TẮT: nếu model vẫn tìm và gọi javis_goal (danh sách tool của hub là đệm, chỉ gợi ý) thì "
+check("1 phiên trợ lý TẮT: nếu model vẫn tìm và gọi uneti_goal (danh sách tool của hub là đệm, chỉ gợi ý) thì "
       "tool trả ERROR agent_off, không ghi gì", not store.list_open(OWNER, session_id=SC)
-      and all("ERROR" in c and "agent_off" in c for c in _sc if "javis_goal" in c or "Cộng hưởng" in c))
+      and all("ERROR" in c and "agent_off" in c for c in _sc if "uneti_goal" in c or "Cộng hưởng" in c))
 
 # Engine gói thuê bao (Claude Code, Codex) dựng prompt ở _subscription_system_prompt: phiên trợ lý phải về đúng
 # _legacy_system_prompt, mà nhánh trợ lý của nó là _agent_chat_prompt (đã kiểm ở trên qua engine API).
@@ -243,11 +243,11 @@ SDK = {}
 async def _sdk_turn(agent, slug, sid, mid):
     with RA.turn(agent, sid, mid, USER, BRAIN, slug=slug):
         e = claude_sdk_engine.ClaudeSDK(cwd=BRAIN)
-        e.javis_vault = BRAIN
+        e.uneti_vault = BRAIN
         cfg = e._plugins_server()
         server = cfg["instance"]
         await asyncio.sleep(0.01)
-        req = CallToolRequest(method="tools/call", params=CallToolRequestParams(name="javis_goal", arguments=PROPOSAL))
+        req = CallToolRequest(method="tools/call", params=CallToolRequestParams(name="uneti_goal", arguments=PROPOSAL))
         res = await server.request_handlers[CallToolRequest](req)
         SDK[slug] = res
 
@@ -268,7 +268,7 @@ async def _sdk_plain():
                                               message_id=3))
     try:
         e = claude_sdk_engine.ClaudeSDK(cwd=BRAIN)
-        e.javis_vault = BRAIN
+        e.uneti_vault = BRAIN
         cfg = e._plugins_server()
         names = [t.name for t in (await cfg["instance"].request_handlers[__import__("mcp.types").types.ListToolsRequest](
             __import__("mcp.types").types.ListToolsRequest(method="tools/list"))).root.tools]
@@ -277,7 +277,7 @@ async def _sdk_plain():
         turn_context.reset(tok)
 
 
-check("3 Claude SDK, lượt chat thường: server plugin không mang javis_goal", "javis_goal" not in asyncio.run(_sdk_plain()))
+check("3 Claude SDK, lượt chat thường: server plugin không mang uneti_goal", "uneti_goal" not in asyncio.run(_sdk_plain()))
 
 # ───────────── P1-2: file trợ lý mất, không có lượt chat ─────────────
 calls = {"n": 0}

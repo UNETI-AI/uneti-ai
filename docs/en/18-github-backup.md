@@ -27,16 +27,16 @@ The brain is all the knowledge UNETI AI has accumulated about you and your work.
 ### Step 1 - Create a private GitHub repo
 
 1. Go to https://github.com/new
-2. Give it a name, for example `javis-brain-backup`.
+2. Give it a name, for example `uneti-brain-backup`.
 3. Choose **Private** (MANDATORY: the brain holds personal and business data, never make it Public).
 4. Do **NOT** tick "Add a README file" (leave the repo empty to avoid a conflict on the first push).
-5. Click **Create repository**. Copy the URL, shaped `https://github.com/<your-name>/javis-brain-backup`.
+5. Click **Create repository**. Copy the URL, shaped `https://github.com/<your-name>/uneti-brain-backup`.
 
 ### Step 2 - Create a token (fine-grained)
 
 1. Go to https://github.com/settings/tokens?type=beta (Settings → Developer settings → **Fine-grained tokens** → Generate new token).
 2. Name the token and choose an expiry.
-3. **Repository access** → Only select repositories → pick exactly the `javis-brain-backup` repo.
+3. **Repository access** → Only select repositories → pick exactly the `uneti-brain-backup` repo.
 4. **Permissions** → Repository permissions → **Contents** → choose **Read and write**.
 5. Click Generate and **copy the token** (shaped `github_pat_...`). The token is shown once only, so copy it immediately.
 
@@ -77,7 +77,7 @@ Safety notes about the mechanism:
 
 - The token is **not** stored in the brain or pushed to the repo. It lives in the local `settings.json` (git-ignored). Error messages mask the token too.
 - **Only TEXT files are synced.** Images, video, audio, PDFs and every other binary do not go to the repo; see [Sync INFORMATION only, not media](#sync-information-only-not-media) just below.
-- Sensitive files are excluded from sync even when they are text: raw conversations (`memory/conversations`), loop and learn logs (`Javis/loop-log`, `Javis/learn-log`, `Javis/learn-staging`), skill usage statistics (`Javis/skill-usage.json`), lock files, `.tmp` files, and each brain's own `.git`. Those stay on the machine that created them.
+- Sensitive files are excluded from sync even when they are text: raw conversations (`memory/conversations`), loop and learn logs (`UNETI/loop-log`, `UNETI/learn-log`, `UNETI/learn-staging`), skill usage statistics (`UNETI/skill-usage.json`), lock files, `.tmp` files, and each brain's own `.git`. Those stay on the machine that created them.
 - The brain trash (`brain-trash` in the state folder) is OUTSIDE the sync area, so it never reaches the repo.
 - A machine with an **empty** brains folder (a new machine, a new volume) is treated as a RESTORE: it only receives data and never pushes an "empty state" that would wipe the backup.
 - Deleting a file or brain on one machine deletes it on the others at the next sync (that is what sync means). Because the repo is git, everything remains in the commit history and can be recovered when needed.
@@ -112,7 +112,7 @@ After every **⇅ Sync now**, if media was skipped UNETI AI states it right unde
 
 Some people genuinely need the images in their brain (screenshots, product photos of a few hundred KB) to follow the knowledge to another machine. Since version 0.46.0, the sync block has an extra **Sync images too** switch (off by default). Turning it on means:
 
-- **jpg / png / gif / webp** images, each up to **10 MB** (change it with the `JAVIS_SYNC_ANH_MAX_MB` environment variable), also reach the repo and sync two ways like text files. Video, audio, PDFs and images over the ceiling still never go; nor does `inbox/`, which is a one-chat transit area.
+- **jpg / png / gif / webp** images, each up to **10 MB** (change it with the `UNETI_SYNC_ANH_MAX_MB` environment variable), also reach the repo and sync two ways like text files. Video, audio, PDFs and images over the ceiling still never go; nor does `inbox/`, which is a one-chat transit area.
 - UNETI AI **stops clearing `attachments/`** on that machine (it still clears `inbox/`): if backed-up images were cleared by the age rule, the deletion would propagate to every machine and the backup images would vanish, so the two must go together.
 
 Three things to weigh BEFORE turning it on:

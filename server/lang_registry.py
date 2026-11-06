@@ -65,7 +65,7 @@ class Lang:
 
     # --- chữ để dựng prompt ---
     # Một câu viết bằng CHÍNH ngôn ngữ này. Model mạnh không cần, nhưng model nhỏ (Groq,
-    # Ollama Cloud) trôi theo ngôn ngữ của prompt, và prompt của Javis là tiếng Việt.
+    # Ollama Cloud) trôi theo ngôn ngữ của prompt, và prompt của UNETI AI là tiếng Việt.
     nudge: str = ""
     weekdays: Tuple[str, ...] = ()          # thứ 2 -> chủ nhật, đúng thứ tự datetime.weekday()
     # Chỗ điền: {hm} {weekday} {date} {tz}, ĐÚNG bốn cái này. improvement_trial_dashboard dựng lại câu này với đúng bốn

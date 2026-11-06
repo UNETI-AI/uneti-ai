@@ -7,7 +7,7 @@ from _paths import ROOT, SERVER
 import asyncio
 import os
 import tempfile
-os.environ['JAVIS_STATE_DIR'] = tempfile.mkdtemp(prefix='zalo-file-state-')
+os.environ['UNETI_STATE_DIR'] = tempfile.mkdtemp(prefix='zalo-file-state-')
 import unittest
 from pathlib import Path
 from unittest.mock import AsyncMock, patch

@@ -4,7 +4,7 @@ Why
 ---
 Only Claude Code sends the plan's selling name (`planDisplayName`, see `plan_limits.ten_goi_claude`).
 Codex sends a CODE that no longer matches the name: `prolite` is the $100 tier, `pro` the renamed
-$200 one. Grok and Antigravity send little or nothing. A table in Javis's code would need a new
+$200 one. Grok and Antigravity send little or nothing. A table in UNETI AI's code would need a new
 release every time a vendor renames a plan (owner, 2026-11-04), so the table lives in javis-store
 (`plan-names.json`, next to `index.json`). A weekly cloud check opens a Pull Request there when a
 vendor renames something; the owner approves it, and every machine picks it up here.
@@ -30,7 +30,7 @@ from config import STATE_DIR
 CACHE = STATE_DIR / "plan-names-cache.json"
 TTL = 6 * 3600
 RETRY = 30 * 60
-FORMAT = "javis-plan-names"
+FORMAT = "uneti-plan-names"
 FORMAT_VERSION = 1
 NHA = ("claude", "codex", "grok", "agy")
 MAX_BYTES = 64 * 1024
@@ -74,9 +74,9 @@ def lam_sach(d) -> dict:
 
 
 def url_danh_ba() -> str:
-    """`plan-names.json` next to the pack catalog the machine uses. `JAVIS_PLAN_NAMES_URL` overrides it;
+    """`plan-names.json` next to the pack catalog the machine uses. `UNETI_PLAN_NAMES_URL` overrides it;
     an empty value turns the catalog off."""
-    env = os.environ.get("JAVIS_PLAN_NAMES_URL")
+    env = os.environ.get("UNETI_PLAN_NAMES_URL")
     if env is not None:
         return env.strip()
     try:

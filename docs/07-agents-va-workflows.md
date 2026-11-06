@@ -44,7 +44,7 @@ Từ 0.403.0 UNETI AI Core quyết định thông báo nào được báo (chấ
 - Mỗi thông báo có hai nút **Nên báo** và **Không cần báo**. Muốn chấm bằng emoji thì bấm **Mở trong UNETI AI Core**: thông báo thành một tin trong chat UNETI AI Core, thả emoji của Cộng hưởng (👍 ❤️ 😂 😮 😢 😡) lên tin đó như mọi câu trả lời, kèm "Đáng lẽ nên nói" hoặc "Nên im" nếu muốn. UNETI AI Core tự chỉnh theo phản hồi: bấm Không cần báo là loại tin đó bị lọc; bấm Nên báo lên một tin đã lọc là loại đó luôn được báo; một nhóm bị chê nhiều thì hạ một nấc. Mỗi lần chỉnh, UNETI AI Core nói một câu trong chat của nó.
 - Một loại tin báo tới lần thứ 3 trong 6 tiếng thì các lần sau trong 6 tiếng đó bị lọc là "lặp lại".
 - UNETI AI Core **không bao giờ tự giấu tin khẩn**. Chỉ bạn làm được, bằng chế độ Tắt hoặc nút Không cần báo.
-- Nói trong chat UNETI AI Core cũng được, ví dụ "tắt thông báo đăng nhập Zalo" hay "báo hết cho tôi": UNETI AI Core dùng công cụ `javis_notify` và trả kèm mã để hoàn tác.
+- Nói trong chat UNETI AI Core cũng được, ví dụ "tắt thông báo đăng nhập Zalo" hay "báo hết cho tôi": UNETI AI Core dùng công cụ `uneti_notify` và trả kèm mã để hoàn tác.
 
 ### Tin chưa đọc và tắt thông báo
 
@@ -211,14 +211,14 @@ Cách này tiện khi bạn mô tả được ý định bằng lời nhưng ng�
 
 Trong brain theo cấu trúc mới, mỗi agent là một file `agents/<slug>.md` và mỗi workflow là một file `workflows/<slug>.md`. `slug` là tên viết thường, có gạch ngang, không dấu (ví dụ "viết email" thành `viet-email`).
 
-**Brain cũ chưa chuyển cấu trúc** thì hai thư mục đó nằm ở `Javis/agents/` và `Javis/workflows/`. UNETI AI tự dò: có thư mục mới thì dùng thư mục mới, không có thì dùng đường cũ. Nên nếu bạn mở trang Tệp tin mà không thấy `agents/` ở gốc brain, hãy tìm trong `Javis/`.
+**Brain cũ chưa chuyển cấu trúc** thì hai thư mục đó nằm ở `UNETI/agents/` và `UNETI/workflows/`. UNETI AI tự dò: có thư mục mới thì dùng thư mục mới, không có thì dùng đường cũ. Nên nếu bạn mở trang Tệp tin mà không thấy `agents/` ở gốc brain, hãy tìm trong `UNETI/`.
 
 Vì là file văn bản, bạn có thể mở qua [Quản lý tệp tin](05-quan-ly-tep-tin.md) để xem hoặc sửa tay. Cấu trúc file:
 
 - Agent: phần đầu (frontmatter) chứa tên, vai trò, tag (`tags`, một danh sách), danh sách skill, model, và tài liệu đã gắn (`assets` gồm `files` và `links`); phần thân là system prompt chi tiết. Bộ nhớ riêng và nhật ký chạy nằm ngoài file này, ở `memory/agents/<slug>/`.
 - Workflow: phần đầu chứa tên, trạng thái (active hoặc off), nhóm (`group`), mô tả và danh sách các bước (mỗi bước có agent, task, và tuỳ chọn agent kiểm chứng cùng số lần sửa).
   - Viết tay thì để `status: 'off'` CÓ dấu nháy: `off` trần bị YAML đọc thành giá trị đúng/sai. Từ 0.107.0 UNETI AI hiểu được cả hai cách viết, nhưng giữ nháy cho chắc. Quy trình tắt không chạy nền từ Kanban hay nhắc hẹn; bấm Chạy ở Cộng sự thì vẫn chạy để bạn thử trước khi bật.
-  - Một bước có thể khai `tools: [javis_generate_image, javis_describe_image]` để lấy đúng tool đó khi quy trình chạy nền dưới Toàn quyền (bình thường lúc đó agent chỉ có công cụ file). Nhận tên tool plugin và `WebFetch`, `WebSearch`; Bash không bao giờ được cấp theo cách này. Mức quyền riêng của tool vẫn được kiểm khi gọi, nên một bước không tự nâng mức được.
+  - Một bước có thể khai `tools: [uneti_generate_image, uneti_describe_image]` để lấy đúng tool đó khi quy trình chạy nền dưới Toàn quyền (bình thường lúc đó agent chỉ có công cụ file). Nhận tên tool plugin và `WebFetch`, `WebSearch`; Bash không bao giờ được cấp theo cách này. Mức quyền riêng của tool vẫn được kiểm khi gọi, nên một bước không tự nâng mức được.
 
 Sửa tay trong file cũng được. Agent: ghi `tags: [Marketing, Viết nội dung]`; có trường `tags` (kể cả `tags: []`) thì UNETI AI chỉ đọc nó. File agent cũ chỉ có `group: Marketing` vẫn đọc thành một tag Marketing; lần lưu đầu UNETI AI ghi thêm `tags` và giữ `group` bằng tag đầu tiên để bản cũ hơn vẫn đọc được. Workflow và skill dùng `group`; thiếu trường này thì vào nhóm "Chung".
 
@@ -247,7 +247,7 @@ Lưu ý: gói xuất chỉ chứa file định nghĩa. **Bộ nhớ riêng và n
 
 ## Chia sẻ cả một Team
 
-Ở trang Team, menu **⋯** của một team có **Chia sẻ team**: tải về một file `.team.javis.zip` gồm các cộng sự của team, kỹ năng của họ, trưởng nhóm và các tin đã ghim (thành hướng dẫn chung). File **không** có lịch sử chat, khoá, mật khẩu, model hay công tắc Auto; chữ trông giống khoá API, mã bot hay dòng `password: ...` bị thay bằng `[REDACTED]` trước khi ghi.
+Ở trang Team, menu **⋯** của một team có **Chia sẻ team**: tải về một file `.team.uneti.zip` gồm các cộng sự của team, kỹ năng của họ, trưởng nhóm và các tin đã ghim (thành hướng dẫn chung). File **không** có lịch sử chat, khoá, mật khẩu, model hay công tắc Auto; chữ trông giống khoá API, mã bot hay dòng `password: ...` bị thay bằng `[REDACTED]` trước khi ghi.
 
 Người nhận bấm **Nhập team** ở đầu danh sách team, chọn file, xem trước có những cộng sự nào và bao nhiêu kỹ năng rồi xác nhận. Cộng sự trùng tên đã có trong brain thì giữ nguyên bản của người nhận; model và Auto người nhận tự chọn sau. File này vẫn mở được bằng nút Nhập ở trang Cộng sự của bản UNETI AI cũ (khi đó chỉ nhập cộng sự, không dựng team).
 

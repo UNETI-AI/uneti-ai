@@ -1,10 +1,10 @@
-"""Login vault (0.251.0): the owner's sign-in cookies, kept encrypted, reused by Javis.
+"""Login vault (0.251.0): the owner's sign-in cookies, kept encrypted, reused by UNETI AI.
 
 The owner signs in on their own browser, exports the cookies of that site and pastes them on the
 "Kho đăng nhập" page. Four shapes are read: a Cookie-Editor JSON export, a Playwright storage state,
-a Netscape cookies.txt and a bare `Cookie:` header. Javis then uses that sign-in to:
+a Netscape cookies.txt and a bare `Cookie:` header. UNETI AI then uses that sign-in to:
 
-- open a page behind it for every engine (plugin tool `javis_login`, op=fetch), and
+- open a page behind it for every engine (plugin tool `uneti_login`, op=fetch), and
 - check a page behind it on a schedule (web_watch, a watch with `login_id`).
 
 Rules this module keeps:
@@ -350,10 +350,10 @@ def _encrypt(obj) -> str:
     try:
         return secrets_store.encrypt_required(json.dumps(obj, ensure_ascii=False))
     except RuntimeError as e:
-        raise VaultError(localefmt.chu("Máy này chưa mã hoá được dữ liệu (thiếu thư viện cryptography), nên Javis "
-                                       "không lưu đăng nhập. Cài lại Javis hoặc chạy: pip install cryptography",
+        raise VaultError(localefmt.chu("Máy này chưa mã hoá được dữ liệu (thiếu thư viện cryptography), nên UNETI AI "
+                                       "không lưu đăng nhập. Cài lại UNETI AI hoặc chạy: pip install cryptography",
                                        "This machine cannot encrypt data (the cryptography library is missing), so "
-                                       "Javis will not store sign-ins. Reinstall Javis or run: pip install cryptography")) from e
+                                       "UNETI AI will not store sign-ins. Reinstall UNETI AI or run: pip install cryptography")) from e
 
 
 def _decrypt(value: str):
@@ -400,8 +400,8 @@ class LoginVault:
                 return None, [], localefmt.chu(f"Không có đăng nhập nào tên '{login}' trong trang Cookies.",
                                                f"No sign-in named '{login}' on the Cookies page.")
             if only_allowed and not row.get("allow_ai"):
-                return None, [], localefmt.chu(f"Đăng nhập '{row['name']}' đang tắt quyền cho Javis dùng.",
-                                               f"The sign-in '{row['name']}' is not allowed for Javis.")
+                return None, [], localefmt.chu(f"Đăng nhập '{row['name']}' đang tắt quyền cho UNETI AI dùng.",
+                                               f"The sign-in '{row['name']}' is not allowed for UNETI AI.")
             ck = _decrypt(row["cookies_enc"])
             if not matches(ck, url):
                 return None, [], localefmt.chu(f"Đăng nhập '{row['name']}' không dùng cho địa chỉ này.",

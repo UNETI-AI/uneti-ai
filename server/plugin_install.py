@@ -92,13 +92,13 @@ def _collision(slug: str) -> dict:
     """Error dict when `slug` may never be installed from a zip, else {}."""
     if slug in plugins_host._slug_bundled():
         return _err("validate",
-                    f"'{slug}' trùng tên một plugin có sẵn của Javis. Đổi slug trong plugin.yaml rồi thử lại.",
-                    f"'{slug}' is the name of a built-in Javis plugin. Change the slug in plugin.yaml and try again.",
+                    f"'{slug}' trùng tên một plugin có sẵn của UNETI AI. Đổi slug trong plugin.yaml rồi thử lại.",
+                    f"'{slug}' is the name of a built-in UNETI AI plugin. Change the slug in plugin.yaml and try again.",
                     code="bundled")
     if slug in _pack_slugs():
         return _err("validate",
-                    f"'{slug}' trùng tên một plugin đến từ gói trong Javis Store. Đổi slug trong plugin.yaml rồi thử lại.",
-                    f"'{slug}' is the name of a plugin from a Javis Store pack. Change the slug in plugin.yaml and try again.",
+                    f"'{slug}' trùng tên một plugin đến từ gói trong UNETI AI Store. Đổi slug trong plugin.yaml rồi thử lại.",
+                    f"'{slug}' is the name of a plugin from a UNETI AI Store pack. Change the slug in plugin.yaml and try again.",
                     code="pack")
     return {}
 

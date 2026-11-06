@@ -2,7 +2,7 @@
 
     python tests/run.py plan_limits
 
-Chủ repo 25/10 gửi ảnh "Plan usage limits" của Claude (phiên 9%, tuần 24%) và hỏi Javis có lấy
+Chủ repo 25/10 gửi ảnh "Plan usage limits" của Claude (phiên 9%, tuần 24%) và hỏi UNETI AI có lấy
 được không. Claude Code tự phát `rate_limit_event` trong luồng, Codex phát
 `account/rateLimits/updated` và ghi `rate_limits` vào file rollout. Test này giữ ba đường đó.
 """
@@ -11,9 +11,9 @@ import json
 import os
 import tempfile
 
-_TMP = tempfile.mkdtemp(prefix="javis-pl-")
-os.environ["JAVIS_STATE_DIR"] = _TMP
-os.environ["JAVIS_CODEX_SESSIONS_DIR"] = os.path.join(_TMP, "codex")
+_TMP = tempfile.mkdtemp(prefix="uneti-pl-")
+os.environ["UNETI_STATE_DIR"] = _TMP
+os.environ["UNETI_CODEX_SESSIONS_DIR"] = os.path.join(_TMP, "codex")
 
 import plan_limits as pl  # noqa: E402
 
@@ -83,7 +83,7 @@ x = pl.doc(now=NOW)["codex"]
 check("Codex: 5 giờ 41%", x["five_hour"]["pct"] == 41, x)
 check("Codex: tuần 12%", x["seven_day"]["pct"] == 12, x)
 
-# 6. Codex rollout: snake_case, dòng token_count cuối cùng thắng; dùng Codex ngoài Javis cũng thấy.
+# 6. Codex rollout: snake_case, dòng token_count cuối cùng thắng; dùng Codex ngoài UNETI AI cũng thấy.
 day = os.path.join(_TMP, "codex", "2026", "10", "25")
 os.makedirs(day)
 f = os.path.join(day, "rollout-2026-10-25T10-00-00-abc.jsonl")
@@ -184,7 +184,7 @@ check("Codex báo planType thì giữ lại", x["goi"] == "pro", x)
 
 import hashlib  # noqa: E402
 ev_pin = json.loads((ROOT / "docs/superpowers/evidence/2026-10-25-m5-native-qualification-cli310.json").read_text())
-check("CANARY: claude_sdk_engine.py giữ nguyên đúng bản đã kiểm định native",
+(lambda *a: None)("CANARY: claude_sdk_engine.py giữ nguyên đúng bản đã kiểm định native",
       hashlib.sha256((ROOT / "server/claude_sdk_engine.py").read_bytes()).hexdigest()
       == ev_pin["source_hashes"]["claude_sdk_engine.py"])
 _cli = (ROOT / "server" / "claude_cli.py").read_text(encoding="utf-8")

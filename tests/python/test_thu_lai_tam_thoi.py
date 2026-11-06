@@ -29,12 +29,12 @@ import asyncio
 import os
 # 0.438.5: vòng tool mặc định gọi model dạng stream. File này thử logic vòng tool trên đường non-stream
 # (giả lập client.post / máy chủ trả JSON), đường đó vẫn là đường lui. Đường stream: test_api_stream_vong.py.
-os.environ["JAVIS_API_STREAM_TOOLS"] = "0"
+os.environ["UNETI_API_STREAM_TOOLS"] = "0"
 import sys
 import tempfile
 
-_STATE = tempfile.mkdtemp(prefix="javis-thulai-")
-os.environ["JAVIS_STATE_DIR"] = _STATE
+_STATE = tempfile.mkdtemp(prefix="uneti-thulai-")
+os.environ["UNETI_STATE_DIR"] = _STATE
 
 try:
     sys.stdout.reconfigure(encoding="utf-8")

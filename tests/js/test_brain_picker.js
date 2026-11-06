@@ -1,4 +1,4 @@
-// The brain picker drawn by Javis, in the owner's order (0.431.0, dashboard/brain-picker.js).
+// The brain picker drawn by UNETI AI, in the owner's order (0.431.0, dashboard/brain-picker.js).
 "use strict";
 const assert = require("node:assert/strict");
 const fs = require("node:fs");

@@ -21,7 +21,7 @@ import threading
 import time
 from pathlib import Path
 
-os.environ.setdefault("JAVIS_STATE_DIR", tempfile.mkdtemp(prefix="javis-usagehot-"))
+os.environ.setdefault("UNETI_STATE_DIR", tempfile.mkdtemp(prefix="uneti-usagehot-"))
 
 try:
     sys.stdout.reconfigure(encoding="utf-8")
@@ -126,7 +126,7 @@ def ghi_lien_tuc():
         for i in range(200):
             w.execute("INSERT INTO file_daily(path,day,provider,source,activity,model,project,"
                       "input,output,cache_read,cache_create) VALUES(?,?,?,?,?,?,?,?,?,?,?)",
-                      (f"/p/{i}", "2026-07-28", "claude", "javis", "chat",
+                      (f"/p/{i}", "2026-07-28", "claude", "uneti", "chat",
                        "claude-opus-5", "prj", 10, 5, 0, 0))
             w.commit()
         w.close()

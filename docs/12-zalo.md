@@ -160,7 +160,7 @@ Nói trong chat như bình thường, ví dụ “xem ảnh hoá đơn chị Lan
   chép nguyên văn chữ và số trong ảnh. Chưa đăng nhập ChatGPT ở trang Model thì vẫn tải được ảnh,
   chỉ thiếu phần tả.
 
-Phần ChatGPT xem ảnh nằm trong app (plugin có sẵn `image-chatgpt`, tool `javis_describe_image`),
+Phần ChatGPT xem ảnh nằm trong app (plugin có sẵn `image-chatgpt`, tool `uneti_describe_image`),
 nên xem được cả mọi ảnh khác trong brain, có cài gói Zalo hay không.
 
 ## Gửi ảnh và file
@@ -232,7 +232,7 @@ Bốn điều nên biết:
 - **Tag chỉ cần nói tên.** “@minhquy” hay “Minh Quý” đều được, không phân biệt hoa thường hay dấu. UNETI AI tìm ID Zalo thật trong
   những người đã nhắn ở nhóm đó trước, rồi tới danh sách thành viên của Zalo. **Trùng tên hoặc không thấy thì UNETI AI hỏi lại kèm
   danh sách ứng viên**, không đoán, vì tag nhầm người thì không rút lại được. Tag cả nhóm (`@All`) chỉ khi bạn yêu cầu rõ.
-- **Nhắc hẹn này khác nhắc hẹn riêng của UNETI AI** (`javis_schedule`): nó hiện trong Zalo nên cả nhóm cùng thấy. Giờ tính theo múi giờ của UNETI AI.
+- **Nhắc hẹn này khác nhắc hẹn riêng của UNETI AI** (`uneti_schedule`): nó hiện trong Zalo nên cả nhóm cùng thấy. Giờ tính theo múi giờ của UNETI AI.
 - **Nhóm khoá quyền tạo ghi chú hoặc poll của thành viên** thì Zalo từ chối và UNETI AI báo thẳng lý do đó. Nếu lệnh quá giờ, UNETI AI nói
   **không rõ đã tạo chưa** và dặn xem lại nhóm trước khi thử tiếp, để khỏi ra hai poll.
 - **Đấu nhiều tài khoản Zalo thì UNETI AI hỏi lại** nên dùng tài khoản nào, giống phần gửi ảnh.
@@ -276,7 +276,7 @@ giới hạn vẫn bị MCP Hub chặn gửi tin, dù tài khoản đang đặt 
 ## Khác với tích hợp Zalo cũ
 
 Luồng mới đã bỏ sidecar `listen --webhook`, endpoint `/hook/zalo`, panel “Nghe tin liên
-tục”, file luật theo từng cuộc chat và hai plugin `javis_zalo_rule`/`javis_zalo_send`.
+tục”, file luật theo từng cuộc chat và hai plugin `uneti_zalo_rule`/`uneti_zalo_send`.
 Không còn việc một tiến trình listener tự tắt rồi bật lại connector MCP.
 
 Do đó UNETI AI không tự chuyển tiếp tin Zalo sang Telegram ở nền. Khi cần kiểm tra tin, hãy

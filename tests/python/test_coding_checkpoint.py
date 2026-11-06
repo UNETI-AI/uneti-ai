@@ -19,8 +19,8 @@ import tempfile
 import time
 from pathlib import Path
 
-_TMP = tempfile.mkdtemp(prefix="javis-checkpoint-")
-os.environ["JAVIS_STATE_DIR"] = _TMP
+_TMP = tempfile.mkdtemp(prefix="uneti-checkpoint-")
+os.environ["UNETI_STATE_DIR"] = _TMP
 
 import coding_checkpoint as cc  # noqa: E402
 

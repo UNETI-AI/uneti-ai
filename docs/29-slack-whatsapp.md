@@ -85,7 +85,7 @@ WhatsApp chỉ chạy qua **WhatsApp Business Cloud API** chính thức của Me
 ### Trước khi bắt đầu
 
 - UNETI AI phải truy cập được qua **HTTPS bằng tên miền** (VPS có tên miền, xem [DEPLOY.md](../DEPLOY.md)). Meta từ chối `http://` và địa chỉ IP.
-- Khi chưa đặt mật khẩu đăng nhập, tên miền phải là tên UNETI AI biết (tên miền riêng, xem [15 - Thương hiệu và tên miền](15-thuong-hieu-ten-mien.md), hoặc `JAVIS_ALLOWED_HOSTS`), nếu không UNETI AI trả Meta mã 403.
+- Khi chưa đặt mật khẩu đăng nhập, tên miền phải là tên UNETI AI biết (tên miền riêng, xem [15 - Thương hiệu và tên miền](15-thuong-hieu-ten-mien.md), hoặc `UNETI_ALLOWED_HOSTS`), nếu không UNETI AI trả Meta mã 403.
 - Meta có thể tính phí một số cuộc hội thoại; xem trang bảng giá hiện tại của họ.
 
 ### 1. Tạo app Meta (một lần)

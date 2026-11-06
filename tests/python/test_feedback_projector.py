@@ -12,9 +12,9 @@ import os
 import tempfile
 from pathlib import Path
 
-os.environ["JAVIS_STATE_DIR"] = tempfile.mkdtemp(prefix="javis-fb-proj-")
-os.environ.pop("JAVIS_RESONANCE_CALL_CEILING", None)
-TEMP = Path(tempfile.mkdtemp(prefix="javis-fb-proj-w-"))
+os.environ["UNETI_STATE_DIR"] = tempfile.mkdtemp(prefix="uneti-fb-proj-")
+os.environ.pop("UNETI_RESONANCE_CALL_CEILING", None)
+TEMP = Path(tempfile.mkdtemp(prefix="uneti-fb-proj-w-"))
 
 import agent_ledger as AL  # noqa: E402
 import feedback_projector as FP  # noqa: E402
@@ -194,7 +194,7 @@ rs = W.reasons()
 check("reaction của chủ trong nhóm: lý do ở ngữ cảnh team:<id>", len(rs) == 1 and rs[0]["context_ref"] == f"team:{tid}"
       and tm.reaction_of(tsid, m1)["status"] == "pending_review", rs)
 main_sid = ss.create_session(brain=str(d))
-mm = ss.append_message(main_sid, "assistant", "Câu của Javis")
+mm = ss.append_message(main_sid, "assistant", "Câu của UNETI AI")
 z = ss.set_dm_reaction(main_sid, mm, value="like", nonce="mn1")
 pj.project("dm", z["log_id"])
 check("trang Trò chuyện chính (không agent): 'Đã nhận', không lý do", ss.dm_reaction_of(main_sid, mm)["status"]

@@ -16,11 +16,11 @@ Clicking the icon opens UNETI AI in its own window (no address bar), UNETI AI st
 **Install without the warning screen (recommended).** Both installers are not code-signed yet, so a browser download gets blocked the first time. Paste one line instead and you get the same installer with the UNETI AI logo, unblocked:
 - **Windows:** press Start, type `PowerShell`, open it, paste this line and press Enter:
   ```
-  irm https://raw.githubusercontent.com/uneti-ai/uneti-ai/main/packaging/windows/get-javis.ps1 | iex
+  irm https://raw.githubusercontent.com/uneti-ai/uneti-ai/main/packaging/windows/get-uneti.ps1 | iex
   ```
 - **macOS:** open **Terminal** (Launchpad, type Terminal), paste this line and press Enter:
   ```
-  curl -fsSL https://raw.githubusercontent.com/uneti-ai/uneti-ai/main/packaging/macos/get-javis.sh | bash
+  curl -fsSL https://raw.githubusercontent.com/uneti-ai/uneti-ai/main/packaging/macos/get-uneti.sh | bash
   ```
 
 If you already downloaded the file with the browser and it was blocked:
@@ -38,13 +38,13 @@ If you already downloaded the file with the browser and it was blocked:
    ```
 3. (Optional, for HTTPS + a domain) set this in the **Environment** box:
    ```
-   DOMAIN_NAME=javis.<vps-hostname>.hstgr.cloud
+   DOMAIN_NAME=uneti.<vps-hostname>.hstgr.cloud
    ```
-   (Find the hostname under hPanel → VPS, e.g. `javis.srv1782015.hstgr.cloud`.)
+   (Find the hostname under hPanel → VPS, e.g. `uneti.srv1782015.hstgr.cloud`.)
 4. **Deploy**. Wait 1-3 minutes. Open the app with the **Open** button (or `https://<DOMAIN_NAME>`).
 5. On first run the screen asks you to create an admin account. After that, sign in to Claude Code once inside the container terminal: `claude auth login --claudeai`.
 
-VPS on **Ubuntu 26** or a plain OS without Hostinger's Traefik: paste the same link, `DOMAIN_NAME` may stay empty: **Open** moves you to `https://javis.srvXXXX.hstgr.cloud` or `https://srvXXXX.hstgr.cloud` (since 0.302.0). **Settings → Domain** says whether the link works yet. The bundled `javis-gateway` container issues HTTPS for `DOMAIN_NAME` when ports 80/443 are free (since 0.300.0); open ports 80 and 443 in the firewall.
+VPS on **Ubuntu 26** or a plain OS without Hostinger's Traefik: paste the same link, `DOMAIN_NAME` may stay empty: **Open** moves you to `https://uneti.srvXXXX.hstgr.cloud` or `https://srvXXXX.hstgr.cloud` (since 0.302.0). **Settings → Domain** says whether the link works yet. The bundled `uneti-gateway` container issues HTTPS for `DOMAIN_NAME` when ports 80/443 are free (since 0.300.0); open ports 80 and 443 in the firewall.
 
 To update: press **⬆ Update now** in the app (Updates page), or **Redeploy** in Docker Manager (image `:latest`, `pull_policy: always`). Brain data stays in the volume.
 
@@ -61,7 +61,7 @@ Open http://localhost:7777. For HTTPS through Caddy, add `-f docker-compose.http
 
 1. Install Python 3.12 + Node 22.
 2. In the project folder run `setup.bat` once - it creates .venv, installs dependencies, and installs the two CLI engines (Claude Code, Codex) for you.
-3. `start-javis.bat` to run in the background (`stop-javis.bat` to stop).
+3. `start-uneti.bat` to run in the background (`stop-uneti.bat` to stop).
 4. Open http://localhost:7777.
 
 ## Once it is running
@@ -77,6 +77,6 @@ See [docs/en/README.md](docs/en/README.md) - a guide per feature (chat/voice, kn
 
 ## Common problems
 
-- **The in-app update button does not work on Hostinger**: it needs the bundled `javis-watchtower` container (included since 0.55.56). If the stack shows "Partially running", open that container's log; if it cannot be fixed, update with **Redeploy** in Docker Manager.
+- **The in-app update button does not work on Hostinger**: it needs the bundled `uneti-watchtower` container (included since 0.55.56). If the stack shows "Partially running", open that container's log; if it cannot be fixed, update with **Redeploy** in Docker Manager.
 - **ChatGPT/Codex says "model not supported"**: pick a valid Codex model on the Models page (e.g. `gpt-5.5`). Do not use `gpt-5-mini` or `gpt-4o` - those are API models and a Codex account cannot run them.
 - More: [docs/17 - Troubleshooting](docs/en/17-troubleshooting.md).

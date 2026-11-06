@@ -23,7 +23,7 @@ The token is encrypted at rest and never sent back to the browser. UNETI AI hand
 In a chat press **plus → GitHub repo**, tick one or more repos, press **Attach**. A chip with the repo name appears next to the input.
 
 - UNETI AI downloads the repo to this machine, **outside** the brain folder (`<state folder>/repos/<brain>/<owner>/<repo>`), so code never ends up in the brain backup or in search.
-- Each conversation works on **its own branch and folder** (`javis/...`). Two chats editing the same repo never overwrite each other.
+- Each conversation works on **its own branch and folder** (`uneti/...`). Two chats editing the same repo never overwrite each other.
 - Attaching runs no script and installs nothing until a check needs it.
 
 ## 3. After every turn that changes code
@@ -56,7 +56,7 @@ Gave several jobs at once ("when this is done, do that")? UNETI AI queues the ne
 
 ## 6. Lessons and numbers
 
-- Each time CI or a local check failed and was then fixed, UNETI AI writes one lesson line for that repo into `Javis/learned/repos/` in the brain, and feeds it back on the next turn.
+- Each time CI or a local check failed and was then fixed, UNETI AI writes one lesson line for that repo into `UNETI/learned/repos/` in the brain, and feeds it back on the next turn.
 - The **Numbers** button on the GitHub card shows, per engine and model: share of jobs green on the first push, average fix rounds, issues caught by the cross review. Pick a model with real numbers.
 
 ## 7. Removing a repo

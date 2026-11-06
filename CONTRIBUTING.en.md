@@ -1,4 +1,4 @@
-# Contributing to Javis OS
+# Contributing to UNETI AI
 
 The contributing guide has moved to [CONTRIBUTING.md](CONTRIBUTING.md). Bản tiếng Việt: [docs/i18n/vi/CONTRIBUTING.md](docs/i18n/vi/CONTRIBUTING.md).
 

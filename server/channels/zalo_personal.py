@@ -31,7 +31,7 @@ SPEC = KenhSpec(
 def cau_vao_nhom(ev: dict) -> str:
     """What the Agent reads when someone joins a group (0.84.2). Written for the model, so Vietnamese like the
     rest of the bot prompts. It says plainly this is an event and not a message, gives the join time Zalo
-    reported, and tells the Agent to stay silent unless its own instructions cover newcomers: Javis has no
+    reported, and tells the Agent to stay silent unless its own instructions cover newcomers: UNETI AI has no
     greeting of its own, so a bot whose owner never asked for one must not start greeting people."""
     from datetime import datetime
     md = (ev.get("metadata") or {}).get("member_join") or {}
@@ -566,9 +566,9 @@ class Transport:
                     self.status = "error"
                     self.last_error = localefmt.chu(
                         "Một phiên khác của cùng nick đang giành kết nối Zalo, bot lỡ phần lớn tin. Đóng Zalo Web của "
-                        "nick này và các Javis hay Claude khác dùng cùng nick.",
+                        "nick này và các UNETI AI hay Claude khác dùng cùng nick.",
                         "Another session of this account keeps taking the Zalo connection, so the bot misses most "
-                        "messages. Close Zalo Web for this account and any other Javis or Claude client using it.")
+                        "messages. Close Zalo Web for this account and any other UNETI AI or Claude client using it.")
                 elif tt.get("lan_cuoi"):
                     self.status = "polling"
                     self.last_error = ""
@@ -715,7 +715,7 @@ class Transport:
         chi_file = kieu == "file"
         if chi_file and not files:
             return
-        # Tin ảnh có CHÚ THÍCH (0.65.13) xử lý như tin chữ với chú thích làm nội dung: "@Javis Vũ ..." viết trong phần chú thích của ảnh
+        # Tin ảnh có CHÚ THÍCH (0.65.13) xử lý như tin chữ với chú thích làm nội dung: "@UNETI AI Vũ ..." viết trong phần chú thích của ảnh
         # là một cái tag thật. Trước đây mọi tin không phải chữ bị bỏ, nên tag kèm ảnh không bao giờ tới bot. Ảnh trơn: xem `_nho_anh_tron`.
         co_anh = kieu == "image"
         # 0.433.0: a video the customer sent in this private turn; the bot looks at its frames (`chatbot_runtime`).
@@ -726,7 +726,7 @@ class Transport:
                       else [md0["audio_url"]] if kieu == "audio" and md0.get("audio_url") else [])
         if vao_nhom:
             # 0.84.2: someone joined the group. The newcomer is the "sender", so a reply tags them (`_gui`).
-            # Javis writes no greeting of its own: the bot's Agent decides, and stays silent when its
+            # UNETI AI writes no greeting of its own: the bot's Agent decides, and stays silent when its
             # instructions say nothing about newcomers.
             text = cau_vao_nhom(ev)
         else:
@@ -925,7 +925,7 @@ class Transport:
                     cu = zc.lay_bo_do(self.conn_id, thread)
                     meta["bo_do_n"] = int(cu.get("n") or 0)
                     if cu:
-                        meta["ghi_chu_dau"] = ("[Ghi chú của Javis, không phải lời khách: câu trả lời trước của bạn CHƯA được gửi "
+                        meta["ghi_chu_dau"] = ("[Ghi chú của UNETI AI, không phải lời khách: câu trả lời trước của bạn CHƯA được gửi "
                                                "vì khách nhắn thêm trong lúc bạn soạn. Các tin khách chưa được đáp, theo thứ tự: "
                                                + " / ".join(cu["texts"]) + ". Hãy trả lời MỘT lần cho các tin này cùng tin mới "
                                                "bên dưới, đừng hỏi lại điều khách đã nói. Việc lượt trước đã làm bằng công cụ (ghi file, gửi tin, "

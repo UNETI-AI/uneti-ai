@@ -192,7 +192,7 @@ Worker là một phiên AI **headless**: không có màn hình, không hỏi l�
 | `mcp-read` | Công cụ file cộng đọc dữ liệu thật qua các kết nối MCP | Bash, tìm kiếm web |
 | `code` | Công cụ file cộng Bash (sửa và kiểm thử code) | Đọc web, tìm kiếm web |
 | `external-write` | Công cụ file cộng MCP, nhưng xem luật ngay bên dưới | Bash, tìm kiếm web |
-| `image` (0.107.0) | Công cụ file cộng ĐÚNG hai tool ảnh: tạo ảnh (`javis_generate_image`) và xem ảnh (`javis_describe_image`) | Bash, web, mọi kết nối khác |
+| `image` (0.107.0) | Công cụ file cộng ĐÚNG hai tool ảnh: tạo ảnh (`uneti_generate_image`) và xem ảnh (`uneti_describe_image`) | Bash, web, mọi kết nối khác |
 
 `image` có để việc cần làm ảnh chạy được mà không phải mở Toàn quyền (Toàn quyền mở luôn cả đăng bài, gửi tin). Hai tool ảnh ở mức ghi nháp, nên việc mức `suggest` vẫn không tạo được ảnh.
 
@@ -204,7 +204,7 @@ Ngoài ra worker cũng không thấy repo mã nguồn nằm ngoài brain, và kh
 
 ## Chạy một quy trình qua hàng đợi
 
-Giao việc với `route` là `wf:<slug>` thì việc chạy ĐÚNG quy trình đó, từng bước do agent của quy trình làm. Từ khung chat, UNETI AI đặt route này bằng tool `javis_task` (có từ 0.107.0); slug không có thật thì tool từ chối và liệt kê các quy trình đang có. Chỉ chép tên quy trình vào mô tả việc thì KHÔNG chạy quy trình: một worker chung sẽ làm hết, và tool cảnh báo ngay khi thấy chuyện đó.
+Giao việc với `route` là `wf:<slug>` thì việc chạy ĐÚNG quy trình đó, từng bước do agent của quy trình làm. Từ khung chat, UNETI AI đặt route này bằng tool `uneti_task` (có từ 0.107.0); slug không có thật thì tool từ chối và liệt kê các quy trình đang có. Chỉ chép tên quy trình vào mô tả việc thì KHÔNG chạy quy trình: một worker chung sẽ làm hết, và tool cảnh báo ngay khi thấy chuyện đó.
 
 Quy trình đang tắt (`status: off`) không chạy nền: việc dừng chờ bạn với lý do quy trình đang tắt. Bước nào vẫn trượt kiểm chứng sau số lần sửa cho phép thì quy trình dừng ở bước đó và việc chờ bạn, không chạy tiếp các bước sau.
 
@@ -274,7 +274,7 @@ Nhớ rằng việc tạo qua chat vẫn nằm trong hàng đợi của brain đ
 
 Từ 0.25.2 UNETI AI **nói ra chuyện đó ngay lúc giao**: giao việc vào một bảng đang **Tắt** hoặc **Quan sát** thì nó báo lại là việc đang xếp hàng chứ chưa chạy, kèm cách bật. Trước đó nó luôn kết bằng "Việc chạy nền, kết quả tự về" bất kể chế độ nào - một lời hứa sai mà chính UNETI AI không có cách nào biết là sai. Dải việc nền ở khung chat cũng chuyển sang màu vàng trong đúng tình huống này.
 
-Việc này chạy trên **mọi bộ não** từ 0.17.1, qua tool `javis_task`. Trước đó chỉ Claude Code và ChatGPT/Codex giao được việc từ chat, vì đường duy nhất là gọi HTTP bằng lệnh máy mà chỉ hai engine đó chạy được. Các engine API (OpenRouter, OpenAI, Anthropic, Gemini, Groq, Ollama) nhận lời rồi không làm gì cả, và không báo lỗi. Nếu bạn từng gặp cảnh "bảo giao việc mà bảng vẫn trống", nhiều khả năng đó là lỗi này.
+Việc này chạy trên **mọi bộ não** từ 0.17.1, qua tool `uneti_task`. Trước đó chỉ Claude Code và ChatGPT/Codex giao được việc từ chat, vì đường duy nhất là gọi HTTP bằng lệnh máy mà chỉ hai engine đó chạy được. Các engine API (OpenRouter, OpenAI, Anthropic, Gemini, Groq, Ollama) nhận lời rồi không làm gì cả, và không báo lỗi. Nếu bạn từng gặp cảnh "bảo giao việc mà bảng vẫn trống", nhiều khả năng đó là lỗi này.
 
 Hai điều tool đó **không** làm, cố ý:
 
@@ -296,9 +296,9 @@ Chi tiết ở [Tự học](22-tu-hoc.md).
 
 ## Dữ liệu của bảng nằm ở đâu
 
-- **Nguồn chính**: file `kanban.sqlite3` trong thư mục state của UNETI AI (biến `JAVIS_STATE_DIR`, mặc định là thư mục `server/`). Đây là nơi giữ vòng đời, lần chạy và nhật ký sự kiện. Nó cố tình nằm ngoài brain để việc đang chạy không bị đồng bộ git ghi đè.
+- **Nguồn chính**: file `kanban.sqlite3` trong thư mục state của UNETI AI (biến `UNETI_STATE_DIR`, mặc định là thư mục `server/`). Đây là nơi giữ vòng đời, lần chạy và nhật ký sự kiện. Nó cố tình nằm ngoài brain để việc đang chạy không bị đồng bộ git ghi đè.
 - **Sổ thao tác ra ngoài** (từ 0.238.0): file `once_ledger.sqlite3` cạnh `kanban.sqlite3`, ghi thao tác nào của việc nào đã làm xong. Dòng đã xong quá 30 ngày tự xoá.
-- **Bản sao đọc được**: `Javis/kanban.json` trong brain, được ghi lại mỗi lần bảng đổi. File này để sao lưu và để bản UNETI AI cũ đọc được; sửa tay vào đó không đổi được gì trong hàng đợi thật.
+- **Bản sao đọc được**: `UNETI/kanban.json` trong brain, được ghi lại mỗi lần bảng đổi. File này để sao lưu và để bản UNETI AI cũ đọc được; sửa tay vào đó không đổi được gì trong hàng đợi thật.
 - Bảng cũ từ những bản UNETI AI trước được nhập vào đúng một lần, và việc còn kẹt ở trạng thái "đang chạy" của tiến trình cũ được đưa về hàng đợi.
 - Việc hoàn thành hoặc đã huỷ quá **3 ngày** tự chuyển sang lưu trữ để bảng không phình ra.
 
@@ -306,7 +306,7 @@ Chi tiết ở [Tự học](22-tu-hoc.md).
 
 | Thông số | Giá trị |
 | --- | --- |
-| Số worker chạy song song | 2 (đổi bằng biến môi trường `JAVIS_KANBAN_MAX_WORKERS`, kẹp trong khoảng 1 tới 8, tính chung cho mọi brain) |
+| Số worker chạy song song | 2 (đổi bằng biến môi trường `UNETI_KANBAN_MAX_WORKERS`, kẹp trong khoảng 1 tới 8, tính chung cho mọi brain) |
 | Nhịp quét của dispatcher | 5 giây, và được đánh thức ngay khi có việc mới |
 | Thời hạn giữ việc / nhịp báo sống | 90 giây / 20 giây |
 | Trần thời gian bước đặc tả | 3 phút |
@@ -324,7 +324,7 @@ Trang web không phủ hết những gì server làm được. Các endpoint dư
 | `GET /kanban` | Toàn bộ dữ liệu bảng |
 | `GET /kanban/health` | Chế độ, tình trạng dispatcher, số đếm theo trạng thái |
 | `GET /kanban/task/show?id=...` | Một việc kèm lần chạy và nhật ký sự kiện |
-| `POST /kanban/task` | Tạo việc. Ngoài các trường có trên form còn nhận `chat_id`, `capability`, `execution_mode`, `deps` (danh sách id cách nhau bằng dấu phẩy) và `idempotency_key`. Cần đăng nhập; từ trong khung chat thì dùng tool `javis_task` |
+| `POST /kanban/task` | Tạo việc. Ngoài các trường có trên form còn nhận `chat_id`, `capability`, `execution_mode`, `deps` (danh sách id cách nhau bằng dấu phẩy) và `idempotency_key`. Cần đăng nhập; từ trong khung chat thì dùng tool `uneti_task` |
 | `POST /kanban/run` | Chạy đúng một việc theo id |
 | `POST /kanban/task/move` | Chuyển việc sang một trạng thái khác |
 | `POST /kanban/task/answer` | Trả lời việc đang dừng hỏi: `id` và `answer`. Việc về hàng đợi, chạy tiếp với câu trả lời |
@@ -372,7 +372,7 @@ Việc giao trong chat web phải mang theo mã phiên chat thì kết quả m�
 Ba khả năng, theo thứ tự hay gặp: bạn đang đứng ở **brain khác** (đổi brain ở đầu dashboard), việc đã kết thúc quá 3 ngày nên tự lưu trữ, hoặc ai đó đã gọi endpoint dọn bảng.
 
 **Việc nền chiếm hết hạn mức của bạn.**
-Mỗi việc là một phiên AI thật. Hạ số worker song song bằng `JAVIS_KANBAN_MAX_WORKERS=1`, hoặc đặt chế độ về **Tắt** khi không cần. Theo dõi lượng tiêu thụ ở trang [Mức dùng](23-muc-dung-token.md), chỗ tách riêng "UNETI AI tự chạy" với "Bạn gõ tay".
+Mỗi việc là một phiên AI thật. Hạ số worker song song bằng `UNETI_KANBAN_MAX_WORKERS=1`, hoặc đặt chế độ về **Tắt** khi không cần. Theo dõi lượng tiêu thụ ở trang [Mức dùng](23-muc-dung-token.md), chỗ tách riêng "UNETI AI tự chạy" với "Bạn gõ tay".
 
 ## Liên quan
 
@@ -384,4 +384,4 @@ Mỗi việc là một phiên AI thật. Hạ số worker song song bằng `JAVI
 - [Kết nối & số liệu kinh doanh](09-mcp-va-so-lieu.md) - nguồn dữ liệu thật cho việc `mcp-read`.
 - [Mức dùng: token & chi phí](23-muc-dung-token.md) - việc nền tiêu bao nhiêu.
 - [Task & Dataview trong note](19-task-va-dataview.md) - checkbox việc trong file markdown, khác hẳn trang này.
-- [Cấu hình .env](16-cau-hinh-env.md) - `JAVIS_STATE_DIR`, `JAVIS_KANBAN_MAX_WORKERS`.
+- [Cấu hình .env](16-cau-hinh-env.md) - `UNETI_STATE_DIR`, `UNETI_KANBAN_MAX_WORKERS`.

@@ -157,12 +157,12 @@ In "Self-assess" mode a **reply judge** decides, message by message, whether a g
 
 - **What it can change:** lessons (it only ever removes its own, never yours), example messages, each group's threshold, the bot's overall eagerness, and whether messages that start by tagging someone else ("@Quy, when is class?") are considered at all. The bot still only speaks when its documents match and the judge agrees. Rate limits, yielding to you, permissions and what the bot says stay out of reach.
 - **Every change must cite this bot's own messages as evidence**, so text a customer types cannot become an instruction.
-- **It measures itself:** if the bot is marked wrong noticeably more often after a review, that review is undone and you get a message. Issues only a code change can fix are written to `Javis/gop-y-bo-phan-xu.md` in the bot's brain.
+- **It measures itself:** if the bot is marked wrong noticeably more often after a review, that review is undone and you get a message. Issues only a code change can fix are written to `UNETI/gop-y-bo-phan-xu.md` in the bot's brain.
 - **You hear about it** in one message to the inbox (the bell) and Telegram per review that changed something.
 
 **To step in, just tell UNETI AI:** "show me UNETI AI Vu's reply judge stats this week", "let UNETI AI Vu answer for me when customers tag me about class times", "undo review a1b2c3 of UNETI AI Vu". UNETI AI reads the same report, proposes, and applies when you agree; every change is logged and can be undone. Customer-facing bots never see these tools, even at the "can write" or "full" levels.
 
-If your main brain runs on a Claude Pro/Max plan, note that the review is background work on that plan, which Anthropic does not count as ordinary personal use. It runs at most once a day per bot and only with evidence, but the safest setup is a ChatGPT or Grok plan or an API key for the main brain. Operators can turn the review off with the environment variable `JAVIS_REPLY_POLICY_REVIEW=0`.
+If your main brain runs on a Claude Pro/Max plan, note that the review is background work on that plan, which Anthropic does not count as ordinary personal use. It runs at most once a day per bot and only with evidence, but the safest setup is a ChatGPT or Grok plan or an API key for the main brain. Operators can turn the review off with the environment variable `UNETI_REPLY_POLICY_REVIEW=0`.
 
 ### Telegram's privacy mode (read this if the bot is silent in a group)
 
@@ -468,7 +468,7 @@ It is not the "chat only" API token from Settings: that token calls `/chat` **as
 
 1. **Chatbot** page → **Channels** tab → **Add a channel** → pick **Internal API**, name it, click **Save**. There is no token to paste: UNETI AI generates the key (`jvc_...`, 32 random bytes) and **shows it exactly once**. Copy it to your server right away. UNETI AI keeps only a hash, so a lost key cannot be shown again; rotate to a new one.
 2. Put that account on a bot at **Read only** or **Read documents**, then switch the bot on.
-3. Your server calls `POST http://<UNETI AI host>:<port>/chatbot-api/v1/turn` **directly**, not through the public domain. By default only the machine running UNETI AI may call. A caller in another container or on another machine of your network is added to `JAVIS_CHATBOT_API_ALLOW` (see **Limits and sources**).
+3. Your server calls `POST http://<UNETI AI host>:<port>/chatbot-api/v1/turn` **directly**, not through the public domain. By default only the machine running UNETI AI may call. A caller in another container or on another machine of your network is added to `UNETI_CHATBOT_API_ALLOW` (see **Limits and sources**).
 
 Click **Edit** on the account to **Rotate key** (the old key stops at once, no bot restart needed) and to set the rate limits.
 
@@ -506,7 +506,7 @@ Every error carries a `code` for machines and an `error` for people. `conversati
 Example:
 
 ```bash
-curl -s http://javis:7777/chatbot-api/v1/turn \
+curl -s http://uneti:7777/chatbot-api/v1/turn \
   -H "Authorization: Bearer jvc_..." -H "Content-Type: application/json" \
   -d '{"message_id":"mgr-1","conversation_id":"mgr-user-123","user":{"id":"123","name":"Nguyen Van A"},"scopes":["vai:nhan-vien"],"text":"What does the Cloud Garden concept need?"}'
 ```
@@ -533,7 +533,7 @@ A document matching **any** scope of the list is seen by that turn. Documents of
 ### Limits and sources
 
 - **Rate**: by default 20 turns per conversation in 10 minutes and 300 turns per hour for the whole account. Set them on the account edit form.
-- **Sources**: the `JAVIS_CHATBOT_API_ALLOW` environment variable is a CIDR list, by default `127.0.0.0/8,::1/128` (only the machine running UNETI AI). Anything else gets `403`. For a caller in another container, list its exact address or the one Docker network both share (for example `JAVIS_CHATBOT_API_ALLOW=127.0.0.0/8,::1/128,172.20.0.0/16`), as narrow as you can. Do not open the whole `172.16.0.0/12`: on a Docker host with a published port, some connections from the Internet show up with Docker's internal gateway address and would pass. A request carrying a forwarding header (`X-Forwarded-For`, `X-Real-IP`...) also gets `403`, so calls through Nginx Proxy Manager or a tunnel never get in.
+- **Sources**: the `UNETI_CHATBOT_API_ALLOW` environment variable is a CIDR list, by default `127.0.0.0/8,::1/128` (only the machine running UNETI AI). Anything else gets `403`. For a caller in another container, list its exact address or the one Docker network both share (for example `UNETI_CHATBOT_API_ALLOW=127.0.0.0/8,::1/128,172.20.0.0/16`), as narrow as you can. Do not open the whole `172.16.0.0/12`: on a Docker host with a published port, some connections from the Internet show up with Docker's internal gateway address and would pass. A request carrying a forwarding header (`X-Forwarded-For`, `X-Real-IP`...) also gets `403`, so calls through Nginx Proxy Manager or a tunnel never get in.
 - **Key guessing**: more than 10 wrong keys in 5 minutes from one IP bans that IP for 15 minutes and is written to `auth_audit.jsonl` (first 12 characters only), sharing the counter with API tokens.
 
 ### Inbox and Take over

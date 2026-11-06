@@ -22,7 +22,7 @@ Bản chuẩn (canonical) của skill nằm ở `skills/<slug>/SKILL.md` - đún
 
 Đây là chỗ hay làm người dùng tắc mà không hiểu vì sao. Khi bạn bấm **💾 Lưu**, server kiểm tra `description` và **từ chối lưu** nếu vi phạm một trong hai luật:
 
-**1. Tối đa 150 ký tự.** Đây không phải chuyện thẩm mỹ. UNETI AI cắt mô tả đúng ở 150 ký tự khi bơm vào system prompt và vào mô tả tool `javis_use_skill`, nên phần dư mất im lặng và skill không route được. Lý do từ chối hiện đúng chữ: "description dài N ký tự, vượt trần 150. Router cắt đúng ở 150 nên phần dư MẤT IM LẶNG và skill không route được. Đưa ví dụ trigger xuống mục '## Khi nào dùng' trong thân file."
+**1. Tối đa 150 ký tự.** Đây không phải chuyện thẩm mỹ. UNETI AI cắt mô tả đúng ở 150 ký tự khi bơm vào system prompt và vào mô tả tool `uneti_use_skill`, nên phần dư mất im lặng và skill không route được. Lý do từ chối hiện đúng chữ: "description dài N ký tự, vượt trần 150. Router cắt đúng ở 150 nên phần dư MẤT IM LẶNG và skill không route được. Đưa ví dụ trigger xuống mục '## Khi nào dùng' trong thân file."
 
 **2. Không mở đầu bằng cụm sáo rỗng.** Các cụm bị chặn: "Kích hoạt khi...", "Sử dụng skill này khi...", "Dùng skill này khi...", "Skill này dùng / Skill này được dùng...", "Use this skill when...", "Activate when...". Mọi skill đều mở y hệt nhau nên cụm đó đốt ngân sách ký tự mà không phân biệt được skill nào với skill nào. Lý do từ chối gợi ý luôn cách viết đúng: nêu thẳng năng lực, ví dụ "Tóm tắt biên bản họp thành danh sách việc cần làm."
 
@@ -32,11 +32,11 @@ Luật này áp cho cả biểu mẫu trên dashboard lẫn skill do trang **T�
 
 ## Trigger hoạt động thế nào
 
-Skill tự kích hoạt dựa trên trường `description` (và bạn cũng gọi tay được, xem mục kế tiếp). Khi bạn gõ hoặc nói một yêu cầu, UNETI AI so khớp yêu cầu với `description` của các skill đang bật, thấy khớp thì nạp hướng dẫn tương ứng. Trên Claude Code là nạp native; trên các engine khác UNETI AI bơm danh sách skill vào system prompt và nạp qua tool `javis_use_skill`.
+Skill tự kích hoạt dựa trên trường `description` (và bạn cũng gọi tay được, xem mục kế tiếp). Khi bạn gõ hoặc nói một yêu cầu, UNETI AI so khớp yêu cầu với `description` của các skill đang bật, thấy khớp thì nạp hướng dẫn tương ứng. Trên Claude Code là nạp native; trên các engine khác UNETI AI bơm danh sách skill vào system prompt và nạp qua tool `uneti_use_skill`.
 
 Vì vậy chất lượng của một skill phụ thuộc lớn vào cách bạn viết `description`. Mô tả nêu đúng năng lực và đúng từ khoá thì skill "bắt" đúng lúc. Mô tả chung chung sẽ khiến skill hoặc không bao giờ chạy, hoặc chạy nhầm.
 
-Lưu ý: skill dùng được trên **mọi engine**. Claude Code nạp native; ChatGPT/Codex, OpenRouter và OpenAI/Anthropic/Google Gemini API dùng skill qua router (UNETI AI bơm danh sách skill vào system prompt) và tool `javis_use_skill`. Xem [Models & engine](10-models-va-engine.md) để biết chi tiết từng engine.
+Lưu ý: skill dùng được trên **mọi engine**. Claude Code nạp native; ChatGPT/Codex, OpenRouter và OpenAI/Anthropic/Google Gemini API dùng skill qua router (UNETI AI bơm danh sách skill vào system prompt) và tool `uneti_use_skill`. Xem [Models & engine](10-models-va-engine.md) để biết chi tiết từng engine.
 
 ## Gọi skill bằng tay: menu lệnh "/"
 
@@ -53,9 +53,9 @@ Trên Telegram, nhắn `/<slug>` (kèm nội dung phía sau nếu cần) cho ra 
 
 ## Trần 20 skill của router
 
-Danh sách skill mà UNETI AI bơm vào system prompt và vào mô tả tool `javis_use_skill` bị **cắt ở 20 skill**. Phần dư chỉ còn một dòng "…(+N skill nữa - xem `Javis/index.md`)".
+Danh sách skill mà UNETI AI bơm vào system prompt và vào mô tả tool `uneti_use_skill` bị **cắt ở 20 skill**. Phần dư chỉ còn một dòng "…(+N skill nữa - xem `UNETI/index.md`)".
 
-Hệ quả cần biết: nếu brain của bạn bật nhiều hơn 20 skill, những skill từ thứ 21 trở đi **không nằm trong router**, nên trên các engine dùng router (ChatGPT/Codex, OpenRouter, OpenAI/Anthropic/Google Gemini API) chúng sẽ không tự kích hoạt. Chúng vẫn còn nguyên và vẫn nạp được: gọi tay bằng `/slug` là chạy bình thường, vì tool `javis_use_skill` nhận mọi slug đang bật chứ không chỉ 20 cái được liệt kê.
+Hệ quả cần biết: nếu brain của bạn bật nhiều hơn 20 skill, những skill từ thứ 21 trở đi **không nằm trong router**, nên trên các engine dùng router (ChatGPT/Codex, OpenRouter, OpenAI/Anthropic/Google Gemini API) chúng sẽ không tự kích hoạt. Chúng vẫn còn nguyên và vẫn nạp được: gọi tay bằng `/slug` là chạy bình thường, vì tool `uneti_use_skill` nhận mọi slug đang bật chứ không chỉ 20 cái được liệt kê.
 
 Cách xử lý: tắt bớt skill không dùng tới để 20 chỗ trong router dành cho những skill bạn thật sự muốn UNETI AI tự bắt.
 
@@ -67,7 +67,7 @@ UNETI AI chia skill làm 2 loại:
 
   | Slug | Làm gì |
   |---|---|
-  | `javis-builder` | Tạo hoặc sửa năng lực của UNETI AI: agent, skill, workflow, loop, plugin |
+  | `uneti-builder` | Tạo hoặc sửa năng lực của UNETI AI: agent, skill, workflow, loop, plugin |
   | `ingest-source` | Tiêu hoá một source thô vào Second Brain, chưng cất thành tri thức wiki |
   | `query-wiki` | Khai thác tri thức trong Second Brain, trả lời có trích dẫn |
   | `lint-wiki` | Rà soát sức khoẻ wiki, trả về danh sách vấn đề |
@@ -89,7 +89,7 @@ Hai thứ này dễ lẫn vì cùng nằm trong nhóm **Năng lực** trên than
 | Bản chất | Tri thức **CÁCH LÀM**: một file hướng dẫn cho AI đọc rồi làm theo | **CODE Python thật** chạy trong tiến trình server |
 | Cho ra cái gì | Một quy trình, khung mẫu, bộ quy tắc | Một **tool** mới mà mọi engine gọi được, và/hoặc **hook** chạy quanh mỗi lần gọi tool |
 | Nằm ở đâu | `skills/<slug>/SKILL.md` trong brain | Thư mục `plugins/<slug>/` (gồm `plugin.yaml` + `plugin.py`) |
-| Bật thế nào | Tích ô đánh dấu trên thẻ là xong | Cũng tích ô trên thẻ. Máy nào đặt `JAVIS_ENABLE_USER_PLUGINS=false` thì plugin do bạn cài không chạy |
+| Bật thế nào | Tích ô đánh dấu trên thẻ là xong | Cũng tích ô trên thẻ. Máy nào đặt `UNETI_ENABLE_USER_PLUGINS=false` thì plugin do bạn cài không chạy |
 
 Chọn thế nào: cần **hướng dẫn** làm việc bằng công cụ sẵn có thì viết Skill. Cần một **hành động Python cụ thể** chưa có nguồn nào phủ (tính toán, biến đổi dữ liệu, gọi một API đơn giản) thì viết Plugin. Còn nếu là một nguồn dữ liệu ngoài đã có sẵn server thì đấu MCP ở trang Kết nối, đừng viết plugin. Chi tiết ở [Plugins](20-plugins.md) và [Kết nối & số liệu kinh doanh](09-mcp-va-so-lieu.md).
 
@@ -126,9 +126,9 @@ Skill đang tắt sẽ hiển thị mờ đi. Khi rê chuột vào thẻ, các n
 - **"đã dùng N lần, gần nhất <ngày>"** khi skill đã được nạp ít nhất một lần.
 - **"chưa thấy dùng"** (chữ mờ, nghiêng) khi skill đã quá 30 ngày mà không có tín hiệu dùng nào.
 
-Đây là **tín hiệu dương một chiều**, cần hiểu đúng kẻo oan cho skill: UNETI AI chỉ đếm được lần nạp đi qua tool `javis_use_skill`. Claude Code nạp skill native qua `.claude/skills` thì **không** đi qua bộ đếm. Vậy nên "đã dùng N lần" chắc chắn đúng, còn "chưa thấy dùng" chỉ có nghĩa là chưa có bằng chứng, **không** có nghĩa skill vô dụng. Rê chuột vào nhãn đó sẽ thấy đúng lời giải thích này. Không có gì tự tắt hay tự xoá dựa trên nhãn này - bạn tự quyết.
+Đây là **tín hiệu dương một chiều**, cần hiểu đúng kẻo oan cho skill: UNETI AI chỉ đếm được lần nạp đi qua tool `uneti_use_skill`. Claude Code nạp skill native qua `.claude/skills` thì **không** đi qua bộ đếm. Vậy nên "đã dùng N lần" chắc chắn đúng, còn "chưa thấy dùng" chỉ có nghĩa là chưa có bằng chứng, **không** có nghĩa skill vô dụng. Rê chuột vào nhãn đó sẽ thấy đúng lời giải thích này. Không có gì tự tắt hay tự xoá dựa trên nhãn này - bạn tự quyết.
 
-Số liệu này lưu ở `Javis/skill-usage.json` trong brain, tách khỏi file `SKILL.md` để mỗi lần dùng skill không đẻ ra một thay đổi rác trong git của brain.
+Số liệu này lưu ở `UNETI/skill-usage.json` trong brain, tách khỏi file `SKILL.md` để mỗi lần dùng skill không đẻ ra một thay đổi rác trong git của brain.
 
 ## Tìm kiếm skill
 
@@ -224,7 +224,7 @@ Trong trang **Agents**, khi tạo hoặc sửa một agent, bạn thấy phần 
 | Huy hiệu **hệ thống** | Skill đi theo app, có ở mọi brain, chỉ tắt được chứ không xoá |
 | Thẻ hiển thị mờ | Skill đang tắt |
 | Dòng "x/y bật" | x skill đang bật trên tổng y |
-| "đã dùng N lần, gần nhất …" | Skill đã được nạp qua tool `javis_use_skill` N lần |
+| "đã dùng N lần, gần nhất …" | Skill đã được nạp qua tool `uneti_use_skill` N lần |
 | "chưa thấy dùng" | Quá 30 ngày không có tín hiệu dùng; chỉ là tham khảo, không phải phán quyết |
 
 ## Mẹo
@@ -243,7 +243,7 @@ Trong trang **Agents**, khi tạo hoặc sửa một agent, bạn thấy phần 
 - **Tạo skill nhưng UNETI AI không tự dùng:** kiểm tra ba thứ theo thứ tự. Một, skill có đang **bật** không (thẻ không bị mờ, ô đánh dấu có tích). Hai, `description` có nêu đúng năng lực không. Ba, brain có đang bật quá 20 skill không - nếu có, skill của bạn có thể đã rơi ra ngoài router; tắt bớt skill khác hoặc gọi tay bằng `/slug`.
 - **Danh sách trống dù đã tạo skill:** đảm bảo đang xem đúng brain. Nguồn skill là `skills/` của brain đang chọn; đổi brain thì danh sách đổi theo.
 - **Bấm bật/tắt báo lỗi "Không đổi được trạng thái":** thường do quyền ghi thư mục hoặc thư mục đang bị khoá. Xem thêm [Khắc phục sự cố & FAQ](17-khac-phuc-su-co.md).
-- **Skill ghi "chưa thấy dùng" dù bạn biết nó có chạy:** bình thường. UNETI AI chỉ đếm được lần nạp qua tool `javis_use_skill`; Claude Code nạp native thì không qua bộ đếm. Đừng xoá skill chỉ vì nhãn này.
+- **Skill ghi "chưa thấy dùng" dù bạn biết nó có chạy:** bình thường. UNETI AI chỉ đếm được lần nạp qua tool `uneti_use_skill`; Claude Code nạp native thì không qua bộ đếm. Đừng xoá skill chỉ vì nhãn này.
 - **Thẻ skill không hiện nút Xoá:** đó là skill hệ thống. Muốn ngừng dùng thì tắt.
 - **Lỡ tay Xoá:** xoá là dứt điểm, không khôi phục được từ dashboard. Lần sau nếu chỉ muốn ngừng dùng tạm, hãy tắt.
 - **Nhóm bị rơi vào "Chung":** do để trống ô Nhóm khi lưu. Bấm **Sửa** và điền tên nhóm.
@@ -252,7 +252,7 @@ Trong trang **Agents**, khi tạo hoặc sửa một agent, bạn thấy phần 
 
 - [Agents & Workflows](07-agents-va-workflows.md) - gán skill cho agent, dựng chuỗi công việc, xuất/nhập gói kèm phụ thuộc.
 - [Plugins](20-plugins.md) - khi bạn cần một tool chạy code thật chứ không phải một bản hướng dẫn.
-- [Models & engine](10-models-va-engine.md) - skill chạy trên mọi engine; xem khác biệt native (Claude Code) vs router (`javis_use_skill`).
+- [Models & engine](10-models-va-engine.md) - skill chạy trên mọi engine; xem khác biệt native (Claude Code) vs router (`uneti_use_skill`).
 - [Trò chuyện & giọng nói](02-tro-chuyen-va-giong-noi.md) - nhờ UNETI AI tạo skill bằng lời, và menu lệnh "/" trong khung chat.
 - [Tự học](22-tu-hoc.md) - nơi UNETI AI đề xuất skill mới từ hội thoại đã qua.
 - [Second Brain: bộ nhớ, Wiki, INGEST](13-second-brain-bo-nho-wiki.md) - hiểu khái niệm brain nơi skill được lưu.

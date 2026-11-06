@@ -1,7 +1,7 @@
 /* call-bar.js - THANH GỌI ngay trên khung chat (0.65.18, docs/dev/2026-10-voice-call-spec.md mục 4).
 
-   Bấm mic là gọi Javis; thanh này cho biết cuộc gọi đang ở đâu (đang nghe, Javis đang nói, đang
-   làm việc, đang chờ gọi tên, đang nối lại), đếm giờ, và có hai nút: tắt mic (Javis vẫn nói được)
+   Bấm mic là gọi UNETI AI; thanh này cho biết cuộc gọi đang ở đâu (đang nghe, UNETI AI đang nói, đang
+   làm việc, đang chờ gọi tên, đang nối lại), đếm giờ, và có hai nút: tắt mic (UNETI AI vẫn nói được)
    và cúp máy. Lời hai bên vẫn chạy thành bong bóng chat thường nên bảng số, file, kết quả việc
    hiện đầy đủ, thanh chỉ là phần điều khiển.
 
@@ -94,5 +94,5 @@
 
   var api = { create: create, clock: clock };
   if (typeof module === "object" && module.exports) module.exports = api;
-  else root.JavisCallBar = api;
+  else root.UnetiCallBar = api;
 })(typeof window !== "undefined" ? window : globalThis);

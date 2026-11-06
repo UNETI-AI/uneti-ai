@@ -28,9 +28,9 @@ import os
 import sys
 import tempfile
 
-_STATE = tempfile.mkdtemp(prefix="javis-tkkn-")
-os.environ["JAVIS_STATE_DIR"] = _STATE
-os.environ["BRAINS_DIR"] = tempfile.mkdtemp(prefix="javis-tkkn-brains-")
+_STATE = tempfile.mkdtemp(prefix="uneti-tkkn-")
+os.environ["UNETI_STATE_DIR"] = _STATE
+os.environ["BRAINS_DIR"] = tempfile.mkdtemp(prefix="uneti-tkkn-brains-")
 
 try:
     sys.stdout.reconfigure(encoding="utf-8")
@@ -221,7 +221,7 @@ _that = main._schedule_cancel_action
 
 async def _lich_gia(text, brain):
     # Đúng hình dạng _schedule_cancel_reply đọc: handled + result, không phải "reply".
-    return {"calls": ["javis_schedule:huy"], "handled": True, "result": "Đã huỷ lịch."}
+    return {"calls": ["uneti_schedule:huy"], "handled": True, "result": "Đã huỷ lịch."}
 
 
 main._schedule_cancel_action = _lich_gia

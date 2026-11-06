@@ -23,8 +23,8 @@ import sys
 import tempfile
 from urllib.parse import parse_qs, urlparse
 
-os.environ["JAVIS_STATE_DIR"] = tempfile.mkdtemp(prefix="javis-messenger-ig-")
-os.environ["JAVIS_ALLOWED_HOSTS"] = "testserver"
+os.environ["UNETI_STATE_DIR"] = tempfile.mkdtemp(prefix="uneti-messenger-ig-")
+os.environ["UNETI_ALLOWED_HOSTS"] = "testserver"
 try:
     sys.stdout.reconfigure(encoding="utf-8")
 except Exception:
@@ -213,7 +213,7 @@ check("Instagram off: comments are dropped", not seen and not calls, (seen, call
 
 async def _file_refused():
     bot = make_bot(None)
-    p = os.path.join(os.environ["JAVIS_STATE_DIR"], "a.jpg")
+    p = os.path.join(os.environ["UNETI_STATE_DIR"], "a.jpg")
     with open(p, "wb") as f:
         f.write(b"\xff\xd8\xff")
     return await bot.send_file(p, "", chat="igc:c1")

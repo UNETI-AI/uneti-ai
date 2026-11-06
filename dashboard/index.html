@@ -37,7 +37,7 @@
        Giá trị cũ "dim" (tông tối-nhạt, gỡ ở 0.9.250) quy về tối; theme.js sẽ ghi đè lại.
        Chưa chọn gì thì SÁNG (2026-11-05; trước đó là "auto"). Chế độ "auto" (0.74.0) tính theo khung giờ "HH:MM-HH:MM", cùng quy tắc với lightAt() trong
        theme.js (vắt qua nửa đêm được, hai mốc trùng là tối): sửa một bên thì sửa cả bên kia. -->
-  <script>(function(){try{var m=localStorage.getItem('javis.theme'),L=m!=='dark'&&m!=='dim';if(m==='auto'){var p=/^(\d{1,2}):(\d{2})-(\d{1,2}):(\d{2})$/.exec(localStorage.getItem('javis.theme.schedule')||'')||[0,6,0,18,0],a=p[1]*60+ +p[2],b=p[3]*60+ +p[4],d=new Date(),n=d.getHours()*60+d.getMinutes();L=a!==b&&(a<b?n>=a&&n<b:n>=a||n<b);}if(L)document.documentElement.setAttribute('data-theme','light');}catch(e){}})();</script>
+  <script>(function(){try{var m=localStorage.getItem('uneti.theme'),L=m!=='dark'&&m!=='dim';if(m==='auto'){var p=/^(\d{1,2}):(\d{2})-(\d{1,2}):(\d{2})$/.exec(localStorage.getItem('uneti.theme.schedule')||'')||[0,6,0,18,0],a=p[1]*60+ +p[2],b=p[3]*60+ +p[4],d=new Date(),n=d.getHours()*60+d.getMinutes();L=a!==b&&(a<b?n>=a&&n<b:n>=a||n<b);}if(L)document.documentElement.setAttribute('data-theme','light');}catch(e){}})();</script>
 </head>
 <body>
   <div class="hud">
@@ -507,7 +507,7 @@
               </details>
               <div class="gcard-meta" id="vcStatus" role="status"></div>
               <div class="gcard-meta" id="v2LastErr" hidden></div>
-              <!-- Kho giọng Edge: app.js đọc/ghi giọng Edge qua ô này (localStorage javis.voice), còn
+              <!-- Kho giọng Edge: app.js đọc/ghi giọng Edge qua ô này (localStorage uneti.voice), còn
                    người dùng chọn ở #vcVoice. Ẩn, nhưng vẫn là danh sách gốc của bảy giọng Edge. -->
               <select id="voiceSel" name="voice" hidden aria-hidden="true" tabindex="-1">
                 <option value="en-US-EmmaMultilingualNeural" data-i18n="qs.voice_opt_emma">Emma · Nữ, vui tươi rõ chữ · đa ngôn ngữ</option>
@@ -548,7 +548,7 @@
               <div class="popover-label" data-i18n="qs.domain">TÊN MIỀN & SSL</div>
               <div class="opt-sub dom-intro" data-i18n="qs.domain_intro">Nhập tên miền để UNETI AI kiểm tra DNS và hướng dẫn bật HTTPS theo đúng môi trường đang chạy.</div>
               <div class="dom-field">
-                <input id="setDomain" placeholder="Ví dụ: javis.tencuaban.com" data-i18n-ph="qs.domain_ph" autocomplete="off" spellcheck="false">
+                <input id="setDomain" placeholder="Ví dụ: uneti.tencuaban.com" data-i18n-ph="qs.domain_ph" autocomplete="off" spellcheck="false">
                 <button class="gcard-btn" id="saveDomain" data-i18n="qs.domain_save">Lưu &amp; kiểm tra</button>
               </div>
               <div class="dom-status" id="domStatusRow" style="display:none">
@@ -584,7 +584,7 @@
       </aside>
     </div>
 
-    <!-- Việc nền đang sống của hội thoại này (app.js JavisBackground bơm nội dung, ẩn khi rỗng).
+    <!-- Việc nền đang sống của hội thoại này (app.js UnetiBackground bơm nội dung, ẩn khi rỗng).
          Nằm NGAY trên khung nhập vì đó là chỗ mắt người dùng đang ở lúc họ tự hỏi "nó có chạy
          thật không". Được đăng ký trong CHAT_NODE_IDS (console.js) nên sang trang Trò chuyện
          là nó đi theo, không bị bỏ lại như thanh #toolBar cũ. -->
@@ -710,7 +710,7 @@
     </div>
     <!-- Ô đổi ngôn ngữ GIAO DIỆN ngay trên hàng version: console.js đổ danh sách từ /settings
          (lang_list - sổ đăng ký phía server, cùng nguồn với trang Cài đặt). Đổi là
-         JavisI18n.setLang áp NGAY trên máy này rồi mới lưu ui_lang lên server. Ẩn cho tới khi
+         UnetiI18n.setLang áp NGAY trên máy này rồi mới lưu ui_lang lên server. Ẩn cho tới khi
          có danh sách để không hiện một ô select trống. -->
     <div class="rail-lang" id="railLangWrap" hidden>
       <i data-ic="globe"></i>
@@ -877,8 +877,8 @@
         <div class="auth-help"><span id="authForgot" data-i18n="auth.forgot">Quên mật khẩu?</span></div>
         <div class="auth-reset" id="authResetInfo" style="display:none">
           <span data-i18n="auth.reset1">Mở file</span> <code>server/settings.json</code><span data-i18n="auth.reset2">, xóa khối</span> <code>"auth"</code> <span data-i18n="auth.reset3">(hoặc đặt rỗng), rồi chạy</span>
-          <code>stop-javis.bat</code> → <code>start-javis.vbs</code>. <span data-i18n="auth.reset4">Mở lại sẽ về bộ cài đặt để tạo tài khoản mới.</span>
-          <div class="auth-reset-srv" data-i18n="auth.reset_server">Chạy trên máy chủ (Docker, Hostinger): đổi JAVIS_ADMIN_PASSWORD trong Environment rồi Redeploy. UNETI AI đặt lại mật khẩu theo giá trị mới, 2FA giữ nguyên.</div>
+          <code>stop-uneti.bat</code> → <code>start-uneti.vbs</code>. <span data-i18n="auth.reset4">Mở lại sẽ về bộ cài đặt để tạo tài khoản mới.</span>
+          <div class="auth-reset-srv" data-i18n="auth.reset_server">Chạy trên máy chủ (Docker, Hostinger): đổi UNETI_ADMIN_PASSWORD trong Environment rồi Redeploy. UNETI AI đặt lại mật khẩu theo giá trị mới, 2FA giữ nguyên.</div>
         </div>
       </div>
     </div>
@@ -975,7 +975,7 @@
   <script src="/static/fetch-gop.js?v=1"></script>
   <!-- Code của từng trang nạp khi cần (nap-cham.js, 0.417.0): các file LỚN chỉ một trang dùng không còn chặn lúc mở app.
        Nhóm nào trang nào cần: console.js renderPage. Trang rảnh thì nạp nốt ở nền theo đúng thứ tự dưới đây. -->
-  <script id="javis-lazy" type="application/json">{
+  <script id="uneti-lazy" type="application/json">{
  "congviec": [
   "/static/agent-jobs.js?v=6",
   "/static/agent-pulse.js?v=4",
@@ -1028,7 +1028,7 @@
   <script src="/static/tz-picker.js?v=1"></script>
 
   <!-- theme.js phải nạp TRƯỚC mọi file khác: graph.js / app.js đăng ký
-       hàm vẽ lại theo tông ngay lúc parse, nếu window.javisTheme chưa có thì chúng
+       hàm vẽ lại theo tông ngay lúc parse, nếu window.unetiTheme chưa có thì chúng
        đăng ký hụt và các lớp canvas kẹt ở bảng màu tối. -->
   <script src="/static/theme.js?v=5"></script>
   <script src="/static/ui-sound.js?v=1"></script>
@@ -1047,14 +1047,14 @@
   <script src="/static/chat-render.js?v=23"></script>
   <script src="/static/code-hl.js?v=1"></script>
   <script src="/static/dataview.js?v=2"></script>
-  <!-- window.JavisCopy: chép một chuỗi vào bảng nhớ tạm, có đường lui cho http trần. Đứng
+  <!-- window.UnetiCopy: chép một chuỗi vào bảng nhớ tạm, có đường lui cho http trần. Đứng
        sớm vì nhiều màn dùng chung (ngăn kéo File & link, thanh trình sửa file). -->
   <script src="/static/copy-path.js?v=1"></script>
   <script src="/static/task-suggest.js?v=1"></script>
   <!-- Bảng lệnh của trình soạn .md (nút thanh công cụ + phím tắt + menu "/"). PHẢI đứng
-       trước console.js: _neBuildToolbar đọc window.JavisEditorCmds để vẽ nút. -->
+       trước console.js: _neBuildToolbar đọc window.UnetiEditorCmds để vẽ nút. -->
   <script src="/static/editor-cmds.js?v=2"></script>
-  <!-- Đếm từ + ký tự cho trình sửa file (0.65.32). Thuần, console.js dùng qua window.JavisWordCount. -->
+  <!-- Đếm từ + ký tự cho trình sửa file (0.65.32). Thuần, console.js dùng qua window.UnetiWordCount. -->
   <script src="/static/word-count.js?v=1"></script>
   <!-- .html opens on its preview with a Code tab (0.430.2): before file-editor.js and console.js. -->
   <script src="/static/html-preview.js?v=1"></script>
@@ -1066,7 +1066,7 @@
   <script src="/static/limit-resume.js?v=2"></script>
   <script src="/static/chat-slash.js?v=5"></script>
   <!-- Lệnh "/" hệ thống (/status /model /compact /plan /goal ...): chạy lệnh mà chat-slash.js vừa nhận
-       diện. Phải nạp TRƯỚC app.js (sendMessage gọi window.JavisLenh) và SAU chat-slash.js (đọc menu). -->
+       diện. Phải nạp TRƯỚC app.js (sendMessage gọi window.UnetiLenh) và SAU chat-slash.js (đọc menu). -->
   <script src="/static/chat-goal.js?v=1"></script>
   <script src="/static/chat-lenh.js?v=2"></script>
   <script src="/static/chat-acts.js?v=7"></script>
@@ -1086,7 +1086,7 @@
   <script src="/static/chat-reactions.js?v=7"></script>
   <script src="/static/chat-marks.js?v=5"></script>
   <!-- Khối tiến trình từng bước trong khung chat: phải đứng TRƯỚC app.js vì app.js gọi
-       window.JavisSteps ngay khi khung tool_call đầu tiên về. -->
+       window.UnetiSteps ngay khi khung tool_call đầu tiên về. -->
   <script src="/static/chat-steps.js?v=2"></script>
   <script src="/static/chat-viec.js?v=6"></script>
   <script src="/static/chat-nho.js?v=1"></script>
@@ -1105,13 +1105,13 @@
   <script src="/static/incoming-call.js?v=1"></script>
   <script src="/static/call-bar.js?v=1"></script>
   <script src="/static/app.js?v=158"></script>
-  <!-- Sau app.js: dải việc nền đọc window.JavisSessions (app.js dựng) để biết phiên + brain. -->
+  <!-- Sau app.js: dải việc nền đọc window.UnetiSessions (app.js dựng) để biết phiên + brain. -->
   <script src="/static/background-strip.js?v=3"></script>
   <!-- Thân bảng chọn model dùng chung: phải đứng TRƯỚC model-picker.js (thanh chat) và
-       studio.js (ô Model của trợ lý) vì cả hai gọi window.JavisModelList lúc vẽ. -->
+       studio.js (ô Model của trợ lý) vì cả hai gọi window.UnetiModelList lúc vẽ. -->
   <script src="/static/model-list.js?v=3"></script>
   <script src="/static/effort-slider.js?v=3"></script>
-  <!-- Models page usage order (0.351.0): drag, swap, popover placement. console.js calls window.JavisModelsOrder. -->
+  <!-- Models page usage order (0.351.0): drag, swap, popover placement. console.js calls window.UnetiModelsOrder. -->
   <script src="/static/models-order.js?v=1"></script>
   <script src="/static/provider-logos.js?v=1"></script>
   <script src="/static/plan-limit.js?v=2"></script>
@@ -1135,16 +1135,16 @@
   <script src="/static/agent-picker.js?v=1"></script>
   <script src="/static/studio.js?v=49"></script>
   <!-- Trang Cộng sự: nạp SAU studio.js (mượn trình sửa agent/workflow của Studio) và TRƯỚC
-       console.js (renderWorkspace ủy quyền cho window.JavisWorkspace). -->
-  <!-- Tab Công việc của trợ lý (0.142.0): nạp TRƯỚC workspace.js, workspace.js gọi window.JavisAgentJobs. -->
+       console.js (renderWorkspace ủy quyền cho window.UnetiWorkspace). -->
+  <!-- Tab Công việc của trợ lý (0.142.0): nạp TRƯỚC workspace.js, workspace.js gọi window.UnetiAgentJobs. -->
   <script src="/static/pulse-seen.js?v=1"></script>
   <!-- Tag filter bar and tag picker shared by Cộng sự and Team (0.195.0): load BEFORE workspace.js and teams.js. -->
   <script src="/static/tag-picker.js?v=1"></script>
   <script src="/static/workspace.js?v=35"></script>
-  <!-- Hộp chọn thành viên kiểu Zalo (0.142.0): nạp TRƯỚC teams.js, teams.js gọi window.JavisTeamPicker. -->
+  <!-- Hộp chọn thành viên kiểu Zalo (0.142.0): nạp TRƯỚC teams.js, teams.js gọi window.UnetiTeamPicker. -->
   <script src="/static/team-picker.js?v=1"></script>
   <!-- Bộ phán xử nói / chờ / im của từng trợ lý (T3 phần J 0.156.0): lịch sử quyết định và nút sửa. Nạp TRƯỚC teams.js
-       (ngăn Nhóm gọi window.JavisAgentJudge.hydrate); góp phần "judge" vào khung nhịp qua window.JavisPulseParts. -->
+       (ngăn Nhóm gọi window.UnetiAgentJudge.hydrate); góp phần "judge" vào khung nhịp qua window.UnetiPulseParts. -->
   <!-- Nút mic nhập chữ của khung soạn Nhóm (0.176.0): nạp TRƯỚC teams.js. -->
   <script src="/static/dictate.js?v=4"></script>
   <script src="/static/composer-dictate.js?v=5"></script>
@@ -1154,7 +1154,7 @@
   <!-- Trang Code (terminal): nạp TRƯỚC console.js để renderCode ủy quyền được. File này CHỈ có
        phần khung - xterm.js (285KB) nạp lười ở lần đầu mở tab, không nằm trong đường khởi động. -->
   <script src="/static/code-term.js?v=3"></script>
-  <!-- Hộp chọn thư mục dùng chung (JavisFolderPicker). Nạp TRƯỚC file nào gọi nó. -->
+  <!-- Hộp chọn thư mục dùng chung (UnetiFolderPicker). Nạp TRƯỚC file nào gọi nó. -->
   <script src="/static/folder-picker.js?v=2"></script>
   <!-- Trang Coding (nhóm Code): mượn khung chat của app, nên nạp TRƯỚC console.js y như
        workspace.js để renderCoding uỷ quyền được. -->
@@ -1162,7 +1162,7 @@
   <!-- Console layer: console.js đăng ký store TRƯỚC khi Alpine khởi động (defer) -->
   <!-- Phần đọc cấu hình của form "Tự thêm MCP" (thuần, có test node). Nạp TRƯỚC console.js. -->
   <script src="/static/mcp-form-parse.js?v=1"></script>
-  <!-- Webhooks section of the Work page (0.198.0): load BEFORE console.js, which mounts window.JavisWebhooks. -->
+  <!-- Webhooks section of the Work page (0.198.0): load BEFORE console.js, which mounts window.UnetiWebhooks. -->
   <!-- Health section of the Work page (0.199.0): incidents UNETI AI Core handles and the read-only scan. -->
   <script src="/static/health-panel.js?v=1"></script>
   <!-- Watch tab of the Recurring work page (0.239.0): token-free web page watching (server/web_watch.py). -->
@@ -1180,7 +1180,7 @@
   <script src="/static/star-nudge.js?v=2"></script>
   <script src="/static/notifications.js?v=11"></script>
   <!-- Linh vật ở mép màn hình. Nạp SAU app.js vì nó chỉ được app.js gọi vào
-       (setOrbState -> JavisPet.setState), và sau console.js để trang Cài đặt vẽ được thẻ chọn. -->
+       (setOrbState -> UnetiPet.setState), và sau console.js để trang Cài đặt vẽ được thẻ chọn. -->
   <!-- Mascot menu the owner arranges (Settings > Mascot): load BEFORE pet.js, which builds its menu from it. -->
   <script src="/static/pet-menu.js?v=4"></script>
   <script src="/static/pet.js?v=4"></script>

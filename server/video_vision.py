@@ -1,7 +1,7 @@
 """A video a customer sends, turned into something the bot's model can take in (0.433.0).
 
 Field report 2026-11-01 (a phone-repair shop on personal Zalo): a customer sent a video of the faulty machine, the
-bot answered "em chưa xem được video" twice and the customer had to call. No model brain Javis runs takes a video as
+bot answered "em chưa xem được video" twice and the customer had to call. No model brain UNETI AI runs takes a video as
 input, and before this module the video message never even reached the bot's turn.
 
 What the bot gets instead, and what it is TOLD it got:
@@ -148,7 +148,7 @@ async def _look(url: str, dest: Path, msg_id: str, transcribe: Optional[Transcri
         res["why"] = "tin video không kèm link tải"
         return res
     if not available():
-        res["why"] = "máy chủ Javis chưa cài ffmpeg"
+        res["why"] = "máy chủ UNETI AI chưa cài ffmpeg"
         return res
     import image_vision
     import zalo_attachments

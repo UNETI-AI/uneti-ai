@@ -1,8 +1,8 @@
-"""A voice call from a partner's chat speaks as that partner, not as plain Javis.
+"""A voice call from a partner's chat speaks as that partner, not as plain UNETI AI.
 
     python tests/run.py voice_persona
 
-Owner report 2026-11-05: in a voice call with a partner (Partners page) the call model had neither the Javis context
+Owner report 2026-11-05: in a voice call with a partner (Partners page) the call model had neither the UNETI AI context
 nor the partner's prompt, and asked who it was it answered "em là ChatGPT". No engine runs here: the pure prompt
 builders, the session -> partner lookup in main.py, and (by reading the code) that every call path uses them.
 """
@@ -10,8 +10,8 @@ from _paths import ROOT, SERVER  # noqa: E402,F401
 import os
 import tempfile
 
-os.environ["JAVIS_STATE_DIR"] = tempfile.mkdtemp(prefix="javis-vpersona-")
-os.environ["BRAINS_DIR"] = tempfile.mkdtemp(prefix="javis-vpersona-brains-")
+os.environ["UNETI_STATE_DIR"] = tempfile.mkdtemp(prefix="uneti-vpersona-")
+os.environ["BRAINS_DIR"] = tempfile.mkdtemp(prefix="uneti-vpersona-brains-")
 
 import main  # noqa: E402
 import voice_brain  # noqa: E402
@@ -34,13 +34,13 @@ for label, base in (("voice_live.SYSTEM_PROMPT", voice_live.SYSTEM_PROMPT),
                     ("voice_brain.SYSTEM_PROMPT", voice_brain.SYSTEM_PROMPT)):
     check(f"{label} opens with the clause voice_persona swaps", base.startswith(voice_persona.OPENING))
     out = voice_persona.apply(base, "Người viết", "BLOCK")
-    check(f"{label} as a partner names the partner, not Javis",
-          out.startswith("Bạn là Người viết, một cộng sự của chủ trong Javis,") and out.endswith("BLOCK")
+    check(f"{label} as a partner names the partner, not UNETI AI",
+          out.startswith("Bạn là Người viết, một cộng sự của chủ trong UNETI AI,") and out.endswith("BLOCK")
           and voice_persona.OPENING not in out)
 
 block = voice_persona.identity_block("Người viết", "viết bài", "Viết súc tích.", "## Luật chủ dặn\n- không emoji")
-check("identity block: name, role, Javis context",
-      "**Người viết**" in block and "Vai trò: viết bài." in block and "Javis OS" in block)
+check("identity block: name, role, UNETI AI context",
+      "**Người viết**" in block and "Vai trò: viết bài." in block and "UNETI AI" in block)
 check("identity block: never claims to be ChatGPT", "KHÔNG tự nhận là ChatGPT" in block)
 check("identity block: carries the partner file and memory", "Viết súc tích." in block and "không emoji" in block)
 check("identity block caps a long file", len(voice_persona.identity_block("A", "", "x" * 20000)) < 6000)
@@ -62,7 +62,7 @@ b = voice_brain._make(conf)
 check("fast lane brain takes the partner prompt", b.system == "PROMPT RIÊNG")
 check("fast lane builds its messages from that prompt",
       voice_brain.build_messages([], "chào", b.system)[0]["content"] == "PROMPT RIÊNG")
-check("fast lane without a partner keeps the Javis prompt",
+check("fast lane without a partner keeps the UNETI AI prompt",
       voice_brain._make({"provider": "openai", "model": "m", "api_key": "k"}).system == voice_brain.SYSTEM_PROMPT)
 check("seed text carries the partner prompt for brains without a system flag",
       "PROMPT RIÊNG" in voice_brain.seed_text([], "chào", with_prompt=True, system="PROMPT RIÊNG"))
@@ -81,8 +81,8 @@ agent = main._voice_agent(sid_agent, "brain")
 check("a call in a partner's chat finds the partner",
       agent is not None and agent["slug"] == "nguoi-viet" and agent["brain"] == main._brain_root("brain"))
 check("a plain chat call has no partner", main._voice_agent(sid_plain, "brain") is None)
-check("a partner whose file is gone: plain Javis call", main._voice_agent(sid_gone, "brain") is None)
-check("no session: plain Javis call", main._voice_agent("", "brain") is None)
+check("a partner whose file is gone: plain UNETI AI call", main._voice_agent(sid_gone, "brain") is None)
+check("no session: plain UNETI AI call", main._voice_agent("", "brain") is None)
 
 persona = main._voice_persona(sid_agent, "brain")
 check("persona carries the partner's name and file",
@@ -96,13 +96,13 @@ check("fast lane conf of a plain chat is unchanged",
 # The work a call hands off runs as the partner too, with the voice channel line.
 p = main._agent_chat_prompt("brain", "nguoi-viet", channel="voice", conv_sid=sid_agent)
 check("handed-off work: partner prompt with the call channel", "cuộc gọi thoại" in p and f"web:{sid_agent}" in p)
-check("partner chat prompt says who it is inside Javis",
-      "cộng sự (trợ lý chuyên trách) trong Javis OS" in p and "KHÔNG tự nhận là" in p)
+check("partner chat prompt says who it is inside UNETI AI",
+      "cộng sự (trợ lý chuyên trách) trong UNETI AI" in p and "KHÔNG tự nhận là" in p)
 
 # --- every call path reads it (code reading: these paths run engines) ---
 src = (SERVER / "main.py").read_text(encoding="utf-8")
-ask = src[src.index("async def _voice_ask_javis("):src.index("def _live_call_lang(")]
-check("_voice_ask_javis runs the turn as the partner", "agent = _voice_agent(conv_sid, brain)" in ask
+ask = src[src.index("async def _voice_ask_uneti("):src.index("def _live_call_lang(")]
+check("_voice_ask_uneti runs the turn as the partner", "agent = _voice_agent(conv_sid, brain)" in ask
       and "agent=agent" in ask and '"call_lang": call_lang' in ask)
 check("the agent turn of a call gets the voice channel line", 'else "voice" if "call_lang" in (meta or {})' in src)
 route = src[src.index("async def voice_live_ws("):]

@@ -4,7 +4,7 @@
 
 Bug 2026-09-28: nhờ UNETI AI (engine ChatGPT qua Codex) làm 3 ảnh công thức 9:16. Codex vẽ bằng
 skill `imagegen` riêng của nó, lưu ở `~/.codex/generated_images/<thread>/exec-*.png`, NGOÀI
-brain. Câu trả lời dẫn `[Thành phẩm](/home/javis/.codex/generated_images/...png)`: bấm vào
+brain. Câu trả lời dẫn `[Thành phẩm](/home/uneti/.codex/generated_images/...png)`: bấm vào
 ra 404, ảnh không hiện trong khung chat, lại thêm dòng "không tìm thấy trong brain", người dùng
 phải tự đi lưu ảnh về.
 
@@ -25,9 +25,9 @@ import tempfile
 import time
 from pathlib import Path
 
-TMP = Path(tempfile.mkdtemp(prefix="javis-anhcodex-"))
+TMP = Path(tempfile.mkdtemp(prefix="uneti-anhcodex-"))
 os.environ["CODEX_HOME"] = str(TMP / "codexhome")
-os.environ.setdefault("JAVIS_STATE_DIR", str(TMP / "state"))
+os.environ.setdefault("UNETI_STATE_DIR", str(TMP / "state"))
 
 import anh_codex  # noqa: E402
 from claude_cli import CodexCLI  # noqa: E402

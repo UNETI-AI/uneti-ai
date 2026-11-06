@@ -14,9 +14,9 @@ import os
 import tempfile
 from pathlib import Path
 
-os.environ["JAVIS_STATE_DIR"] = tempfile.mkdtemp(prefix="javis-core-dispatch-")
-BR = Path(tempfile.mkdtemp(prefix="javis-core-dispatch-brain-"))
-BR2 = Path(tempfile.mkdtemp(prefix="javis-core-dispatch-brain2-"))
+os.environ["UNETI_STATE_DIR"] = tempfile.mkdtemp(prefix="uneti-ai-core-dispatch-")
+BR = Path(tempfile.mkdtemp(prefix="uneti-ai-core-dispatch-brain-"))
+BR2 = Path(tempfile.mkdtemp(prefix="uneti-ai-core-dispatch-brain2-"))
 for root, slugs in ((BR, ("lan", "minh")), (BR2, ("xa",))):
     (root / "agents").mkdir()
     for slug in slugs:
@@ -61,7 +61,7 @@ def _fake_report(owner_chat, text, **kw):
 
 main._TEAM_API.deps.report = _fake_report
 
-spec = importlib.util.spec_from_file_location("javis_team_plugin", ROOT / "system" / "plugins" / "javis-team" / "plugin.py")
+spec = importlib.util.spec_from_file_location("uneti_team_plugin", ROOT / "system" / "plugins" / "uneti-team" / "plugin.py")
 plugin = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(plugin)
 regs = []
@@ -70,7 +70,7 @@ regs = []
 class Ctx:
     def __init__(self, vault_root):
         self.vault_root = vault_root
-        self.slug = "javis-team"
+        self.slug = "uneti-team"
 
     def register_tool(self, *a, **kw):
         regs.append((a, kw))

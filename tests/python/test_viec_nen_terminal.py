@@ -5,7 +5,7 @@
 Chủ repo: "làm tiếp phần terminal cho việc nền". Trước bản này việc nền bằng API key không có
 lệnh máy nên không dựng nổi video (ffmpeg) dù đã hết trần 30 vòng. Bảng phải giữ:
 
-    Claude của việc này được chạy Bash, mức full   -> API key có javis_terminal
+    Claude của việc này được chạy Bash, mức full   -> API key có uneti_terminal
     mức auto / suggest                             -> không terminal
     loop bị cô lập (disallowed Bash)               -> không terminal
     task bị rào bằng allowlist không có Bash       -> không terminal
@@ -22,9 +22,9 @@ import tempfile
 from pathlib import Path
 from types import SimpleNamespace
 
-_TMP = tempfile.mkdtemp(prefix="javis-nenterm-")
-os.environ["JAVIS_STATE_DIR"] = _TMP
-BRAIN = Path(tempfile.mkdtemp(prefix="javis-nenterm-brain-"))
+_TMP = tempfile.mkdtemp(prefix="uneti-nenterm-")
+os.environ["UNETI_STATE_DIR"] = _TMP
+BRAIN = Path(tempfile.mkdtemp(prefix="uneti-nenterm-brain-"))
 
 import aux_engine  # noqa: E402
 import engine  # noqa: E402
@@ -40,8 +40,8 @@ def check(name, cond, extra=""):
 
 
 def cli(allowed=None, disallowed=None, mode="full"):
-    return SimpleNamespace(allowed_tools=allowed, disallowed_tools=disallowed, javis_mode=mode,
-                           javis_vault=str(BRAIN), system_prompt="", tag="dispatch:t1:run")
+    return SimpleNamespace(allowed_tools=allowed, disallowed_tools=disallowed, uneti_mode=mode,
+                           uneti_vault=str(BRAIN), system_prompt="", tag="dispatch:t1:run")
 
 
 # ---- 1. Quyết định thừa hưởng từ engine Claude ----
@@ -74,10 +74,10 @@ async def _luot(eng, lenh=None):
         seen["system"] = messages[0]["content"] if messages and messages[0]["role"] == "system" else ""
         seen["sid"] = {k[-1] for k in mcp_hub._cache if isinstance(k, tuple) and str(k[-1]).startswith("nen-")}
         # Web nằm ở tầng tool tìm-rồi-gọi (lazy) khi brain có nhiều tool: hỏi đúng đường model sẽ đi.
-        seen["web"] = ("javis_web_search" in route or "javis_web_search" in str(
-            await mcp_client.call_route(route, "javis_search_tools", {"query": "web search"})))
-        if lenh and "javis_terminal" in route:
-            seen["out"] = await mcp_client.call_route(route, "javis_terminal", {"command": lenh})
+        seen["web"] = ("uneti_web_search" in route or "uneti_web_search" in str(
+            await mcp_client.call_route(route, "uneti_search_tools", {"query": "web search"})))
+        if lenh and "uneti_terminal" in route:
+            seen["out"] = await mcp_client.call_route(route, "uneti_terminal", {"command": lenh})
         yield {"type": "text", "content": "xong"}
 
     engine.openai_chat_with_mcp = _gia
@@ -92,7 +92,7 @@ async def _luot(eng, lenh=None):
 full = aux_engine._ApiAuxEngine("openai", "gpt-x", vault_root=str(BRAIN), mode="full", tag="dispatch:t1:run",
                                 api_key="sk-test", terminal=True)
 r = asyncio.run(_luot(full, "echo xin-chao > video-thu.txt && pwd"))
-check("việc nền Toàn quyền thấy javis_terminal", "javis_terminal" in r["tools"], sorted(r["tools"])[:12])
+check("việc nền Toàn quyền thấy uneti_terminal", "uneti_terminal" in r["tools"], sorted(r["tools"])[:12])
 check("và tìm được web", r["web"])
 check("lệnh chạy thật, thư mục làm việc là brain",
       (BRAIN / "video-thu.txt").read_text(encoding="utf-8").strip() == "xin-chao", r.get("out"))
@@ -105,7 +105,7 @@ check("hết lượt thì cache của phiên được dọn", not _con, _con)
 auto = aux_engine._ApiAuxEngine("openai", "gpt-x", vault_root=str(BRAIN), mode="auto", tag="loop",
                                 api_key="sk-test", terminal=True)
 r2 = asyncio.run(_luot(auto))
-check("mức auto: không có javis_terminal", "javis_terminal" not in r2["tools"])
+check("mức auto: không có uneti_terminal", "uneti_terminal" not in r2["tools"])
 check("mức auto: vẫn tìm được web", r2["web"])
 check("mức auto: câu khai năng lực nói không có lệnh máy", "KHÔNG có: lệnh máy" in r2["system"])
 

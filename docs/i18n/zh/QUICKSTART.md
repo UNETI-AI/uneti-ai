@@ -1,28 +1,28 @@
 <!-- translated-from: QUICKSTART.en.md sha256:2f4928f341af -->
-# Javis OS - 快速开始
+# UNETI AI - 快速开始
 
 *[English](../../../QUICKSTART.en.md) · [Tiếng Việt](../../../QUICKSTART.md) · **简体中文** · [Español](../es/QUICKSTART.md) · [日本語](../ja/QUICKSTART.md) · [हिन्दी](../hi/QUICKSTART.md) · [Português](../pt-BR/QUICKSTART.md) · [한국어](../ko/QUICKSTART.md) · [Русский](../ru/QUICKSTART.md) · [Deutsch](../de/QUICKSTART.md) · [Français](../fr/QUICKSTART.md) · [Bahasa Indonesia](../id/QUICKSTART.md)*
 
 > 本文是英文快速开始指南的自动翻译版本。
 
-几分钟内让 Javis OS 跑起来。完整指南：[docs/en/](../../../docs/en/README.md)。
+几分钟内让 UNETI AI 跑起来。完整指南：[docs/en/](../../../docs/en/README.md)。
 
 ## 个人电脑（Windows、macOS）- 下载安装程序
 
-像安装普通应用一样安装 Javis：下载一个文件，打开它，之后每天点 JAVIS OS 图标即可。安装程序会检查电脑缺少什么（Git、Python、Node、AI 大脑），只安装缺少的部分。
+像安装普通应用一样安装 UNETI AI：下载一个文件，打开它，之后每天点 UNETI AI 图标即可。安装程序会检查电脑缺少什么（Git、Python、Node、AI 大脑），只安装缺少的部分。
 
-- **Windows 10/11：** 下载 [JavisOS-Setup.exe](https://github.com/uneti-ai/uneti-ai/releases/download/desktop/JavisOS-Setup.exe)，双击并一路点 Next。黑色窗口会显示安装进度（几分钟）。完成后桌面和开始菜单会出现 JAVIS OS 图标。
-- **macOS 11 及以上：** 下载 [JavisOS-macOS.dmg](https://github.com/uneti-ai/uneti-ai/releases/download/desktop/JavisOS-macOS.dmg)，打开后把 **JAVIS OS** 拖进 **Applications**，再从启动台打开。第一次会打开终端进行安装（可能会让你设置 Javis 管理员账号，并输入一次 Mac 密码）。
+- **Windows 10/11：** 下载 [UNETI-AI-Setup.exe](https://github.com/uneti-ai/uneti-ai/releases/download/desktop/UNETI-AI-Setup.exe)，双击并一路点 Next。黑色窗口会显示安装进度（几分钟）。完成后桌面和开始菜单会出现 UNETI AI 图标。
+- **macOS 11 及以上：** 下载 [UNETI-AI-macOS.dmg](https://github.com/uneti-ai/uneti-ai/releases/download/desktop/UNETI-AI-macOS.dmg)，打开后把 **UNETI AI** 拖进 **Applications**，再从启动台打开。第一次会打开终端进行安装（可能会让你设置 UNETI AI 管理员账号，并输入一次 Mac 密码）。
 
-点击图标后 Javis 会以独立窗口打开（没有地址栏），Javis 随电脑启动，应用内的 **Update** 按钮照常可用。数据保存在用户文件夹下的 `JavisOS` 文件夹中；卸载应用不会删除该文件夹。
+点击图标后 UNETI AI 会以独立窗口打开（没有地址栏），UNETI AI 随电脑启动，应用内的 **Update** 按钮照常可用。数据保存在用户文件夹下的 `UNETI-AI` 文件夹中；卸载应用不会删除该文件夹。
 
 两个安装程序暂未进行代码签名，所以电脑第一次会询问：
 - Windows 显示 “Windows protected your PC”：点 **More info**，再点 **Run anyway**。
-- macOS 提示无法打开：进入 **System Settings → Privacy & Security**，向下滚动点 **Open Anyway**，然后重新打开 JAVIS OS。
+- macOS 提示无法打开：进入 **System Settings → Privacy & Security**，向下滚动点 **Open Anyway**，然后重新打开 UNETI AI。
 
 ## 方式一 - Hostinger VPS（Docker Manager，一键部署）
 
-> 🛒 **还没有 VPS？** [在这里购买 Hostinger VPS](https://www.hostinger.com?REFERRALCODE=UTRBLOGMIDSN)。它自带 Docker Manager，一键即可安装 Javis。开通后回到下面的步骤。
+> 🛒 **还没有 VPS？** [在这里购买 Hostinger VPS](https://www.hostinger.com?REFERRALCODE=UTRBLOGMIDSN)。它自带 Docker Manager，一键即可安装 UNETI AI。开通后回到下面的步骤。
 
 1. hPanel → VPS → **Docker Manager** → **Compose** → **Compose from URL**。
 2. 粘贴这个 URL：
@@ -31,9 +31,9 @@
    ```
 3. （可选，用于 HTTPS + 域名）在 **Environment** 框中设置：
    ```
-   DOMAIN_NAME=javis.<vps-hostname>.hstgr.cloud
+   DOMAIN_NAME=uneti.<vps-hostname>.hstgr.cloud
    ```
-   （主机名可在 hPanel → VPS 中找到，例如 `javis.srv1782015.hstgr.cloud`。）
+   （主机名可在 hPanel → VPS 中找到，例如 `uneti.srv1782015.hstgr.cloud`。）
 4. 点击 **Deploy**。等待 1-3 分钟。用 **Open** 按钮打开应用（或访问 `https://<DOMAIN_NAME>`）。
 5. 首次运行时，界面会要求你创建一个管理员账号。之后，在容器终端里登录一次 Claude Code：`claude auth login --claudeai`。
 
@@ -52,7 +52,7 @@ docker compose -f docker-compose.yml up -d
 
 1. 安装 Python 3.12 + Node 22。
 2. 在项目文件夹中运行一次 `setup.bat`，它会创建 .venv、安装依赖，并为你安装两个 CLI 引擎（Claude Code、Codex）。
-3. 运行 `start-javis.bat` 在后台启动（用 `stop-javis.bat` 停止）。
+3. 运行 `start-uneti.bat` 在后台启动（用 `stop-uneti.bat` 停止）。
 4. 打开 http://localhost:7777。
 
 ## 运行起来之后

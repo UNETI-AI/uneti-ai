@@ -17,7 +17,7 @@ Sau vài lượt chat, UNETI AI mở một **tiến trình học riêng** để 
 
 Trước khi ghi, code còn quét thêm hai lớp: **quét lộ khoá bí mật** (API key, token Telegram, JWT, chuỗi kết nối cơ sở dữ liệu, dòng có nhãn "mật khẩu"/"password") và **quét câu chèn lệnh** kiểu "bỏ qua mọi chỉ dẫn trước đó". Cái nào dính là bị chặn, không ghi, và lý do được ghi vào nhật ký. Ngược chiều cũng vậy: nội dung hội thoại đưa cho tiến trình học đọc đã được vô hiệu hoá các câu mệnh lệnh, để một tin nhắn khách gửi vào không điều khiển được vòng học.
 
-Cuối cùng, UNETI AI chỉ cho phép ghi vào đúng các thư mục `memory/`, `Memory/`, `Wiki/`, `skills/`, `.claude/skills/`, `agents/`, `workflows/`, `Javis/` của brain. Đường dẫn nào lọt ra ngoài danh sách này sẽ bị khôi phục lại ngay.
+Cuối cùng, UNETI AI chỉ cho phép ghi vào đúng các thư mục `memory/`, `Memory/`, `Wiki/`, `skills/`, `.claude/skills/`, `agents/`, `workflows/`, `UNETI/` của brain. Đường dẫn nào lọt ra ngoài danh sách này sẽ bị khôi phục lại ngay.
 
 ## Mở ở đâu trong UNETI AI
 
@@ -77,7 +77,7 @@ Khi hội thoại cho thấy một skill, agent hay workflow **đang có** làm 
 
 Riêng **skill** có thêm hai rào nữa, vì hai đường hỏng này không tồn tại với agent và workflow:
 
-- **Skill hệ thống là cấm.** `javis-builder`, `ingest-source`, `query-wiki`, `lint-wiki`, `notes`, `html-to-webcake`, `security-audit` do app ship và tự cập nhật theo bản mới. Sửa một cái là bản đó thành của bạn và app ngừng cập nhật đè lên, tức bạn mất im lặng một năng lực mặc định.
+- **Skill hệ thống là cấm.** `uneti-builder`, `ingest-source`, `query-wiki`, `lint-wiki`, `notes`, `html-to-webcake`, `security-audit` do app ship và tự cập nhật theo bản mới. Sửa một cái là bản đó thành của bạn và app ngừng cập nhật đè lên, tức bạn mất im lặng một năng lực mặc định.
 - **Skill bạn đã tắt là cấm.** Sửa nó chẳng khác gì bật lại thứ bạn cố ý tắt.
 
 Ngoài ra vòng học chỉ được đổi phần chuyên môn: tên hiển thị, nhóm, trạng thái, ngày tạo và mọi field lạ bạn tự thêm vào frontmatter đều giữ nguyên. Bỏ trống mô tả nghĩa là "không đụng", không phải "xoá". Việc ghi đè này có bốn rào, tất cả đều do code ép chứ không phải dặn bằng lời:
@@ -254,7 +254,7 @@ Một điểm an tâm: git ở đây chỉ theo dõi **tri thức đã chưng c�
 
 ## Khối "Nhật ký học"
 
-Khối cuối trang hiện tối đa 10 mục gần nhất, gom từ ba file nhật ký mới nhất trong `Javis/learn-log/` của brain (mỗi ngày một file `YYYY-MM-DD.md`).
+Khối cuối trang hiện tối đa 10 mục gần nhất, gom từ ba file nhật ký mới nhất trong `UNETI/learn-log/` của brain (mỗi ngày một file `YYYY-MM-DD.md`).
 
 Mỗi mục có mốc giờ, loại (`learn` hoặc `curator`), lý do chạy (`auto` khi tự bắn, `manual` khi bạn bấm nút), trạng thái (`auto-ghi` hoặc `dry-run` kèm lý do bị hạ), rồi danh sách những gì đã học dạng `fact=[...] wiki=[...] skill=[...]`, và mã commit nếu có. Phần thân là câu tóm tắt tiếng Việt của mẻ học, kèm mục **Bị chặn** liệt kê từng thứ bị cửa lọc chặn và vì sao.
 
@@ -310,7 +310,7 @@ Trang này làm việc trên brain đang chọn ở đầu màn hình. Đổi đ
 Nó chạy 24 giờ một lần, và bỏ qua brain đã im lặng quá 14 ngày. Ngoài ra khi Wiki không đổi note nào thì nó bỏ hẳn vòng đó cho đỡ tốn, nhật ký sẽ ghi lý do "wiki không đổi note nào". Muốn thấy ngay thì bấm **🧹 Curator ngay**.
 
 **Sợ tự học làm hỏng ghi chú viết tay.**
-Tiến trình học không có quyền ghi. Code ghi thì không đè file ký ức đã có, không đè note Wiki đã có, không đè skill đã có, không xoá gì, chỉ sửa agent/workflow đã có khi có lý do rõ ràng và bạn chưa khoá file đó, và chỉ được động vào các thư mục `memory/`, `Wiki/`, `skills/`, `agents/`, `workflows/`, `Javis/`. Đường dẫn nào lọt ra ngoài bị khôi phục lại ngay.
+Tiến trình học không có quyền ghi. Code ghi thì không đè file ký ức đã có, không đè note Wiki đã có, không đè skill đã có, không xoá gì, chỉ sửa agent/workflow đã có khi có lý do rõ ràng và bạn chưa khoá file đó, và chỉ được động vào các thư mục `memory/`, `Wiki/`, `skills/`, `agents/`, `workflows/`, `UNETI/`. Đường dẫn nào lọt ra ngoài bị khôi phục lại ngay.
 
 ## Liên quan
 

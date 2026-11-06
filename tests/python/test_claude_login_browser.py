@@ -31,7 +31,7 @@ if os.name == "nt":
     print("skip: the fake CLI is a POSIX script")
     sys.exit(0)
 
-_TMP = Path(tempfile.mkdtemp(prefix="javis-claude-browser-"))
+_TMP = Path(tempfile.mkdtemp(prefix="uneti-claude-browser-"))
 _STATE = _TMP / "state"
 _GO = _TMP / "browser-done"
 _FAKE = _TMP / "claude"

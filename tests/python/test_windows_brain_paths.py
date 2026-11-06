@@ -1,11 +1,11 @@
-"""Javis finds agy and grok where the official Windows installers really put them.
+"""UNETI AI finds agy and grok where the official Windows installers really put them.
 
     python tests/run.py windows_brain_paths
 
 Found by the desktop installer smoke test (0.439.0) on a clean windows-latest runner: the
 Antigravity installer writes %LOCALAPPDATA%\\agy\\bin\\agy.exe and the Grok installer writes
 %USERPROFILE%\\.grok\\bin\\grok.exe, and each only adds its folder to the USER PATH in the
-registry. A Javis started right after the install (the setup wizard's "Open now", or an
+registry. A UNETI AI started right after the install (the setup wizard's "Open now", or an
 already-running Explorer) still has the old PATH, and its finders did not look in either
 folder, so the Models page said "not installed" for two brains that were installed.
 
@@ -37,8 +37,8 @@ for f in (agy, grok):
     f.write_bytes(b"MZ")
 
 os.environ.update({"USERPROFILE": str(home), "HOME": str(home), "LOCALAPPDATA": str(local),
-                   "PATH": str(tmp / "empty"), "JAVIS_STATE_DIR": str(tmp / "state")})
-for k in ("JAVIS_AGY_BIN", "JAVIS_GROK_BIN", "APPDATA"):
+                   "PATH": str(tmp / "empty"), "UNETI_STATE_DIR": str(tmp / "state")})
+for k in ("UNETI_AGY_BIN", "UNETI_GROK_BIN", "APPDATA"):
     os.environ.pop(k, None)
 (tmp / "state").mkdir()
 

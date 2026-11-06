@@ -44,7 +44,7 @@ From 0.403.0 UNETI AI Core decides which notices ring (red dot on the bell, phon
 - Every notice has two buttons, **Needed** and **Not needed**. To rate it with an emoji, press **Open in UNETI AI Core**: the notice becomes a message in the UNETI AI Core chat, and you put a Resonance emoji (👍 ❤️ 😂 😮 😢 😡) on it like on any answer, with "Should have spoken" or "Should stay quiet" if you like. UNETI AI Core adjusts itself from it: Not needed filters that kind; Needed on a filtered notice makes that kind always ring; a group that gets many bad reactions moves one notch down. Each time, UNETI AI Core says so in its chat.
 - A kind that rings a 3rd time within 6 hours is filtered as "repeated" for the rest of those 6 hours.
 - UNETI AI Core **never hides an urgent notice by itself**. Only you can, with Off or Not needed.
-- You can also say it in the UNETI AI Core chat, for example "turn off Zalo sign-in notices" or "tell me everything": UNETI AI Core uses the `javis_notify` tool and gives you a code to undo it.
+- You can also say it in the UNETI AI Core chat, for example "turn off Zalo sign-in notices" or "tell me everything": UNETI AI Core uses the `uneti_notify` tool and gives you a code to undo it.
 
 ### Unread messages and muting
 
@@ -197,7 +197,7 @@ This is handy when you can describe the intent in words but do not want to fill 
 
 In the current brain layout, each agent is a file at `agents/<slug>.md` and each workflow at `workflows/<slug>.md`. The `slug` is lowercase, hyphenated and accent-free (so "viết email" becomes `viet-email`).
 
-**Older brains that have not migrated** keep those two folders at `Javis/agents/` and `Javis/workflows/`. UNETI AI detects it: if the new folder exists it uses it, otherwise it uses the old path. So if the Files page shows no `agents/` at the brain root, look inside `Javis/`.
+**Older brains that have not migrated** keep those two folders at `UNETI/agents/` and `UNETI/workflows/`. UNETI AI detects it: if the new folder exists it uses it, otherwise it uses the old path. So if the Files page shows no `agents/` at the brain root, look inside `UNETI/`.
 
 Because they are text files, you can open them through [File manager](05-file-manager.md) to read or edit by hand. The file structure:
 
@@ -230,7 +230,7 @@ Note: an exported package only contains definition files. **An agent's memory an
 
 ## Share a whole Team
 
-On the Teams page, a team's **⋯** menu has **Share team**: it downloads one `.team.javis.zip` file with the team's partners, their skills, the leader and the pinned messages (as shared instructions). The file holds **no** chat history, keys, passwords, models or Auto switches; text that looks like an API key, a bot token or a `password: ...` line is replaced with `[REDACTED]` before writing.
+On the Teams page, a team's **⋯** menu has **Share team**: it downloads one `.team.uneti.zip` file with the team's partners, their skills, the leader and the pinned messages (as shared instructions). The file holds **no** chat history, keys, passwords, models or Auto switches; text that looks like an API key, a bot token or a `password: ...` line is replaced with `[REDACTED]` before writing.
 
 The person who receives it presses **Import team** at the top of the team list, picks the file, sees which partners and how many skills come in, and confirms. A partner already in the brain under the same name keeps the receiver's version; models and Auto are the receiver's choice afterwards. An older UNETI AI can still open the file with the Import button on the Partners page (it then adds the partners without building the team).
 

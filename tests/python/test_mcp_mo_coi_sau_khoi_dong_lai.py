@@ -2,7 +2,7 @@
 
     python tests/run.py mcp_mo_coi      (KHÔNG mạng; spawn vài tiến trình python ngủ)
 
-Báo cáo 13/10/2026, bot "Javis Vũ": bot im trong nhóm Zalo từ 21:09. Tài khoản có HAI tiến trình
+Báo cáo 13/10/2026, bot "UNETI AI Vũ": bot im trong nhóm Zalo từ 21:09. Tài khoản có HAI tiến trình
 `javis-zalo mcp start`, một từ 20:49 và một do server mở lại lúc 21:10. Zalo chỉ đẩy tin về một
 socket, bot đọc phiên mới, phiên mới gần như không nhận được gì.
 
@@ -22,7 +22,7 @@ import sys
 import tempfile
 import time
 
-os.environ["JAVIS_STATE_DIR"] = tempfile.mkdtemp(prefix="javis-mocoi-")
+os.environ["UNETI_STATE_DIR"] = tempfile.mkdtemp(prefix="uneti-mocoi-")
 try:
     sys.stdout.reconfigure(encoding="utf-8")
 except Exception:
@@ -55,7 +55,7 @@ def _pid_da_chet():
     return p.pid
 
 
-NGU = "import time; time.sleep(600)  # javis-mcp-mo-coi-{}"
+NGU = "import time; time.sleep(600)  # uneti-mcp-mo-coi-{}"
 
 
 async def _mo(key, tag):

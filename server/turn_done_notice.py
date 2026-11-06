@@ -1,14 +1,14 @@
 """Ring the bell when a long chat turn finishes (the owner has usually left the screen by then).
 
 The owner reported on 2026-11-04: a long video render or edit started from the chat finished, and nothing told them,
-neither the chat nor the notifications. A background job Javis tracks already reports through `_notify_owner`, but the
+neither the chat nor the notifications. A background job UNETI AI tracks already reports through `_notify_owner`, but the
 answer that matters comes after it: the turn that waited for Claude Code's background task, or the follow-up turn
-Javis opens when a tracked job ends (it adds the audio, checks the file, sends the link). Both are ordinary chat turns,
+UNETI AI opens when a tracked job ends (it adds the audio, checks the file, sends the link). Both are ordinary chat turns,
 whose answer lands in the chat only, so a phone in a pocket never hears of it.
 
-So a dashboard chat turn that ran at least `threshold_s()` (JAVIS_LONG_TURN_NOTIFY_S, default 180 seconds, 0 turns it
+So a dashboard chat turn that ran at least `threshold_s()` (UNETI_LONG_TURN_NOTIFY_S, default 180 seconds, 0 turns it
 off), or that is a background job's follow-up, also leaves its answer in the bell, which sends the push notification.
-The push is skipped on a device where Javis is open and in front of the owner (dashboard/sw.js, `quiet_if_visible`).
+The push is skipped on a device where UNETI AI is open and in front of the owner (dashboard/sw.js, `quiet_if_visible`).
 
 Pure functions: main.py does the delivery (`_bao_luot_dai_xong`).
 """
@@ -25,7 +25,7 @@ MAX_BODY = 600
 
 def threshold_s() -> float:
     """Seconds a turn must run before its answer rings the bell. 0 = only background follow-ups ring."""
-    raw = os.getenv("JAVIS_LONG_TURN_NOTIFY_S", "").strip()
+    raw = os.getenv("UNETI_LONG_TURN_NOTIFY_S", "").strip()
     if not raw:
         return float(DEFAULT_THRESHOLD_S)
     try:

@@ -8,7 +8,7 @@ Vì sao ba thứ này cần một test riêng, tách khỏi connector và plugin
 nằm TRONG thư mục gói, gỡ là rmtree và không ai mất gì. Agent, workflow và skill thì sống trong
 BRAIN của người dùng, và brain là nơi họ SỬA.
 
-Nên toàn bộ test này xoay quanh đúng một câu hỏi: **có bao giờ Javis xoá hay ghi đè thứ người
+Nên toàn bộ test này xoay quanh đúng một câu hỏi: **có bao giờ UNETI AI xoá hay ghi đè thứ người
 dùng viết không.** Trả lời sai câu đó là loại lỗi tệ nhất một trình cài có thể gây ra - gói cài
 lại được trong ba giây, còn thứ họ viết thì không.
 
@@ -180,13 +180,13 @@ with tempfile.TemporaryDirectory() as td:
         check("gỡ xoá cả skill đang tắt", not (brain5 / "skills" / ".disabled" / "viet-email").exists())
         check("và xoá bản mirror .claude/skills để Claude Code thôi nạp nó", not mir.exists())
 
-        # ─────────────── 4d. Brain còn dùng thư mục cũ Javis/agents ───────────────
+        # ─────────────── 4d. Brain còn dùng thư mục cũ UNETI/agents ───────────────
         brain6 = tmp / "brain6"
-        (brain6 / "Javis" / "agents").mkdir(parents=True)
-        (brain6 / "Javis" / "agents" / "cu.md").write_text("---\nname: Cũ\n---\nx\n", encoding="utf-8")
+        (brain6 / "UNETI" / "agents").mkdir(parents=True)
+        (brain6 / "UNETI" / "agents" / "cu.md").write_text("---\nname: Cũ\n---\nx\n", encoding="utf-8")
         pv.cai("acme.old", goi, str(brain6))
-        check("brain kiểu cũ: agent của gói vào Javis/agents, không tạo agents/ làm mất agent cũ",
-              (brain6 / "Javis" / "agents" / "tro-ly.md").is_file() and not (brain6 / "agents").exists())
+        check("brain kiểu cũ: agent của gói vào UNETI/agents, không tạo agents/ làm mất agent cũ",
+              (brain6 / "UNETI" / "agents" / "tro-ly.md").is_file() and not (brain6 / "agents").exists())
         pv.go("acme.old")
 
         # ─────────────── 5. Khác xuống dòng KHÔNG bị hiểu là đã sửa ───────────────
@@ -278,7 +278,7 @@ check("gói cộng đồng có cảnh báo riêng trên màn hình xác nhận",
       and "chưa qua " in _VI.get("store.inspect.community.body", "")
       and "kiểm duyệt" in _VI.get("store.inspect.community.body", ""))
 check("màn hình xác nhận nói rõ gói ghi gì vào bộ não", "vaultTom" in src_js)
-check("và nói rõ Javis giữ bản của bạn khi trùng tên",
+check("và nói rõ UNETI AI giữ bản của bạn khi trùng tên",
       'tw("store.inspect.vault_note")' in src_js
       and "giữ bản của bạn" in _VI.get("store.inspect.vault_note", ""))
 check("hộp gỡ nói rõ thứ giữ lại vì đã sửa",

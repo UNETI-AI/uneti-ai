@@ -1,5 +1,5 @@
 """
-Conversation-session persistence cho Javis OS.
+Conversation-session persistence cho UNETI AI.
 
 Lưu hội thoại web-chat (lượt user/assistant của MỌI engine: cli / codex /
 openrouter / openai / anthropic-api) vào 1 file SQLite để dashboard có thể
@@ -37,10 +37,10 @@ import reaction_values as RV
 import team_migration
 import subscription_context_store
 
-# DB nằm cùng nơi settings.json/.sessions.json (JAVIS_STATE_DIR, mặc định server/).
-_STATE_DIR = Path(os.getenv("JAVIS_STATE_DIR", str(Path(__file__).parent)))
+# DB nằm cùng nơi settings.json/.sessions.json (UNETI_STATE_DIR, mặc định server/).
+_STATE_DIR = Path(os.getenv("UNETI_STATE_DIR", str(Path(__file__).parent)))
 _DEFAULT_DB = _STATE_DIR / "conversations.db"
-DB_PATH = Path(os.getenv("JAVIS_SESSIONS_DB", str(_DEFAULT_DB)))
+DB_PATH = Path(os.getenv("UNETI_SESSIONS_DB", str(_DEFAULT_DB)))
 
 # Kênh của phiên "cộng sự": chat với MỘT trợ lý hoặc MỘT quy trình (trang Cộng sự, 0.59), và
 # từ 0.63.0 thêm phiên của trang Coding (`coding:<id repo>`).
@@ -140,7 +140,7 @@ def loc_brain(brain, cot: str = "s.brain"):
     gửi tên gọi tắt "brain" cho brain mặc định, còn Telegram (`/brain`) và loop lưu ĐƯỜNG DẪN
     TUYỆT ĐỐI của đúng brain đó. So bằng một chuỗi duy nhất thì hai bên không bao giờ gặp
     nhau - hội thoại Telegram vẫn lưu đủ nhưng biến mất khỏi thanh bên lẫn ô tìm kiếm, và
-    người dùng thấy đúng như "Javis không lưu phiên chat từ Telegram" (báo 23/08).
+    người dùng thấy đúng như "UNETI AI không lưu phiên chat từ Telegram" (báo 23/08).
     Bên gọi dựng danh sách bí danh (main.py::_brain_keys); ở đây chỉ lo phần SQL.
     """
     if not brain:
@@ -256,7 +256,7 @@ CREATE TABLE IF NOT EXISTS project_links (
 -- Tài liệu và link người dùng TỰ GẮN vào một CUỘC TRÒ CHUYỆN.
 --
 -- Khác hẳn danh sách "file & link trong cuộc này" đang có: danh sách đó SUY RA từ tin nhắn
--- (xem `main.sessions_assets`) nên nó chỉ thấy thứ Javis có nhắc tên, và không ai thêm bớt
+-- (xem `main.sessions_assets`) nên nó chỉ thấy thứ UNETI AI có nhắc tên, và không ai thêm bớt
 -- được. Hai bảng dưới là phần NGƯỜI DÙNG chủ động gắn vào - đúng cái quyền họ đã có ở khung
 -- Project. Hai nguồn được trộn lúc đọc chứ không ghi đè nhau: máy đoán vẫn đoán, người vẫn
 -- thêm được thứ máy không đoán ra (file ghi lặng lẽ giữa lượt, link chưa dán vào chat).
@@ -326,18 +326,18 @@ _KHOI_DINH_KEM = re.compile(r"^\s*\[File đính kèm[^\]]*\]\s*")
 # Khối "file đang ghim trong trình sửa" (app.js chèn khi user mở một file .md rồi chat). Cùng
 # LOẠI với khối đính kèm ở trên, nhưng là một CỬA KHÁC: nó ra đời sau bản vá 2026-07-31 nên
 # lọt qua, và hậu quả giống hệt - mọi hội thoại mở lúc đang ghim file đều mang đúng một cái
-# tên "[FILE ĐANG MỞ trong trình sửa của Javis: /home/…". Ghim còn được gửi lại MỖI LƯỢT nên
+# tên "[FILE ĐANG MỞ trong trình sửa của UNETI AI: /home/…". Ghim còn được gửi lại MỖI LƯỢT nên
 # nó phổ biến hơn khối đính kèm nhiều.
 _KHOI_GHIM = re.compile(r"^\s*\[FILE ĐANG MỞ[^\]]*\]\s*")
 # Khối ngữ cảnh giao diện (Voice V1, dashboard/ui-context.js): trang đang mở, đoạn đang bôi
-# đen, câu Javis bị ngắt lời. Cùng loại với hai khối trên và cũng đi TRƯỚC câu của user.
+# đen, câu UNETI AI bị ngắt lời. Cùng loại với hai khối trên và cũng đi TRƯỚC câu của user.
 _KHOI_NGU_CANH_UI = re.compile(r"^\s*\[NGỮ CẢNH GIAO DIỆN:[^\]]*\]\s*")
 # Khối chỉ dẫn của lệnh `/plan` và `/goal` (lenh_he_thong.py): cùng loại, cũng đi TRƯỚC câu của user.
 # Hội thoại mở đầu bằng `/plan dọn kho` phải mang tên "dọn kho", không phải "[CHẾ ĐỘ KẾ HOẠCH: chỉ
 # đọc và đề xuất. Lượt này CHƯA được làm gì...". Neo đúng hai cụm này, đừng bóc mọi khối [..].
 _KHOI_LENH_HE_THONG = re.compile(r"^\s*\[(?:CHẾ ĐỘ KẾ HOẠCH|MỤC TIÊU):[^\]]*\]\s*")
-# Khối nguồn của tin do AI bên ngoài gửi qua Javis Gate (chat_bridge.py, 0.440.0): cùng loại.
-_KHOI_GATE = re.compile(r"^\s*\[GỬI QUA JAVIS GATE:[^\]]*\]\s*")
+# Khối nguồn của tin do AI bên ngoài gửi qua UNETI AI Gate (chat_bridge.py, 0.440.0): cùng loại.
+_KHOI_GATE = re.compile(r"^\s*\[GỬI QUA UNETI GATE:[^\]]*\]\s*")
 # Câu dashboard tự điền khi user đính kèm file mà KHÔNG gõ gì - không mang thông tin gì.
 _CAU_TU_DIEN = "Hãy đọc (các) file trên và phản hồi / tóm tắt nội dung chính."
 # File đính kèm được app.js liệt kê mỗi dòng một cái, dạng "- <đường dẫn>". Neo vào ĐÚNG dạng
@@ -515,7 +515,7 @@ class SessionStore:
                               ("compact_count", "INTEGER NOT NULL DEFAULT 0"),
                               ("channel", "TEXT NOT NULL DEFAULT 'web'"),
                               # Token VÀO của lượt gần nhất. Engine gói thuê bao (Claude Code,
-                              # Codex) tự quản mạch hội thoại của chúng, nên Javis không nhìn
+                              # Codex) tự quản mạch hội thoại của chúng, nên UNETI AI không nhìn
                               # thấy thread phình tới đâu - trừ chính con số này. Nó là dấu
                               # hiệu DUY NHẤT để biết khi nào phải bắt đầu mạch mới.
                               ("last_input_tokens", "INTEGER NOT NULL DEFAULT 0"),
@@ -523,7 +523,7 @@ class SessionStore:
                               # TỤC: token vào của engine thuê bao phần lớn đến từ vòng lặp
                               # agentic bên trong nó, không phải từ độ dài mạch. Nếu một lượt
                               # nặng sinh ra bởi vòng lặp chứ không bởi mạch dài, xoay xong
-                              # lượt sau vẫn nặng, và không có mốc này thì Javis xoay mãi -
+                              # lượt sau vẫn nặng, và không có mốc này thì UNETI AI xoay mãi -
                               # phá mạch hội thoại mỗi lượt mà chẳng tiết kiệm được gì.
                               ("thread_rotated_msg", "INTEGER NOT NULL DEFAULT 0"),
                               # Ghim hội thoại lên đầu danh sách. Cuộc dùng đi dùng lại không
@@ -975,8 +975,8 @@ class SessionStore:
         """Thay NỘI DUNG tin cuối của phiên nếu nó đúng vai. Trả True khi có thay.
 
         Dùng cho lượt nói: tin người dùng được lưu NGAY khi tới (chữ thô của máy nghe), rồi bộ
-        não giọng diễn giải lại câu đó (JAVIS_NGHE). Bản lưu phải là câu đã diễn giải, vì đó
-        là câu Javis thực sự trả lời, là câu người dùng thấy trong khung chat sau F5, và là câu
+        não giọng diễn giải lại câu đó (UNETI_NGHE). Bản lưu phải là câu đã diễn giải, vì đó
+        là câu UNETI AI thực sự trả lời, là câu người dùng thấy trong khung chat sau F5, và là câu
         đi vào vòng tự học. Trigger messages_fts_upd cập nhật chỉ mục tìm kiếm theo."""
         def _do(conn):
             row = conn.execute(
@@ -1420,7 +1420,7 @@ class SessionStore:
     def brain_gan_nhat(self) -> str:
         """Brain của cuộc trò chuyện được cập nhật GẦN NHẤT, tức "brain đang mở".
 
-        MCP Hub dùng hàm này khi một client gọi tool mà không mang header `X-Javis-Vault`
+        MCP Hub dùng hàm này khi một client gọi tool mà không mang header `X-Uneti-Vault`
         (mọi phiên Codex người dùng tự mở đều như vậy - xem `mcp_hub.resolve_vault`). Đọc từ
         đây thay vì nuôi thêm một file trạng thái riêng: cột `brain` đã được MỌI kênh ghi sẵn
         ở mỗi lượt chat, nên nó luôn đúng mà không ai phải nhớ cập nhật.
@@ -1635,7 +1635,7 @@ class SessionStore:
             params.append(_sach_icon(icon))
         if instructions is not None:
             # Cắt NGAY LÚC LƯU, không chỉ lúc dựng prompt. Trần ở tầng prompt một mình thì kho
-            # vẫn phình theo mỗi lần gõ, và người dùng thấy chữ mình lưu được nhưng Javis lặng
+            # vẫn phình theo mỗi lần gõ, và người dùng thấy chữ mình lưu được nhưng UNETI AI lặng
             # lẽ chỉ đọc một phần - kiểu hỏng không ai truy ra.
             sets.append("instructions = ?")
             params.append((instructions or "").strip()[:PROJECT_INSTRUCTIONS_MAX])
@@ -2033,7 +2033,7 @@ class SessionStore:
 
     def name_group_session(self, session_id: str, group_name: str) -> bool:
         """Phiên của bot trong NHÓM mang tên NHÓM (chủ dự án 2026-09-30): cả nhóm dùng chung một mạch, nên tên theo
-        tin đầu ("[Minh Quý] @Javis Vũ hầy") chỉ nói người nhắn đầu tiên và các phiên trong lịch sử Agent nhìn giống
+        tin đầu ("[Minh Quý] @UNETI AI Vũ hầy") chỉ nói người nhắn đầu tiên và các phiên trong lịch sử Agent nhìn giống
         hệt nhau. Chỉ đặt khi phiên chưa có tên (không ghi đè tên chủ tự đặt) và tên nhóm đã biết: nhóm mới có lúc chưa
         có tiêu đề, lượt sau gọi lại là đặt kịp. Trả True nếu vừa đặt."""
         name = " ".join(str(group_name or "").split())[:80]

@@ -2,7 +2,7 @@
 
     python tests/run.py zalo_send_file      (no network, no real Zalo, no npx)
 
-Incident 2026-10-14: Javis had to send an 11 KB Excel list to a staff member. `msg send-file` hung twice until it was killed at
+Incident 2026-10-14: UNETI AI had to send an 11 KB Excel list to a staff member. `msg send-file` hung twice until it was killed at
 120 seconds and the file never arrived, while PNG images through the same path went fine. Cause, read in zca-js 2.2.0
 (`apis/uploadAttachment.js`, `apis/listen.js`): a file that is not an image is only confirmed (`file_done`) over the live
 WebSocket, and the one-shot CLI never opens one, so zca-js waits forever. Opening one there would evict the MCP listener of the
@@ -118,8 +118,8 @@ check("CANARY: outbox cleaned up after a failure too", list(outbox.iterdir()) ==
 
 reply["raise"] = RuntimeError("MCP error -32602: Tool zalo_send_file not found")
 ok, data, err = send([SRC / "Danh sach.xlsx"])
-check("older javis-zalo without the tool: says to update Javis and restart the connection, no QR",
-      ok is False and "bản javis-zalo cũ" in err and "Cập nhật Javis" in err, err)
+check("older javis-zalo without the tool: says to update UNETI AI and restart the connection, no QR",
+      ok is False and "bản javis-zalo cũ" in err and "Cập nhật UNETI AI" in err, err)
 
 reply["raise"] = TimeoutError("tool không phản hồi sau 120s")
 ok, data, err = send([SRC / "Danh sach.xlsx"])

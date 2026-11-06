@@ -23,7 +23,7 @@ import os
 import sys
 import tempfile
 
-os.environ["JAVIS_STATE_DIR"] = tempfile.mkdtemp(prefix="javis-duongtat-")
+os.environ["UNETI_STATE_DIR"] = tempfile.mkdtemp(prefix="uneti-duongtat-")
 
 import config as cfg  # noqa: E402
 import fast_path_runtime as fp  # noqa: E402

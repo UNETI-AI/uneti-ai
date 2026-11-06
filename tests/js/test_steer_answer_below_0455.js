@@ -1,4 +1,4 @@
-// 0.455.0: a message sent while Javis works and read by the running turn (steer_read) gets its answer BELOW it.
+// 0.455.0: a message sent while UNETI AI works and read by the running turn (steer_read) gets its answer BELOW it.
 // Before, the step block and answer bubble of that turn had been drawn above the message and stayed there, so the
 // owner thought the add-on had not been done. The server stores the answer after the message, so a reload agrees.
 const fs = require("fs");

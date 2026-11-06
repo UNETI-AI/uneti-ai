@@ -11,8 +11,8 @@ import os
 import tempfile
 from pathlib import Path
 
-os.environ["JAVIS_STATE_DIR"] = tempfile.mkdtemp(prefix="javis-team-docs-")
-BR = Path(tempfile.mkdtemp(prefix="javis-team-docs-brain-"))
+os.environ["UNETI_STATE_DIR"] = tempfile.mkdtemp(prefix="uneti-team-docs-")
+BR = Path(tempfile.mkdtemp(prefix="uneti-team-docs-brain-"))
 (BR / "agents").mkdir()
 for slug, name in (("lan", "Lan"), ("minh", "Minh")):
     (BR / "agents" / f"{slug}.md").write_text(f"---\nname: {name}\nrole: Thành viên\n---\nBạn là {name}.\n", encoding="utf-8")
@@ -124,10 +124,10 @@ check("going inside lists the subfolder's folders", [i["name"] for i in d["items
 check("without subdirs the file browser gets the same rows as before",
       "dirs" not in [i for i in client.get("/files/list", params={"brain": b}).json()["items"] if i["type"] == "dir"][0])
 
-# ---- Javis Core has no jobs of its own: its Jobs tab says "no jobs yet", not "could not load" ----
-import javis_core  # noqa: E402
-r = client.get(f"/agents/{javis_core.SLUG}/jobs", params={"brain": b})
-check("the Jobs tab of Javis Core gets an empty ok list (it used to be a 404 shown as a load error)",
+# ---- UNETI AI Core has no jobs of its own: its Jobs tab says "no jobs yet", not "could not load" ----
+import uneti_core  # noqa: E402
+r = client.get(f"/agents/{uneti_core.SLUG}/jobs", params={"brain": b})
+check("the Jobs tab of UNETI AI Core gets an empty ok list (it used to be a 404 shown as a load error)",
       r.status_code == 200 and r.json().get("ok") and r.json()["jobs"] == [] and r.json()["total"] == 0, r.text)
 check("an unknown assistant is still a 404", client.get("/agents/khong-co/jobs", params={"brain": b}).status_code == 404)
 

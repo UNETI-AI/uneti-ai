@@ -45,7 +45,7 @@ def _da_go():
 
     Import lazy và bọc try/except có chủ ý: `mcp_catalog` là module nền mà nửa server phụ
     thuộc vào, nên một file JSON lạ trong STATE_DIR không được phép làm nó ngừng nạp. Suy biến
-    nghiêng về "thấy đủ năng lực" chứ không phải "Javis trống rỗng"."""
+    nghiêng về "thấy đủ năng lực" chứ không phải "UNETI AI trống rỗng"."""
     try:
         import core_off
         return core_off.da_go("connectors")
@@ -185,7 +185,7 @@ def public_catalog():
                        "link_label": s.get("link_label", ""), "copy": s.get("copy", "")}
                       for s in (auth.get("steps") or [])],
             "risk": c.get("risk", ""), "default_perm": c.get("default_perm", "readonly"),
-            # Có kho token riêng ngoài Javis → UI hiện nút "Đăng nhập lại Google (xoá quyền cũ)".
+            # Có kho token riêng ngoài UNETI AI → UI hiện nút "Đăng nhập lại Google (xoá quyền cũ)".
             # Chỉ trả CÓ hay KHÔNG (bool), không lộ tên biến môi trường ra frontend.
             "cred_dir": bool(c.get("cred_dir")),
             # Nguồn: connector do GÓI cấp không bao giờ được trông y hệt hàng chính chủ.
@@ -365,7 +365,7 @@ def build_env(connector, secrets):
     Thứ hạng: ô đăng nhập user gõ > env tĩnh catalog; và env user tự đặt ở connection
     thắng cả hai (mcp_store.resolved đặt env connection trước rồi mới setdefault).
     Có khối này để KHỎI đẻ thêm ô nhập bắt user gõ URL kỹ thuật, cũng khỏi bắt user chạy
-    lệnh login ngoài Javis."""
+    lệnh login ngoài UNETI AI."""
     env = {}
     for k, v in ((connector or {}).get("env") or {}).items():
         if k and v not in (None, ""):
@@ -506,7 +506,7 @@ def classify(connector, tool, args=None):
 
     # TOOL CỔNG (vd COMPOSIO_MULTI_EXECUTE_TOOL): một tool chạy HÀNG LOẠT hành động con, mỗi cái
     # một tên riêng nằm trong args (tools[].tool_slug). Phân loại theo tên tool cổng thì chỉ có
-    # hai lựa chọn tệ: coi là nguy hiểm (mức Chỉ đọc không đọc được gì, vụ 24/09: Javis chỉ còn
+    # hai lựa chọn tệ: coi là nguy hiểm (mức Chỉ đọc không đọc được gì, vụ 24/09: UNETI AI chỉ còn
     # công cụ tìm kiếm của Composio nên không đọc nổi lịch dù đã nối) hoặc coi là đọc (lọt lệnh
     # gửi mail). Luật `call_rules` phân loại TỪNG hành động con rồi lấy mức nặng nhất.
     cr = call_rule(c, tool)

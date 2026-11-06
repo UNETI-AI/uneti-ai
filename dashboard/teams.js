@@ -6,7 +6,7 @@
 
    Gửi tin bằng POST /teams/{id}/messages kèm `client_msg_id`: rớt mạng thì gửi lại ĐÚNG mã cũ, server trả tin cũ, không
    thêm lượt hay việc. Câu trả lời và trạng thái về qua WebSocket chung (app.js đổi gói `team_message` / `team_state`
-   thành sự kiện `javis:team-event`).
+   thành sự kiện `uneti:team-event`).
 
    @: chọn từ gợi ý chèn "@Tên " vào chữ; lúc gửi, người được gọi là các "@Tên" CÒN trong chữ (xoá chữ là bỏ gọi).
 
@@ -30,10 +30,10 @@
       .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
   }
-  // 0.214.0: the (i) button and its hidden block (info-tip.js); in Node tests (no JavisInfo) the text is drawn open.
-  function infoBtn() { var J = typeof window !== "undefined" && window.JavisInfo; return J ? J.btn(tw("info.more")) : ""; }
+  // 0.214.0: the (i) button and its hidden block (info-tip.js); in Node tests (no UnetiInfo) the text is drawn open.
+  function infoBtn() { var J = typeof window !== "undefined" && window.UnetiInfo; return J ? J.btn(tw("info.more")) : ""; }
   function infoBody(html) {
-    var J = typeof window !== "undefined" && window.JavisInfo;
+    var J = typeof window !== "undefined" && window.UnetiInfo;
     return J ? J.body(html) : '<div class="info-body">' + html + "</div>";
   }
   // Icon lấy từ bộ Lucide của dashboard; chạy trong Node (test) thì không có, trả chuỗi rỗng.
@@ -111,7 +111,7 @@
     { n: 3, key: "teams.level_3", desc: "teams.level_3_desc" }];
   // Sáu reaction, lý do, trục nói/im, chip, bộ chọn và trạng thái nằm ở reactions.js (bảng sáu emoji duy nhất của repo,
   // dùng chung với chat riêng; hợp đồng T2 mục 6). File này chỉ giữ tên hàm cũ làm lớp mỏng với họ class "tm".
-  var JR = (typeof window !== "undefined" && window.JavisReactions) || require("./reactions.js");
+  var JR = (typeof window !== "undefined" && window.UnetiReactions) || require("./reactions.js");
   var REACTIONS = JR.EMOJI;
   var COMMENT_MAX = JR.COMMENT_MAX;
   var INPUT_MAX_PX = 132;   // khung soạn tự cao theo chữ, tối đa khoảng năm dòng
@@ -134,7 +134,7 @@
   // Time, reply (quote), copy and pin in one row UNDER the bubble, like the main chat (0.194.1, owner 17/10/2026: beside the
   // bubble it looked cluttered). Shown on hover (mouse); touch screens use swipe left (reply) and long press.
   function actsApi() {
-    if (typeof window !== "undefined" && window.JavisActs) return window.JavisActs;
+    if (typeof window !== "undefined" && window.UnetiActs) return window.UnetiActs;
     try { return require("./chat-acts.js"); } catch (e) { return null; }
   }
 
@@ -175,7 +175,7 @@
   // accent colour, lists, code, tables), so the two chats read the same. Owner text stays plain like the main chat's
   // user bubble, with a reply quote block on top when the message quotes an earlier one.
   function quoteApi() {
-    if (typeof window !== "undefined" && window.JavisQuote) return window.JavisQuote;
+    if (typeof window !== "undefined" && window.UnetiQuote) return window.UnetiQuote;
     try { return require("./chat-quote.js"); } catch (e) { return null; }
   }
 
@@ -253,7 +253,7 @@
       // anhV: the message's own time is the version of the pictures it shows, like the main chat, so a picture the AI
       // overwrote under the same name shows the new one in a newer message instead of the browser's cached copy.
       try {
-        return '<div class="tm-text msg-javis tm-mdwrap"><div class="bubble">' + md(text, brain(), m.ts ? { anhV: String(m.ts) } : undefined) +
+        return '<div class="tm-text msg-uneti tm-mdwrap"><div class="bubble">' + md(text, brain(), m.ts ? { anhV: String(m.ts) } : undefined) +
           "</div></div>";
       }
       catch (e) { /* fall through to plain text */ }
@@ -312,7 +312,7 @@
     var Q = quoteApi();
     var s = skillSplit(text).rest;
     if (Q) s = Q.tach(s).rest;
-    // Hidden blocks (JAVIS_CARD, JAVIS_ASK... are HTML comments) never show in a preview or a quote.
+    // Hidden blocks (UNETI_CARD, UNETI_ASK... are HTML comments) never show in a preview or a quote.
     s = s.replace(/<!--[\s\S]*?-->/g, " ").replace(/<!--[\s\S]*$/, " ");
     // 0.192.0: a preview reads as text: pictures dropped, [label](path) and [[note|label]] become their label.
     s = s.replace(/!\[[^\]]*\]\([^)]*\)/g, " ").replace(/!\[\[[^\]]*\]\]/g, " ")
@@ -337,12 +337,12 @@
     return '<span class="' + avaClass(name) + '" aria-hidden="true">' + esc(initial(name)) + "</span>";
   }
 
-  // Ảnh trợ lý: ĐÚNG ảnh trợ lý đang dùng (bộ vẽ JavisAvatar của trang Cộng sự, theo slug và `avatar` trong file trợ
+  // Ảnh trợ lý: ĐÚNG ảnh trợ lý đang dùng (bộ vẽ UnetiAvatar của trang Cộng sự, theo slug và `avatar` trong file trợ
   // lý; trợ lý chưa chọn ảnh thì bộ vẽ tự suy từ slug, giống mọi trang khác). Chưa có bộ vẽ (test dưới node) thì về chữ
   // đầu trên nền màu.
   function agentAva(m, size) {
     m = m || {};
-    var A = typeof window !== "undefined" && window.JavisAvatar;
+    var A = typeof window !== "undefined" && window.UnetiAvatar;
     // `avatar_seed`: tác giả cũ không còn xác nhận được nhân dạng thì ảnh suy từ chính mã của họ, không suy từ slug (slug
     // có thể đã thuộc trợ lý mới; review 4f6268bd #1).
     if (A && A.html && m.slug) {
@@ -490,12 +490,12 @@
   }
   // 0.454.0: the owner's own tag order (reorder-dialog.js, saved per page), else by name.
   function tagOrder(list) {
-    var R = typeof window !== "undefined" && window.JavisReorder;
+    var R = typeof window !== "undefined" && window.UnetiReorder;
     return R ? R.sortTags(list, "tags_teams", function (g) { return g.key; }, function (g) { return g.ten; })
       : list.sort(function (a, b) { return a.ten.localeCompare(b.ten, "vi"); });
   }
   function reorderTags(tags) {
-    var R = window.JavisReorder;
+    var R = window.UnetiReorder;
     R.open({ title: tw("reorder.title_tags"), items: tags.map(function (g) { return { id: g.key, label: g.ten, icon: "tag" }; }),
       save: function (keys) { return R.saveTags("tags_teams", keys); } });
   }
@@ -517,7 +517,7 @@
     return g ? g.ten : key;
   }
 
-  // The filter bar on top of the list: the Partners page's bar (JavisTagPicker.barHtml).
+  // The filter bar on top of the list: the Partners page's bar (UnetiTagPicker.barHtml).
   function tagBarHtml(teams, key) {
     var TP = tagPicker();
     if (!TP) return "";
@@ -525,7 +525,7 @@
                         canClear: !!key, pickTitle: tw("teams.tag_pick_title"), clearTitle: tw("ws.tag_clear_title") });
   }
 
-  // Rows of the filter dropdown (JavisChatSide.menu, the same dropdown the Partners page opens).
+  // Rows of the filter dropdown (UnetiChatSide.menu, the same dropdown the Partners page opens).
   function tagMenuRows(teams, key, pick) {
     var tags = allTags(teams);
     var none = (teams || []).filter(function (t) { return !(t.tags || []).length; }).length;
@@ -537,7 +537,7 @@
     tags.forEach(function (g) {
       rows.push({ label: g.ten, icon: "tag", right: String(g.n), on: key === g.key, run: function () { pick(g.key); } });
     });
-    if (tags.length > 1 && typeof window !== "undefined" && window.JavisReorder) {
+    if (tags.length > 1 && typeof window !== "undefined" && window.UnetiReorder) {
       rows.push({ sep: true });
       rows.push({ label: tw("reorder.menu_tags"), icon: "arrow-up-down", run: function () { reorderTags(tags); } });
     }
@@ -555,7 +555,7 @@
   }
 
   function tagPicker() {
-    if (typeof window !== "undefined" && window.JavisTagPicker) return window.JavisTagPicker;
+    if (typeof window !== "undefined" && window.UnetiTagPicker) return window.UnetiTagPicker;
     try { return require("./tag-picker.js"); } catch (e) { return null; }
   }
 
@@ -728,7 +728,7 @@
     } else if (mine && meta.as_job) {
       head.push('<span class="tm-tag tm-tag-new">' + ic("list-todo") + esc(tw("teams.as_job")) + "</span>");
     }
-    // 0.357.0: a job Javis Core gave the team on the owner's behalf (javis_team op=dispatch, issue #826).
+    // 0.357.0: a job UNETI AI Core gave the team on the owner's behalf (uneti_team op=dispatch, issue #826).
     if (mine && meta.via_core) head.push('<span class="tm-role">' + esc(tw("teams.via_core")) + "</span>");
     if (meta.job_result) head.push('<span class="tm-result">' + esc(tw("teams.job_result")) + "</span>");
     var late = !mine && LATE.indexOf(meta.status) >= 0;
@@ -1093,7 +1093,7 @@
     });
     var md = typeof window !== "undefined" && window.mdToHtml;
     var res = String(j.result || "").trim();
-    var resHtml = res ? (md ? (function () { try { return '<div class="msg-javis tm-mdwrap"><div class="bubble">' + md(res, brain()) + "</div></div>"; }
+    var resHtml = res ? (md ? (function () { try { return '<div class="msg-uneti tm-mdwrap"><div class="bubble">' + md(res, brain()) + "</div></div>"; }
       catch (e) { return esc(res); } })() : esc(res).replace(/\n/g, "<br>")) : '<p class="tm-sub">' + esc(tw("teams.fin_no_result")) + "</p>";
     var when = j.updated_at ? new Date(Number(j.updated_at) * 1000).toLocaleString() : "";
     return '<div class="tm-report">' +
@@ -1416,7 +1416,7 @@
         "><span>" + esc(tw(TEAM_STATUS_KEY[s])) + "</span></label>";
     }).join("");
     // Ảnh nhóm (0.176.0): mặc định ghép từ gương mặt thành viên; "Tải ảnh lên" thay bằng ảnh riêng, lưu ngay không chờ nút Lưu.
-    var A = typeof window !== "undefined" && window.JavisAvatar;
+    var A = typeof window !== "undefined" && window.UnetiAvatar;
     var ava = A && A.uploadRowHtml ? '<div class="tm-field tm-ava-set"><span>' + esc(tw("teams.avatar")) + '</span><div class="tm-ava-row">' +
       teamAvatarHtml(team, 56) + '<div class="tm-ava-acts">' + A.uploadRowHtml(!!team.avatar_image, tw("teams.avatar_use_faces")) +
       "</div></div></div>" : "";
@@ -1882,7 +1882,7 @@
 
   function brain() {
     try {
-      if (window.JavisSessions && window.JavisSessions.brain) return window.JavisSessions.brain();
+      if (window.UnetiSessions && window.UnetiSessions.brain) return window.UnetiSessions.brain();
       return (window.currentBrainPath && window.currentBrainPath()) || "brain";
     } catch (e) { return "brain"; }
   }
@@ -2373,7 +2373,7 @@
   // ───────────── mic: speak, the words land in the input (dictate.js) ─────────────
 
   function toggleMic() {
-    var D = typeof window !== "undefined" && window.JavisDictate;
+    var D = typeof window !== "undefined" && window.UnetiDictate;
     if (!D) { setNote(tw("teams.mic_unsupported")); return; }
     if (S.dict && S.dict.active()) { S.dict.stop(); return; }
     if (S.dictState === "transcribing") return;
@@ -2443,7 +2443,7 @@
       key: !mine && active && (!active.status || active.status === "active") ? m.author_ref : "" };
   }
 
-  // A button of a JAVIS_CARD in an assistant's message (chat-card.js): its words are sent as the owner's reply to that
+  // A button of a UNETI_CARD in an assistant's message (chat-card.js): its words are sent as the owner's reply to that
   // message, in this team (they used to go to the hidden main chat).
   function sendCardReply(btn, text) {
     var host = btn && btn.closest && btn.closest(".tm-msg");
@@ -2492,7 +2492,7 @@
       var sk = skillSplit(text);
       return Q ? Q.tach(sk.rest).rest : sk.rest;
     }
-    var vm = typeof window !== "undefined" && window.JavisVisibleMarkdown;
+    var vm = typeof window !== "undefined" && window.UnetiVisibleMarkdown;
     return vm ? vm(text) : text;
   }
 
@@ -2563,12 +2563,12 @@
   function openAgentSettings(slug) {
     if (!slug) return;
     S.picker = null;
-    var St = typeof window !== "undefined" && window.JavisStudio;
+    var St = typeof window !== "undefined" && window.UnetiStudio;
     if (St && St.editAgent) {
       St.editAgent({ slug: slug }, { chatButton: true, onSaved: function () { loadTeam(); loadMsgs(false); } });
       return;
     }
-    if (window.JavisWorkspace && window.JavisWorkspace.openCommand) window.JavisWorkspace.openCommand("agent", slug);
+    if (window.UnetiWorkspace && window.UnetiWorkspace.openCommand) window.UnetiWorkspace.openCommand("agent", slug);
   }
 
   // Khung soạn một dòng, tự cao theo chữ tới khoảng năm dòng rồi cuộn trong.
@@ -2791,15 +2791,15 @@
     var nb = side.querySelector(".tm-side-body");
     if (nb && keep) nb.scrollTop = top;
     attachSideResize(side);
-    if (window.JavisPulse) {
+    if (window.UnetiPulse) {
       Array.prototype.forEach.call(side.querySelectorAll(".tm-pulse[data-pulse-slug]"), function (el) {
         var names = {};
         names[S.team.team_id] = S.team.name || "";
-        window.JavisPulse.mount(el, { slug: el.getAttribute("data-pulse-slug"), brain: brain(),
+        window.UnetiPulse.mount(el, { slug: el.getAttribute("data-pulse-slug"), brain: brain(),
           only: el.getAttribute("data-pulse-ctx"), teamNames: names });
       });
     }
-    if (window.JavisAgentJudge && window.JavisAgentJudge.hydrate) window.JavisAgentJudge.hydrate(side);
+    if (window.UnetiAgentJudge && window.UnetiAgentJudge.hydrate) window.UnetiAgentJudge.hydrate(side);
   }
 
   function drawAll(stick) {
@@ -2823,12 +2823,12 @@
   // Nút xử lý trên dòng lỗi của lượt trả lời (0.142.0).
   function replyAct(kind, slug, btn) {
     if (kind === "models") {
-      if (typeof window !== "undefined" && window.JavisNav && window.JavisNav.go) window.JavisNav.go("models");
+      if (typeof window !== "undefined" && window.UnetiNav && window.UnetiNav.go) window.UnetiNav.go("models");
       return;
     }
     if (kind === "agent") {
-      if (typeof window !== "undefined" && window.JavisWorkspace && window.JavisWorkspace.openCommand) {
-        window.JavisWorkspace.openCommand("agent", slug);
+      if (typeof window !== "undefined" && window.UnetiWorkspace && window.UnetiWorkspace.openCommand) {
+        window.UnetiWorkspace.openCommand("agent", slug);
       }
       return;
     }
@@ -2892,7 +2892,7 @@
       openTeam(teamId, taskId);
       return;
     }
-    if (typeof window !== "undefined" && window.JavisNav && window.JavisNav.go) window.JavisNav.go("teams");
+    if (typeof window !== "undefined" && window.UnetiNav && window.UnetiNav.go) window.UnetiNav.go("teams");
   }
 
   function loadAgents() {
@@ -2912,7 +2912,7 @@
     });
   }
 
-  // Nhóm đang mở vừa bị xoá (0.173.0: Javis xoá bằng công cụ javis_team, hay tab khác bấm xoá): đóng khung chat về trạng
+  // Nhóm đang mở vừa bị xoá (0.173.0: UNETI AI xoá bằng công cụ uneti_team, hay tab khác bấm xoá): đóng khung chat về trạng
   // thái trống thay vì giữ một nhóm không còn, ô soạn vẫn mở mà gửi tin nào cũng lỗi.
   function closeGone(id) {
     if (!S || S.activeId !== id) return;
@@ -3068,7 +3068,7 @@
   }
 
   // The chosen tag filter is a per-device convenience (localStorage); a blocked storage only forgets it.
-  var TAG_FILTER_KEY = "javis.teams.tagFilter";
+  var TAG_FILTER_KEY = "uneti.teams.tagFilter";
   function readTagFilter() {
     try { return (typeof localStorage !== "undefined" && localStorage.getItem(TAG_FILTER_KEY)) || ""; } catch (e) { return ""; }
   }
@@ -3116,7 +3116,7 @@
   // Send is never blocked for good (it waits for busy chips). Resolves { code, j } like call(); rejects an Error with
   // `kind` once the retries are spent.
   function upload(file, a) {
-    var U = typeof window !== "undefined" && window.JavisUpload;
+    var U = typeof window !== "undefined" && window.UnetiUpload;
     if (!U) {
       var fd0 = new FormData();
       fd0.append("file", file);
@@ -3234,7 +3234,7 @@
     // paste inline / attach .txt / cancel, like the main chat (chat-paste.js, 0.430.1).
     var input = e.target;
     if (!(input && input.classList && input.classList.contains("tm-input"))) return;
-    var paste = typeof window !== "undefined" ? window.JavisPaste : null;
+    var paste = typeof window !== "undefined" ? window.UnetiPaste : null;
     var txt = (cd && cd.getData("text/plain")) || "";
     if (!paste || !paste.isLong(txt)) return;
     e.preventDefault(); e.stopPropagation();
@@ -3277,7 +3277,7 @@
     }
     if (S.repos.length) {
       // 0.449.0: the GitHub repos of the team chat. The name opens the picker; the status (once pushed) opens the detail.
-      var G = window.JavisTeamGithub, names = S.repos.map(function (r) { return r.full_name; });
+      var G = window.UnetiTeamGithub, names = S.repos.map(function (r) { return r.full_name; });
       var stKey = S.ghIcon && S.ghIcon.state ? "gh.st_" + S.ghIcon.state : "";
       h += '<span class="tm-chip tm-chip-gh" title="' + esc(tw("gh.chip_label", { names: names.join(", ") })) + '">' + ic("git-branch") +
         '<button type="button" class="tm-chip-name" data-gh-open="1">' + esc(G ? G.chipText(names, 18) : names[0]) + "</button>" +
@@ -3311,10 +3311,10 @@
       }).catch(function () {}).then(loadRepos);
   }
 
-  // 0.449.0: GitHub repos attached to the team chat (team-github.js). Work/Help steps edit them and Javis pushes once a
+  // 0.449.0: GitHub repos attached to the team chat (team-github.js). Work/Help steps edit them and UNETI AI pushes once a
   // job is done, like a private chat.
   function loadRepos() {
-    var sid = sessionId(), G = window.JavisTeamGithub;
+    var sid = sessionId(), G = window.UnetiTeamGithub;
     if (!sid || !G) return Promise.resolve();
     return G.load(sid, brain()).then(function (d) {
       if (!d || sessionId() !== sid) return;
@@ -3337,7 +3337,7 @@
   function githubOutside(e) { if (!(e.target.closest && e.target.closest(".tm-gh-pop, .info-pop, .info-pop-bg"))) closeGithubPanel(); }
   function githubEsc(e) { if (e.key === "Escape") closeGithubPanel(); }
   function openGithubPanel() {
-    var G = window.JavisTeamGithub;
+    var G = window.UnetiTeamGithub;
     var comp = S.el.querySelector(".tm-composer");
     if (!G || !comp || !S.team || !sessionId()) return;
     closeGithubPanel();
@@ -3386,7 +3386,7 @@
   function folderOutside(e) { if (!(e.target.closest && e.target.closest(".tm-folder-pop"))) closeFolderPanel(); }
   function folderEsc(e) { if (e.key === "Escape") closeFolderPanel(); }
   function openFolderPanel() {
-    var P = window.JavisPinnedFolder && window.JavisPinnedFolder.panelFor;
+    var P = window.UnetiPinnedFolder && window.UnetiPinnedFolder.panelFor;
     var comp = S.el.querySelector(".tm-composer");
     if (!P || !comp || !S.team) return;
     closeFolderPanel();
@@ -3530,7 +3530,7 @@
     // engine reads it and history shows it), and calls the assistant being replied to when nobody is @-mentioned.
     var Q = quoteApi();
     // 0.449.0: a /skill call goes first as the main chat's skill block; the quote and the owner's words follow it.
-    var X = window.JavisSlash;
+    var X = window.UnetiSlash;
     var call = X && X.buildSkillInvocation ? skillCall(typed, (S.skills || []).map(function (k) { return k.slug; })) : null;
     var words = call ? call.rest : typed;
     var text = S.replyTo && Q ? Q.ghep(S.replyTo.quote, words) : words;
@@ -3671,7 +3671,7 @@
       loadSkills().then(function () { if (S && S.el && S.el.isConnected && S.skills) suggest(); });
       return;
     }
-    var X = window.JavisSlash;
+    var X = window.UnetiSlash;
     var items = S.skills.filter(function (k) { return k && k.slug; }).map(function (k) {
       return { kind: "skill", cmd: k.slug, name: k.name || k.slug, group: k.group || "", desc: k.description || "" };
     });
@@ -3709,7 +3709,7 @@
     var input = S.el.querySelector(".tm-input");
     var box = S.el.querySelector(".tm-sug");
     if (!input || !box || !S.team) return;
-    var X = window.JavisSlash;
+    var X = window.UnetiSlash;
     var tok = X && X.tokenAtCaret ? X.tokenAtCaret(input.value, input.selectionStart || 0) : null;
     if (tok) return skillSuggest(input, box, tok);
     var query = suggestQuery(input);
@@ -3952,7 +3952,7 @@
 
   // ───────────── hộp chọn thành viên kiểu Zalo (0.142.0, team-picker.js) ─────────────
 
-  function TP() { return (typeof window !== "undefined" && window.JavisTeamPicker) || null; }
+  function TP() { return (typeof window !== "undefined" && window.UnetiTeamPicker) || null; }
 
   // Trợ lý của trang Cộng sự (tên, vai, tag, ảnh): cùng nguồn với cột trái trang Cộng sự để chip tag khớp.
   function loadRoster() {
@@ -4102,7 +4102,7 @@
       drawMsgs(false);
     }
     if (!t || !(S.el.contains(t) || (S.pickHost && S.pickHost.contains(t)))) return;
-    // A JAVIS_CARD button carries data-reply too (its words, not a message id): chat-card.js sends it (sendCardReply).
+    // A UNETI_CARD button carries data-reply too (its words, not a message id): chat-card.js sends it (sendCardReply).
     if (t.classList && t.classList.contains("jv-card-btn")) return;
     // "Show more" on a long owner message: chat-acts.js toggles it (document listener, after this one). Remember the
     // state so a redraw of the list keeps the message open.
@@ -4120,7 +4120,7 @@
     if (d.renameTeam) { S.rowMenu = null; S.renaming = d.renameTeam; drawList(); return; }
     if (d.tagTeam) { S.tagMenu = d.tagTeam; S.tagFocus = null; drawList(); return; }
     if (t.classList && t.classList.contains("cs-proj-cur") && t.closest(".tm-tagbar")) {
-      var cs = typeof window !== "undefined" && window.JavisChatSide;
+      var cs = typeof window !== "undefined" && window.UnetiChatSide;
       if (cs && cs.menu) cs.menu(t, tagMenuRows(S.teams, S.tagFilter, function (k) { setTagFilter(k); drawList(); }));
       return;
     }
@@ -4139,7 +4139,7 @@
     }
     if (d.agentEdit) return openAgentSettings(d.agentEdit);
     // 0.193.0: message a member privately, straight from the team (the Partners page chat with that assistant).
-    if (d.agentChat) { if (window.JavisWorkspace && window.JavisWorkspace.openCommand) window.JavisWorkspace.openCommand("agent", d.agentChat); return; }
+    if (d.agentChat) { if (window.UnetiWorkspace && window.UnetiWorkspace.openCommand) window.UnetiWorkspace.openCommand("agent", d.agentChat); return; }
     if (d.rxToggle) {
       var rm = msgById(Number(d.rxToggle));
       return sendReaction(Number(d.rxToggle), JR.cornerToggle(rm && rm.reaction));
@@ -4162,7 +4162,7 @@
     if (d.plusFolder || d.folderOpen) { setPlus(false); return openFolderPanel(); }
     if (d.folderUnpin) return pinTeamFolder("");
     if (d.plusGithub || d.ghOpen) { setPlus(false); return openGithubPanel(); }
-    if (d.ghStatus) { var gs = sessionId(); if (gs && window.JavisTeamGithub) window.JavisTeamGithub.openStatus(gs); return; }
+    if (d.ghStatus) { var gs = sessionId(); if (gs && window.UnetiTeamGithub) window.UnetiTeamGithub.openStatus(gs); return; }
     if (d.attX !== undefined) { forgetAtts(S.atts.splice(+d.attX, 1)); drawComposer(); return; }
     if (d.outRetry) {
       var oe = S.outbox.filter(function (p) { return p.cid === d.outRetry; })[0];
@@ -4614,10 +4614,10 @@
     var msg = box && box.querySelector(".aa-upload-msg");
     var btn = box && box.querySelector("[data-aa-upload]");
     inp.value = "";
-    if (!f || !window.JavisAvatar) return;
+    if (!f || !window.UnetiAvatar) return;
     if (btn) btn.disabled = true;
     if (msg) { msg.textContent = tw("ws.avatar_uploading"); msg.classList.remove("loi"); }
-    window.JavisAvatar.uploadImage(f).then(function (name) {
+    window.UnetiAvatar.uploadImage(f).then(function (name) {
       return call("PATCH", teamUrl(), { avatar_image: name }).then(function (r) { act(r, drawAll); });
     }).catch(function (err) {
       if (btn) btn.disabled = false;
@@ -4676,7 +4676,7 @@
       var on = box.checked;
       box.checked = !on;
       box.disabled = true;
-      var RA = window.JavisResonanceAgent;
+      var RA = window.UnetiResonanceAgent;
       var p = RA && RA.toggleAgent ? RA.toggleAgent(box.getAttribute("data-slug"), on)
         : call("POST", "/resonance/agents/toggle", { slug: box.getAttribute("data-slug"), enabled: on }).then(function (r) {
           return { ok: r.code === 200, error: r.j && r.j.error };
@@ -4823,15 +4823,15 @@
   // ───────────── column widths (0.196.0) ─────────────
   // Owner, 17/10/2026: drag a column edge like the Partners page; past a point the list folds into a strip of team
   // pictures (hover shows the team card) and the side panel folds away. Same helper and card as every other page
-  // (col-resize.js: JavisColResize.attach with snap/collapse, JavisColResize.miniTip).
+  // (col-resize.js: UnetiColResize.attach with snap/collapse, UnetiColResize.miniTip).
   var LIST_MINI_W = 72;   // the Partners page's avatar strip width (workspace.js MINI_W)
 
-  function colResize() { return typeof window !== "undefined" ? window.JavisColResize : null; }
+  function colResize() { return typeof window !== "undefined" ? window.UnetiColResize : null; }
 
   function listResizeOpts(page) {
     var CR = colResize();
     var side = function () { var x = page.querySelector(".tm-side"); return x && !x.hidden ? x.getBoundingClientRect().width : 0; };
-    return { host: page, varName: "--tm-list-w", key: "javis_tm_list_w", min: 220, max: 480, edge: "right",
+    return { host: page, varName: "--tm-list-w", key: "uneti_tm_list_w", min: 220, max: 480, edge: "right",
       label: "teams.resize_list", keep: 420, total: function () { return page.clientWidth; }, other: side,
       snap: { below: CR.FOLD_AT(220), to: LIST_MINI_W, onSnap: function (on) {
         page.classList.toggle("tm-mini", !!on);
@@ -4842,7 +4842,7 @@
   function sideResizeOpts(page) {
     var CR = colResize();
     var list = function () { var x = page.querySelector(".tm-list"); return x ? x.getBoundingClientRect().width : 0; };
-    return { host: page, varName: "--tm-side-w", key: "javis_tm_side_w", min: 300, max: 640, edge: "left",
+    return { host: page, varName: "--tm-side-w", key: "uneti_tm_side_w", min: 300, max: 640, edge: "left",
       label: "teams.resize_side", keep: 420, total: function () { return page.clientWidth; }, other: list,
       collapse: { below: CR.FOLD_AT(300), run: function () { closeSide(); } } };
   }
@@ -4885,7 +4885,7 @@
     if (S && S.scroll) S.scroll.detach();
     S = fresh(el);
     shell();
-    var CS = typeof window !== "undefined" && window.JavisChatScroll;
+    var CS = typeof window !== "undefined" && window.UnetiChatScroll;
     var msgsBox = el.querySelector(".tm-msgs");
     S.scroll = CS && msgsBox ? CS.attach(msgsBox, { buttonClass: "jv-new-msg tm-new-msg", msg: ".tm-msg",
       hold: ".tm-hacts:hover, .tm-rx:hover", key: "data-mid", followLoads: true }) : null;
@@ -4956,10 +4956,10 @@
     // Phone: swipe a message to the left to reply to it, like Zalo, with the same gesture as the main chat (msg-swipe.js:
     // the bubble follows the finger, a quote mark shows once far enough, vertical moves keep scrolling, a wide code block
     // or table scrolls sideways instead). Own and assistant messages both reply, as before.
-    // JAVIS_CARD buttons inside this page answer in this team, not in the hidden main chat (chat-card.js).
-    var JC = typeof window !== "undefined" && window.JavisCard;
+    // UNETI_CARD buttons inside this page answer in this team, not in the hidden main chat (chat-card.js).
+    var JC = typeof window !== "undefined" && window.UnetiCard;
     if (JC && JC.onSend) S.uncard = JC.onSend(el, function (text, btn) { sendCardReply(btn, text); });
-    var SW = typeof window !== "undefined" && window.JavisMsgSwipe;
+    var SW = typeof window !== "undefined" && window.UnetiMsgSwipe;
     if (SW) {
       S.unswipe = SW.bind(el, {
         selector: ".tm-msg",
@@ -4970,7 +4970,7 @@
     }
     // Phone (0.179.0): hold a message for the msg-press.js menu, emoji above the finger (slide to pick, assistant
     // messages) and Reply / Copy / Pin at the bottom.
-    var MP = typeof window !== "undefined" && window.JavisMsgPress;
+    var MP = typeof window !== "undefined" && window.UnetiMsgPress;
     if (MP) {
       S.unpress = MP.bind(el, {
         selector: ".tm-msg",
@@ -5010,15 +5010,15 @@
   }
 
   if (typeof window !== "undefined" && window.addEventListener) {
-    window.addEventListener("javis:team-event", onTeamEvent);
+    window.addEventListener("uneti:team-event", onTeamEvent);
     // 0.197.0: back to this tab with a team open: what arrived while away is read now.
     if (typeof document !== "undefined" && document.addEventListener) document.addEventListener("visibilitychange", onVisible);
     // Auto bật/tắt ở trang Cộng sự hay tab khác (0.142.0): danh sách thành viên của nhóm đang mở đọc lại trạng thái.
     // 0.454.0: the tag order changed (here or on another tab of this page): the list and its tag bar follow.
-    window.addEventListener("javis:order-changed", function () {
+    window.addEventListener("uneti:order-changed", function () {
       if (S && S.el && S.el.isConnected) drawList();
     });
-    window.addEventListener("javis:resonance-agents-changed", function () {
+    window.addEventListener("uneti:resonance-agents-changed", function () {
       if (!S || !S.el || !S.el.isConnected || !S.activeId) return;
       loadTeam();
       if (S.side && S.tab === "team") loadAgents().then(function () { if (S.side && S.tab === "team") drawSide(); });
@@ -5044,6 +5044,6 @@
     typingHtml: typingHtml, pinsHtml: pinsHtml, markMentions: markMentions, replyRefHtml: replyRefHtml,
     allTags: allTags, filterTeams: filterTeams, tagBarHtml: tagBarHtml, tagMenuRows: tagMenuRows, tagPickRows: tagPickRows,
     lastWorkedTeam: lastWorkedTeam, TAG_NONE: TAG_NONE, unreadHtml: unreadHtml };
-  if (typeof window !== "undefined") window.JavisTeams = api;
+  if (typeof window !== "undefined") window.UnetiTeams = api;
   if (typeof module !== "undefined" && module.exports) module.exports = api;
 })();

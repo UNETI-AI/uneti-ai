@@ -130,13 +130,13 @@ Graph detail: [Knowledge graph](../03-do-thi-tri-thuc.md).
 
 **The Normalise brain card** collects the `agents`, `workflows`, `memory` and `skills` folders of the selected brain into one flat structure. Press **Normalise the selected brain** to run it.
 
-It is safe: it only moves when the destination does not exist, it never overwrites, and running it repeatedly is harmless (for example moving `Javis/agents` to `agents`, `Memory` to `memory`). Afterwards UNETI AI reports what it moved, or "Nothing to move (already normalised)".
+It is safe: it only moves when the destination does not exist, it never overwrites, and running it repeatedly is harmless (for example moving `UNETI/agents` to `agents`, `Memory` to `memory`). Afterwards UNETI AI reports what it moved, or "Nothing to move (already normalised)".
 
 **The AI image provenance card** decides whether images UNETI AI generates carry a provenance mark (Content Credentials, the C2PA standard). The corner label reads "Keeping" or "Stripping".
 
 - The default is **Keep the mark**: images carry a record that they were AI-generated. Facebook reads it and labels posts "AI-generated content".
 - Press **Strip the mark** and new images no longer carry it, so platforms usually stop showing the label. Images generated earlier are unchanged.
-- Either way the `javisos.com` author tag stays, and you remain responsible for disclosing AI content under the law and the terms of whatever platform you post to.
+- Either way the `uneti-ai.github.io` author tag stays, and you remain responsible for disclosing AI content under the law and the terms of whatever platform you post to.
 
 ### General tab: Language and timezone
 
@@ -164,9 +164,9 @@ If you boot the machine and `localhost:7777` reports **ERR_CONNECTION_REFUSED**,
 
 - **Windows is blocking this startup entry.** In Task Manager's **Startup** tab, pressing Disable deletes nothing - it just sets a flag telling Windows to skip the entry. Plenty of "clean up your PC, speed up boot" tools set the same flag without asking. Pressing **Enable auto-start** again clears it.
 - **The install folder moved** and the startup command still points at the old path. Press enable again to update it.
-- **`start-javis.vbs` or `.venv\Scripts\python.exe` is missing.** Run `setup.bat` again to rebuild what is missing.
+- **`start-uneti.vbs` or `.venv\Scripts\python.exe` is missing.** Run `setup.bat` again to rebuild what is missing.
 
-If the card says **On** with no warning and boot still does not bring it up, open `server\javis.log` in the install folder: that is where the server records errors when it does start but dies part-way.
+If the card says **On** with no warning and boot still does not bring it up, open `server\uneti.log` in the install folder: that is where the server records errors when it does start but dies part-way.
 
 For the Second Brain (memory, Wiki, vault structure), see [Second Brain: memory, Wiki, INGEST](../13-second-brain-bo-nho-wiki.md).
 
@@ -202,7 +202,7 @@ On Hostinger, open Docker Manager and hit **Redeploy** (the stack re-reads the c
 
 Reload the page and the button appears. If you would rather go without Watchtower, updating by hand still works: `docker compose up -d --pull always`.
 
-**Want UNETI AI to update itself with no button at all:** add `JAVIS_AUTO_UPDATE=true` to `.env` (Hostinger: the Environment box) and bring the stack up again. It is off by default on purpose: auto-updating means the app restarts itself whenever a new version lands, cutting across background work. The default cadence is 24 hours, changed with `JAVIS_AUTO_UPDATE_INTERVAL` (seconds).
+**Want UNETI AI to update itself with no button at all:** add `UNETI_AUTO_UPDATE=true` to `.env` (Hostinger: the Environment box) and bring the stack up again. It is off by default on purpose: auto-updating means the app restarts itself whenever a new version lands, cutting across background work. The default cadence is 24 hours, changed with `UNETI_AUTO_UPDATE_INTERVAL` (seconds).
 
 The Updates panel distinguishes these cases and prints the right procedure for your machine.
 
@@ -228,7 +228,7 @@ Below the update panel is the version changelog: what each release added, pagina
 
 When UNETI AI runs publicly (listening on `0.0.0.0`, i.e. VPS/Docker/Hostinger) with no admin account yet, the first-run screen only asks for a username and password. That means **whoever opens the link before an admin exists can create it**, and the brain runs with full rights on the machine. So:
 
-- **Recommended:** set the environment variables `JAVIS_ADMIN_USER` and `JAVIS_ADMIN_PASSWORD` at deploy time (`install.sh` already asks for both). UNETI AI creates the admin at startup and opening the app gives you a sign-in screen, with no gap at all. Details: [.env configuration](../16-cau-hinh-env.md).
+- **Recommended:** set the environment variables `UNETI_ADMIN_USER` and `UNETI_ADMIN_PASSWORD` at deploy time (`install.sh` already asks for both). UNETI AI creates the admin at startup and opening the app gives you a sign-in screen, with no gap at all. Details: [.env configuration](../16-cau-hinh-env.md).
 - **Without the env vars:** open the app and create the account right after deploying; do not leave a public server without an admin.
 - **After the first sign-in:** turn on two-factor authentication (2FA) on the **Account** page. See [Security & accounts](../14-bao-mat-tai-khoan.md).
 

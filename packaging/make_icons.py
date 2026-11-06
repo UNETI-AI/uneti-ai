@@ -3,8 +3,8 @@
 
     python packaging/make_icons.py
 
-Writes packaging/assets/javis.ico (Windows installer and shortcuts) and
-packaging/assets/javis.icns (macOS app bundle and the .dmg volume icon), plus a copy of
+Writes packaging/assets/uneti.ico (Windows installer and shortcuts) and
+packaging/assets/uneti.icns (macOS app bundle and the .dmg volume icon), plus a copy of
 the .icns inside the in-repo "UNETI AI.app", and the Windows setup wizard pictures:
 wizard-<pct>.bmp (the tall panel on the first and last page) and wizard-small-<pct>.bmp
 (the corner logo on the pages between), one per display scale Inno Setup picks from.
@@ -66,15 +66,15 @@ def _wizard_small(logo: Image.Image, pct: int) -> Image.Image:
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     img = Image.open(SRC).convert("RGBA")
-    img.save(OUT / "javis.ico", sizes=[(16, 16), (24, 24), (32, 32), (48, 48), (64, 64), (128, 128), (256, 256)])
-    img.save(OUT / "javis.icns")
+    img.save(OUT / "uneti.ico", sizes=[(16, 16), (24, 24), (32, 32), (48, 48), (64, 64), (128, 128), (256, 256)])
+    img.save(OUT / "uneti.icns")
     res = ROOT / "UNETI AI.app" / "Contents" / "Resources"
     res.mkdir(parents=True, exist_ok=True)
-    shutil.copyfile(OUT / "javis.icns", res / "javis.icns")
+    shutil.copyfile(OUT / "uneti.icns", res / "uneti.icns")
     for pct in SCALES:
         _wizard_big(img, pct).save(OUT / f"wizard-{pct}.bmp")
         _wizard_small(img, pct).save(OUT / f"wizard-small-{pct}.bmp")
-    print("wrote", OUT / "javis.ico", OUT / "javis.icns", f"and {2 * len(SCALES)} wizard pictures")
+    print("wrote", OUT / "uneti.ico", OUT / "uneti.icns", f"and {2 * len(SCALES)} wizard pictures")
 
 
 if __name__ == "__main__":

@@ -11,7 +11,7 @@ import asyncio
 import os
 import tempfile
 
-os.environ["JAVIS_STATE_DIR"] = tempfile.mkdtemp(prefix="javis-pack-updates-")
+os.environ["UNETI_STATE_DIR"] = tempfile.mkdtemp(prefix="javis-pack-updates-")
 
 import pack_install  # noqa: E402
 import pack_updates as PU  # noqa: E402
@@ -29,25 +29,25 @@ def check(name, cond, extra=""):
 STORE = [
     {"id": "javis.zalo", "name": {"vi": "Zalo cá nhân", "en": "Personal Zalo"}, "version": "1.4.0"},
     {"id": "javis.crm", "name": {"en": "Customer CRM"}, "version": "1.10.0"},
-    {"id": "javis.old", "name": {"en": "Old"}, "version": "0.9.0"},
-    {"id": "javis.not-installed", "name": {"en": "Other"}, "version": "2.0.0"},
+    {"id": "uneti.old", "name": {"en": "Old"}, "version": "0.9.0"},
+    {"id": "uneti.not-installed", "name": {"en": "Other"}, "version": "2.0.0"},
 ]
-INSTALLED = {"javis.zalo": {"version": "1.3.0"}, "javis.crm": {"version": "1.9.0"}, "javis.old": {"version": "1.0.0"}}
+INSTALLED = {"javis.zalo": {"version": "1.3.0"}, "javis.crm": {"version": "1.9.0"}, "uneti.old": {"version": "1.0.0"}}
 
 ups = PU.find_updates(STORE, INSTALLED)
 ids = {u["id"]: u for u in ups}
 check("an installed pack with a newer Store version is an update", "javis.zalo" in ids
       and ids["javis.zalo"]["from"] == "1.3.0" and ids["javis.zalo"]["to"] == "1.4.0", ups)
 check("versions compare as numbers: 1.10.0 is newer than 1.9.0", "javis.crm" in ids)
-check("an older Store number is never an update", "javis.old" not in ids)
-check("a pack that is not installed is not an update", "javis.not-installed" not in ids)
+check("an older Store number is never an update", "uneti.old" not in ids)
+check("a pack that is not installed is not an update", "uneti.not-installed" not in ids)
 
 item = PU.notify(ups)
 check("one bell notice for all new versions", item and item.get("kind") == "system" and item.get("channel") == PU.CHANNEL,
       item)
 check("it names each pack with old and new version", item and "1.3.0 → 1.4.0" in item["body"]
       and "1.9.0 → 1.10.0" in item["body"], item and item["body"])
-check("it says Javis never updates on its own", item and ("không tự cập nhật" in item["body"]
+check("it says UNETI AI never updates on its own", item and ("không tự cập nhật" in item["body"]
                                                        or "never updates on its own" in item["body"]))
 check("the same versions do not ring again", PU.notify(ups) is None)
 again = PU.notify([dict(ids["javis.zalo"], to="1.5.0")])
@@ -82,8 +82,8 @@ check("no timer runs the Store check any more", "pack_updates.tick" not in src a
 check("the check rides on the dashboard opening (/version)",
       "asyncio.create_task(pack_updates.on_open())" in src[src.index('@app.get("/version")'):][:800])
 nj = (ROOT / "dashboard" / "notifications.js").read_text(encoding="utf-8")
-check("pressing the notice opens the Javis Store",
-      'item.channel === "store:updates"' in nj and "window.JavisPacks.moKho(\"\")" in nj)
+check("pressing the notice opens the UNETI AI Store",
+      'item.channel === "store:updates"' in nj and "window.UnetiPacks.moKho(\"\")" in nj)
 import json  # noqa: E402
 vi = json.loads((ROOT / "dashboard" / "i18n" / "vi.json").read_text(encoding="utf-8"))
 en = json.loads((ROOT / "dashboard" / "i18n" / "en.json").read_text(encoding="utf-8"))

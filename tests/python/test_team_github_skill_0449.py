@@ -15,8 +15,8 @@ import os
 import tempfile
 from pathlib import Path
 
-os.environ["JAVIS_STATE_DIR"] = tempfile.mkdtemp(prefix="javis-team-gh-")
-BR = Path(tempfile.mkdtemp(prefix="javis-team-gh-brain-"))
+os.environ["UNETI_STATE_DIR"] = tempfile.mkdtemp(prefix="uneti-team-gh-")
+BR = Path(tempfile.mkdtemp(prefix="uneti-team-gh-brain-"))
 (BR / "agents").mkdir()
 for slug, name in (("lan", "Lan"), ("minh", "Minh")):
     (BR / "agents" / f"{slug}.md").write_text(f"---\nname: {name}\nrole: Thành viên\n---\nBạn là {name}.\n", encoding="utf-8")
@@ -136,7 +136,7 @@ async def _fake_inbox(chat, text, **kw):
 real_inbox = main._bo_vao_hom_thu
 main._bo_vao_hom_thu = _fake_inbox
 try:
-    ok = asyncio.run(main._github_notify(sid, "**o/r**\nĐã đẩy lên nhánh `javis/abc`, PR #7", True))
+    ok = asyncio.run(main._github_notify(sid, "**o/r**\nĐã đẩy lên nhánh `uneti/abc`, PR #7", True))
 finally:
     main._bo_vao_hom_thu = real_inbox
 store = main.get_store()
@@ -146,7 +146,7 @@ check("GitHub news of a team chat is a system line in the team chat",
 check("and a quiet copy in the inbox", inbox and inbox[0][0] == f"web:{sid}" and inbox[0][2] is True and ok == (True, ""), inbox)
 
 # ---- a CI fix round becomes one team job ----
-fix = "[Javis GitHub] CI đỏ (vòng sửa 1/3, repo o/r, PR #7)\nFAILED tests/test_x.py"
+fix = "[UNETI AI GitHub] CI đỏ (vòng sửa 1/3, repo o/r, PR #7)\nFAILED tests/test_x.py"
 def _jobs():
     q = main.tasks_feature.store.team_queue(tid)
     return [t for v in q.values() if isinstance(v, list) for t in v if isinstance(t, dict) and t.get("id")]
@@ -161,7 +161,7 @@ job = main.tasks_feature.store.get_task(jobs[0]["id"]) if jobs else {}
 check("the job carries the fix text, marked so the round count is kept",
       str(job.get("intent") or "").startswith(github_work.FIX_MARKER), job)
 msg = [m for m in store.get_team_messages_page(sid, limit=10)["messages"] if m["author_kind"] == "owner"][-1]
-check("the job message says it came through Javis, from GitHub",
+check("the job message says it came through UNETI AI, from GitHub",
       ((msg.get("meta") or {}).get("via_core") or {}).get("kenh") == "github", msg.get("meta"))
 check("a private chat with no follow-up runner still returns False (asks the person)",
       asyncio.run(main._github_start_turn("no-such-chat", fix)) is False)

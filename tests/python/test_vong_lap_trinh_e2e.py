@@ -13,13 +13,13 @@ import json
 import os
 # 0.438.5: vòng tool mặc định gọi model dạng stream. File này thử logic vòng tool trên đường non-stream
 # (giả lập client.post / máy chủ trả JSON), đường đó vẫn là đường lui. Đường stream: test_api_stream_vong.py.
-os.environ["JAVIS_API_STREAM_TOOLS"] = "0"
+os.environ["UNETI_API_STREAM_TOOLS"] = "0"
 import sys
 import tempfile
 from pathlib import Path
 
-_TMP = tempfile.mkdtemp(prefix="javis-e2e-code-")
-os.environ["JAVIS_STATE_DIR"] = _TMP
+_TMP = tempfile.mkdtemp(prefix="uneti-e2e-code-")
+os.environ["UNETI_STATE_DIR"] = _TMP
 
 import coding_checkpoint  # noqa: E402
 import coding_terminal  # noqa: E402
@@ -53,10 +53,10 @@ tools, route = mcp_hub._builtin_tools("full", str(VAULT), workspace_root=[str(WS
 coding_checkpoint.luot_moi("e2e")
 
 KICH_BAN = [
-    ("javis_search_files", {"pattern": "def cong"}),
-    ("javis_read_file", {"path": "src/tinh.py", "offset": 1, "limit": 50}),
-    ("javis_edit_file", {"path": "src/tinh.py", "old_string": "return a - b", "new_string": "return a + b"}),
-    ("javis_terminal", {"command": "cd src && python3 -c 'import tinh; print(tinh.cong(2, 3))' | tr -d '\\n'"}),
+    ("uneti_search_files", {"pattern": "def cong"}),
+    ("uneti_read_file", {"path": "src/tinh.py", "offset": 1, "limit": 50}),
+    ("uneti_edit_file", {"path": "src/tinh.py", "old_string": "return a - b", "new_string": "return a + b"}),
+    ("uneti_terminal", {"command": "cd src && python3 -c 'import tinh; print(tinh.cong(2, 3))' | tr -d '\\n'"}),
 ]
 gui = []
 
@@ -120,8 +120,8 @@ moc = coding_checkpoint.danh_sach("e2e")
 check("có đúng một mốc khôi phục cho lượt này", len(moc) == 1)
 check("mốc giữ bản TRƯỚC khi sửa", "-    return a - b" in coding_checkpoint.diff_file("e2e", moc[0]["id"], "src/tinh.py"))
 check("công cụ gửi lên model có đủ bộ lập trình",
-      {t["function"]["name"] for t in gui[0]["tools"]} >= {"javis_read_file", "javis_edit_file",
-                                                          "javis_search_files", "javis_terminal", "javis_process"})
+      {t["function"]["name"] for t in gui[0]["tools"]} >= {"uneti_read_file", "uneti_edit_file",
+                                                          "uneti_search_files", "uneti_terminal", "uneti_process"})
 
 print()
 if _fails:

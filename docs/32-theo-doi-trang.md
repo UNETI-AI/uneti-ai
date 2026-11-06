@@ -14,7 +14,7 @@ Dùng khi việc cần làm chỉ là canh một trang: giá bên đối thủ, 
 
 ## Tạo bằng lời trong chat
 
-Nói với UNETI AI như: "canh giúp anh trang này, giá áo xuống dưới 900k thì báo" kèm đường link. UNETI AI dùng tool `javis_watch` và báo lại mã mục theo dõi. Mọi engine đều dùng được.
+Nói với UNETI AI như: "canh giúp anh trang này, giá áo xuống dưới 900k thì báo" kèm đường link. UNETI AI dùng tool `uneti_watch` và báo lại mã mục theo dõi. Mọi engine đều dùng được.
 
 ## Tạo trên trang Việc định kỳ
 
@@ -53,7 +53,7 @@ Tick **Tóm tắt thay đổi bằng AI** thì mỗi lần có thay đổi UNETI
 
 ## Dữ liệu nằm ở đâu
 
-File `web_watch.sqlite3` trong thư mục state của UNETI AI (`JAVIS_STATE_DIR`), cạnh `kanban.sqlite3`.
+File `web_watch.sqlite3` trong thư mục state của UNETI AI (`UNETI_STATE_DIR`), cạnh `kanban.sqlite3`.
 
 ## Liên quan
 

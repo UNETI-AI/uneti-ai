@@ -16,9 +16,9 @@ const ctx = { window: {}, Intl, Date, String, Math, isNaN, console };
 ctx.window.t = (k) => k;   // no dictionary: the module must fall back to its English labels
 vm.createContext(ctx);
 vm.runInContext(fs.readFileSync(path.join(ROOT, "dashboard", "tz-picker.js"), "utf8"), ctx);
-const Tz = ctx.window.JavisTz;
+const Tz = ctx.window.UnetiTz;
 
-check("exposes JavisTz", Tz && typeof Tz.options === "function");
+check("exposes UnetiTz", Tz && typeof Tz.options === "function");
 check("detect returns the browser timezone", typeof Tz.detect() === "string");
 check("Ho Chi Minh is UTC+07:00 (no daylight saving)", Tz.offsetLabel("Asia/Ho_Chi_Minh") === "UTC+07:00");
 check("Kolkata keeps its half hour", Tz.offsetLabel("Asia/Kolkata") === "UTC+05:30");

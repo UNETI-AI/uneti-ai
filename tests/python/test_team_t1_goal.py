@@ -21,8 +21,8 @@ import tempfile
 import time
 from pathlib import Path
 
-os.environ["JAVIS_STATE_DIR"] = tempfile.mkdtemp(prefix="javis-team-goal-")
-TEMP = Path(tempfile.mkdtemp(prefix="javis-team-goal-w-"))
+os.environ["UNETI_STATE_DIR"] = tempfile.mkdtemp(prefix="uneti-team-goal-")
+TEMP = Path(tempfile.mkdtemp(prefix="uneti-team-goal-w-"))
 
 import sessions  # noqa: E402
 import task_store  # noqa: E402
@@ -40,7 +40,7 @@ def check(name, cond, extra=""):
 
 
 def directive(**op):
-    return f"\n<!-- JAVIS_TEAM: {json.dumps(op, ensure_ascii=False)} -->"
+    return f"\n<!-- UNETI_TEAM: {json.dumps(op, ensure_ascii=False)} -->"
 
 
 class Admin:

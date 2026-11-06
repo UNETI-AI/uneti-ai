@@ -30,7 +30,7 @@ UNINSTALL_PATH = "/threads/uninstall"
 DELETE_PATH = "/threads/delete"
 AUTHORIZE_URL = "https://threads.net/oauth/authorize"
 TTL = 15 * 60
-# Read the account, read and answer replies under its posts, publish (Javis can post to Threads when asked).
+# Read the account, read and answer replies under its posts, publish (UNETI AI can post to Threads when asked).
 SCOPES = ("threads_basic", "threads_read_replies", "threads_manage_replies", "threads_content_publish")
 
 _lock = threading.Lock()
@@ -70,8 +70,8 @@ def start(app_id: str, app_secret: str, redirect_uri: str, brain: str = "", comm
         return {"ok": False, "error": bad}
     if not str(redirect_uri or "").startswith("https://"):
         return {"ok": False, "error": _c(
-            "Javis cần địa chỉ HTTPS (Cài đặt, Truy cập từ xa) và bạn phải mở Javis bằng địa chỉ đó.",
-            "Javis needs an HTTPS address (Settings, Remote access) and you must open Javis through it.")}
+            "UNETI AI cần địa chỉ HTTPS (Cài đặt, Truy cập từ xa) và bạn phải mở UNETI AI bằng địa chỉ đó.",
+            "UNETI AI needs an HTTPS address (Settings, Remote access) and you must open UNETI AI through it.")}
     _purge()
     state = secrets.token_urlsafe(24)
     with _lock:
@@ -94,8 +94,8 @@ async def callback(state: str, code: str, error: str = "", error_description: st
     with _lock:
         p = dict(_pending.get(str(state or "")) or {})
     if not p:
-        return {"ok": False, "error": _c("Phiên đăng nhập đã hết hạn. Quay lại Javis bấm Đăng nhập Threads lần nữa.",
-                                         "This sign-in expired. Go back to Javis and click Log in to Threads again.")}
+        return {"ok": False, "error": _c("Phiên đăng nhập đã hết hạn. Quay lại UNETI AI bấm Đăng nhập Threads lần nữa.",
+                                         "This sign-in expired. Go back to UNETI AI and click Log in to Threads again.")}
     if error or not code:
         msg = error_description or error or _c("Threads không trả mã đăng nhập.", "Threads returned no sign-in code.")
         if error == "access_denied":

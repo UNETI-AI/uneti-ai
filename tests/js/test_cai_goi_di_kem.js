@@ -2,8 +2,8 @@
 //
 //     node tests/js/test_cai_goi_di_kem.js
 //
-// Ba plugin Zalo (gửi ảnh, tag người, đọc ảnh trong nhóm) rời app sang Javis Store. Javis không có
-// đường tự cài gói, nên lối vào là `JavisPacks.caiGoiKho(id, tuy)`: tìm gói trong kho rồi mở ĐÚNG màn
+// Ba plugin Zalo (gửi ảnh, tag người, đọc ảnh trong nhóm) rời app sang UNETI AI Store. UNETI AI không có
+// đường tự cài gói, nên lối vào là `UnetiPacks.caiGoiKho(id, tuy)`: tìm gói trong kho rồi mở ĐÚNG màn
 // hình đồng ý của đường cài từ kho. Những điều phải giữ:
 //   1. Không có lần cài nào trước khi người dùng bấm Cài: lối vào mới không được ngắn hơn đường kho.
 //   2. Vân tay đi kèm: tải bằng sha256 của kho, cài bằng sha256 của bản soi.
@@ -88,7 +88,7 @@ function nap(kho) {
   globalThis.Alpine = win.Alpine;
   new Function("window", "document", "fetch", SRC)(win, doc, fetchGia);
   globalThis.Alpine = alpineCu;
-  return { P: win.JavisPacks || {}, goi, hop, nut };
+  return { P: win.UnetiPacks || {}, goi, hop, nut };
 }
 const nghi = () => new Promise(r => setTimeout(r, 0));
 

@@ -4,8 +4,8 @@
 
 Owner, 05/11/2026, with a customer's screenshots:
 1. "The Antigravity card has no Disconnect button." Its Google session lives in the OS keyring, so Disconnect now runs
-   the CLI's own sign-out when the binary lists one, and switches the card off in Javis either way.
-2. "Google ran out of quota and Javis keeps using it; switching to ChatGPT does not stick." Two causes:
+   the CLI's own sign-out when the binary lists one, and switches the card off in UNETI AI either way.
+2. "Google ran out of quota and UNETI AI keeps using it; switching to ChatGPT does not stick." Two causes:
    - `_LIMIT_ENGINE_PROVIDER` had no Antigravity entry, so an `agy` quota refusal marked nothing;
    - a quota mark on the card the owner had just chosen kept every turn away from it, with no way to lift it.
    And the error said "no other brain is connected" while ChatGPT was signed in.
@@ -16,7 +16,7 @@ import tempfile
 import time
 from pathlib import Path
 
-os.environ["JAVIS_STATE_DIR"] = tempfile.mkdtemp(prefix="javis-disc-")
+os.environ["UNETI_STATE_DIR"] = tempfile.mkdtemp(prefix="uneti-disc-")
 
 import config as cfgmod  # noqa: E402
 import antigravity_cli  # noqa: E402
@@ -32,7 +32,7 @@ def check(name, cond, extra=""):
 
 
 def fake_agy(help_text: str) -> str:
-    d = Path(tempfile.mkdtemp(prefix="javis-fakeagy-"))
+    d = Path(tempfile.mkdtemp(prefix="uneti-fakeagy-"))
     p = d / "agy"
     p.write_text("#!/usr/bin/env python3\nimport sys\n"
                  f"if '--help' in sys.argv:\n    sys.stdout.write({help_text!r}); sys.exit(0)\n"
@@ -42,7 +42,7 @@ def fake_agy(help_text: str) -> str:
 
 
 def use_agy(path: str):
-    os.environ["JAVIS_AGY_BIN"] = path
+    os.environ["UNETI_AGY_BIN"] = path
     antigravity_cli._HELP_CACHE.update(path=None, text="", ts=0.0)
     antigravity_cli.forget_status()
 
@@ -60,27 +60,27 @@ no_logout = fake_agy("Usage: agy [command]\n\nCommands:\n  models    List models
 use_agy(no_logout)
 check("a binary with no sign-out command gets nothing run", antigravity_cli.logout_argv() is None)
 r = antigravity_cli.logout()
-check("no sign-out: still ok, Javis switches the card off instead", r == {"ok": True, "cli_logout": False}, r)
+check("no sign-out: still ok, UNETI AI switches the card off instead", r == {"ok": True, "cli_logout": False}, r)
 check("`logged out` inside a description is not a command",
       (use_agy(fake_agy("Commands:\n  models   List models once you are logged out\n")) or True)
       and antigravity_cli.logout_argv() is None)
 
-# ---- 2. switched off in Javis: every status read says so ----
+# ---- 2. switched off in UNETI AI: every status read says so ----
 cfgmod.update_settings({"model": {"antigravity_off": True}})
-check("javis_off reads the flag", antigravity_cli.javis_off() is True)
+check("uneti_off reads the flag", antigravity_cli.uneti_off() is True)
 st = antigravity_cli.auth_status(True)
 check("auth_status: not connected, marked off, says how to undo",
-      st.get("connected") is False and st.get("javis_off") is True and st.get("error"), st)
+      st.get("connected") is False and st.get("uneti_off") is True and st.get("error"), st)
 st2 = antigravity_cli.auth_status_nen()
-check("the hot-path status says the same (no CLI run)", st2.get("javis_off") is True and st2.get("connected") is False)
+check("the hot-path status says the same (no CLI run)", st2.get("uneti_off") is True and st2.get("connected") is False)
 view = next(p for p in main._providers_view(cfgmod.read_settings()) if p["id"] == "antigravity-cli")
-check("the Models card is not connected and carries javis_off", view["configured"] is False and view["javis_off"] is True)
+check("the Models card is not connected and carries uneti_off", view["configured"] is False and view["uneti_off"] is True)
 mcfg = cfgmod.read_settings()["model"]
 route = main._chat_provider_for_session(mcfg, {"pinned_provider": "antigravity-cli", "pinned_model": ""})
 check("a chat pinned to the disconnected card runs on the main model", route[0] != "antigravity-cli", route)
 check("the chat model bar calls that pin unusable", main._pin_health(mcfg, "antigravity-cli")[0] is False)
 cfgmod.update_settings({"model": {"antigravity_off": False}})
-check("Connect again clears it", antigravity_cli.javis_off() is False)
+check("Connect again clears it", antigravity_cli.uneti_off() is False)
 
 # ---- 3. an Antigravity quota refusal marks the card, and the owner's choice lifts a mark ----
 main._PIN_LIMITED.clear()

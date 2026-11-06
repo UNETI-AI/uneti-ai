@@ -22,7 +22,7 @@ import tempfile
 from pathlib import Path
 from types import SimpleNamespace
 
-os.environ.setdefault("JAVIS_STATE_DIR", tempfile.mkdtemp(prefix="javis-doiduong-"))
+os.environ.setdefault("UNETI_STATE_DIR", tempfile.mkdtemp(prefix="uneti-doiduong-"))
 
 from fastapi import WebSocketDisconnect  # noqa: E402
 
@@ -276,7 +276,7 @@ if __name__ == "__main__":
                 setattr(obj, name, old)
 
     mp = _Patch()
-    tmp = Path(tempfile.mkdtemp(prefix="javis-doiduong-run-"))
+    tmp = Path(tempfile.mkdtemp(prefix="uneti-doiduong-run-"))
     try:
         main_test(mp, tmp)
     finally:

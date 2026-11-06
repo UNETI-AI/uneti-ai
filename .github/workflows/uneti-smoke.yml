@@ -28,7 +28,7 @@ jobs:
           pass="$(openssl rand -hex 16)"
           echo "::add-mask::$pass"
           echo "ADMIN_PASS=$pass" >> "$GITHUB_ENV"
-          docker run -d --name app -p 127.0.0.1:7777:7777 -e JAVIS_ADMIN_USER=quantri -e JAVIS_ADMIN_PASSWORD="$pass" "$image"
+          docker run -d --name app -p 127.0.0.1:7777:7777 -e UNETI_ADMIN_USER=quantri -e UNETI_ADMIN_PASSWORD="$pass" "$image"
           for i in $(seq 1 60); do
             if curl -fsS -m 3 http://127.0.0.1:7777/health >/dev/null; then break; fi
             sleep 5

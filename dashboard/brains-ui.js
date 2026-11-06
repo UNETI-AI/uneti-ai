@@ -46,7 +46,7 @@
   // dọn cả nó → lần app.js render sau vẫn đúng, không "sống lại" qua update.
   async function pruneCustomBrains(realBrains) {
     let list;
-    try { list = JSON.parse(localStorage.getItem("javis.brains") || "[]"); }
+    try { list = JSON.parse(localStorage.getItem("uneti.brains") || "[]"); }
     catch (e) { list = []; }
     if (!Array.isArray(list)) list = [];
     const realPaths = new Set((realBrains || []).map((b) => normPath(b.path)));
@@ -60,7 +60,7 @@
       // còn lại: đã bị xoá / không phải thư mục → loại
     }
     if (kept.length !== list.length) {
-      localStorage.setItem("javis.brains", JSON.stringify(kept));
+      localStorage.setItem("uneti.brains", JSON.stringify(kept));
     }
     // Gỡ các option thư mục ngoài (do app.js đã render) không còn trong danh sách giữ lại.
     const keepVals = new Set(kept.map((b) => "path:" + b.path));
@@ -68,7 +68,7 @@
       if (keepVals.has(o.value)) return;
       if (sel.value === o.value) {           // đang chọn đúng cái bị gỡ → về brain mặc định
         sel.value = "brain";
-        localStorage.setItem("javis.graphSource", "brain");
+        localStorage.setItem("uneti.graphSource", "brain");
         sel.dispatchEvent(new Event("change"));
       }
       o.remove();
@@ -117,11 +117,11 @@
       const want = "path:" + selectPath;
       if ([...sel.options].some((o) => o.value === want)) {
         sel.value = want;
-        localStorage.setItem("javis.graphSource", want);
+        localStorage.setItem("uneti.graphSource", want);
         sel.dispatchEvent(new Event("change"));
       }
     } else if (restoreSaved) {
-      const saved = localStorage.getItem("javis.graphSource");
+      const saved = localStorage.getItem("uneti.graphSource");
       if (saved && saved !== sel.value && [...sel.options].some((o) => o.value === saved)) {
         sel.value = saved;
         sel.dispatchEvent(new Event("change"));
@@ -146,13 +146,13 @@
     const name = opt.textContent.trim();
     if (!window.confirm(window.t("brains.confirm_remove_custom", { ten: name }))) return;
     let list;
-    try { list = JSON.parse(localStorage.getItem("javis.brains") || "[]"); } catch (e) { list = []; }
+    try { list = JSON.parse(localStorage.getItem("uneti.brains") || "[]"); } catch (e) { list = []; }
     if (!Array.isArray(list)) list = [];
     list = list.filter((b) => b && ("path:" + b.path) !== opt.value);
-    localStorage.setItem("javis.brains", JSON.stringify(list));
+    localStorage.setItem("uneti.brains", JSON.stringify(list));
     if (sel.value === opt.value) {
       sel.value = "brain";
-      localStorage.setItem("javis.graphSource", "brain");
+      localStorage.setItem("uneti.graphSource", "brain");
     }
     opt.remove();
     sel.dispatchEvent(new Event("change"));
@@ -183,13 +183,13 @@
     if (!r || !r.ok) { alert((r && r.error) || window.t("brains.delete_failed")); return; }
     // Về brain mặc định rồi nạp lại danh sách
     sel.value = "brain";
-    localStorage.setItem("javis.graphSource", "brain");
+    localStorage.setItem("uneti.graphSource", "brain");
     await loadBrains(null, false);
     sel.dispatchEvent(new Event("change"));
     alert(window.t("brains.deleted", { ten: name }));
   }
 
-  // Đổi tên (0.219.0): chỉ đổi TÊN HIỂN THỊ, lưu trong chính brain (Javis/brain.json). Thư mục giữ nguyên nên mọi
+  // Đổi tên (0.219.0): chỉ đổi TÊN HIỂN THỊ, lưu trong chính brain (UNETI/brain.json). Thư mục giữ nguyên nên mọi
   // lựa chọn đã lưu, bot, nhắc việc, việc nền và link /brains/<thư mục>/... trong note vẫn trỏ đúng. Đổi được cả Brain
   // mặc định (trước đây không có cách nào đổi tên não nào).
   async function renameBrain() {
@@ -207,7 +207,7 @@
     if (!r || !r.ok) { alert((r && r.error) || window.t("brains.rename_failed")); return; }
     await loadBrains(null, false);
     // Báo các phần khác (tiêu đề, sidebar) vẽ lại tên mà không đổi brain đang chọn.
-    try { window.dispatchEvent(new CustomEvent("javis:brain-renamed", { detail: { brain: sel.value, label: r.label } })); } catch (e) {}
+    try { window.dispatchEvent(new CustomEvent("uneti:brain-renamed", { detail: { brain: sel.value, label: r.label } })); } catch (e) {}
   }
 
   const rb = document.getElementById("renameBrainBtn");
@@ -219,5 +219,5 @@
 
   loadBrains(null, true);
 
-  window.JavisBrains = { reload: () => loadBrains(null, false) };
+  window.UnetiBrains = { reload: () => loadBrains(null, false) };
 })();

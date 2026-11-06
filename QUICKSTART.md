@@ -16,11 +16,11 @@ Bấm vào biểu tượng là UNETI AI mở thành cửa sổ riêng (không th
 **Cách cài không bị màn hình cảnh báo (khuyên dùng).** Hai bộ cài chưa ký số, nên tải bằng trình duyệt thì lần đầu máy sẽ chặn lại. Dán một dòng lệnh dưới đây thì không bị chặn, vẫn ra đúng bộ cài có logo UNETI AI:
 - **Windows:** bấm Start, gõ `PowerShell`, mở lên, dán dòng này rồi Enter:
   ```
-  irm https://raw.githubusercontent.com/uneti-ai/uneti-ai/main/packaging/windows/get-javis.ps1 | iex
+  irm https://raw.githubusercontent.com/uneti-ai/uneti-ai/main/packaging/windows/get-uneti.ps1 | iex
   ```
 - **macOS:** mở **Terminal** (Launchpad, gõ Terminal), dán dòng này rồi Enter:
   ```
-  curl -fsSL https://raw.githubusercontent.com/uneti-ai/uneti-ai/main/packaging/macos/get-javis.sh | bash
+  curl -fsSL https://raw.githubusercontent.com/uneti-ai/uneti-ai/main/packaging/macos/get-uneti.sh | bash
   ```
 
 Nếu đã tải file bằng trình duyệt và bị chặn:
@@ -38,13 +38,13 @@ Nếu đã tải file bằng trình duyệt và bị chặn:
    ```
 3. (Tùy chọn, để có HTTPS + tên miền) ở ô **Environment** đặt:
    ```
-   DOMAIN_NAME=javis.<hostname-vps>.hstgr.cloud
+   DOMAIN_NAME=uneti.<hostname-vps>.hstgr.cloud
    ```
-   (hostname xem ở hPanel → VPS; ví dụ `javis.srv1782015.hstgr.cloud`.)
+   (hostname xem ở hPanel → VPS; ví dụ `uneti.srv1782015.hstgr.cloud`.)
 4. **Deploy**. Đợi 1-3 phút. Mở app bằng nút **Open** (hoặc `https://<DOMAIN_NAME>`).
 5. Lần đầu: màn hình sẽ hỏi tạo tài khoản admin. Sau đó đăng nhập Claude Code trong terminal container 1 lần: `claude auth login --claudeai`.
 
-VPS cài **Ubuntu 26** hay hệ điều hành trắng, không có Traefik của Hostinger: vẫn dán đúng link trên, bỏ trống `DOMAIN_NAME` cũng được: bấm **Open** là UNETI AI tự chuyển sang `https://javis.srvXXXX.hstgr.cloud` hoặc `https://srvXXXX.hstgr.cloud` (từ 0.302.0). **Cài đặt → Tên miền** cho biết link đã chạy chưa. Container `javis-gateway` đi kèm tự cấp HTTPS cho `DOMAIN_NAME` khi cổng 80/443 trống (từ 0.300.0); nhớ mở cổng 80, 443 ở tường lửa.
+VPS cài **Ubuntu 26** hay hệ điều hành trắng, không có Traefik của Hostinger: vẫn dán đúng link trên, bỏ trống `DOMAIN_NAME` cũng được: bấm **Open** là UNETI AI tự chuyển sang `https://uneti.srvXXXX.hstgr.cloud` hoặc `https://srvXXXX.hstgr.cloud` (từ 0.302.0). **Cài đặt → Tên miền** cho biết link đã chạy chưa. Container `uneti-gateway` đi kèm tự cấp HTTPS cho `DOMAIN_NAME` khi cổng 80/443 trống (từ 0.300.0); nhớ mở cổng 80, 443 ở tường lửa.
 
 Cập nhật bản mới: bấm **⬆ Cập nhật ngay** trong app (trang Cập nhật), hoặc **Redeploy** trong Docker Manager (image `:latest`, `pull_policy: always`). Dữ liệu brain giữ nguyên trong volume.
 
@@ -61,7 +61,7 @@ Mở http://localhost:7777. Muốn HTTPS qua Caddy: thêm `-f docker-compose.htt
 
 1. Cài Python 3.12 + Node 22.
 2. Trong thư mục dự án: `setup.bat` một lần - tạo .venv, cài deps, và cài sẵn hai engine CLI (Claude Code, Codex).
-3. `start-javis.bat` để chạy nền (tắt: `stop-javis.bat`).
+3. `start-uneti.bat` để chạy nền (tắt: `stop-uneti.bat`).
 4. Mở http://localhost:7777.
 
 ## Sau khi chạy
@@ -77,6 +77,6 @@ Xem [docs/README.md](docs/README.md) - hướng dẫn từng chức năng (chat/
 
 ## Sự cố hay gặp
 
-- **Nút cập nhật trong app không chạy trên Hostinger**: nút cần container `javis-watchtower` đi kèm (có sẵn từ 0.55.56). Stack hiện "Partially running" thì mở log container đó; không sửa được thì cập nhật bằng **Redeploy** trong Docker Manager.
+- **Nút cập nhật trong app không chạy trên Hostinger**: nút cần container `uneti-watchtower` đi kèm (có sẵn từ 0.55.56). Stack hiện "Partially running" thì mở log container đó; không sửa được thì cập nhật bằng **Redeploy** trong Docker Manager.
 - **ChatGPT/Codex báo "model không hỗ trợ"**: chọn model Codex hợp lệ ở trang Models (vd `gpt-5.5`), không dùng `gpt-5-mini`/`gpt-4o` (đó là model API, Codex account không chạy).
 - Thêm: [docs/17 - Khắc phục sự cố](docs/17-khac-phuc-su-co.md).

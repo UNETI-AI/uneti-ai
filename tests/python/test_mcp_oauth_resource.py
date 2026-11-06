@@ -3,14 +3,14 @@
     python tests/run.py mcp_oauth_resource      (no network)
 
 Reported with the official Spacemail MCP: the server is https://mcp.spacemail.com/mcp but its protected-resource metadata
-(RFC 9728) declares resource https://mcp.spacemail.com/. Javis sent the transport URL as the RFC 8707 `resource`, which the
+(RFC 9728) declares resource https://mcp.spacemail.com/. UNETI AI sent the transport URL as the RFC 8707 `resource`, which the
 authorization server answers with invalid_target. Its DCR also hands back a shared client ("starlight.mcp") whose callback
-allowlist does not hold Javis's callback, so the provider's sign-in page fails and never comes back to Javis.
+allowlist does not hold UNETI AI's callback, so the provider's sign-in page fails and never comes back to UNETI AI.
 
 This file guards:
   1. canonical_resource takes the declared resource only when it covers the MCP URL (same origin, path prefix).
   2. _discover keeps the declared resource; start_auth sends it, and the code exchange and refresh send the same value.
-  3. A DCR answer whose redirect_uris lack Javis's callback stops before the sign-in page, with an honest error.
+  3. A DCR answer whose redirect_uris lack UNETI AI's callback stops before the sign-in page, with an honest error.
 """
 from _paths import ROOT, SERVER  # noqa: E402,F401
 import asyncio
@@ -20,7 +20,7 @@ import tempfile
 import urllib.parse
 from unittest.mock import patch
 
-os.environ["JAVIS_STATE_DIR"] = tempfile.mkdtemp(prefix="javis-oauth-resource-")
+os.environ["UNETI_STATE_DIR"] = tempfile.mkdtemp(prefix="uneti-oauth-resource-")
 try:
     sys.stdout.reconfigure(encoding="utf-8")
 except Exception:
@@ -40,7 +40,7 @@ def check(name, cond, extra=""):
 
 
 MCP = "https://mcp.spacemail.com/mcp"
-REDIR = "https://javis.example/connect/oauth/callback"
+REDIR = "https://uneti.example/connect/oauth/callback"
 
 # ---- 1. canonical_resource
 cr = oauth_mcp.canonical_resource
@@ -135,14 +135,14 @@ async def flow():
         check("the refresh names the same resource", ref and ref[0].get("resource") == "https://mcp.spacemail.com/"
               and ref[0].get("grant_type") == "refresh_token", ref)
 
-    # ---- 3. a shared client that does not allow Javis's callback stops before the sign-in page
+    # ---- 3. a shared client that does not allow UNETI AI's callback stops before the sign-in page
     conn2, err = mcp_store.add_connection("custom", {"label": "Mail 2", "url": MCP, "auth": "oauth"})
     assert not err, err
     shared = {"client_id": "starlight.mcp", "redirect_uris": ["https://provider-app.example/callback"]}
     with patch.object(oauth_mcp.httpx, "AsyncClient", fake_client(shared)):
         r2 = await oauth_mcp.start_auth(conn2, REDIR)
     check("a callback mismatch is reported, no sign-in URL", r2.get("ok") is False and not r2.get("url"), r2)
-    check("the error names Javis's callback", REDIR in str(r2.get("error")), r2)
+    check("the error names UNETI AI's callback", REDIR in str(r2.get("error")), r2)
     check("the shared client is not saved for the next attempt",
           (oauth_mcp._load().get(conn2) or {}).get("client_id", "") == "")
     # CANARY: a DCR answer that does not list callbacks (many servers) still proceeds.

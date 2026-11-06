@@ -10,13 +10,13 @@ import sys
 import tempfile
 from pathlib import Path
 
-os.environ["JAVIS_STATE_DIR"] = tempfile.mkdtemp(prefix="javis-reminder-delivery-state-")
+os.environ["UNETI_STATE_DIR"] = tempfile.mkdtemp(prefix="uneti-reminder-delivery-state-")
 
 import reminders  # noqa: E402
 
 fails = []
 sent = []
-brain = Path(tempfile.mkdtemp(prefix="javis-reminder-delivery-brain-"))
+brain = Path(tempfile.mkdtemp(prefix="uneti-reminder-delivery-brain-"))
 
 
 def check(name, cond):
@@ -70,7 +70,7 @@ async def run():
     })
     check("task thành công gửi đúng phần kết quả", sent[-1] == ("123", answer))
     check("task thành công không lộ prompt nội bộ", internal not in sent[-1][1])
-    check("task thành công bỏ prefix 'Javis đã làm'", "Javis đã làm" not in sent[-1][1])
+    check("task thành công bỏ prefix 'UNETI AI đã làm'", "UNETI AI đã làm" not in sent[-1][1])
 
     async def task_error(_brain, _text, _muc_quyen=""):
         return "", "engine timeout"

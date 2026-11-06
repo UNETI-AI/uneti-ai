@@ -22,9 +22,9 @@ import tempfile
 from contextlib import closing
 from pathlib import Path
 
-os.environ["JAVIS_STATE_DIR"] = tempfile.mkdtemp(prefix="javis-fix-learn-")
-os.environ.pop("JAVIS_RESONANCE_CALL_CEILING", None)
-TEMP = Path(tempfile.mkdtemp(prefix="javis-fix-learn-w-"))
+os.environ["UNETI_STATE_DIR"] = tempfile.mkdtemp(prefix="uneti-fix-learn-")
+os.environ.pop("UNETI_RESONANCE_CALL_CEILING", None)
+TEMP = Path(tempfile.mkdtemp(prefix="uneti-fix-learn-w-"))
 
 import agent_budget as AB  # noqa: E402
 import agent_judge as AJ  # noqa: E402

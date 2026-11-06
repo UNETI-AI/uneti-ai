@@ -1,7 +1,7 @@
 """Plan usage limits (0.329.0): how much of the subscription's 5-hour and weekly allowance is used.
 
 The composer ring shows these two meters for the brains that run on a plan the user already pays
-for: Claude Code signed in to Pro/Max, and ChatGPT through Codex. Javis never reads either login
+for: Claude Code signed in to Pro/Max, and ChatGPT through Codex. UNETI AI never reads either login
 token, so the numbers come from what the two CLIs report on their own:
 
 - Claude Code sends a `rate_limit_event` in its stream after each request (hooked by `cai_vao_claude_sdk`). `rate_limit_info.raw`
@@ -199,7 +199,7 @@ def ghi_codex(snap: dict, now: float = None):
 
 
 def _codex_dir() -> str:
-    return os.getenv("JAVIS_CODEX_SESSIONS_DIR") or os.path.expanduser("~/.codex/sessions")
+    return os.getenv("UNETI_CODEX_SESSIONS_DIR") or os.path.expanduser("~/.codex/sessions")
 
 
 def _ngay_moi_nhat(goc: str, n: int) -> list:
@@ -246,7 +246,7 @@ def _doc_rollout(path: str) -> Optional[dict]:
 
 
 def quet_codex(now: float = None) -> Optional[dict]:
-    """Newest Codex rollout files (Codex used inside or outside Javis) -> the latest snapshot, if newer
+    """Newest Codex rollout files (Codex used inside or outside UNETI AI) -> the latest snapshot, if newer
     than what is stored. Only the 3 newest files are opened, and an unchanged file is not reread."""
     now = time.time() if now is None else now
     try:
@@ -317,7 +317,7 @@ def doc(now: float = None) -> dict:
 def ten_goi(raw: str, nha: str = "") -> str:
     """Name a plan CODE the provider sent ("max" -> "Max", "chatgpt_plus" -> "Plus", "SuperGrok" stays).
 
-    No name table in Javis's code (owner, 2026-11-04): vendors rename plans (Anthropic's Max 20x became
+    No name table in UNETI AI's code (owner, 2026-11-04): vendors rename plans (Anthropic's Max 20x became
     Ultra on 2026-10-30 under the same code "max"; OpenAI sells the code "prolite" as Pro), so a table
     here goes stale the day they do. Order: the vendor's own name (callers try `ten_goi_claude` first),
     then javis-store's catalog for provider `nha` (`plan_names`, refreshed without a release), then the
@@ -366,7 +366,7 @@ def ten_goi_claude(config_dir=None, email: str = "") -> str:
 
     Claude Code fetches the account profile itself and stores `organization.plan_display_name` as
     `oauthAccount.planDisplayName` in its config file `.claude.json`. That file holds no token (the
-    login lives in `.credentials.json` or the OS keyring), so Javis reads only that one field and never
+    login lives in `.credentials.json` or the OS keyring), so UNETI AI reads only that one field and never
     touches a credential. `email`: the account `claude auth status` reports; a config written by a
     different account is ignored instead of naming someone else's plan."""
     for f in _file_claude_json(config_dir):

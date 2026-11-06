@@ -2,7 +2,7 @@
 
     python tests/run.py cai_windows
 
-Ba triệu chứng chủ dự án gặp khi nhờ Claude cài Javis trên máy Windows mới (16/09), cả ba đều
+Ba triệu chứng chủ dự án gặp khi nhờ Claude cài UNETI AI trên máy Windows mới (16/09), cả ba đều
 cùng một gốc:
 
   1. Cài xong, mở localhost:7777, đăng nhập thì báo "thiếu CLI".
@@ -11,7 +11,7 @@ cùng một gốc:
   3. Có lúc còn báo thiếu claude-agent-sdk.
 
 Gốc bệnh:
-  - Javis dò binary bằng PATH cộng một danh sách thư mục mà TOÀN BỘ là đường Unix/mac
+  - UNETI AI dò binary bằng PATH cộng một danh sách thư mục mà TOÀN BỘ là đường Unix/mac
     (/opt/homebrew, ~/.npm-global...). Trên Windows danh sách đó vô dụng.
   - PATH trên Windows nằm trong registry và bị mọi installer ghi vào. `setx` CẮT PATH ở 1024
     ký tự, nên một installer khác (đúng như Antigravity) có thể xoá sạch `%APPDATA%\\npm` khỏi
@@ -33,7 +33,7 @@ import sys
 import tempfile
 from pathlib import Path
 
-os.environ["JAVIS_STATE_DIR"] = tempfile.mkdtemp(prefix="javis-caiwin-")
+os.environ["UNETI_STATE_DIR"] = tempfile.mkdtemp(prefix="uneti-caiwin-")
 
 import claude_cli as cc  # noqa: E402
 
@@ -57,25 +57,25 @@ def _binary_gia(thu_muc: Path, ten: str) -> Path:
 # ============================================================
 # 1. NHỚ chỗ đã thấy: PATH bị cắt cụt vẫn tìm ra binary còn trên ổ đĩa
 # ============================================================
-_bin_dir = Path(tempfile.mkdtemp(prefix="javis-fakebin-"))
-_fake = _binary_gia(_bin_dir, "javisfakecli")
+_bin_dir = Path(tempfile.mkdtemp(prefix="uneti-fakebin-"))
+_fake = _binary_gia(_bin_dir, "unetifakecli")
 _path_that = os.environ.get("PATH", "")
 os.environ["PATH"] = str(_bin_dir)
-check("tìm được binary trên PATH", cc.tim_binary("javisfakecli") == str(_fake))
+check("tìm được binary trên PATH", cc.tim_binary("unetifakecli") == str(_fake))
 
 # Đây là ca Antigravity: PATH bị một installer khác ghi đè/cắt cụt, binary KHÔNG mất.
-os.environ["PATH"] = str(Path(tempfile.mkdtemp(prefix="javis-empty-")))
+os.environ["PATH"] = str(Path(tempfile.mkdtemp(prefix="uneti-empty-")))
 cc._BIN_NHO["data"] = None          # tiến trình mới: đọc lại bản nhớ từ file
 check("PATH bị cắt cụt vẫn dùng lại được chỗ đã nhớ",
-      cc.tim_binary("javisfakecli") == str(_fake))
+      cc.tim_binary("unetifakecli") == str(_fake))
 check("bản nhớ ghi xuống file trong STATE_DIR",
-      (Path(os.environ["JAVIS_STATE_DIR"]) / "bin_paths.json").exists())
+      (Path(os.environ["UNETI_STATE_DIR"]) / "bin_paths.json").exists())
 
 # Gỡ THẬT thì phải báo là chưa cài - bản nhớ không được biến thành lời nói dối.
 _fake.unlink()
 cc._BIN_NHO["data"] = None
 check("gỡ CLI thật thì trả None, không giữ đường dẫn chết",
-      cc.tim_binary("javisfakecli") is None)
+      cc.tim_binary("unetifakecli") is None)
 os.environ["PATH"] = _path_that
 
 # ============================================================
@@ -89,7 +89,7 @@ check("danh sách thư mục Windows có npm global, nvm, volta, scoop",
 check("có cả %LOCALAPPDATA%\\npm, không chỉ %APPDATA%\\npm",
       any("LOCALAPPDATA" in m and "npm" in m for m in cc._THU_MUC_BIN_WINDOWS))
 # Bung biến môi trường: biến không tồn tại thì BỎ, không được trả về chuỗi còn dấu %.
-_tmp_appdata = tempfile.mkdtemp(prefix="javis-appdata-")
+_tmp_appdata = tempfile.mkdtemp(prefix="uneti-appdata-")
 os.environ["APPDATA"] = _tmp_appdata
 Path(_tmp_appdata, "npm").mkdir(exist_ok=True)
 os.environ.pop("NVM_SYMLINK", None)
@@ -102,25 +102,25 @@ check("biến môi trường không có thì bỏ, không trả chuỗi còn d�
 # ============================================================
 # 3. Env override cho cả bốn CLI (trước đây `claude` là cái duy nhất thiếu)
 # ============================================================
-_claude_gia = _binary_gia(Path(tempfile.mkdtemp(prefix="javis-cl-")), "claude-gia")
-os.environ["JAVIS_CLAUDE_BIN"] = str(_claude_gia)
-check("JAVIS_CLAUDE_BIN chỉ thẳng được đường dẫn lạ",
+_claude_gia = _binary_gia(Path(tempfile.mkdtemp(prefix="uneti-cl-")), "claude-gia")
+os.environ["UNETI_CLAUDE_BIN"] = str(_claude_gia)
+check("UNETI_CLAUDE_BIN chỉ thẳng được đường dẫn lạ",
       cc.find_claude_cli() == str(_claude_gia))
-os.environ.pop("JAVIS_CLAUDE_BIN", None)
+os.environ.pop("UNETI_CLAUDE_BIN", None)
 src_cc = (SERVER / "claude_cli.py").read_text(encoding="utf-8")
 src_agy = (SERVER / "antigravity_cli.py").read_text(encoding="utf-8")
 src_grok = (SERVER / "grok_cli.py").read_text(encoding="utf-8")
 check("cả bốn CLI đều có cửa thoát bằng biến môi trường",
-      "JAVIS_CLAUDE_BIN" in src_cc and "JAVIS_CODEX_BIN" in src_cc
-      and "JAVIS_AGY_BIN" in src_agy and "JAVIS_GROK_BIN" in src_grok)
+      "UNETI_CLAUDE_BIN" in src_cc and "UNETI_CODEX_BIN" in src_cc
+      and "UNETI_AGY_BIN" in src_agy and "UNETI_GROK_BIN" in src_grok)
 
 # ============================================================
 # 4. Câu báo thiếu CLI phải nói ĐỦ ba việc
 # ============================================================
 _cau = cc.cau_thieu_cli("claude", "Claude")
 check("câu báo có lệnh cài cụ thể", "npm install -g @anthropic-ai/claude-code" in _cau)
-check("câu báo nhắc KHỞI ĐỘNG LẠI JAVIS (tiến trình giữ PATH cũ)",
-      "KHỞI ĐỘNG LẠI JAVIS" in _cau)
+check("câu báo nhắc KHỞI ĐỘNG LẠI UNETI (tiến trình giữ PATH cũ)",
+      "KHỞI ĐỘNG LẠI UNETI" in _cau)
 check("câu báo giữ nguyên cụm cũ để người quen vẫn nhận ra", _cau.startswith("Claude CLI chưa cài"))
 for _t, _l in (("codex", "npm install -g @openai/codex"),
                ("agy", "antigravity.google/cli/install"),
@@ -169,14 +169,14 @@ _che = subprocess.run(["git", "check-ignore", "server/bin_paths.json"], cwd=ROOT
 check("bản nhớ bị .gitignore che (STATE_DIR mặc định là server/)", _che.returncode == 0)
 
 readme = (ROOT / "docs" / "i18n" / "vi" / "README.md").read_text(encoding="utf-8")
-readme_en = "install.ps1 restart javis"
+readme_en = "install.ps1 restart uneti"
 check("README nói một lệnh cài hết cho Windows", "install.ps1" in readme)
-check("README nhắc phải khởi động lại Javis khi cài thêm CLI",
-      "khởi động lại javis" in readme.lower())
+check("README nhắc phải khởi động lại UNETI AI khi cài thêm CLI",
+      "khởi động lại uneti" in readme.lower())
 check("README không còn mời Gemini CLI (đã gỡ ở 0.50.0)", "Gemini CLI" not in readme)
 # Từ 0.66.0 README.md gốc là tiếng Anh: ba điều trên phải đúng ở cả bản đó.
 check("README (en) nói một lệnh cài hết cho Windows", "install.ps1" in readme_en)
-check("README (en) nhắc phải khởi động lại Javis khi cài thêm CLI", "restart javis" in readme_en.lower())
+check("README (en) nhắc phải khởi động lại UNETI AI khi cài thêm CLI", "restart uneti" in readme_en.lower())
 check("README (en) không mời Gemini CLI", "Gemini CLI" not in readme_en)
 
 if _fails:

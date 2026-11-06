@@ -68,7 +68,7 @@
   var pure = { fmtTime: fmtTime, levelOf: levelOf, enterSendsFrom: enterSendsFrom, MAX_SECONDS: MAX_SECONDS };
   if (typeof module !== "undefined" && module.exports) module.exports = pure;
   if (typeof document === "undefined") return;
-  window.JavisComposerDictate = pure;
+  window.UnetiComposerDictate = pure;
 
   function tw(k) { return window.t ? window.t(k) : k; }
   // A finger, not a mouse: no Shift+Enter, an on-screen keyboard that comes up with focus.
@@ -101,7 +101,7 @@
     ctx: null, src: null, analyser: null, buf: null, raf: 0, levels: [], lastPush: 0 };
 
   function note(key) {
-    try { if (window.JavisNoteFlash) window.JavisNoteFlash(tw(key)); } catch (e) {}
+    try { if (window.UnetiNoteFlash) window.UnetiNoteFlash(tw(key)); } catch (e) {}
   }
 
   function inCall() {
@@ -225,7 +225,7 @@
   }
 
   function finished() {
-    var inp = $("chatInput"), send = S.sendAfter, D = window.JavisDictate;
+    var inp = $("chatInput"), send = S.sendAfter, D = window.UnetiDictate;
     S.dict = null;
     S.sendAfter = false;
     // The faded bubble goes first, so the real message (sent just below) takes its place and nothing is shown twice.
@@ -247,7 +247,7 @@
   }
 
   function start() {
-    var D = window.JavisDictate;
+    var D = window.UnetiDictate;
     if (!D) { note("dict.unsupported"); return; }
     if (S.state !== "idle") return;
     if (inCall()) { note("dict.in_call"); return; }
@@ -335,8 +335,8 @@
     window.addEventListener("keydown", function (e) {
       if (S.state === "idle") return;
       if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); cancel(); return; }
-      // Enter follows the chat's own rule (JavisActs.enterSends): a phone's Enter stays a new line here too.
-      var sends = window.JavisActs ? window.JavisActs.enterSends(e, false) : e.key === "Enter" && !e.shiftKey;
+      // Enter follows the chat's own rule (UnetiActs.enterSends): a phone's Enter stays a new line here too.
+      var sends = window.UnetiActs ? window.UnetiActs.enterSends(e, false) : e.key === "Enter" && !e.shiftKey;
       // Not only from the text box: the focus usually sits on the page (see the note at the top).
       if (sends && enterSendsFrom(e.target, { input: "chatInput", cancel: "dictCancel", stop: "dictStop" }, card)) {
         e.preventDefault(); e.stopPropagation(); sendNow();

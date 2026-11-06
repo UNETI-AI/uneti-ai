@@ -1,4 +1,4 @@
-# Javis Resonance: tiến độ và hướng triển khai hiện hành
+# UNETI AI Resonance: tiến độ và hướng triển khai hiện hành
 
 Cập nhật 08/10/2026. MVP M1–M5 đã phát hành trong 0.86.0 qua PR #587; main khi rà là 0.86.1 (`09f254d0`). Hướng tiếp theo theo yêu cầu chủ dự án: Cộng hưởng dành cho từng agent, có công tắc riêng, heartbeat thích nghi và học từ phản hồi.
 
@@ -8,7 +8,7 @@ Cập nhật 08/10/2026. MVP M1–M5 đã phát hành trong 0.86.0 qua PR #587; 
 |---|---|
 | [Phạm vi agent và lộ trình mới](specs/2026-10-08-resonance-agent-scope-roadmap.md) | Hướng sau MVP, bốn bất biến, A1–A5 và điều kiện nghiệm thu |
 | [Báo cáo rà tiến độ](../dev/resonance-progress-audit-2026-10-08.md) | Phần đã có trong mã, nền có thể tái dùng và khoảng trống bằng chứng |
-| Trang HTML theo dõi (`exports/javis-resonance-tien-do.html`, ngoài git, chỉ có trên máy chủ dự án) | Bản dễ đọc cho chủ dự án, tách phần đã phát hành và phần chưa làm |
+| Trang HTML theo dõi (`exports/uneti-resonance-tien-do.html`, ngoài git, chỉ có trên máy chủ dự án) | Bản dễ đọc cho chủ dự án, tách phần đã phát hành và phần chưa làm |
 
 ## Lộ trình hiện hành
 
@@ -18,7 +18,7 @@ Tiến độ 12/10/2026: A1 đã phát hành 0.87.0 (`fdfec7c5`, [biên bản](.
 
 ## MVP đã hoàn thành, giữ làm lịch sử
 
-- [Thiết kế 06/10](specs/2026-10-06-javis-resonance-design.md).
+- [Thiết kế 06/10](specs/2026-10-06-uneti-resonance-design.md).
 - [Kế hoạch M1–M5](plans/2026-10-06-resonance-00-mvp.md).
 - [Đối chiếu các bản cũ](specs/2026-10-06-resonance-revised-package-review.md).
 - Review nội dung pilot 5 (`exports/reviews/PR-579-pilot5-content-review.md`, ngoài git, chỉ có trên máy chủ dự án).

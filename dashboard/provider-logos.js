@@ -42,5 +42,5 @@
   }
   var api = { svg: svg, BY_PROVIDER: BY_PROVIDER, has: function (p) { return !!BY_PROVIDER[p]; } };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
-  if (typeof window !== "undefined") window.JavisProviderLogos = api;
+  if (typeof window !== "undefined") window.UnetiProviderLogos = api;
 })();

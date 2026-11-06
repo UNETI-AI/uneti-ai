@@ -1,5 +1,5 @@
 """
-MCP client của Javis - để MỌI bộ não (API/OAuth lẫn hub) dùng được MCP.
+MCP client của UNETI AI - để MỌI bộ não (API/OAuth lẫn hub) dùng được MCP.
 v2: SESSION POOL sống lâu giữa các tin nhắn (hết cảnh mỗi tool call mở session mới),
 thêm transport stdio (MCP local như javis-zalo, webcake-landing-mcp) và
 "internal" (cầu nối Python nội bộ như botcake_mcp).
@@ -37,7 +37,7 @@ def _owner_tz_env(own_env) -> dict:
 
     A POS or chat MCP that works out "today" by itself reads the process clock, and on a VPS that is UTC, so "orders
     today" asked at 6am in Vietnam returned yesterday's. Handing it the owner's timezone makes the server's own idea
-    of a day match Javis's. A connector that sets its own `TZ` keeps it. Not on Windows: its C runtime reads `TZ` in
+    of a day match UNETI AI's. A connector that sets its own `TZ` keeps it. Not on Windows: its C runtime reads `TZ` in
     the POSIX "EST5EDT" form and would misread an IANA name, which is worse than the machine's local time.
     """
     if os.name == "nt" or "TZ" in (own_env or {}):
@@ -165,7 +165,7 @@ class McpHttpSession:
         Đây là chỗ đã gây ra vụ 03/09/2026 (Pancake POS "Làng Chài Xưa"): máy chủ MCP có
         quyền XOÁ PHIÊN bất cứ lúc nào - hết hạn, họ deploy lại, hoặc bộ cân tải đưa ta
         sang máy khác - và chuẩn quy định lúc đó máy chủ trả 404 còn CLIENT PHẢI TỰ BẮT TAY
-        LẠI. Javis trước đây không hề đọc mã HTTP, nên 404 kèm thân JSON-RPC được `r.json()`
+        LẠI. UNETI AI trước đây không hề đọc mã HTTP, nên 404 kèm thân JSON-RPC được `r.json()`
         nuốt gọn thành một phản hồi bình thường, `tools/list` trả `[]` mà KHÔNG ném lỗi.
 
         Hậu quả dây chuyền, không có lấy một dòng lỗi ở đâu:
@@ -175,7 +175,7 @@ class McpHttpSession:
           - `discover_resolved` thấy 0 tool thì `continue`, KHÔNG ghi vào `bo_qua` → hub
             tưởng vòng dò đủ, đóng băng danh sách thiếu nguồn suốt 60 giây.
           - `connect_health` thấy không có ngoại lệ → `ok=True, tools=0` → trang Kết nối
-            chấm XANH ghi "Hoạt động bình thường (0 công cụ)", `javis_connections` báo "ổn".
+            chấm XANH ghi "Hoạt động bình thường (0 công cụ)", `uneti_connections` báo "ổn".
         Đúng cảnh chủ repo gặp nhiều lần: kết nối xanh, quyền đủ, mà không bộ não nào tìm ra
         một tool POS nào, rồi "để 15-20 phút tự hết" - chính là lúc phiên chết bị dọn.
         """
@@ -208,7 +208,7 @@ class McpHttpSession:
         """
         res = await self._rpc("initialize", {
             "protocolVersion": PROTOCOL, "capabilities": {},
-            "clientInfo": {"name": "javis-os", "version": "1.0"},
+            "clientInfo": {"name": "uneti-ai", "version": "1.0"},
         }, cho_lam_moi=False)
         if isinstance(res, dict) and res.get("error"):
             raise McpHttpError("initialize lỗi: "
@@ -292,7 +292,7 @@ class McpHttpSession:
 def npx_node_argv(resolved) -> list | None:
     """`npx.cmd` -> `[node.exe, npx-cli.js]` of the same Node install, so Windows never routes npx through cmd.exe.
 
-    Why (#898, item 2): `cmd.exe /c "C:\\Program Files\\nodejs\\npx.cmd" --user-data-dir "C:\\My Javis\\x"` loses its
+    Why (#898, item 2): `cmd.exe /c "C:\\Program Files\\nodejs\\npx.cmd" --user-data-dir "C:\\My UNETI\\x"` loses its
     quotes: when the command line after /c starts with a quote, cmd strips the first and the last one, and the
     connector died with "'C:\\Program' is not recognized". The default Node install lives in "Program Files", so
     any argument with a space broke. cmd also expands `% ^ & |` in arguments. zalo_cli.npx_command does the same.
@@ -344,7 +344,7 @@ class McpStdioSession:
         return self._init_task is not None and not self._init_task.done()
 
     def _argv(self):
-        # Tìm cả trong Scripts/bin của venv Javis: uvx/uv cài theo requirements nằm ở đó
+        # Tìm cả trong Scripts/bin của venv UNETI AI: uvx/uv cài theo requirements nằm ở đó
         # (PATH hệ thống thường không có) → connector PyPI (uvx ...) chạy được out-of-the-box.
         venv_bin = str(Path(sys.executable).parent)
         search = venv_bin + os.pathsep + os.environ.get("PATH", "")
@@ -480,7 +480,7 @@ class McpStdioSession:
                 continue   # noise (log npx...) → bỏ qua
             if obj.get("id") == msg["id"]:
                 return obj
-            # notification/request từ server → bỏ qua (Javis không hỗ trợ sampling)
+            # notification/request từ server → bỏ qua (UNETI AI không hỗ trợ sampling)
 
     async def ensure_init(self):
         """Run the MCP handshake once per process, in a task of its own.
@@ -514,11 +514,11 @@ class McpStdioSession:
             folder = self.npx_check.get("dir") if self._cold_start else None
             npx_cache.claim(folder)
             try:
-                timeout = (_env_seconds("JAVIS_MCP_INSTALL_TIMEOUT", _INSTALL_TIMEOUT) if self._cold_start
-                           else _env_seconds("JAVIS_MCP_INIT_TIMEOUT", _INIT_TIMEOUT))
+                timeout = (_env_seconds("UNETI_MCP_INSTALL_TIMEOUT", _INSTALL_TIMEOUT) if self._cold_start
+                           else _env_seconds("UNETI_MCP_INIT_TIMEOUT", _INIT_TIMEOUT))
                 await self._rpc("initialize", {
                     "protocolVersion": PROTOCOL, "capabilities": {},
-                    "clientInfo": {"name": "javis-os", "version": "1.0"},
+                    "clientInfo": {"name": "uneti-ai", "version": "1.0"},
                 }, timeout=timeout)
                 await self._rpc("notifications/initialized", notify=True)
                 self._init_done = True
@@ -930,7 +930,7 @@ class SessionPool:
         down = self._down.get(key)
         if down and down[1] == h and time.time() - down[0] < _DOWN_TTL:
             return (f"ERROR: nguồn {spec.get('label') or key} vừa không khởi động được "
-                    f"({down[2]}). Javis tạm ngừng gọi nguồn này {_DOWN_TTL} giây, đừng gọi lại "
+                    f"({down[2]}). UNETI AI tạm ngừng gọi nguồn này {_DOWN_TTL} giây, đừng gọi lại "
                     "liên tục: báo người dùng bấm Kiểm tra ở trang Kết nối.")
         started = [False]
 
@@ -1048,7 +1048,7 @@ def tran_dial():
     Bỏ nguồn chậm ở vòng này KHÔNG mất gì lâu dài: cache hub hết hạn sau 60s là dò lại, và
     nguồn khoẻ vẫn lên tool đầy đủ ngay lượt đó.
     """
-    raw = os.getenv("JAVIS_MCP_DISCOVER_TIMEOUT", _DIAL_TRAN)
+    raw = os.getenv("UNETI_MCP_DISCOVER_TIMEOUT", _DIAL_TRAN)
     try:
         v = float(raw)
     except (TypeError, ValueError):
@@ -1067,7 +1067,7 @@ def tran_warm():
     Docker mất sạch cache npm/uv sau mỗi lần đổi ảnh), và máy chủ HTTP phía dịch vụ cũng
     phải dựng lại phiên từ đầu.
     """
-    raw = os.getenv("JAVIS_MCP_WARM_TIMEOUT", _WARM_TRAN)
+    raw = os.getenv("UNETI_MCP_WARM_TIMEOUT", _WARM_TRAN)
     try:
         v = float(raw)
     except (TypeError, ValueError):
@@ -1178,7 +1178,7 @@ async def discover_resolved(conns, bo_qua=None):
                 #     cây tiến trình, tức là giết luôn cái đơn đang lên dở - đúng lỗi "lên đơn
                 #     thứ 2 là rớt kết nối" khách của chủ repo báo 01/09/2026. Giữ phiên, và trả
                 #     lại danh sách tool lần dò trước để nguồn KHÔNG biến mất khỏi hộp công cụ
-                #     chỉ vì nó đang bận (biến mất là Javis nói "chưa đấu POS", cũng sai nốt).
+                #     chỉ vì nó đang bận (biến mất là UNETI AI nói "chưa đấu POS", cũng sai nốt).
                 # (b) Server thật sự treo giữa một request: huỷ từ ngoài để lại nửa câu trả lời
                 #     trong ống, lần sau đọc là lệch pha vĩnh viễn - vứt phiên, đừng tái dùng.
                 if pool.dang_goi_tool(spec):
@@ -1214,7 +1214,7 @@ async def discover_resolved(conns, bo_qua=None):
             # Dial được mà KHÔNG có tool nào là một dạng hỏng, không phải một trạng thái bình
             # thường: nguồn có máy chủ thật thì nó phải có tool, bằng không nó vô dụng. Ghi vào
             # `bo_qua` để hub biết vòng dò này THIẾU và chỉ cache 10 giây (thay vì đóng băng 60
-            # giây một danh sách vắng nguồn), và để `javis_connections` nói thật với model thay
+            # giây một danh sách vắng nguồn), và để `uneti_connections` nói thật với model thay
             # vì im lặng. Connector ảo (không có gì để dial) không tính - nó vốn không có tool.
             if bo_qua is not None and co_server_de_dial(spec):
                 bo_qua.add(conn["id"])

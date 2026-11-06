@@ -1,0 +1,12 @@
+name: GitHub trong khung chat
+name_en: "GitHub in chat"
+slug: uneti-github
+version: 1.0.0
+description: Xem trạng thái repo GitHub của khung chat (nhánh, PR, CI, merge) và xếp việc kế tiếp để UNETI AI tự làm khi PR hiện tại đã merge xong.
+description_en: "Shows the chat's GitHub repos (branch, PR, CI, merge) and queues the next job, which UNETI AI starts on its own once the current PR is merged."
+author: UNETI AI (bundled)
+enabled: true
+min_mode: safe
+tools:
+  - uneti_github
+hooks: []

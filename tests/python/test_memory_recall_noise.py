@@ -17,7 +17,7 @@ import tempfile
 from pathlib import Path
 from types import SimpleNamespace
 
-os.environ.setdefault("JAVIS_STATE_DIR", tempfile.mkdtemp(prefix="javis-memory-noise-"))
+os.environ.setdefault("UNETI_STATE_DIR", tempfile.mkdtemp(prefix="uneti-memory-noise-"))
 
 from capability_registry import brain_scope  # noqa: E402
 import memory_index  # noqa: E402
@@ -99,7 +99,7 @@ def test_always_on_path_rule():
     assert on("memory/facts/profile-chu-shop.md")
     assert on("memory/profile/ten.md")
     assert on("memory/core-facts.md")
-    assert not on("memory/facts/reference-javis-google-business-profile.md")
+    assert not on("memory/facts/reference-uneti-google-business-profile.md")
     assert not on("memory/facts/identityless.md")
 
 

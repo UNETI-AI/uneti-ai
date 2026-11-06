@@ -22,7 +22,7 @@ The canonical copy lives at `skills/<slug>/SKILL.md`, which is exactly what the 
 
 This is where people get stuck without knowing why. When you click **💾 Save**, the server checks `description` and **refuses to save** if it breaks either rule:
 
-**1. At most 150 characters.** This is not cosmetic. UNETI AI truncates the description at exactly 150 characters when injecting it into the system prompt and into the `javis_use_skill` tool description, so the excess is lost silently and the skill cannot be routed. The rejection message says exactly that, and tells you to move trigger examples into a `## When to use` section in the body.
+**1. At most 150 characters.** This is not cosmetic. UNETI AI truncates the description at exactly 150 characters when injecting it into the system prompt and into the `uneti_use_skill` tool description, so the excess is lost silently and the skill cannot be routed. The rejection message says exactly that, and tells you to move trigger examples into a `## When to use` section in the body.
 
 **2. No hollow opening phrases.** Blocked openings include "Activate when...", "Use this skill when...", "This skill is used for..." and their Vietnamese equivalents. Every skill opens the same way, so that phrase burns character budget without distinguishing anything. The rejection message suggests the right shape: state the capability directly, for example "Summarise meeting minutes into a task list."
 
@@ -32,11 +32,11 @@ These rules apply both to the dashboard form and to skills proposed by the **Sel
 
 ## How triggering works
 
-A skill activates on its `description` (and you can also call it by hand, see the next section). When you type or say a request, UNETI AI matches it against the `description` of every enabled skill and loads the matching instruction. On Claude Code that is a native load; on other engines UNETI AI injects the skill list into the system prompt and loads through the `javis_use_skill` tool.
+A skill activates on its `description` (and you can also call it by hand, see the next section). When you type or say a request, UNETI AI matches it against the `description` of every enabled skill and loads the matching instruction. On Claude Code that is a native load; on other engines UNETI AI injects the skill list into the system prompt and loads through the `uneti_use_skill` tool.
 
 So a skill's quality depends heavily on how you write `description`. A description that states the capability and the right keywords fires at the right time. A vague description either never fires or fires on the wrong thing.
 
-Note: skills work on **every engine**. Claude Code loads natively; ChatGPT/Codex, OpenRouter and the OpenAI/Anthropic/Google Gemini APIs use skills through the router (UNETI AI injects the skill list into the system prompt) plus the `javis_use_skill` tool. See [Models & engines](10-models-and-engines.md) for the per-engine details.
+Note: skills work on **every engine**. Claude Code loads natively; ChatGPT/Codex, OpenRouter and the OpenAI/Anthropic/Google Gemini APIs use skills through the router (UNETI AI injects the skill list into the system prompt) plus the `uneti_use_skill` tool. See [Models & engines](10-models-and-engines.md) for the per-engine details.
 
 ## Calling a skill by hand: the "/" command menu
 
@@ -53,9 +53,9 @@ On Telegram, sending `/<slug>` (with content after it if needed) produces the sa
 
 ## The router's 20-skill ceiling
 
-The skill list UNETI AI injects into the system prompt and into the `javis_use_skill` tool description is **cut at 20 skills**. The rest collapses into a single line: "…(+N more skills, see `Javis/index.md`)".
+The skill list UNETI AI injects into the system prompt and into the `uneti_use_skill` tool description is **cut at 20 skills**. The rest collapses into a single line: "…(+N more skills, see `UNETI/index.md`)".
 
-The consequence: if your brain enables more than 20 skills, skills 21 and beyond are **not in the router**, so on router-based engines (ChatGPT/Codex, OpenRouter, OpenAI/Anthropic/Google Gemini API) they will not self-activate. They are still intact and still loadable: calling `/slug` by hand works normally, because the `javis_use_skill` tool accepts any enabled slug, not just the 20 listed.
+The consequence: if your brain enables more than 20 skills, skills 21 and beyond are **not in the router**, so on router-based engines (ChatGPT/Codex, OpenRouter, OpenAI/Anthropic/Google Gemini API) they will not self-activate. They are still intact and still loadable: calling `/slug` by hand works normally, because the `uneti_use_skill` tool accepts any enabled slug, not just the 20 listed.
 
 The fix: turn off skills you do not use so the 20 router slots go to the ones you actually want UNETI AI to catch on its own.
 
@@ -67,7 +67,7 @@ UNETI AI has 2 kinds of skill:
 
   | Slug | What it does |
   |---|---|
-  | `javis-builder` | Create or edit a UNETI AI capability: agent, skill, workflow, loop, plugin |
+  | `uneti-builder` | Create or edit a UNETI AI capability: agent, skill, workflow, loop, plugin |
   | `ingest-source` | Digest a raw source into the Second Brain, distilled into wiki knowledge |
   | `query-wiki` | Mine knowledge in the Second Brain, answering with citations |
   | `lint-wiki` | Audit wiki health and return a list of issues |
@@ -89,7 +89,7 @@ These two are easy to confuse because both sit in the **Capabilities** group in 
 | Nature | **KNOW-HOW**: a file of instructions the AI reads and follows | **Real Python CODE** running inside the server process |
 | What it produces | A procedure, a template, a set of rules | A new **tool** every engine can call, and/or a **hook** running around each tool call |
 | Where it lives | `skills/<slug>/SKILL.md` in the brain | The `plugins/<slug>/` folder (`plugin.yaml` + `plugin.py`) |
-| How to enable | Tick the checkbox on the card | Also tick the checkbox on the card. A machine with `JAVIS_ENABLE_USER_PLUGINS=false` does not run plugins you install |
+| How to enable | Tick the checkbox on the card | Also tick the checkbox on the card. A machine with `UNETI_ENABLE_USER_PLUGINS=false` does not run plugins you install |
 
 How to choose: if you need **instructions** for working with existing tools, write a Skill. If you need a **specific Python action** no source covers (a computation, a data transformation, a simple API call), write a Plugin. And if it is an external data source that already has a server, connect an MCP on the Connections page rather than writing a plugin. Details in [Plugins](20-plugins.md) and [Connections & business data](09-connections-and-business-data.md).
 
@@ -126,9 +126,9 @@ At the end of the group · slug line, UNETI AI shows one of two labels:
 - **"used N times, last on <date>"** when the skill has been loaded at least once.
 - **"no usage seen"** (dim, italic) when 30 days have passed with no usage signal.
 
-This is a **one-way positive signal** and needs to be read correctly so a skill is not condemned unfairly: UNETI AI can only count loads that go through the `javis_use_skill` tool. Claude Code loading a skill natively through `.claude/skills` does **not** pass the counter. So "used N times" is certainly true, while "no usage seen" only means there is no evidence, **not** that the skill is useless. Hovering the label shows this explanation. Nothing is disabled or deleted based on this label; you decide.
+This is a **one-way positive signal** and needs to be read correctly so a skill is not condemned unfairly: UNETI AI can only count loads that go through the `uneti_use_skill` tool. Claude Code loading a skill natively through `.claude/skills` does **not** pass the counter. So "used N times" is certainly true, while "no usage seen" only means there is no evidence, **not** that the skill is useless. Hovering the label shows this explanation. Nothing is disabled or deleted based on this label; you decide.
 
-The figures are stored in `Javis/skill-usage.json` in the brain, separate from `SKILL.md`, so using a skill does not create junk changes in the brain's git history.
+The figures are stored in `UNETI/skill-usage.json` in the brain, separate from `SKILL.md`, so using a skill does not create junk changes in the brain's git history.
 
 ## Searching skills
 
@@ -224,7 +224,7 @@ On the **Agents** page, creating or editing an agent shows a **Skills** section 
 | The **system** badge | A skill that ships with the app, exists in every brain, can be disabled but not deleted |
 | A dimmed card | The skill is disabled |
 | The "x/y enabled" line | x skills on out of y |
-| "used N times, last on …" | The skill was loaded through `javis_use_skill` N times |
+| "used N times, last on …" | The skill was loaded through `uneti_use_skill` N times |
 | "no usage seen" | No usage signal for over 30 days; a hint, not a verdict |
 
 ## Tips
@@ -243,7 +243,7 @@ On the **Agents** page, creating or editing an agent shows a **Skills** section 
 - **You created a skill but UNETI AI never uses it:** check three things in order. One, is it **enabled** (card not dimmed, checkbox ticked). Two, does `description` state the capability. Three, does the brain have more than 20 skills enabled; if so, yours may have fallen outside the router, so disable some others or call it by hand with `/slug`.
 - **The list is empty although you created skills:** make sure you are looking at the right brain. The source is the selected brain's `skills/`; switching brains switches the list.
 - **Toggling reports that the state could not be changed:** usually folder write permissions or a locked folder. See [Troubleshooting & FAQ](17-troubleshooting.md).
-- **A skill reads "no usage seen" although you know it runs:** that is normal. UNETI AI can only count loads through `javis_use_skill`; Claude Code's native loading bypasses the counter. Do not delete a skill over that label.
+- **A skill reads "no usage seen" although you know it runs:** that is normal. UNETI AI can only count loads through `uneti_use_skill`; Claude Code's native loading bypasses the counter. Do not delete a skill over that label.
 - **A skill card has no Delete button:** it is a system skill. To stop using it, disable it.
 - **You deleted one by accident:** deletion is final and cannot be recovered from the dashboard. Next time, disable rather than delete when you only want a pause.
 - **The group fell into "Chung":** the Group field was empty when you saved. Click **Edit** and fill it in.
@@ -252,7 +252,7 @@ On the **Agents** page, creating or editing an agent shows a **Skills** section 
 
 - [Agents & Workflows](07-agents-and-workflows.md) - assigning skills to agents, building step chains, exporting and importing with dependencies.
 - [Plugins](20-plugins.md) - when you need a tool that runs real code rather than an instruction.
-- [Models & engines](10-models-and-engines.md) - skills run on every engine; see the difference between native (Claude Code) and router (`javis_use_skill`).
+- [Models & engines](10-models-and-engines.md) - skills run on every engine; see the difference between native (Claude Code) and router (`uneti_use_skill`).
 - [Chat & voice](02-chat-and-voice.md) - asking UNETI AI to create a skill in words, and the "/" command menu.
 - [Self-learning](22-self-learning.md) - where UNETI AI proposes new skills from past conversations.
 - [Second Brain: memory, Wiki, INGEST](13-second-brain.md) - understanding the brain that stores skills.

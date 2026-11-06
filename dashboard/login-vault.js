@@ -1,7 +1,7 @@
 /* Cookies page, once "Kho đăng nhập" / Login vault (0.251.0; renamed and given a file upload in 0.261.0).
  *
  * The owner signs in on their own browser, exports that site's cookies and pastes them here. The server
- * (server/login_vault.py) encrypts them; Javis then opens pages behind that sign-in (tool javis_login) and
+ * (server/login_vault.py) encrypts them; UNETI AI then opens pages behind that sign-in (tool uneti_login) and
  * page watches can use it. This page adds, checks, updates, switches off and deletes sign-ins. It never
  * receives a cookie back from the server: the list carries names, domains and status only. A cookie file
  * (Cookie-Editor JSON, cookies.txt) is read in the browser and goes in as the same text a paste would.
@@ -27,7 +27,7 @@
   var ic = function (n) { return (typeof window !== "undefined" && window.ic) ? window.ic(n) : ""; };
   // (i) with its own words, for a spot with no title beside it (0.432.0: the page header already says Cookies).
   function infoPair(html, label) {
-    var J = typeof window !== "undefined" && window.JavisInfo;
+    var J = typeof window !== "undefined" && window.UnetiInfo;
     return J ? J.pair(html, label) : '<div class="info-body">' + html + "</div>";
   }
 
@@ -321,6 +321,6 @@
 
   var api_ = { mount: mount, introHtml: introHtml, cardHtml: cardHtml, expiryText: expiryText, needsSite: needsSite, pasteFormHtml: pasteFormHtml,
     nameFromFile: nameFromFile };
-  if (typeof window !== "undefined") window.JavisLoginVault = api_;
+  if (typeof window !== "undefined") window.UnetiLoginVault = api_;
   if (typeof module !== "undefined" && module.exports) module.exports = api_;
 })();

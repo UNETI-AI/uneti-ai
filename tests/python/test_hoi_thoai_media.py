@@ -12,9 +12,9 @@ import os
 import sys
 import tempfile
 
-_STATE = tempfile.mkdtemp(prefix="javis-ht-media-")
-_BRAINS = tempfile.mkdtemp(prefix="javis-ht-media-brains-")
-os.environ["JAVIS_STATE_DIR"] = _STATE
+_STATE = tempfile.mkdtemp(prefix="uneti-ht-media-")
+_BRAINS = tempfile.mkdtemp(prefix="uneti-ht-media-brains-")
+os.environ["UNETI_STATE_DIR"] = _STATE
 os.environ["BRAINS_DIR"] = _BRAINS
 
 BRAIN = os.path.join(_BRAINS, "brain")

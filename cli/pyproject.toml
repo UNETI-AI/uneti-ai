@@ -3,17 +3,17 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "javis-cli"
+name = "uneti-cli"
 version = "0.17.0"
-description = "Javis CLI - nói chuyện với Javis OS từ terminal"
+description = "UNETI AI CLI - nói chuyện với UNETI AI từ terminal"
 readme = "README.md"
 requires-python = ">=3.9"
 license = { text = "MIT" }
-authors = [{ name = "Javis OS" }]
-keywords = ["javis", "cli", "ai", "agent", "second-brain"]
+authors = [{ name = "UNETI AI" }]
+keywords = ["uneti", "cli", "ai", "agent", "second-brain"]
 
 # CHỈ httpx. Đây là một luật, không phải sự tình cờ: gói này phải cài được trên máy chưa từng
-# có Javis, và mọi thứ kéo thêm (fastapi, uvicorn, rich...) đều là thứ người dùng phải tải về
+# có UNETI AI, và mọi thứ kéo thêm (fastapi, uvicorn, rich...) đều là thứ người dùng phải tải về
 # chỉ để gõ một câu hỏi. Có test canh đúng danh sách này.
 dependencies = ["httpx>=0.24"]
 
@@ -22,7 +22,7 @@ Homepage = "https://github.com/uneti-ai/uneti-ai"
 Documentation = "https://github.com/uneti-ai/uneti-ai/blob/main/docs/dev/2026-08-cli-spec.md"
 
 [project.scripts]
-javis = "javis_cli.__main__:main"
+uneti = "uneti_cli.__main__:main"
 
 [tool.setuptools.packages.find]
-include = ["javis_cli*"]
+include = ["uneti_cli*"]

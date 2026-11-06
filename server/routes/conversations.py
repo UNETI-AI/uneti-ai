@@ -2,7 +2,7 @@
 
 Danh sách hội thoại, lịch sử tin, đánh dấu đã đọc, `mode` để người thật TIẾP QUẢN một cuộc
 chat (bot im) và trả lại cho AI (phần chạy thật nằm ở `chatbot_runtime`, xem `che_do`), và từ
-0.61.0 `reply`: chủ trả lời khách NGAY TỪ JAVIS qua năng lực gửi của kênh (sổ `channels`).
+0.61.0 `reply`: chủ trả lời khách NGAY TỪ UNETI qua năng lực gửi của kênh (sổ `channels`).
 
 Kênh và tài khoản kênh có API riêng ở `routes/channels.py`; hai đường cũ
 `/conversations/channels` và `/conversations/zalo/{id}/watch` giữ làm bí danh cho bookmark cũ.
@@ -81,7 +81,7 @@ def register(app, deps: ConversationsDeps):
 
         `tieng_vong=True`: trên Zalo cá nhân phải nhớ câu vừa gửi TRƯỚC khi gửi, y như `Transport._gui`, không thì vòng đọc thấy nó
         quay về như tin của chính chủ (bot tưởng chủ vừa nhắn tay nên im cả quãng) hoặc như tin của một khách (bot tự trả lời chính
-        mình trong nhóm). Câu CHỦ gõ ở Hộp thư cũng bật cờ này (0.108.0): Javis đã tự ghi câu đó, và từ javis-zalo 1.3.0 tin của
+        mình trong nhóm). Câu CHỦ gõ ở Hộp thư cũng bật cờ này (0.108.0): UNETI AI đã tự ghi câu đó, và từ javis-zalo 1.3.0 tin của
         chính tài khoản quay về vòng đọc kèm `isSelf`, nên không nhớ thì Hộp thư hiện câu chủ gõ HAI lần.
 
         `reply_to` (tin khách bot đang trả lời): trong nhóm Zalo cá nhân, câu của bot tag đúng người gửi tin đó, y như bot tự trả lời."""
@@ -502,7 +502,7 @@ def register(app, deps: ConversationsDeps):
             "external_chat_id": c.get("external_chat_id"), "chat_type": c.get("chat_type"),
             "chat_title": c.get("title") if c.get("chat_type") == "group" else "",
             "sender_type": "human", "sender_name": "Bạn", "message_type": "text", "text": txt,
-            "metadata": {"tu_javis": True},
+            "metadata": {"tu_uneti": True},
         })
         tiep_quan = False
         if c.get("bot_id") and str(c.get("mode") or "ai") == "ai":
@@ -567,7 +567,7 @@ def register(app, deps: ConversationsDeps):
                 "bot_id": c.get("bot_id") or "", "sender_type": "human", "sender_name": "Bạn", "message_type": "text",
                 "text": txt}
         conversations.ghi_su_kien({**base, "external_chat_id": chat, "chat_type": c.get("chat_type") or "private",
-                                   "metadata": {"tu_javis": True, "private_reply_to": cid}})
+                                   "metadata": {"tu_uneti": True, "private_reply_to": cid}})
         dm_id = 0
         psid = r.get("recipient_id") or ""
         if psid and instagram:
@@ -577,7 +577,7 @@ def register(app, deps: ConversationsDeps):
             who = str(c.get("customer_name") or target.get("sender_name") or "")
             d = conversations.ghi_su_kien({**base, "external_chat_id": psid, "chat_type": "private", "chat_title": who,
                                            "external_message_id": r.get("message_id") or "",
-                                           "metadata": {"tu_javis": True, "from_comment": cid}}, dem_chua_doc=False)
+                                           "metadata": {"tu_uneti": True, "from_comment": cid}}, dem_chua_doc=False)
             dm_id = int(d.get("conversation_id") or 0)
             if dm_id and c.get("bot_id"):
                 dm = conversations.chi_tiet(dm_id) or {}
@@ -783,7 +783,7 @@ def register(app, deps: ConversationsDeps):
                 "bot_id": c.get("bot_id") or "", "external_chat_id": c.get("external_chat_id"), "chat_type": c.get("chat_type"),
                 "chat_title": c.get("title") if c.get("chat_type") == "group" else "",
                 "sender_type": "ai", "sender_name": "Bot", "message_type": "text", "text": txt,
-                "metadata": {"tu_javis": True, "draft": True},
+                "metadata": {"tu_uneti": True, "draft": True},
             })
         conversations.clear_draft(conv_id)
         return {"ok": True, "conversation": _detail_with_state(conv_id)}

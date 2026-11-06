@@ -63,7 +63,7 @@ check("switching a tab does not rebuild the popup", /function switchTab[\s\S]*?\
 check("Esc steps back from a run before it closes", js.includes("if (sub && !sub.hidden) { hideSub(); return; }"));
 check("a refresh keeps the popup open and redraws its head in place", js.includes('M.el.querySelector(".wh-dhead").innerHTML = headHtml(h, M.tab)'));
 check("leaving the page closes the popup", js.includes("function unmount()") && fs.readFileSync(path.join(__dirname, "../../dashboard/console.js"), "utf8")
-  .includes("window.JavisWebhooks.unmount()"));
+  .includes("window.UnetiWebhooks.unmount()"));
 
 // The page draws no title of its own: the page header already says Webhook.
 check("no in-page title", !js.includes('"wh.head"') && !("wh.head" in vi) && !("wh.head" in en));

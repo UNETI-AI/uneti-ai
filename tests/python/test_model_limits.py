@@ -15,7 +15,7 @@ import os
 import sys
 import tempfile
 
-os.environ["JAVIS_STATE_DIR"] = tempfile.mkdtemp(prefix="javis-limits-")
+os.environ["UNETI_STATE_DIR"] = tempfile.mkdtemp(prefix="uneti-limits-")
 
 import config as cfg  # noqa: E402
 import fast_path_runtime  # noqa: E402

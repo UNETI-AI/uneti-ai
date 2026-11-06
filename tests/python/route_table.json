@@ -1424,8 +1424,8 @@
  {
   "order": 142,
   "type": "APIRoute",
-  "path": "/javis-core/session",
-  "name": "javis_core_session",
+  "path": "/uneti-ai-core/session",
+  "name": "uneti_core_session",
   "methods": [
    "POST"
   ],
@@ -1434,8 +1434,8 @@
  {
   "order": 143,
   "type": "APIRoute",
-  "path": "/javis-core/model",
-  "name": "javis_core_model_get",
+  "path": "/uneti-ai-core/model",
+  "name": "uneti_core_model_get",
   "methods": [
    "GET"
   ],
@@ -1444,8 +1444,8 @@
  {
   "order": 144,
   "type": "APIRoute",
-  "path": "/javis-core/model",
-  "name": "javis_core_model_set",
+  "path": "/uneti-ai-core/model",
+  "name": "uneti_core_model_set",
   "methods": [
    "POST"
   ],
@@ -3232,8 +3232,8 @@
  {
   "order": 324,
   "type": "APIRoute",
-  "path": "/javis/index",
-  "name": "javis_index",
+  "path": "/uneti/index",
+  "name": "uneti_index",
   "methods": [
    "GET"
   ],
@@ -3412,8 +3412,8 @@
  {
   "order": 342,
   "type": "APIRoute",
-  "path": "/javis-core/cite",
-  "name": "javis_core_cite",
+  "path": "/uneti-ai-core/cite",
+  "name": "uneti_core_cite",
   "methods": [
    "POST"
   ],

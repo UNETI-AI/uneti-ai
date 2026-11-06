@@ -21,7 +21,7 @@ Muốn viết code thì không cần trang riêng: gắn một thư mục vào b
 2. Rail điều hướng bên trái, mở nhóm **Code**, bấm mục **Terminal**.
 3. Terminal tự mở và tự nối. Bấm vào khung đen rồi gõ như terminal bình thường.
 
-Shell mở sẵn ở **thư mục HOME của user đang chạy UNETI AI** - đúng như một terminal bình thường của máy, hợp nhất cho việc chính của tab này: cài và đăng nhập CLI (`agy`, `codex login`...). Cần vào brain thì gõ `cd "$JAVIS_BRAIN"` - biến này luôn trỏ về gốc brain đang chọn.
+Shell mở sẵn ở **thư mục HOME của user đang chạy UNETI AI** - đúng như một terminal bình thường của máy, hợp nhất cho việc chính của tab này: cài và đăng nhập CLI (`agy`, `codex login`...). Cần vào brain thì gõ `cd "$UNETI_BRAIN"` - biến này luôn trỏ về gốc brain đang chọn.
 
 ## Nhiều tab, mỗi tab một shell riêng
 
@@ -69,22 +69,22 @@ Terminal là chỗ chạy lệnh tuỳ ý trên máy chủ, tức là quyền ca
 - Chỉ **trình duyệt đã đăng nhập** vào được. Token API (loại `jvs_...` dùng cho script và CLI) **không** mở được terminal, kể cả token quyền `full`.
 - Khi UNETI AI chạy public (VPS, Docker) thì bắt buộc đăng nhập, nên terminal cũng được che sau đúng hàng rào đó. Xem [Bảo mật & tài khoản](14-bao-mat-tai-khoan.md).
 - Shell thừa kế biến môi trường của server, trong đó có các khoá trong `.env`. Đúng như terminal của chủ máy, nhưng nên biết là nó ở đó khi cho người khác mượn màn hình.
-- Muốn tắt hẳn tính năng: đặt `JAVIS_TERMINAL=0` rồi khởi động lại UNETI AI. Vào tab Code sẽ thấy thông báo đã tắt thay vì khung trống.
+- Muốn tắt hẳn tính năng: đặt `UNETI_TERMINAL=0` rồi khởi động lại UNETI AI. Vào tab Code sẽ thấy thông báo đã tắt thay vì khung trống.
 
 ## Biến môi trường
 
 | Biến | Ý nghĩa | Mặc định |
 |---|---|---|
-| `JAVIS_TERMINAL` | `0`/`off`/`false`/`no` = tắt hẳn terminal | Bật |
-| `JAVIS_TERMINAL_SHELL` | Đường dẫn shell muốn chạy | `$SHELL`, không có thì `bash`/`sh`. Windows: `powershell.exe` rồi `cmd.exe` |
-| `JAVIS_TERMINAL_CWD` | Thư mục shell mở ra | HOME của user chạy UNETI AI |
-| `JAVIS_TERMINAL_REMOTE` | Khai với các CLI rằng người dùng ngồi ở máy khác (`SSH_CONNECTION`), để đăng nhập Google/Anthropic hỏi chỗ dán mã thay vì chờ trình duyệt cùng máy | Tự đoán: bật trên máy chủ không có màn hình (VPS, Docker), tắt trên Windows/macOS chạy thẳng và Linux có màn hình |
+| `UNETI_TERMINAL` | `0`/`off`/`false`/`no` = tắt hẳn terminal | Bật |
+| `UNETI_TERMINAL_SHELL` | Đường dẫn shell muốn chạy | `$SHELL`, không có thì `bash`/`sh`. Windows: `powershell.exe` rồi `cmd.exe` |
+| `UNETI_TERMINAL_CWD` | Thư mục shell mở ra | HOME của user chạy UNETI AI |
+| `UNETI_TERMINAL_REMOTE` | Khai với các CLI rằng người dùng ngồi ở máy khác (`SSH_CONNECTION`), để đăng nhập Google/Anthropic hỏi chỗ dán mã thay vì chờ trình duyệt cùng máy | Tự đoán: bật trên máy chủ không có màn hình (VPS, Docker), tắt trên Windows/macOS chạy thẳng và Linux có màn hình |
 
 Chi tiết cách đặt biến xem [Cấu hình .env](16-cau-hinh-env.md).
 
 ## Sự cố thường gặp
 
-**Vào mục Terminal thấy "Terminal đang tắt trên máy này".** Máy chủ có `JAVIS_TERMINAL=0`. Bỏ biến đó trong `.env` rồi khởi động lại UNETI AI.
+**Vào mục Terminal thấy "Terminal đang tắt trên máy này".** Máy chủ có `UNETI_TERMINAL=0`. Bỏ biến đó trong `.env` rồi khởi động lại UNETI AI.
 
 **Báo "Đang mở 4 phiên terminal rồi".** Trần 4 phiên tính chung mọi cửa sổ trình duyệt. Đóng bớt một tab (dấu **x**) ở cửa sổ đang mở nó, hoặc chờ 30 phút để UNETI AI tự dọn phiên không ai xem.
 
@@ -92,13 +92,13 @@ Chi tiết cách đặt biến xem [Cấu hình .env](16-cau-hinh-env.md).
 
 **Gõ Tab mà không có gợi ý.** Bạn đang ở chế độ đơn giản (Windows). Đó là giới hạn của hệ điều hành, không phải lỗi cấu hình.
 
-**Shell thoát ngay khi vừa mở.** Xem `JAVIS_TERMINAL_SHELL` có trỏ đúng file thực thi không, và thư mục ở `JAVIS_TERMINAL_CWD` có tồn tại không.
+**Shell thoát ngay khi vừa mở.** Xem `UNETI_TERMINAL_SHELL` có trỏ đúng file thực thi không, và thư mục ở `UNETI_TERMINAL_CWD` có tồn tại không.
 
 **Gõ `agy` (Antigravity) ra link rồi đứng im, không có chỗ dán mã.** `agy` nhận mã về qua một cổng loopback trên chính máy chạy nó, mà trình duyệt của bạn lại ở máy khác nên không với tới. Từ 0.55.46 terminal tự khai là phiên từ xa nên `agy` hỏi chỗ dán: đăng nhập Google xong, copy nguyên địa chỉ `http://localhost:...` mà trình duyệt báo không mở được rồi dán vào terminal. Bản `agy` cũ không hỏi thì mở thêm một phiên terminal và chạy `curl "<địa chỉ vừa copy>"`.
 
 ## Liên quan
 
 - [05 - Quản lý tệp tin](05-quan-ly-tep-tin.md) - duyệt và sửa cùng thư mục đó bằng giao diện.
-- [24 - UNETI AI CLI (terminal)](24-cli-terminal.md) - chiều ngược lại: gõ `javis "..."` từ terminal của máy bạn.
+- [24 - UNETI AI CLI (terminal)](24-cli-terminal.md) - chiều ngược lại: gõ `uneti "..."` từ terminal của máy bạn.
 - [14 - Bảo mật & tài khoản](14-bao-mat-tai-khoan.md) - hàng rào đăng nhập che Terminal.
 - [16 - Cấu hình .env](16-cau-hinh-env.md) - mọi biến môi trường.

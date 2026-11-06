@@ -2,23 +2,23 @@
 # ============================================================
 # UNETI AI - first install on a Mac (UNETI AI.app opens Terminal on this file).
 #
-#   bash bootstrap.sh            # installs into ~/UNETI-AI (JAVIS_HOME to change it)
+#   bash bootstrap.sh            # installs into ~/UNETI-AI (UNETI_HOME to change it)
 #
 # Checks and installs what the Mac lacks, WITHOUT Homebrew (most Macs do not have it):
 #   1. Git: Apple's Command Line Tools. macOS shows its own "Install" dialog for them.
 #   2. Python >= 3.10: macOS only ships 3.9, so if none is found, uv (astral.sh) downloads a
 #      standalone Python 3.12 into the home folder. No admin rights, nothing system wide.
-#   3. Clones Javis into ~/UNETI-AI. A clone, not a copy, because the Update button in the app
+#   3. Clones UNETI AI into ~/UNETI-AI. A clone, not a copy, because the Update button in the app
 #      updates with git (server/updater.py).
 #   4. install.sh does the rest: Node (nodejs.org build when there is no brew), the four CLI
-#      brains, the venv, .env, the admin account, the login auto-start, then opens Javis.
+#      brains, the venv, .env, the admin account, the login auto-start, then opens UNETI AI.
 # Running it again is safe: every step that is already done is skipped.
 # ============================================================
 set -u
 
-JAVIS_HOME="${JAVIS_HOME:-$HOME/UNETI-AI}"
-REPO="${JAVIS_REPO:-https://github.com/uneti-ai/uneti-ai.git}"
-BRANCH="${JAVIS_BRANCH:-main}"
+UNETI_HOME="${UNETI_HOME:-$HOME/UNETI-AI}"
+REPO="${UNETI_REPO:-https://github.com/uneti-ai/uneti-ai.git}"
+BRANCH="${UNETI_BRANCH:-main}"
 
 CYAN='\033[0;36m'; GREEN='\033[0;32m'; YELLOW='\033[0;33m'; RED='\033[0;31m'; NC='\033[0m'
 step() { echo ""; echo -e "${CYAN}[$1]${NC} $2"; }
@@ -32,12 +32,12 @@ fail() {
   exit 1
 }
 
-export PATH="$HOME/.local/bin:$HOME/.javis/node/bin:/opt/homebrew/bin:/usr/local/bin:$PATH"
+export PATH="$HOME/.local/bin:$HOME/.uneti/node/bin:/opt/homebrew/bin:/usr/local/bin:$PATH"
 
 echo ""
 echo " =========================================="
 echo "  UNETI AI - kiem tra va cai nhung gi may con thieu"
-echo "  Thu muc cai: $JAVIS_HOME"
+echo "  Thu muc cai: $UNETI_HOME"
 echo " =========================================="
 
 # ---------------------------------------------------------------- [A] git
@@ -66,7 +66,7 @@ have_py() {
   return 1
 }
 if ! have_py; then
-  warn "Chua co Python 3.10+ (macOS chi kem 3.9). Dang tai Python 3.12 rieng cho Javis (uv)..."
+  warn "Chua co Python 3.10+ (macOS chi kem 3.9). Dang tai Python 3.12 rieng cho UNETI AI (uv)..."
   if ! command -v uv >/dev/null 2>&1; then
     curl -LsSf https://astral.sh/uv/install.sh | env UV_NO_MODIFY_PATH=1 sh >/dev/null 2>&1 || true
   fi
@@ -85,24 +85,24 @@ for c in python3.12 python3.11 python3.13 python3.10 python3; do
 done
 
 # ---------------------------------------------------------------- [C] source
-step C "Tai Javis ve may"
-if [ -d "$JAVIS_HOME/.git" ]; then
-  ok "Da co ban Javis o $JAVIS_HOME, giu nguyen (cap nhat bang nut Cap nhat trong app)"
+step C "Tai UNETI AI ve may"
+if [ -d "$UNETI_HOME/.git" ]; then
+  ok "Da co ban UNETI AI o $UNETI_HOME, giu nguyen (cap nhat bang nut Cap nhat trong app)"
 else
-  if [ -e "$JAVIS_HOME" ] && [ -n "$(ls -A "$JAVIS_HOME" 2>/dev/null)" ]; then
-    fail "Thu muc $JAVIS_HOME da co file nhung khong phai ban Javis tai bang git. Doi ten no roi mo lai UNETI AI."
+  if [ -e "$UNETI_HOME" ] && [ -n "$(ls -A "$UNETI_HOME" 2>/dev/null)" ]; then
+    fail "Thu muc $UNETI_HOME da co file nhung khong phai ban UNETI AI tai bang git. Doi ten no roi mo lai UNETI AI."
   fi
   # blob:none keeps every commit (the updater merges and rolls back on them) and downloads
   # file contents only when needed.
-  git clone --filter=blob:none --branch "$BRANCH" "$REPO" "$JAVIS_HOME" || fail "Khong tai duoc Javis (kiem tra mang Internet)."
-  ok "Da tai ve $JAVIS_HOME"
+  git clone --filter=blob:none --branch "$BRANCH" "$REPO" "$UNETI_HOME" || fail "Khong tai duoc UNETI AI (kiem tra mang Internet)."
+  ok "Da tai ve $UNETI_HOME"
 fi
 
 # ---------------------------------------------------------------- [D] install.sh
 step D "Cai Node, cac bo nao AI, thu vien va tu khoi dong (vai phut)"
-cd "$JAVIS_HOME" || fail "Khong vao duoc $JAVIS_HOME"
+cd "$UNETI_HOME" || fail "Khong vao duoc $UNETI_HOME"
 bash ./install.sh || fail "install.sh bao loi, doc cac dong phia tren."
 
 echo ""
-ok "Xong. Lan sau mo Javis bang UNETI AI trong Launchpad hoac thu muc Applications."
+ok "Xong. Lan sau mo UNETI AI bang UNETI AI trong Launchpad hoac thu muc Applications."
 echo "    Done. Next time, open UNETI AI from Launchpad or Applications. You can close this window."

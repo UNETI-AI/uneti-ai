@@ -5,12 +5,12 @@
 No network. One check per finding, each pinned on the real code path, not on source text where avoidable:
 
   1. A run below Full access (a customer bot at "auto", an auto loop) cannot write files that run or configure code:
-     plugins/<x>/plugin.yaml, Javis/loops, Javis/scripts, .git/config, .claude/settings.json. A customer bot cannot
+     plugins/<x>/plugin.yaml, UNETI/loops, UNETI/scripts, .git/config, .claude/settings.json. A customer bot cannot
      either, even at Full. The owner at Full still can.
-  2. Work queued by a run below Full (javis_schedule, javis_task) is capped at that run's own level, and such a run
+  2. Work queued by a run below Full (uneti_schedule, uneti_task) is capped at that run's own level, and such a run
      cannot rewrite an existing scheduled job.
   3. /files/raw and /upload/raw serve html, xhtml, svg and xml under the share sandbox CSP; pdf and images unchanged.
-  4. javis_add_mcp: op=add needs Full access, and customer bots never see the tool.
+  4. uneti_add_mcp: op=add needs Full access, and customer bots never see the tool.
   5. The login-free local paths (/reminders...) refuse a browser request: non-loopback Host (DNS rebinding), Origin,
      Sec-Fetch-Site. A tool call on 127.0.0.1 still passes.
   6. <brain>/.grok/ (it holds the hub token) stays out of git and the GitHub backup, and an old commit of it is untracked.
@@ -25,7 +25,7 @@ import sys
 import tempfile
 from pathlib import Path
 
-os.environ["JAVIS_STATE_DIR"] = tempfile.mkdtemp(prefix="javis-audit-1105-")
+os.environ["UNETI_STATE_DIR"] = tempfile.mkdtemp(prefix="uneti-audit-1105-")
 
 _fails = []
 
@@ -41,16 +41,16 @@ def check(name, cond, extra=""):
 # ============================================================
 import mcp_hub  # noqa: E402
 
-brain = Path(tempfile.mkdtemp(prefix="javis-audit-brain-"))
+brain = Path(tempfile.mkdtemp(prefix="uneti-audit-brain-"))
 (brain / "notes").mkdir()
 
 
 def _write(mode, rel, for_bot=False):
     tools, route = mcp_hub._builtin_tools(mode, str(brain), for_bot=for_bot)
-    return asyncio.run(route["javis_write_file"]["call"]({"path": rel, "content": "enabled: true\n"}))
+    return asyncio.run(route["uneti_write_file"]["call"]({"path": rel, "content": "enabled: true\n"}))
 
 
-NGUY_HIEM = ["plugins/x/plugin.yaml", "plugins/x/plugin.py", "Javis/loops/x.md", "Javis/scripts/x.sh",
+NGUY_HIEM = ["plugins/x/plugin.yaml", "plugins/x/plugin.py", "UNETI/loops/x.md", "UNETI/scripts/x.sh",
              ".git/config", ".claude/settings.json", ".grok/config.toml", "sub/.git/hooks/pre-commit"]
 for rel in NGUY_HIEM:
     r = _write("auto", rel)
@@ -72,37 +72,37 @@ check("1. a gated Team step keeps its own approval path (not refused by the new 
 import plugins_host  # noqa: E402
 
 cap = plugins_host._cap_job_level
-a, why = cap("javis_schedule", {"op": "create", "name": "n"}, "auto")
+a, why = cap("uneti_schedule", {"op": "create", "name": "n"}, "auto")
 check("2. auto + no level asked: the reminder is capped at auto", a.get("muc_quyen") == "auto" and not why, a)
-a, why = cap("javis_schedule", {"op": "create", "muc_quyen": "full"}, "auto")
+a, why = cap("uneti_schedule", {"op": "create", "muc_quyen": "full"}, "auto")
 check("2. auto asking for full gets auto", a.get("muc_quyen") == "auto", a)
-a, why = cap("javis_schedule", {"op": "create", "muc_quyen": "suggest"}, "auto")
+a, why = cap("uneti_schedule", {"op": "create", "muc_quyen": "suggest"}, "auto")
 check("2. a lighter level asked is kept", a.get("muc_quyen") == "suggest", a)
-a, why = cap("javis_schedule", {"muc_quyen": "full"}, "suggest")
+a, why = cap("uneti_schedule", {"muc_quyen": "full"}, "suggest")
 check("2. suggest caps at suggest (op defaults to create)", a.get("muc_quyen") == "suggest", a)
-a, why = cap("javis_schedule", {"op": "update", "id": "r1", "prompt": "x"}, "auto")
+a, why = cap("uneti_schedule", {"op": "update", "id": "r1", "prompt": "x"}, "auto")
 check("2. auto cannot rewrite an existing scheduled job", why.startswith("ERROR"), why)
-a, why = cap("javis_schedule", {"op": "create", "muc_quyen": "full"}, "full")
+a, why = cap("uneti_schedule", {"op": "create", "muc_quyen": "full"}, "full")
 check("2. Full access unchanged", a.get("muc_quyen") == "full" and not why, a)
-a, why = cap("javis_schedule", {"op": "update", "id": "r1"}, "full")
+a, why = cap("uneti_schedule", {"op": "update", "id": "r1"}, "full")
 check("2. Full access may still update", not why)
-a, why = cap("javis_schedule", {"op": "create"}, "gated")
+a, why = cap("uneti_schedule", {"op": "create"}, "gated")
 check("2. gated Team step left to its approval gate", "muc_quyen" not in a and not why, a)
-a, why = cap("javis_task", {"op": "add", "title": "t"}, "auto")
-check("2. javis_task add at auto: mode capped (default was full)", a.get("mode") == "auto", a)
-a, why = cap("javis_task", {"op": "list"}, "auto")
-check("2. javis_task list untouched", "mode" not in a and not why, a)
-a, why = cap("javis_web_search", {"q": "x"}, "auto")
+a, why = cap("uneti_task", {"op": "add", "title": "t"}, "auto")
+check("2. uneti_task add at auto: mode capped (default was full)", a.get("mode") == "auto", a)
+a, why = cap("uneti_task", {"op": "list"}, "auto")
+check("2. uneti_task list untouched", "mode" not in a and not why, a)
+a, why = cap("uneti_web_search", {"q": "x"}, "auto")
 check("2. other tools untouched", a == {"q": "x"} and not why, a)
 check("2. the cap runs inside every plugin call (_make_call)",
       "_cap_job_level(name, args, mode)" in Path(SERVER, "plugins_host.py").read_text(encoding="utf-8"))
 
 # ============================================================
-# 4. javis_add_mcp
+# 4. uneti_add_mcp
 # ============================================================
-check("4. javis_add_mcp is owner-only (hidden from customer bots)", "javis_add_mcp" in mcp_hub.OWNER_ONLY_TOOLS)
-spec = importlib.util.spec_from_file_location("javis_connect_plugin",
-                                              Path(ROOT, "system", "plugins", "javis-connect", "plugin.py"))
+check("4. uneti_add_mcp is owner-only (hidden from customer bots)", "uneti_add_mcp" in mcp_hub.OWNER_ONLY_TOOLS)
+spec = importlib.util.spec_from_file_location("uneti_connect_plugin",
+                                              Path(ROOT, "system", "plugins", "uneti-connect", "plugin.py"))
 mod = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(mod)
 ghi = {}
@@ -126,7 +126,7 @@ check("4. an unknown op needs the strongest level", plugins_host._required_mode(
 import main  # noqa: E402
 from fastapi.testclient import TestClient  # noqa: E402
 
-raw = Path(tempfile.mkdtemp(prefix="javis-audit-raw-"))
+raw = Path(tempfile.mkdtemp(prefix="uneti-audit-raw-"))
 for ten in ("x.html", "x.htm", "x.xhtml", "x.svg", "x.xml", "x.pdf", "x.png", "x.txt"):
     (raw / ten).write_bytes(b"<html><script>1</script></html>")
 _goc = main._safe_serve_path
@@ -171,7 +171,7 @@ import git_brain  # noqa: E402
 check("6. .gitignore block ignores .grok/", ".grok/" in git_brain._GITIGNORE_BODY)
 check("6. the backup skips .grok/", "/.grok/" in git_brain._BACKUP_SKIP_SUBSTR)
 if shutil.which("git"):
-    repo = Path(tempfile.mkdtemp(prefix="javis-audit-git-"))
+    repo = Path(tempfile.mkdtemp(prefix="uneti-audit-git-"))
     env = dict(os.environ, GIT_AUTHOR_NAME="t", GIT_AUTHOR_EMAIL="t@t", GIT_COMMITTER_NAME="t",
                GIT_COMMITTER_EMAIL="t@t")
     subprocess.run(["git", "init", "-q", str(repo)], check=True, env=env)

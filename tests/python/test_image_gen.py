@@ -13,7 +13,7 @@ import sys
 import tempfile
 import zlib
 
-os.environ["JAVIS_STATE_DIR"] = tempfile.mkdtemp(prefix="javis-imgtest-")
+os.environ["UNETI_STATE_DIR"] = tempfile.mkdtemp(prefix="uneti-imgtest-")
 
 import config           # noqa: E402
 import image_gen        # noqa: E402
@@ -62,7 +62,7 @@ check("extract không có ảnh → None", image_gen.extract_image_b64({"type": 
 check("extract list", image_gen.extract_image_b64([{"x": 1}, {"partial_image_b64": "Z"}]) == "Z")
 
 # ---- 4. save_png_b64 lưu đúng chỗ ----
-vault = tempfile.mkdtemp(prefix="javis-vault-")
+vault = tempfile.mkdtemp(prefix="uneti-vault-")
 saved = image_gen.save_png_b64(_PNG_B64, vault)
 check("save ok", saved.get("ok") is True)
 check("rel_path vào attachments/", saved["rel_path"].startswith("attachments/") and saved["rel_path"].endswith(".png"))
@@ -71,7 +71,7 @@ _raw_goc = base64.b64decode(_PNG_B64)
 _raw_luu = open(saved["abs_path"], "rb").read()
 _IHDR_END = 8 + 12 + int.from_bytes(_raw_goc[8:12], "big")   # hết chunk IHDR
 
-check("ảnh lưu ra có gắn nhãn javisos.com", b"uneti-ai.github.io" in _raw_luu and b"UNETI AI" in _raw_luu)
+check("ảnh lưu ra có gắn nhãn uneti-ai.github.io", b"uneti-ai.github.io" in _raw_luu and b"UNETI AI" in _raw_luu)
 # Gắn nhãn = CHỈ CHÈN chunk giữa IHDR và phần còn lại. Đầu và đuôi file phải y nguyên,
 # tức pixel không bị đụng vào và không chunk nào bị gỡ.
 check("phần đầu (chữ ký PNG + IHDR) y nguyên", _raw_luu[:_IHDR_END] == _raw_goc[:_IHDR_END])
@@ -80,7 +80,7 @@ check("nhãn chèn ngay sau IHDR, ở chunk tEXt", _raw_luu[_IHDR_END + 4:_IHDR_
 
 
 # ---- 4b. brand_png: gắn nhãn tác giả, KHÔNG gỡ chunk sẵn có ----
-# Ảnh nhà cung cấp mang sẵn Content Credentials (C2PA, nằm ở chunk caBX). Javis CHỈ THÊM
+# Ảnh nhà cung cấp mang sẵn Content Credentials (C2PA, nằm ở chunk caBX). UNETI AI CHỈ THÊM
 # nhãn của mình, KHÔNG gỡ chunk đó - test này khoá hành vi ấy lại để sau không ai lặng lẽ
 # đổi thành "gỡ nguồn gốc rồi ghi đè tên mình".
 _gia_c2pa = (len(b"FAKE").to_bytes(4, "big") + b"caBX" + b"FAKE"
@@ -118,7 +118,7 @@ try:
     _go = image_gen.save_png_b64(base64.b64encode(_co_c2pa).decode(), vault)
     _byte_go = open(_go["abs_path"], "rb").read()
     check("bật: dấu nguồn gốc caBX bị gỡ khỏi ảnh", b"caBX" not in _byte_go)
-    check("bật: nhãn tác giả javisos.com VẪN còn (không đánh tráo danh nghĩa)",
+    check("bật: nhãn tác giả uneti-ai.github.io VẪN còn (không đánh tráo danh nghĩa)",
           b"uneti-ai.github.io" in _byte_go)
 finally:
     image_gen._strip_c2pa_on = _goc_strip_on
@@ -172,9 +172,9 @@ res_noauth = asyncio.run(image_gen.generate_chatgpt("x", vault_root=vault))
 check("chưa OAuth → ok False", res_noauth.get("ok") is False and "ChatGPT" in (res_noauth.get("error") or ""))
 
 # ---- 8. GỬI THẲNG ẢNH cho ChatGPT xem (không phải tả lại bằng lời) ----
-# Chủ repo báo 27/08: Javis tự nhận "chỉ nhận được mô tả bằng chữ, không đưa được ảnh mẫu
+# Chủ repo báo 27/08: UNETI AI tự nhận "chỉ nhận được mô tả bằng chữ, không đưa được ảnh mẫu
 # cho ChatGPT" nên ảnh dựng ra không giống sản phẩm thật. Endpoint Responses vốn nhận
-# input_image; thiếu chỉ là Javis chưa gửi. Khoá lại cả phần payload lẫn phần chặn đường dẫn.
+# input_image; thiếu chỉ là UNETI AI chưa gửi. Khoá lại cả phần payload lẫn phần chặn đường dẫn.
 _goi = {}
 
 
@@ -430,7 +430,7 @@ check("lỗi 401: chỉ gọi một lần", r_401.get("ok") is False and len(_go
 # Env ghim thì chỉ đúng model đó.
 _goc_env = image_gen._HOST_ENV
 image_gen._HOST_ENV = "gpt-ghim"
-check("env JAVIS_IMAGE_HOST_MODEL ghim một model", image_gen.host_model_candidates() == ["gpt-ghim"])
+check("env UNETI_IMAGE_HOST_MODEL ghim một model", image_gen.host_model_candidates() == ["gpt-ghim"])
 image_gen._HOST_ENV = _goc_env
 openai_oauth.list_models = _goc_live
 image_gen._catalog_models = _goc_cat

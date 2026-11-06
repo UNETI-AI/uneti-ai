@@ -1,4 +1,4 @@
-"""The admin password set in the environment (JAVIS_ADMIN_PASSWORD) must actually work.
+"""The admin password set in the environment (UNETI_ADMIN_PASSWORD) must actually work.
 
     python tests/run.py admin_env_password      (no network)
 
@@ -22,9 +22,9 @@ import os
 import sys
 import tempfile
 
-os.environ["JAVIS_STATE_DIR"] = tempfile.mkdtemp(prefix="javis-envpw-")
-os.environ.pop("JAVIS_ADMIN_PASSWORD", None)
-os.environ.pop("JAVIS_ADMIN_USER", None)
+os.environ["UNETI_STATE_DIR"] = tempfile.mkdtemp(prefix="uneti-envpw-")
+os.environ.pop("UNETI_ADMIN_PASSWORD", None)
+os.environ.pop("UNETI_ADMIN_USER", None)
 
 import config as c   # noqa: E402
 
@@ -38,7 +38,7 @@ def check(name, cond):
 
 
 def set_env(pw=None, user=None):
-    for k, v in (("JAVIS_ADMIN_PASSWORD", pw), ("JAVIS_ADMIN_USER", user)):
+    for k, v in (("UNETI_ADMIN_PASSWORD", pw), ("UNETI_ADMIN_USER", user)):
         if v is None:
             os.environ.pop(k, None)
         else:

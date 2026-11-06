@@ -193,7 +193,7 @@ UNETI AI không gọi API nào của nhà cung cấp để lấy thống kê. N�
 | Nhật ký nội bộ | `usage-events.jsonl` trong thư mục state | Cột API, và là nguồn dự phòng cho Claude/ChatGPT |
 | Kho phiên hội thoại | `conversations.db` trong thư mục state | Dùng để biết lượt nào là chat thật, lượt nào là chạy nền |
 
-Kết quả gộp vào một cơ sở dữ liệu SQLite là `usage_index.db`, cũng trong thư mục state (đặt bằng biến `JAVIS_STATE_DIR`, xem [Cấu hình .env](16-cau-hinh-env.md)).
+Kết quả gộp vào một cơ sở dữ liệu SQLite là `usage_index.db`, cũng trong thư mục state (đặt bằng biến `UNETI_STATE_DIR`, xem [Cấu hình .env](16-cau-hinh-env.md)).
 
 Việc quét là **quét tăng dần**: file nào không đổi kích thước và thời gian sửa thì bỏ qua hẳn. Vì thế lần quét đầu chậm còn các lần sau rất nhanh, kể cả khi bạn có hàng nghìn file log.
 
@@ -239,5 +239,5 @@ Nếu bản cài không đọc được log thô (điển hình là bản Docker
 - [Models & engine](10-models-va-engine.md) - đổi model, cắm key OpenRouter, hiểu từng engine ghi số vào đâu.
 - [Việc định kỳ & Nhắc hẹn](08-viec-dinh-ky.md) - nơi tắt bớt loop khi cột "Nền (loop/lịch)" phình to.
 - [Việc / Kanban](21-viec-kanban.md) - việc chạy nền cũng tính vào phần "UNETI AI (tự chạy)".
-- [Cấu hình .env](16-cau-hinh-env.md) - biến `JAVIS_STATE_DIR` quyết định chỉ mục token nằm ở đâu.
+- [Cấu hình .env](16-cau-hinh-env.md) - biến `UNETI_STATE_DIR` quyết định chỉ mục token nằm ở đâu.
 - [Khắc phục sự cố & FAQ](17-khac-phuc-su-co.md) - các lỗi chung của dashboard.

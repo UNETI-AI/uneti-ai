@@ -55,10 +55,10 @@ LOAI = {
 }
 
 # The folder the app READS each kind from (0.4xx, owner report 2026-11-04). The app falls back to the old
-# `Javis/agents` / `Javis/workflows` while the flat folder does not exist (`main._brain_sub`). Writing into
+# `UNETI/agents` / `UNETI/workflows` while the flat folder does not exist (`main._brain_sub`). Writing into
 # `<brain>/agents` on such a brain would create that folder, the app would switch to it, and every agent in
-# `Javis/agents` would vanish from the Partners page.
-_LEGACY = {"agents": "Javis/agents", "workflows": "Javis/workflows"}
+# `UNETI/agents` would vanish from the Partners page.
+_LEGACY = {"agents": "UNETI/agents", "workflows": "UNETI/workflows"}
 
 # How many `-2`, `-3`... names to try before giving up on a clash.
 _MAX_ALT = 50
@@ -276,7 +276,7 @@ def cai(pack_id: str, thu_muc_goi: Path, brain_root: str) -> dict:
     pack's agent, uninstalled (their edited copy is kept, by design), then installed again. Before, the
     install skipped the item without a word, so the agent never came back and the Store still said
     "installed". Now: an identical copy is adopted as the pack's again, and a different one stays the
-    user's while the pack's copy goes in under a free name (`javis-vu-2`), reported in `doi_ten`."""
+    user's while the pack's copy goes in under a free name (`uneti-vu-2`), reported in `doi_ten`."""
     root = Path(brain_root)
     muc_cu = doc_so_brain(pack_id, root)
     moi = {}

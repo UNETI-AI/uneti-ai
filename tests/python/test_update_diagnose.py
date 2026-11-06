@@ -4,7 +4,7 @@ import os
 import sys
 import tempfile
 
-os.environ.setdefault("JAVIS_STATE_DIR", tempfile.mkdtemp(prefix="javis-upd-"))
+os.environ.setdefault("UNETI_STATE_DIR", tempfile.mkdtemp(prefix="uneti-upd-"))
 import updater  # noqa: E402
 
 fails = []
@@ -49,12 +49,12 @@ check("file cục bộ chặn merge: hướng dẫn kiểm tra",
 check("lỗi lạ không bịa nguyên nhân",
       updater.chan_doan_pull_hong("fatal: một lỗi chưa từng gặp") == "")
 
-os.environ["JAVIS_UPDATE_REMOTE"] = "some-fork"
-os.environ["JAVIS_UPDATE_BRANCH"] = "stable"
+os.environ["UNETI_UPDATE_REMOTE"] = "some-fork"
+os.environ["UNETI_UPDATE_BRANCH"] = "stable"
 check("nút cập nhật luôn dùng cùng nguồn với /version",
       updater.release_source() == ("https://github.com/uneti-ai/uneti-ai.git", "main"))
-os.environ.pop("JAVIS_UPDATE_REMOTE", None)
-os.environ.pop("JAVIS_UPDATE_BRANCH", None)
+os.environ.pop("UNETI_UPDATE_REMOTE", None)
+os.environ.pop("UNETI_UPDATE_BRANCH", None)
 
 if fails:
     print(f"THẤT BẠI {len(fails)}: {fails}")

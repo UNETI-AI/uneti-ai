@@ -28,16 +28,16 @@ lần đó không phải di trú.
 
 Vì sao thả tay vào đây KHÔNG cần cổng env, còn `<brain>/plugins/` thì cần
 ---------------------------------------------------------------------
-(Since 0.161.0 that gate is open by default and `JAVIS_ENABLE_USER_PLUGINS=false` opts out; the
+(Since 0.161.0 that gate is open by default and `UNETI_ENABLE_USER_PLUGINS=false` opts out; the
 reasoning below explains why packs never needed it.)
-`plugins_host` bắt `JAVIS_ENABLE_USER_PLUGINS` cho plugin trong vault vì **model ghi được vào
-vault**: `javis_write_file` mở đúng cây đó, nên "một thư mục ghi được" ở đấy nghĩa là code chạy
-mà không ai bấm gì. `STATE_DIR/packs/` thì không tool nào của Javis ghi tới; ghi được vào đây
+`plugins_host` bắt `UNETI_ENABLE_USER_PLUGINS` cho plugin trong vault vì **model ghi được vào
+vault**: `uneti_write_file` mở đúng cây đó, nên "một thư mục ghi được" ở đấy nghĩa là code chạy
+mà không ai bấm gì. `STATE_DIR/packs/` thì không tool nào của UNETI AI ghi tới; ghi được vào đây
 đòi quyền trên hệ tệp của máy chủ, tức đã tương đương quyền sửa mã nguồn - không còn gì để
 cổng đó bảo vệ thêm.
 
 Cổng thật sự cần nằm ở đường TẢI TỪ MẠNG (cài từ zip, URL, kho), và nó là màn hình đồng ý gắn
-digest ở giai đoạn sau, chứ không phải một biến môi trường bật-tắt-tất-cả. `JAVIS_DISABLE_PACKS`
+digest ở giai đoạn sau, chứ không phải một biến môi trường bật-tắt-tất-cả. `UNETI_DISABLE_PACKS`
 là công tắc tắt sạch cho ai cần.
 
 Suy biến: hỏng thì THIẾU, không bao giờ THỪA
@@ -61,10 +61,10 @@ from config import STATE_DIR
 # Gốc CÂY MÃ NGUỒN, để đọc VERSION. Neo vào `__file__` y như `main`, `system_sync`,
 # `plugins_host` và `updater` - KHÔNG suy ra từ STATE_DIR.
 #
-# Bản cũ suy từ STATE_DIR và sai ở mọi bản cài đặt `JAVIS_STATE_DIR`: trên Docker thì
+# Bản cũ suy từ STATE_DIR và sai ở mọi bản cài đặt `UNETI_STATE_DIR`: trên Docker thì
 # `/data/state` ra `/data`, chỗ không có VERSION. Hậu quả không nhẹ chút nào - `_app_version()`
 # trả rỗng, `_hop_compat` so với (0,0,0), nên MỌI gói có khai `compat.app` đều bị từ chối ở
-# bước validate với câu "cần Javis >=x, bản này là " (bỏ trống). Tức là cả kho không cài được
+# bước validate với câu "cần UNETI AI >=x, bản này là " (bỏ trống). Tức là cả kho không cài được
 # gì, trên đúng những bản cài mà người dùng thật đang chạy.
 PROJECT_ROOT = Path(__file__).parent.parent
 PACKS_DIR = STATE_DIR / "packs"
@@ -101,7 +101,7 @@ _cache: dict = {"sig": None, "packs": [], "connectors": {}}
 
 def tat_het() -> bool:
     """Công tắc tắt sạch mọi gói, đọc LIVE để dùng được khi không vào nổi dashboard."""
-    return str(os.getenv("JAVIS_DISABLE_PACKS", "")).strip().lower() in ("1", "true", "yes", "on")
+    return str(os.getenv("UNETI_DISABLE_PACKS", "")).strip().lower() in ("1", "true", "yes", "on")
 
 
 def _app_version() -> str:
@@ -131,7 +131,7 @@ def _hop_compat(dai: str) -> tuple[bool, str]:
         return True, ""
     ban = _app_version()
     if not ban:
-        # Không đọc nổi VERSION là lỗi CỦA JAVIS, không phải lỗi của gói. Từ chối mọi gói vì
+        # Không đọc nổi VERSION là lỗi CỦA UNETI, không phải lỗi của gói. Từ chối mọi gói vì
         # một tệp của chính mình không đọc được thì hỏng nặng hơn nhiều so với cho cài một gói
         # có thể hơi mới - người dùng đã đọc màn hình xác nhận và tự bấm đồng ý rồi.
         print("[packs] không đọc được VERSION, bỏ qua chốt tương thích", file=sys.stderr)
@@ -145,7 +145,7 @@ def _hop_compat(dai: str) -> tuple[bool, str]:
         ok = {">=": hien >= moc, "<=": hien <= moc, ">": hien > moc,
               "<": hien < moc, "==": hien == moc, "=": hien == moc}[op]
         if not ok:
-            return False, f"cần Javis {dai}, bản này là {_app_version()}"
+            return False, f"cần UNETI AI {dai}, bản này là {_app_version()}"
     return True, ""
 
 
@@ -295,7 +295,7 @@ def _nap_mot(thu_muc, id_da_co, vao_loi=None) -> dict:
         return ban
 
     if str(m.get("format") or "") != FORMAT_MAGIC:
-        ban["error"] = f"không phải gói Javis (thiếu format: {FORMAT_MAGIC})"
+        ban["error"] = f"không phải gói UNETI AI (thiếu format: {FORMAT_MAGIC})"
         return ban
     try:
         spec = int(m.get("spec") or 0)
@@ -315,7 +315,7 @@ def _nap_mot(thu_muc, id_da_co, vao_loi=None) -> dict:
         ban["error"] = f"id trong manifest ('{khai_id}') khác tên thư mục ('{pid}')"
         return ban
     if pid in _module_server():
-        ban["error"] = f"id '{pid}' trùng tên một module của Javis, đổi tên gói"
+        ban["error"] = f"id '{pid}' trùng tên một module của UNETI AI, đổi tên gói"
         return ban
 
     ok, vi_sao = _hop_compat((m.get("compat") or {}).get("app"))

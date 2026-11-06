@@ -27,16 +27,16 @@ Brain là toàn bộ tri thức UNETI AI tích luỹ được về bạn và cô
 ### Bước 1 - Tạo repo GitHub riêng tư
 
 1. Vào https://github.com/new
-2. Đặt tên, ví dụ `javis-brain-backup`.
+2. Đặt tên, ví dụ `uneti-brain-backup`.
 3. Chọn **Private** (BẮT BUỘC - brain chứa dữ liệu cá nhân/kinh doanh, tuyệt đối không để Public).
 4. **KHÔNG** tích "Add a README file" (để repo trống, tránh xung đột lần đẩy đầu).
-5. Bấm **Create repository**. Copy URL dạng `https://github.com/<tên-bạn>/javis-brain-backup`.
+5. Bấm **Create repository**. Copy URL dạng `https://github.com/<tên-bạn>/uneti-brain-backup`.
 
 ### Bước 2 - Tạo token (fine-grained)
 
 1. Vào https://github.com/settings/tokens?type=beta (Settings → Developer settings → **Fine-grained tokens** → Generate new token).
 2. Đặt tên token, chọn thời hạn.
-3. **Repository access** → Only select repositories → chọn đúng repo `javis-brain-backup`.
+3. **Repository access** → Only select repositories → chọn đúng repo `uneti-brain-backup`.
 4. **Permissions** → Repository permissions → **Contents** → chọn **Read and write**.
 5. Bấm Generate, **copy token** (dạng `github_pat_...`). Token chỉ hiện 1 lần - copy ngay.
 
@@ -77,7 +77,7 @@ Ghi chú an toàn của cơ chế:
 
 - Token **không** được lưu vào brain hay đẩy lên repo. Nó nằm trong `settings.json` nội bộ (đã git bỏ qua). Thông báo lỗi cũng tự che token.
 - **Chỉ file CHỮ mới được đồng bộ.** Ảnh, video, âm thanh, PDF và mọi file nhị phân khác không lên repo - xem mục [Chỉ đồng bộ THÔNG TIN, không đồng bộ media](#chỉ-đồng-bộ-thông-tin-không-đồng-bộ-media) ngay dưới.
-- File nhạy cảm cũng bị loại khỏi đồng bộ dù là chữ: hội thoại gốc (`memory/conversations`), log loop/learn (`Javis/loop-log`, `Javis/learn-log`, `Javis/learn-staging`), thống kê dùng skill (`Javis/skill-usage.json`), khoá lock, file `.tmp`, và `.git` riêng của từng brain. Những file này chỉ nằm trên máy tạo ra chúng.
+- File nhạy cảm cũng bị loại khỏi đồng bộ dù là chữ: hội thoại gốc (`memory/conversations`), log loop/learn (`UNETI/loop-log`, `UNETI/learn-log`, `UNETI/learn-staging`), thống kê dùng skill (`UNETI/skill-usage.json`), khoá lock, file `.tmp`, và `.git` riêng của từng brain. Những file này chỉ nằm trên máy tạo ra chúng.
 - Thùng rác brain (`brain-trash` trong thư mục state) nằm NGOÀI vùng đồng bộ nên không lên repo.
 - Máy có thư mục brains **trống** (máy mới, volume mới) được coi là KHÔI PHỤC: chỉ nhận dữ liệu về, không bao giờ đẩy "trạng thái trống" lên đè mất backup.
 - Xoá file/brain trên một máy thì lần đồng bộ sau các máy khác cũng xoá theo (đó là nghĩa của sync). Nhờ repo là git, mọi thứ vẫn nằm trong lịch sử commit - khôi phục được khi cần.
@@ -112,7 +112,7 @@ Sau mỗi lần bấm **⇅ Đồng bộ ngay**, nếu có media bị bỏ qua t
 
 Có người thật sự cần ảnh trong brain (chụp màn hình, ảnh sản phẩm vài trăm KB) đi theo tri thức sang máy khác. Từ bản 0.46.0, trong khối đồng bộ có thêm công tắc **Đồng bộ cả ảnh** (mặc định tắt). Bật lên thì:
 
-- Ảnh **jpg / png / gif / webp**, mỗi ảnh tối đa **10 MB** (đổi bằng biến môi trường `JAVIS_SYNC_ANH_MAX_MB`), cũng lên repo và đồng bộ 2 chiều như file chữ. Video, âm thanh, PDF và ảnh quá trần vẫn không bao giờ lên; `inbox/` cũng không - đó là chỗ trung chuyển một lượt chat.
+- Ảnh **jpg / png / gif / webp**, mỗi ảnh tối đa **10 MB** (đổi bằng biến môi trường `UNETI_SYNC_ANH_MAX_MB`), cũng lên repo và đồng bộ 2 chiều như file chữ. Video, âm thanh, PDF và ảnh quá trần vẫn không bao giờ lên; `inbox/` cũng không - đó là chỗ trung chuyển một lượt chat.
 - UNETI AI **ngừng tự dọn `attachments/`** trên máy đó (vẫn dọn `inbox/`): ảnh đã backup mà máy dọn xoá theo hạn thì lệnh xoá lan sang mọi máy, ảnh backup tự biến mất - nên hai thứ này phải đi cùng nhau.
 
 Ba điều cần cân nhắc TRƯỚC khi bật:

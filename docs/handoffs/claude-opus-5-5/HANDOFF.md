@@ -1,4 +1,4 @@
-# Bàn giao Javis cho Claude Opus 5.5
+# Bàn giao UNETI AI cho Claude Opus 5.5
 
 **Bản khởi tạo24/10/2026 — đang cập nhật, M2 engineering CHƯA hoàn tất.**
 Đọc file này trước; kiểm Git/source/PR/CI thật trước mọi hành động. Không suy
@@ -75,8 +75,8 @@ quả hiệu quả. M2 chỉ dùng mô phỏng; pilot thật vẫn PENDING ngoà
 
 | Mục | Trạng thái xác minh lúc khởi tạo |
 |---|---|
-| Worktree được phép | `C:\Users\admin\.codex\worktrees\agent-skill-improvement-m2a\Javis-OS` |
-| Checkout chính cần bảo toàn | `D:\Project\Javis-OS`, có thể bẩn; không reset/clean/checkout/ghi đè |
+| Worktree được phép | `C:\Users\admin\.codex\worktrees\agent-skill-improvement-m2a\Uneti-OS` |
+| Checkout chính cần bảo toàn | `D:\Project\Uneti-OS`, có thể bẩn; không reset/clean/checkout/ghi đè |
 | Nhánh | `codex/agent-skill-improvement-m2d1` |
 | HEAD docs trước scope override | `f2c8f3fe` (xác minh full SHA bằng Git) |
 | PR | [draft803](https://github.com/uneti-ai/uneti-ai/pull/803) |
@@ -236,7 +236,7 @@ pin `1cfe254e8d25b15f37048c3730134686abe60335`, Apache-2.0/Google2026.
   `00219fda201a030f43b35b49c4e73ccf336aedc81164144c435b4b06a1256dd3`.
   Chỉ3 boundary adaptations cho POSIX keys/UTF-8/LF được ghi provenance.
   Temporary derived snapshot chưa là canonical authority hoặc full native integration.
-- Javis vẫn giữ permission/brain/scope/evidence/ledger/leases/cleanup/state machine;
+- UNETI AI vẫn giữ permission/brain/scope/evidence/ledger/leases/cleanup/state machine;
   không có runtime/ledger thứ hai. Chưa thay core orchestration hoặc đo token savings.
 
 Giữ các addendum [Goal12–18](../../superpowers/AGENT-SKILL-IMPROVEMENT-GOAL.md):
@@ -267,13 +267,13 @@ code-first; direct compose/Library reuse; **scope M2 mới ưu tiên trên lịc
   required CI/review theo Goal3 trong scope M2 mới; không hỏi duyệt routine.
 - Không quyền real test mới trong Goal thu hẹp, deploy/restart server thật,
   activation/auto_scoped trên brain thật, gửi/đăng/thanh toán hoặc mở brain khác.
-- Đổi coding assistant không đổi Javis selected engine. Last verified local
+- Đổi coding assistant không đổi UNETI AI selected engine. Last verified local
   config: Claude CLI2.1.309/SDK0.2.116/opus5.5/medium/fastfalse/subscription;
   đây là snapshot cần xác minh metadata cục bộ, không chạy model/auth query.
 - PowerShell trong worktree trên. Dùng Python hiện có
-  `D:\Project\Javis-OS\.venv\Scripts\python.exe -B` với cwd worktree;
+  `D:\Project\Uneti-OS\.venv\Scripts\python.exe -B` với cwd worktree;
   không ghi/cài vào checkout chính. `tests/run.py` là runner isolation thật.
-  No-real flags: JAVIS_NO_REAL_JUDGE_ENGINE/REVIEW_ENGINE/TEAM_ENGINE=1.
+  No-real flags: UNETI_NO_REAL_JUDGE_ENGINE/REVIEW_ENGINE/TEAM_ENGINE=1.
 - `.superpowers/` ignored trong worktree giữ logs/briefs/reports/review packages/
   source freezes/CI raw logs và checkpoint khôi phục. Giữ nguyên tại chỗ;
   không `git clean -fdx`, mass-copy blobs, xóa/move worktree/key.

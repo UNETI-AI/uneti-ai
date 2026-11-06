@@ -12,8 +12,8 @@ Hai loại việc sống chung một trang:
 
 | Loại | Bản chất | Lưu ở đâu |
 |---|---|---|
-| 🔁 **Việc lặp** (loop) | Cứ mỗi N phút lại tự thức dậy làm đúng một việc rồi dừng. Chạy vô hạn cho tới khi bạn tắt. | Một file `.md` trong `Javis/loops/` của brain |
-| ⏰ **Nhắc hẹn** | Một mốc giờ cụ thể ("30 phút nữa", "8h30"), hoặc lịch cron lặp theo giờ cố định ("7h sáng mỗi ngày"). | `Javis/reminders.json` của brain |
+| 🔁 **Việc lặp** (loop) | Cứ mỗi N phút lại tự thức dậy làm đúng một việc rồi dừng. Chạy vô hạn cho tới khi bạn tắt. | Một file `.md` trong `UNETI/loops/` của brain |
+| ⏰ **Nhắc hẹn** | Một mốc giờ cụ thể ("30 phút nữa", "8h30"), hoặc lịch cron lặp theo giờ cố định ("7h sáng mỗi ngày"). | `UNETI/reminders.json` của brain |
 
 Điểm khác nhau quan trọng: việc lặp tính theo **khoảng cách** giữa hai lần chạy, nhắc hẹn tính theo **mốc giờ**. "Mỗi 2 tiếng quét đơn" là việc lặp; "7h sáng nào cũng báo doanh thu" là nhắc hẹn dùng cron.
 
@@ -21,7 +21,7 @@ Bạn tạo được **nhiều việc lặp song song**, mỗi việc một file
 
 Loop **đọc được dữ liệu thật qua MCP** (POS, quảng cáo, lịch, analytics...) để làm việc. Nó có ghi được file hay có thao tác thật ra ngoài hay không thì tuỳ **mức quyền** bạn chọn, xem mục "Ba mức quyền" bên dưới.
 
-Việc lặp được sửa trực tiếp bằng cách mở file `.md` trong Obsidian hoặc trang [Quản lý tệp tin](05-quan-ly-tep-tin.md). Trạng thái chạy (lần cuối, số vòng hôm nay, chuỗi lỗi) nằm tách ở `Javis/loop-state.json`, do server sở hữu, nên bạn sửa file định nghĩa mà không sợ giẫm chân.
+Việc lặp được sửa trực tiếp bằng cách mở file `.md` trong Obsidian hoặc trang [Quản lý tệp tin](05-quan-ly-tep-tin.md). Trạng thái chạy (lần cuối, số vòng hôm nay, chuỗi lỗi) nằm tách ở `UNETI/loop-state.json`, do server sở hữu, nên bạn sửa file định nghĩa mà không sợ giẫm chân.
 
 ## Mở ở đâu trong UNETI AI
 
@@ -175,7 +175,7 @@ Trên thẻ việc lặp:
 - **Bật** / **Tắt**: gạt trạng thái. Bật cũng xoá luôn trạng thái tự tạm dừng.
 - **▶ Chạy ngay**: chạy một vòng ngay lập tức, không chờ tới chu kỳ. Nút đổi thành "Đang chạy..." và danh sách tự tải lại sau khoảng 2,5 giây. Lưu ý: nút này **không** lưu biểu mẫu đang mở, nó chạy đúng nội dung đã lưu trong file. Bấm Chạy ngay cũng xoá trạng thái tự tạm dừng vì đây là hành động chủ động của bạn.
 - **Sửa**: mở lại biểu mẫu với nội dung của việc này.
-- **Xoá**: hỏi xác nhận rồi xoá hẳn file `Javis/loops/<slug>.md`.
+- **Xoá**: hỏi xác nhận rồi xoá hẳn file `UNETI/loops/<slug>.md`.
 - **Chuyển brain…**: ô chọn để dời việc sang brain khác, giữ nguyên file và trạng thái chạy. Brain đích đã có việc trùng tên thì UNETI AI từ chối và báo lỗi, không ghi đè. Việc đang chạy cũng không dời được, hãy thử lại sau.
 
 Trên thẻ nhắc hẹn:
@@ -237,7 +237,7 @@ Gửi cho ai:
 - Việc tạo qua chat có gắn sẵn chat_id của người nói, nên báo về đúng người đó.
 - Việc tạo trên dashboard không biết bạn là ai, nên báo về **ID Telegram đầu tiên** trong danh sách cho phép.
 
-Muốn một việc ngừng báo mỗi vòng vì quá ồn, mở file `Javis/loops/<slug>.md` và đặt `notify: false` trong phần frontmatter.
+Muốn một việc ngừng báo mỗi vòng vì quá ồn, mở file `UNETI/loops/<slug>.md` và đặt `notify: false` trong phần frontmatter.
 
 Nhắc hẹn cũng bắn qua Telegram. Nhắc hẹn tạo trên dashboard không gắn người nhận nên gửi cho **mọi ID** trong danh sách cho phép; nhắc hẹn đặt bằng lời qua chat thì gửi đúng người đã đặt.
 
@@ -254,7 +254,7 @@ UNETI AI tải 200 mục gần nhất rồi chia trang **10 mục** một trang,
 
 Mỗi mục bắt đầu bằng dòng tiêu đề dạng `## [2026-07-20 14:35] doc-source · loop (custom/auto) - scheduled`, trong đó `scheduled` nghĩa là chạy theo lịch, `manual` nghĩa là bạn bấm **▶ Chạy ngay**. Bên dưới là tóm tắt việc đã làm, dòng **Kiểm chứng** nếu có, và dòng cảnh báo nếu chính vòng đó khiến việc bị tự tạm dừng.
 
-Nhật ký cũng nằm trong brain dưới dạng file thật: `Javis/loop-log/YYYY-MM-DD.md`, mỗi ngày một file. Mở qua [Quản lý tệp tin](05-quan-ly-tep-tin.md) nếu muốn xem xa hơn 200 mục.
+Nhật ký cũng nằm trong brain dưới dạng file thật: `UNETI/loop-log/YYYY-MM-DD.md`, mỗi ngày một file. Mở qua [Quản lý tệp tin](05-quan-ly-tep-tin.md) nếu muốn xem xa hơn 200 mục.
 
 ## Đặt lịch bằng lời trong chat
 
@@ -266,7 +266,7 @@ Bạn không bắt buộc phải vào trang này. Nói thẳng với UNETI AI tr
 - "Còn việc gì đang chạy không?"
 - "Huỷ việc quét đơn đi."
 
-UNETI AI dùng công cụ `javis_schedule` (một plugin đi kèm app) để tự chọn đúng kho: lịch lặp theo khoảng cách thì ghi file vào `Javis/loops/`; mốc giờ cố định lặp lại hoặc hẹn một lần thì vào kho nhắc hẹn. Công cụ này tự đặt slug đúng chuẩn và **chặn trùng tên**: đã có việc cùng tên thì nó báo lỗi và bảo bạn sửa cái cũ, chứ không đẻ bản sao.
+UNETI AI dùng công cụ `uneti_schedule` (một plugin đi kèm app) để tự chọn đúng kho: lịch lặp theo khoảng cách thì ghi file vào `UNETI/loops/`; mốc giờ cố định lặp lại hoặc hẹn một lần thì vào kho nhắc hẹn. Công cụ này tự đặt slug đúng chuẩn và **chặn trùng tên**: đã có việc cùng tên thì nó báo lỗi và bảo bạn sửa cái cũ, chứ không đẻ bản sao.
 
 Hai rào an toàn cứng của đường này, không tham số nào đổi được:
 
@@ -284,7 +284,7 @@ Nhắc hẹn chạy theo giờ. Webhook chạy theo **sự kiện**: khách vừ
 
 Chọn mức quyền như nhắc hẹn (Chỉ đọc, Được ghi file, Toàn quyền), rồi **Lưu**.
 
-**Mã bí mật chỉ hiện một lần**, ngay sau khi lưu, kèm một lệnh `curl` để thử. Hệ thống gọi tới gửi mã trong header `Authorization: Bearer <mã>` (hoặc header `X-Javis-Token`, hoặc `?token=` cuối link nếu nó không đặt được header). UNETI AI chỉ giữ bản băm của mã, nên quên mã thì bấm **Tạo mã mới**; mã cũ ngừng chạy ngay.
+**Mã bí mật chỉ hiện một lần**, ngay sau khi lưu, kèm một lệnh `curl` để thử. Hệ thống gọi tới gửi mã trong header `Authorization: Bearer <mã>` (hoặc header `X-Uneti-Token`, hoặc `?token=` cuối link nếu nó không đặt được header). UNETI AI chỉ giữ bản băm của mã, nên quên mã thì bấm **Tạo mã mới**; mã cũ ngừng chạy ngay.
 
 **Kết quả về đâu:** như nhắc hẹn, vào khung UNETI AI Core của brain, hòm thư (chuông) và Telegram của bạn. Kết quả mở đầu hoặc kết thúc bằng `[SILENT]` thì không báo.
 
@@ -319,7 +319,7 @@ Lịch lặp theo cron còn hiện **ba lần chạy tới** ngay trên thẻ. L
 
 ## Trường nâng cao (chỉ sửa được trong file .md)
 
-Biểu mẫu trên dashboard cố ý giữ gọn. Những thứ dưới đây phải mở `Javis/loops/<slug>.md` và sửa phần frontmatter (qua [Quản lý tệp tin](05-quan-ly-tep-tin.md) hoặc Obsidian). Sửa xong, dashboard đọc lại ngay, không cần khởi động lại gì.
+Biểu mẫu trên dashboard cố ý giữ gọn. Những thứ dưới đây phải mở `UNETI/loops/<slug>.md` và sửa phần frontmatter (qua [Quản lý tệp tin](05-quan-ly-tep-tin.md) hoặc Obsidian). Sửa xong, dashboard đọc lại ngay, không cần khởi động lại gì.
 
 | Trường | Ý nghĩa |
 |---|---|
@@ -384,7 +384,7 @@ Phần **thân file** (bên dưới dấu `---` thứ hai) chính là ô "Mô t�
 
 **Kết quả báo "Claude CLI chưa cài".** Bộ não chưa sẵn sàng trên máy. Xem [Bắt đầu & thiết lập lần đầu](01-bat-dau-thiet-lap.md) và [Khắc phục sự cố & FAQ](17-khac-phuc-su-co.md).
 
-**Chạy bằng ChatGPT thì báo `bwrap: Failed to make / slave: Permission denied`.** Codex (ChatGPT) bọc mọi lệnh đọc/ghi file của nó bằng bubblewrap, mà bubblewrap không khởi động nổi trong container Docker, nên việc nền không đọc được một file nào. Ảnh Docker từ bản 0.25.9 đã tắt sẵn rào riêng đó (`JAVIS_CODEX_SANDBOX=off`) nên chỉ cần **cập nhật lên bản mới** là hết. Nếu bạn tự dựng container riêng thì đặt biến môi trường đó, hoặc chuyển việc nền sang bộ não Claude. Chi tiết ở [Biến môi trường](16-cau-hinh-env.md).
+**Chạy bằng ChatGPT thì báo `bwrap: Failed to make / slave: Permission denied`.** Codex (ChatGPT) bọc mọi lệnh đọc/ghi file của nó bằng bubblewrap, mà bubblewrap không khởi động nổi trong container Docker, nên việc nền không đọc được một file nào. Ảnh Docker từ bản 0.25.9 đã tắt sẵn rào riêng đó (`UNETI_CODEX_SANDBOX=off`) nên chỉ cần **cập nhật lên bản mới** là hết. Nếu bạn tự dựng container riêng thì đặt biến môi trường đó, hoặc chuyển việc nền sang bộ não Claude. Chi tiết ở [Biến môi trường](16-cau-hinh-env.md).
 
 **Việc lặp than không có số liệu kinh doanh.** Nó chỉ đọc được số thật khi bạn đã đấu nguồn. Vào [Kết nối & số liệu kinh doanh](09-mcp-va-so-lieu.md) để nối POS, quảng cáo hoặc kênh bán. Không có nguồn nào thì vòng đó dừng và báo lại một câu.
 
@@ -405,4 +405,4 @@ Phần **thân file** (bên dưới dấu `---` thứ hai) chính là ô "Mô t�
 - [Models & engine](10-models-va-engine.md) - chọn model rẻ cho việc nền.
 - [Quản lý tệp tin](05-quan-ly-tep-tin.md) - mở file định nghĩa việc và file nhật ký.
 - [Trò chuyện & giọng nói](02-tro-chuyen-va-giong-noi.md) - đặt việc và nhắc hẹn bằng lời.
-- [Plugins](20-plugins.md) - hiểu về `javis_schedule` và các công cụ đi kèm app.
+- [Plugins](20-plugins.md) - hiểu về `uneti_schedule` và các công cụ đi kèm app.

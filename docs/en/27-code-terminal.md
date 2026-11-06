@@ -21,7 +21,7 @@ To write code you need no separate page: attach a folder to any chat and UNETI A
 2. On the left navigation rail, open the **Code** group and click **Terminal**.
 3. The terminal opens and connects itself. Click the black panel and type as in any terminal.
 
-The shell opens in the **HOME folder of the user running UNETI AI**, exactly like an ordinary terminal on the machine, which suits this tab's main job: installing and signing into CLIs (`agy`, `codex login`...). To get into the brain, type `cd "$JAVIS_BRAIN"`, a variable always pointing at the root of the selected brain.
+The shell opens in the **HOME folder of the user running UNETI AI**, exactly like an ordinary terminal on the machine, which suits this tab's main job: installing and signing into CLIs (`agy`, `codex login`...). To get into the brain, type `cd "$UNETI_BRAIN"`, a variable always pointing at the root of the selected brain.
 
 ## Several tabs, each its own shell
 
@@ -69,22 +69,22 @@ The terminal is where arbitrary commands run on the server, which is the highest
 - Only a **signed-in browser** can reach it. API tokens (the `jvs_...` kind used by scripts and the CLI) **cannot** open the terminal, not even a `full`-scope token.
 - When UNETI AI runs public (VPS, Docker) login is mandatory, so the terminal sits behind that same fence. See [Security and accounts](14-security-and-accounts.md).
 - The shell inherits the server's environment variables, including the keys in `.env`. Exactly like the machine owner's terminal, but worth knowing when you show your screen to someone.
-- To remove the feature entirely: set `JAVIS_TERMINAL=0` and restart UNETI AI. The Code tab then shows a notice that it is off rather than an empty panel.
+- To remove the feature entirely: set `UNETI_TERMINAL=0` and restart UNETI AI. The Code tab then shows a notice that it is off rather than an empty panel.
 
 ## Environment variables
 
 | Variable | Meaning | Default |
 |---|---|---|
-| `JAVIS_TERMINAL` | `0`/`off`/`false`/`no` = remove the terminal entirely | On |
-| `JAVIS_TERMINAL_SHELL` | The path of the shell to run | `$SHELL`, falling back to `bash`/`sh`. Windows: `powershell.exe` then `cmd.exe` |
-| `JAVIS_TERMINAL_CWD` | The folder the shell opens in | The HOME of the user running UNETI AI |
-| `JAVIS_TERMINAL_REMOTE` | Tell CLIs the user is sitting at another machine (`SSH_CONNECTION`), so a Google/Anthropic sign-in asks where to paste the code instead of waiting for a browser on this machine | Auto: on for a server with no screen (VPS, Docker), off on native Windows/macOS and on Linux with a display |
+| `UNETI_TERMINAL` | `0`/`off`/`false`/`no` = remove the terminal entirely | On |
+| `UNETI_TERMINAL_SHELL` | The path of the shell to run | `$SHELL`, falling back to `bash`/`sh`. Windows: `powershell.exe` then `cmd.exe` |
+| `UNETI_TERMINAL_CWD` | The folder the shell opens in | The HOME of the user running UNETI AI |
+| `UNETI_TERMINAL_REMOTE` | Tell CLIs the user is sitting at another machine (`SSH_CONNECTION`), so a Google/Anthropic sign-in asks where to paste the code instead of waiting for a browser on this machine | Auto: on for a server with no screen (VPS, Docker), off on native Windows/macOS and on Linux with a display |
 
 How to set variables: [.env configuration](16-env-configuration.md).
 
 ## Common problems
 
-**Opening Terminal shows "The terminal is off on this machine".** The server has `JAVIS_TERMINAL=0`. Remove that variable from `.env` then restart UNETI AI.
+**Opening Terminal shows "The terminal is off on this machine".** The server has `UNETI_TERMINAL=0`. Remove that variable from `.env` then restart UNETI AI.
 
 **It reports "4 terminal sessions are already open".** The ceiling of 4 counts across every browser window. Close a tab (the **x**) in the window holding it, or wait 30 minutes for UNETI AI to clear the unwatched sessions.
 
@@ -92,13 +92,13 @@ How to set variables: [.env configuration](16-env-configuration.md).
 
 **Tab produces no completion.** You are in simple mode (Windows). That is an operating-system limit, not a configuration error.
 
-**The shell exits the moment it opens.** Check that `JAVIS_TERMINAL_SHELL` points at a real executable and that the folder in `JAVIS_TERMINAL_CWD` exists.
+**The shell exits the moment it opens.** Check that `UNETI_TERMINAL_SHELL` points at a real executable and that the folder in `UNETI_TERMINAL_CWD` exists.
 
 **Typing `agy` (Antigravity) prints a link then sits there with nowhere to paste the code.** `agy` collects the code through a loopback port on the machine it runs on, and your browser is on a different machine, so it never reaches that port. Since 0.55.46 the terminal declares itself a remote session, so `agy` asks where to paste: after signing into Google, copy the whole `http://localhost:...` address your browser fails to open and paste it into the terminal. On an older `agy` that does not ask, open a second terminal session and run `curl "<the address you copied>"`.
 
 ## Related
 
 - [05 - File manager](05-file-manager.md) - browsing and editing those same folders through the interface.
-- [24 - The UNETI AI CLI (terminal)](24-cli.md) - the opposite direction: typing `javis "..."` from your own machine's terminal.
+- [24 - The UNETI AI CLI (terminal)](24-cli.md) - the opposite direction: typing `uneti "..."` from your own machine's terminal.
 - [14 - Security and accounts](14-security-and-accounts.md) - the login fence covering the Terminal.
 - [16 - .env configuration](16-env-configuration.md) - every environment variable.

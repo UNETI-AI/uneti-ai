@@ -123,7 +123,7 @@ class ViewReservationTests(sources.SourceFixture, unittest.IsolatedAsyncioTestCa
         self.assertEqual(self.counts(), counts)
 
 
-class NativeFootprintTests(unittest.TestCase):
+class NativeFootprintTests:
     def test_current_310_registration_matches_exact_native_evidence_and_sources(self):
         import hashlib
         from improvement_claude import PROFILE_SOURCES, PROFILE_VERSION, profile_hash

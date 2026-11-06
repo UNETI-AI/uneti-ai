@@ -6,7 +6,7 @@
 
    How the preview stays safe and still looks right:
    - It runs in an iframe sandboxed WITHOUT allow-same-origin: the page's scripts run, but in an opaque
-     origin that cannot read Javis's cookies, API or storage. Same rule as the chat's HTML artifact.
+     origin that cannot read UNETI AI's cookies, API or storage. Same rule as the chat's HTML artifact.
    - Because of that sandbox, the page cannot load files from the brain by itself (no session cookie).
      So before drawing, inline() fetches each RELATIVE asset (img, video, audio, source, poster,
      stylesheet, script, CSS url()) through the dashboard, with the session, and writes it into the
@@ -178,6 +178,6 @@
 
   var api = { SANDBOX: SANDBOX, isHtmlPath: isHtmlPath, isRelativeUrl: isRelativeUrl,
     resolveRel: resolveRel, dirOf: dirOf, inline: inline, render: render };
-  if (root) root.JavisHtmlPreview = api;
+  if (root) root.UnetiHtmlPreview = api;
   if (typeof module !== "undefined" && module.exports) module.exports = api;
 })(typeof window !== "undefined" ? window : null);

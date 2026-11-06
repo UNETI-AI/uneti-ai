@@ -13,14 +13,14 @@ import localefmt
 
 
 # 0.453.0 (issue #898, item 1): a turn that started background work (a background shell, a sub-agent) used to end at its
-# first ResultMessage: Javis disconnected, Claude Code went away with its tasks, and the follow-up that should read their
-# result never came. Seen first on Windows, where Javis' own adoption of leftover processes (tien_trinh_nen) does not run,
+# first ResultMessage: UNETI AI disconnected, Claude Code went away with its tasks, and the follow-up that should read their
+# result never came. Seen first on Windows, where UNETI AI' own adoption of leftover processes (tien_trinh_nen) does not run,
 # but the disconnect is the same everywhere. Now the turn stays connected while Claude Code reports tasks still running,
 # then reads the follow-up turn Claude Code starts by itself, or nudges it once when it does not.
-BG_WAIT_DEFAULT = "1800"     # JAVIS_CLAUDE_BG_WAIT, seconds; 0 turns the wait off (old behaviour)
-BG_NUDGE_S = 20.0            # tasks done and Claude Code silent this long: Javis asks it to carry on
+BG_WAIT_DEFAULT = "1800"     # UNETI_CLAUDE_BG_WAIT, seconds; 0 turns the wait off (old behaviour)
+BG_NUDGE_S = 20.0            # tasks done and Claude Code silent this long: UNETI AI asks it to carry on
 BG_MAX_ROUNDS = 5            # a follow-up that starts more background work again: at most this many waits per turn
-BG_NUDGE = ("[Javis] Các việc chạy nền của lượt này đã xong. Đọc kết quả của chúng, làm nốt phần việc đang dở rồi báo "
+BG_NUDGE = ("[UNETI AI] Các việc chạy nền của lượt này đã xong. Đọc kết quả của chúng, làm nốt phần việc đang dở rồi báo "
             "kết quả cho người dùng. Đừng bật thêm việc nền mới nếu không thật cần.")
 
 
@@ -98,23 +98,23 @@ class BackgroundWait:
 
     def gave_up_text(self) -> str:
         mins = int((self.cap or 0) // 60)
-        # The process is kept alive for its tasks (claude_warm._linger) and, on POSIX, Javis adopts them at the end of
+        # The process is kept alive for its tasks (claude_warm._linger) and, on POSIX, UNETI AI adopts them at the end of
         # the turn (tien_trinh_nen): the line saying what it now watches and that it reports back follows this one.
         import tien_trinh_nen
         if tien_trinh_nen.POSIX:
             return localefmt.chu(
-                f"\n\n_(Javis đã chờ việc chạy nền {mins} phút. Việc vẫn đang chạy tiếp, nên lượt này ngừng chờ để "
-                f"khung chat không bị giữ. JAVIS_CLAUDE_BG_WAIT đổi thời gian chờ.)_",
-                f"\n\n_(Javis waited {mins} minutes for the background work. It is still running, so this turn stops "
-                f"waiting and frees the chat. JAVIS_CLAUDE_BG_WAIT changes the wait.)_")
+                f"\n\n_(UNETI AI đã chờ việc chạy nền {mins} phút. Việc vẫn đang chạy tiếp, nên lượt này ngừng chờ để "
+                f"khung chat không bị giữ. UNETI_CLAUDE_BG_WAIT đổi thời gian chờ.)_",
+                f"\n\n_(UNETI AI waited {mins} minutes for the background work. It is still running, so this turn stops "
+                f"waiting and frees the chat. UNETI_CLAUDE_BG_WAIT changes the wait.)_")
         return localefmt.chu(
-            f"\n\n_(Javis đã chờ việc chạy nền {mins} phút mà chưa xong nên ngừng chờ. Nhắn \"làm tiếp\" khi muốn xem "
-            f"kết quả; JAVIS_CLAUDE_BG_WAIT đổi thời gian chờ.)_",
-            f"\n\n_(Javis waited {mins} minutes for the background work and it is still not done, so it stopped "
-            f"waiting. Send \"carry on\" when you want the result; JAVIS_CLAUDE_BG_WAIT changes the wait.)_")
+            f"\n\n_(UNETI AI đã chờ việc chạy nền {mins} phút mà chưa xong nên ngừng chờ. Nhắn \"làm tiếp\" khi muốn xem "
+            f"kết quả; UNETI_CLAUDE_BG_WAIT đổi thời gian chờ.)_",
+            f"\n\n_(UNETI AI waited {mins} minutes for the background work and it is still not done, so it stopped "
+            f"waiting. Send \"carry on\" when you want the result; UNETI_CLAUDE_BG_WAIT changes the wait.)_")
 
 
 def bg_wait_cap():
     """Seconds a turn may stay open for background work (None = off)."""
     from claude_sdk_engine import tran_watchdog
-    return tran_watchdog("JAVIS_CLAUDE_BG_WAIT", BG_WAIT_DEFAULT)
+    return tran_watchdog("UNETI_CLAUDE_BG_WAIT", BG_WAIT_DEFAULT)

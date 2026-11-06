@@ -63,7 +63,7 @@ check("Docker được nói RIÊNG, không dùng chung câu với native",
 check("và câu đó nói rõ container không phải máy bạn",
   /container/.test(VI["ol.note_docker"] || "") && /container/i.test(EN["ol.note_docker"] || ""));
 
-// 02/09: chủ repo dán thẳng lệnh cài vào TERMINAL CỦA JAVIS và ăn "requires superuser". Dễ
+// 02/09: chủ repo dán thẳng lệnh cài vào TERMINAL CỦA UNETI và ăn "requires superuser". Dễ
 // hiểu - nút copy nằm ngay cạnh mà app thì có sẵn một terminal. Nhưng kể cả cài đúng máy vẫn
 // còn hai bức tường nữa, và thiếu một trong hai là "không nối được" mà không hiểu vì sao.
 check("bản Docker nói THẲNG là đừng dùng terminal của UNETI AI",

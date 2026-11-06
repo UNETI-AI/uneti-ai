@@ -1,8 +1,8 @@
 # Quy ước dev (phiên Claude Code làm việc trên repo này)
 
 File này tách khỏi `CLAUDE.md` ngày 2026-09-22. Lý do: `CLAUDE.md` là system prompt đi vào
-MỌI lượt chat của Javis, có trần ngân sách (`tests/python/test_prompt_budget.py`), mà quy ước
-dev thì người dùng Javis không bao giờ cần. Để ở đây thì viết bao nhiêu cũng được, không đánh
+MỌI lượt chat của UNETI AI, có trần ngân sách (`tests/python/test_prompt_budget.py`), mà quy ước
+dev thì người dùng UNETI AI không bao giờ cần. Để ở đây thì viết bao nhiêu cũng được, không đánh
 thuế lên lượt chat nào cả.
 
 ## Nhánh, PR và merge
@@ -50,7 +50,7 @@ Workflow chạy lần lượt từng lượt một, nên hai PR merge cách nhau
 Code đè lên nhau (hai PR sửa cùng chỗ) thì vẫn phải rebase như thường, nhưng `VERSION` và nhật ký
 không bao giờ là chỗ xung đột nữa.
 
-**Cài một lần (chủ repo):** tạo fine-grained token trên GitHub cho repo `javis-os`, quyền
+**Cài một lần (chủ repo):** tạo fine-grained token trên GitHub cho repo `uneti-ai`, quyền
 **Contents** và **Pull requests** là Read and write, lưu thành secret `RELEASE_TOKEN` của repo
 (Settings, Secrets and variables, Actions). Thiếu secret thì lượt Release đỏ kèm đúng câu hướng dẫn
 này, image vẫn được build như cũ, và các mảnh nằm chờ trên `main`: thêm secret xong bấm **Run
@@ -83,8 +83,8 @@ chứ không để xổ hết ra bên ngoài". Luật cứng cho MỌI màn hìn
 - **Ngoài mặt chỉ để thứ cần nhìn và cần bấm:** tiêu đề, nhãn, trạng thái, số liệu, ô nhập, nút. Một dòng phụ ngắn
   (tới khoảng 100 ký tự, một câu) được đứng ngoài nếu thiếu nó người ta không biết bấm gì.
 - **Câu giải thích dài hơn thế** (vì sao, lưu ý, cách làm từng bước, rủi ro, khác nhau giữa hai lựa chọn) **nằm trong
-  nút (i)**: `JavisInfo.btn(t("info.more"))` cạnh tiêu đề hoặc nhãn, `JavisInfo.body(...)` ngay sau, hoặc
-  `JavisInfo.pair(html, nhãn)` khi không có tiêu đề để đứng cạnh (`dashboard/info-tip.js`). HTML tĩnh dùng cùng hai lớp
+  nút (i)**: `UnetiInfo.btn(t("info.more"))` cạnh tiêu đề hoặc nhãn, `UnetiInfo.body(...)` ngay sau, hoặc
+  `UnetiInfo.pair(html, nhãn)` khi không có tiêu đề để đứng cạnh (`dashboard/info-tip.js`). HTML tĩnh dùng cùng hai lớp
   `info-i` / `info-body`, mẫu ở đầu file đó. Bấm mới mở, trong một popup cạnh nút (điện thoại: bảng từ dưới lên), không xổ ra trong trang (chủ repo 29/10/2026). Khối `info-body` chỉ là nguồn chữ cho popup và luôn ẩn.
 - **Không gập:** lỗi và câu xác nhận hiện ra sau khi người dùng bấm (họ đang chờ đúng câu đó), placeholder, nội dung
   người dùng mở ra để đọc (nhật ký cập nhật, nội dung chat, ghi chú). Cảnh báo về tiền hay mất dữ liệu: để ngoài một câu
@@ -100,9 +100,9 @@ Chủ repo chốt 01/11/2026: "đừng lặp lại tiêu đề như vậy, thậ
 biết tiết kiệm không gian". Đầu mỗi trang đã có thanh tiêu đề chung (`.cview-head`, chữ lấy từ `page.<id>.title` và
 `page.<id>.sub`), nên:
 
-- **Thân trang không vẽ lại tên trang**, kể cả khi kèm một câu khẩu hiệu ("Webhook: sự kiện bên ngoài gọi Javis làm
+- **Thân trang không vẽ lại tên trang**, kể cả khi kèm một câu khẩu hiệu ("Webhook: sự kiện bên ngoài gọi UNETI AI làm
   việc" ngay dưới tiêu đề "Webhook" là sai). Mở trang là vào thẳng thứ cần nhìn: số liệu, danh sách, nút bấm.
-- Nút (i) từng đứng cạnh cái tiêu đề thừa thì dời sang cạnh nút hành động chính, hoặc dùng `JavisInfo.pair(html, nhãn)`
+- Nút (i) từng đứng cạnh cái tiêu đề thừa thì dời sang cạnh nút hành động chính, hoặc dùng `UnetiInfo.pair(html, nhãn)`
   với một nhãn nói đúng nội dung bên trong ("Cách lấy cookie").
 - Tiêu đề thẻ bên trong trang phải mang thông tin mới (một con số, một trạng thái), không nhắc lại tên trang hay tên tab.
 - Trang tự ẩn `.cview-head` (Nhiệm vụ, Hội thoại, Nhóm, Chat) thì được có tiêu đề riêng, vì không còn gì để lặp.
@@ -118,7 +118,7 @@ Nhóm và trang Hội thoại.
 - Đổi cách khung chat trông hoặc chạy (ô nhập, nút mic, nút gửi, đính kèm, Enter, trích dẫn, thẻ tin nhắn...) thì
   **trong cùng PR** phải áp cho mọi màn có khung chat tương tự, không đợi chủ nhắc.
 - Các màn hiện có: chat chính (`app.js`, `composer-dictate.js`), Nhóm (`teams.js`), Hội thoại/Chatbot
-  (`conversations.js`). Mic đọc chữ dùng chung `dictate.js`: tìm mọi chỗ gọi bằng `grep -n "JavisDictate" dashboard/*.js`.
+  (`conversations.js`). Mic đọc chữ dùng chung `dictate.js`: tìm mọi chỗ gọi bằng `grep -n "UnetiDictate" dashboard/*.js`.
   Có màn chat mới thì thêm tên vào danh sách này.
 - Màn nào cố ý để khác thì ghi lý do trong mô tả PR, và nói rõ với chủ.
 - Thêm test cho từng màn đã đổi, để lần sau lệch là CI đỏ.

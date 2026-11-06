@@ -17,7 +17,7 @@ import os
 import sys
 import tempfile
 
-os.environ["JAVIS_STATE_DIR"] = tempfile.mkdtemp(prefix="javis-preset-")
+os.environ["UNETI_STATE_DIR"] = tempfile.mkdtemp(prefix="uneti-preset-")
 
 import config as cfg  # noqa: E402
 import main  # noqa: E402

@@ -1,4 +1,4 @@
-"""What Javis does with a conversation's GitHub repos (spec docs/dev/2026-10-github-trong-chat-spec.md, sections 8-9).
+"""What UNETI AI does with a conversation's GitHub repos (spec docs/dev/2026-10-github-trong-chat-spec.md, sections 8-9).
 
 After every saved turn (`after_turn`), for each attached repo whose worktree changed:
 
@@ -43,7 +43,7 @@ POLL_FAST_S = 30            # first ten minutes after a push
 POLL_SLOW_S = 120
 FAST_WINDOW_S = 600
 LOG_TAIL = 6000
-FIX_MARKER = "[Javis GitHub]"
+FIX_MARKER = "[UNETI AI GitHub]"
 
 Notify = Callable[[str, str, bool], Awaitable[Any]]
 StartTurn = Callable[[str, str], Awaitable[bool]]
@@ -193,7 +193,7 @@ def _slug(text: str) -> str:
 
 def _identity_env() -> Dict[str, str]:
     conn = github_repos.status()
-    login = conn.get("login") or "javis"
+    login = conn.get("login") or "uneti"
     uid = github_repos.user_id()
     email = f"{uid}+{login}@users.noreply.github.com" if uid else f"{login}@users.noreply.github.com"
     return {"GIT_AUTHOR_NAME": login, "GIT_AUTHOR_EMAIL": email, "GIT_COMMITTER_NAME": login,
@@ -217,14 +217,14 @@ def commit_all(worktree: str, message: str) -> str:
 
 
 def _final_branch(sid: str, repo: Dict[str, Any], title: str) -> str:
-    """`javis/<slug>-<id6>` decided at the first push (spec 6); after that the branch never changes."""
+    """`uneti/<slug>-<id6>` decided at the first push (spec 6); after that the branch never changes."""
     wt = repo["worktree"]
     cur = github_repos.git_out(["rev-parse", "--abbrev-ref", "HEAD"], wt)
     short = github_repos.session_branch(sid)
     slug = _slug(title)
     if cur != short or not slug:
         return cur
-    new = f"javis/{slug}-{short.split('/', 1)[1][:6]}"
+    new = f"uneti/{slug}-{short.split('/', 1)[1][:6]}"
     r = github_repos.git(["branch", "-m", new], wt, check=False)
     return new if r.returncode == 0 else cur
 
@@ -240,9 +240,9 @@ def push(repo: Dict[str, Any], branch: str) -> Tuple[str, bool]:
     if p.returncode != 0:
         msg = github_repos._redact((p.stderr or "").strip().splitlines()[-1] if p.stderr else "?")
         if "non-fast-forward" in (p.stderr or "") or "fetch first" in (p.stderr or ""):
-            raise github_repos.RepoError(_c(f"Nhánh {branch} trên GitHub có commit mà máy này không có, Javis không "
+            raise github_repos.RepoError(_c(f"Nhánh {branch} trên GitHub có commit mà máy này không có, UNETI AI không "
                                             f"ghi đè. ({msg})",
-                                            f"Branch {branch} on GitHub has commits this machine lacks; Javis does "
+                                            f"Branch {branch} on GitHub has commits this machine lacks; UNETI AI does "
                                             f"not overwrite them. ({msg})"))
         raise github_repos.RepoError(_c(f"Đẩy lên không được: {msg}", f"Push failed: {msg}"))
     github_repos.git(["branch", f"--set-upstream-to=origin/{branch}"], wt, check=False)
@@ -250,7 +250,7 @@ def push(repo: Dict[str, Any], branch: str) -> Tuple[str, bool]:
 
 
 def pr_body(info: Dict[str, Any], report: Dict[str, Any], sid: str) -> str:
-    lines = ["Opened by Javis from a chat.", ""]
+    lines = ["Opened by UNETI AI from a chat.", ""]
     if info.get("task"):
         lines += ["**Task**", "", "> " + str(info["task"])[:1500].replace("\n", "\n> "), ""]
     res = report.get("checks") or []
@@ -271,7 +271,7 @@ def pr_body(info: Dict[str, Any], report: Dict[str, Any], sid: str) -> str:
     eng = " ".join(x for x in (info.get("engine"), info.get("model")) if x)
     if eng:
         lines.append(f"Engine: {eng}")
-    lines.append(f"Javis chat: `{sid[:8]}`")
+    lines.append(f"UNETI AI chat: `{sid[:8]}`")
     return "\n".join(lines)
 
 
@@ -297,7 +297,7 @@ def ship(sid: str, brain: str, repo: Dict[str, Any], report: Dict[str, Any]) -> 
     info = _session(sid)
     # The job's own request names the PR; the chat title only describes the chat's FIRST job.
     task_line = (str(info.get("task") or "").strip().splitlines() or [""])[0]
-    title = (task_line[:100] or (info.get("title") or "").strip() or _c("Thay đổi từ Javis", "Changes from Javis"))
+    title = (task_line[:100] or (info.get("title") or "").strip() or _c("Thay đổi từ UNETI AI", "Changes from UNETI AI"))
     row = st().ensure(sid, fn, brain=brain, worktree=repo["worktree"], base_branch=_base_name(repo),
                       engine=str(info.get("engine") or ""), model=str(info.get("model") or ""))
     if not row.get("pr_number") or row.get("integ") == "merged":
@@ -309,7 +309,7 @@ def ship(sid: str, brain: str, repo: Dict[str, Any], report: Dict[str, Any]) -> 
         # The last PR of this chat is merged: what comes now is a new job on the branch the worktree is on.
         row = st().update(sid, fn, branch="", head_sha="", pr_number=0, pr_url="", pr_node_id="", ci="none",
                           integ="no_pr", post_merge="", merged_sha="", fix_rounds=0, rerun_used=0)
-    sha = commit_all(repo["worktree"], f"{title[:72]}\n\nJavis chat {sid[:8]}")
+    sha = commit_all(repo["worktree"], f"{title[:72]}\n\nUneti chat {sid[:8]}")
     branch = row.get("branch") or _final_branch(sid, repo, title)
     pushed_sha, pushed_now = push(repo, branch)
     pr = ensure_pr(repo, branch, title, pr_body(info, report, sid))
@@ -352,7 +352,7 @@ async def request_fix(row: Dict[str, Any], why: str, details: str, key: str) -> 
         "Làm đúng thứ tự: 1) tái hiện ĐÚNG lỗi này ở máy, trong thư mục làm việc của repo (chạy lại đúng lệnh đã đỏ); "
         "2) tìm nguyên nhân gốc rồi sửa; 3) chạy lại đúng lệnh đó cho xanh. KHÔNG bỏ qua, xoá hay nới test, không sửa "
         "workflow CI để cho xanh. Nếu lỗi không do thay đổi của nhánh này thì nói rõ vì sao và dừng. "
-        "Javis tự kiểm tra và đẩy lên sau lượt này.",
+        "UNETI AI tự kiểm tra và đẩy lên sau lượt này.",
     ])
     started = False
     if _start_turn is not None:
@@ -362,9 +362,9 @@ async def request_fix(row: Dict[str, Any], why: str, details: str, key: str) -> 
             started = False
     if not started:
         reason = _c("Cần một lượt chat để sửa nhưng chưa mở được lượt tự động (máy chủ vừa khởi động lại?). "
-                    "Nhắn \"sửa tiếp\" để Javis làm.",
+                    "Nhắn \"sửa tiếp\" để UNETI AI làm.",
                     "A fix turn is needed but could not start on its own (did the server restart?). "
-                    "Send \"keep fixing\" and Javis takes it from there.")
+                    "Send \"keep fixing\" and UNETI AI takes it from there.")
         st().update(sid, fn, exec="stuck", stuck_reason=reason)
         await _say(sid, f"**{fn}**: {why}\n\n{details}\n\n{reason}", False, once=f"nofix:{key}")
     return started
@@ -570,7 +570,7 @@ async def check_row(row: Dict[str, Any]) -> Dict[str, Any]:
     except (GitHubError, github_repos.RepoError):
         return row      # GitHub unreachable or not connected: try again next tick, change nothing
     pr = snap["pr"] or {}
-    # The PR itself first: merged or closed by a person outside Javis.
+    # The PR itself first: merged or closed by a person outside UNETI AI.
     if pr.get("merged"):
         return await on_merged(row, pr)
     if pr and pr.get("state") == "closed":
@@ -579,7 +579,7 @@ async def check_row(row: Dict[str, Any]) -> Dict[str, Any]:
         await _say(sid, f"**{fn}**: {reason}{_pr_tail(row)}", False, once=f"closed:{sid}:{fn}:{row['pr_number']}")
         return st().get(sid, fn) or row
     if snap["head"] != row["head_sha"]:
-        # A newer commit replaced the one Javis recorded: its CI result belongs to that commit only (spec 9.3).
+        # A newer commit replaced the one UNETI AI recorded: its CI result belongs to that commit only (spec 9.3).
         row = st().update(sid, fn, head_sha=snap["head"], ci="pending", pushed_at=time.time(), rerun_used=0,
                           integ="pr_open")
     st().save_checks(fn, row["head_sha"], snap["items"])
@@ -630,9 +630,9 @@ async def on_red(row: Dict[str, Any], snap: Dict[str, Any]) -> Dict[str, Any]:
     logs = await asyncio.to_thread(_failed_logs, row, failed)
     if await asyncio.to_thread(_base_also_red, row, names):
         reason = _c(f"CI đỏ ({', '.join(names)}) nhưng nhánh {row.get('base_branch')} cũng đỏ đúng các kiểm tra đó: "
-                    "không phải lỗi của thay đổi này. Javis không sửa lan ra ngoài phạm vi.",
+                    "không phải lỗi của thay đổi này. UNETI AI không sửa lan ra ngoài phạm vi.",
                     f"CI is red ({', '.join(names)}) but {row.get('base_branch')} fails the same checks: not this "
-                    "change's fault. Javis does not widen the job to fix it.")
+                    "change's fault. UNETI AI does not widen the job to fix it.")
         st().update(sid, fn, exec="stuck", stuck_reason=reason)
         await _say(sid, f"**{fn}**: {reason}{_pr_tail(row)}", False, once=f"basered:{sid}:{fn}:{row['head_sha']}")
         return st().get(sid, fn) or row
@@ -657,7 +657,7 @@ async def on_red(row: Dict[str, Any], snap: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def _merge_blockers(row: Dict[str, Any], pr: Dict[str, Any]) -> List[str]:
-    """Why Javis must not merge this PR on its own right now (spec 11.1). Empty list = it may."""
+    """Why UNETI AI must not merge this PR on its own right now (spec 11.1). Empty list = it may."""
     out = []
     rec = github_repos.find(row.get("brain") or "", row["full_name"]) or {}
     if not github_repos.auto_merge_on(rec):
@@ -795,9 +795,9 @@ async def on_green(row: Dict[str, Any], pr: Dict[str, Any]) -> Dict[str, Any]:
     blockers = await asyncio.to_thread(_merge_blockers, row, pr)
     if not blockers:
         return await merge_now(row, pr)
-    await _say(sid, _c(f"**{fn}**: CI xanh, PR #{row['pr_number']} sẵn sàng merge. Javis chưa tự merge vì "
+    await _say(sid, _c(f"**{fn}**: CI xanh, PR #{row['pr_number']} sẵn sàng merge. UNETI AI chưa tự merge vì "
                        f"{'; '.join(blockers)}.{_pr_tail(row)}",
-                       f"**{fn}**: CI green, PR #{row['pr_number']} is ready to merge. Javis did not merge it because "
+                       f"**{fn}**: CI green, PR #{row['pr_number']} is ready to merge. UNETI AI did not merge it because "
                        f"{'; '.join(blockers)}.{_pr_tail(row)}"), True, once=f"green:{sid}:{fn}:{row['head_sha']}")
     return row
 
@@ -809,15 +809,15 @@ async def on_no_ci(row: Dict[str, Any], pr: Dict[str, Any]) -> Dict[str, Any]:
         return await on_green(row, pr)      # conflict wording and state are the same
     st().update(sid, fn, integ="ready")
     await _say(sid, _c(f"**{fn}**: repo không có CI cho commit này. Kiểm tra ở máy đã qua; PR #{row['pr_number']} "
-                       f"chờ người bấm merge, Javis không tự merge khi không có CI.{_pr_tail(row)}",
+                       f"chờ người bấm merge, UNETI AI không tự merge khi không có CI.{_pr_tail(row)}",
                        f"**{fn}**: no CI ran on this commit. Local checks passed; PR #{row['pr_number']} waits for a "
-                       f"person to merge, Javis never auto-merges without CI.{_pr_tail(row)}"), True,
+                       f"person to merge, UNETI AI never auto-merges without CI.{_pr_tail(row)}"), True,
                once=f"noci:{sid}:{fn}:{row['head_sha']}")
     return st().get(sid, fn) or row
 
 
 async def on_merged(row: Dict[str, Any], pr: Dict[str, Any]) -> Dict[str, Any]:
-    """The PR was merged on GitHub (by a person, or by Javis on an earlier tick)."""
+    """The PR was merged on GitHub (by a person, or by UNETI AI on an earlier tick)."""
     sid, fn = row["sid"], row["full_name"]
     if row.get("integ") == "merged":
         return row
@@ -892,9 +892,9 @@ async def maybe_next(sid: str) -> bool:
             started = False
     if not started:
         await _say(sid, _c(f"Việc kế tiếp đã tới lượt nhưng chưa tự mở được lượt chat: {job['text']}\n"
-                           "Nhắn \"làm tiếp\" để Javis bắt đầu.",
+                           "Nhắn \"làm tiếp\" để UNETI AI bắt đầu.",
                            f"The next job is due but no automatic turn could start: {job['text']}\n"
-                           "Send \"go on\" and Javis starts it."), False, once=f"next:{job['id']}")
+                           "Send \"go on\" and UNETI AI starts it."), False, once=f"next:{job['id']}")
     return started
 
 
@@ -998,7 +998,7 @@ async def cross_review(row: Dict[str, Any]) -> Dict[str, Any]:
             try:
                 await asyncio.to_thread(github_repos.client().comment, fn, row["pr_number"],
                                         "Not cross-reviewed: no engine of another family that can review text-only "
-                                        "is ready in Javis.")
+                                        "is ready in UNETI AI.")
             except Exception:
                 pass
             # Owner, 05/11/2026: say why in the chat too. A plan run through a CLI (ChatGPT, Grok Build, Antigravity)
@@ -1079,7 +1079,7 @@ def _is_review_turn(user_message: str) -> bool:
 def lessons_path(brain: str, full_name: str):
     from pathlib import Path
     root = Path(_brain_root(brain) or brain or ".")
-    return root / "Javis" / "learned" / "repos" / (full_name.replace("/", "__") + ".md")
+    return root / "UNETI" / "learned" / "repos" / (full_name.replace("/", "__") + ".md")
 
 
 def read_lessons(brain: str, full_name: str) -> List[str]:
@@ -1101,7 +1101,7 @@ def add_lesson(brain: str, full_name: str, lesson: str) -> bool:
     cur = (cur + [lesson])[-LESSONS_MAX:]
     p = lessons_path(brain, full_name)
     p.parent.mkdir(parents=True, exist_ok=True)
-    p.write_text(f"# Bài học của repo {full_name}\n\nJavis tự ghi khi một lỗi thật vừa được sửa. Mỗi dòng một bài học.\n\n"
+    p.write_text(f"# Bài học của repo {full_name}\n\nUneti tự ghi khi một lỗi thật vừa được sửa. Mỗi dòng một bài học.\n\n"
                  + "\n".join(f"- {x}" for x in cur) + "\n", encoding="utf-8")
     return True
 

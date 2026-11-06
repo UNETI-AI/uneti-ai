@@ -13,17 +13,17 @@ thừa hưởng nguyên vẹn, không phải chép lại.
 
 Ba loại engine, khác nhau ở CÔNG CỤ có được - đây là chỗ phải cẩn thận:
 - anthropic-cli: Claude Code. Tool file native + Bash + MCP, chặn theo allowlist per-call.
-- openai-oauth: Codex CLI, cũng là agent thật (đọc/ghi file + MCP qua profile javis).
+- openai-oauth: Codex CLI, cũng là agent thật (đọc/ghi file + MCP qua profile uneti).
   Sandbox của Codex ánh xạ theo mode: suggest -> read-only, auto -> workspace-write,
   full -> toàn quyền. KHÔNG có allowlist per-call như Claude nên chỉ chặn ở tầng sandbox.
 - grok-cli: Grok Build CLI chạy bằng gói SuperGrok / X Premium+. Cũng agent thật (tool file +
   MCP hub qua .grok/config.toml trong brain). Mức quyền xuống thẳng cờ chặn của CLI:
   suggest -> chặn Write/Edit/Bash, auto -> chặn Bash, full -> không chặn ở tầng CLI.
 - api (openrouter/openai/gemini/anthropic-api): KHÔNG có tool native. Bù lại hub cấp
-  javis_read_file / javis_list_dir / javis_write_file / javis_use_skill, tìm và đọc web
-  (javis_web_search / javis_web_fetch) + tool MCP, và javis_write_file tự chặn khi mode là
-  suggest (mcp_hub._builtin_tools). Từ 05/11/2026 có thêm TERMINAL THẬT (javis_terminal,
-  javis_process) trong brain, nhưng chỉ khi việc chạy ở mức `full` VÀ engine Claude mà nó thay
+  uneti_read_file / uneti_list_dir / uneti_write_file / uneti_use_skill, tìm và đọc web
+  (uneti_web_search / uneti_web_fetch) + tool MCP, và uneti_write_file tự chặn khi mode là
+  suggest (mcp_hub._builtin_tools). Từ 05/11/2026 có thêm TERMINAL THẬT (uneti_terminal,
+  uneti_process) trong brain, nhưng chỉ khi việc chạy ở mức `full` VÀ engine Claude mà nó thay
   thế cũng được chạy Bash (`cli_cho_bash`). Nghĩa là cùng một việc, đổi bộ não sang API key
   thì được đúng những gì Claude Code được: loop bị cô lập, việc mức auto/suggest vẫn không có
   lệnh máy; việc Toàn quyền (dựng video bằng ffmpeg chẳng hạn) thì có.
@@ -71,8 +71,8 @@ _KEY_FIELD = {
     "anthropic-compat": "anthropic_compat_key",
 }
 
-# mode của Javis -> sandbox của Codex CLI. Bản đồ thật nằm ở `claude_cli.codex_sandbox_cho_mode`
-# (nó còn đọc cờ JAVIS_CODEX_SANDBOX); giữ dict này để mã cũ đọc tên mức vẫn chạy.
+# mode của UNETI AI -> sandbox của Codex CLI. Bản đồ thật nằm ở `claude_cli.codex_sandbox_cho_mode`
+# (nó còn đọc cờ UNETI_CODEX_SANDBOX); giữ dict này để mã cũ đọc tên mức vẫn chạy.
 _CODEX_SANDBOX = {"suggest": "read-only", "auto": "workspace-write", "full": None}
 
 # ── Final "mất đăng nhập" phải bị coi là engine CHẾT, không phải kết quả ──────────────────
@@ -105,14 +105,14 @@ def final_loi_dang_nhap(text: str) -> bool:
 # ghi Google Sheet + gửi Telegram bị chặt ngang lúc đang ghi dở, result rỗng (báo 18/08).
 # Trần này là LƯỚI ĐỠ chống fork treo vô hạn, không phải công cụ quản chi phí - fork đơ
 # thật thì watchdog idle-timeout của engine bắt sớm hơn nhiều, nên đặt trần theo việc nền
-# DÀI NHẤT hợp lệ chứ không theo việc trung bình. Chỉnh qua env JAVIS_BG_MAX_WALL_S
+# DÀI NHẤT hợp lệ chứ không theo việc trung bình. Chỉnh qua env UNETI_BG_MAX_WALL_S
 # (giây; giá trị rác hoặc <= 0 thì về mặc định).
 BG_MAX_WALL_S_DEFAULT = 3600
 
 
 def bg_max_wall_s() -> int:
     try:
-        v = int(os.getenv("JAVIS_BG_MAX_WALL_S", "") or 0)
+        v = int(os.getenv("UNETI_BG_MAX_WALL_S", "") or 0)
         if v > 0:
             return v
     except (TypeError, ValueError):
@@ -289,7 +289,7 @@ def availability(spec: dict, settings: dict = None) -> tuple:
         try:
             import antigravity_cli as _a
             if not _a.find_antigravity_cli():
-                return False, "Chưa cài Antigravity CLI (`agy`) trên máy chạy Javis."
+                return False, "Chưa cài Antigravity CLI (`agy`) trên máy chạy UNETI AI."
             # Bản NỀN (đọc cache, làm mới bằng thread), KHÔNG phải auth_status(): hàm này chạy
             # ngay trong code async (học sau lượt chat, việc Kanban, nhắc hẹn, loop), mà
             # auth_status() hỏi thẳng `agy models` tới 80 giây. Cả app đứng theo: chủ repo đổi
@@ -343,7 +343,7 @@ class _ApiAuxEngine:
         self.account_id = account_id or ""
         self.system_prompt = system_prompt
         self.vault_root = vault_root
-        self.javis_mode = mode
+        self.uneti_mode = mode
         self.tag = tag
         self.reasoning = reasoning
         self.session_id = None      # engine API không có phiên nối tiếp - giữ cho đủ hợp đồng
@@ -396,11 +396,11 @@ class _ApiAuxEngine:
             try:
                 if ctx is not None:
                     tools, route = await mcp_hub.discover_all(
-                        self.javis_mode or "full", vault_root=self.vault_root,
+                        self.uneti_mode or "full", vault_root=self.vault_root,
                         workspace_root=list(ctx.workspace_roots), coding_ctx_cua_phien=ctx)
-                    co_terminal = "javis_terminal" in route
+                    co_terminal = "uneti_terminal" in route
                 else:
-                    tools, route = await mcp_hub.discover_all(self.javis_mode or "full",
+                    tools, route = await mcp_hub.discover_all(self.uneti_mode or "full",
                                                               vault_root=self.vault_root)
             except Exception as e:
                 print(f"[aux discover] {e}", file=sys.stderr)
@@ -412,8 +412,8 @@ class _ApiAuxEngine:
         # ("phiên này bị chặn quyền"), khiến chủ đi sửa mức quyền trong khi mức quyền không hề
         # sai. Nói rõ THIẾU GÌ và VÌ SAO thì câu báo về mới dẫn đúng tới việc cần làm.
         if co_terminal:
-            _may = ("terminal thật (javis_terminal, chạy nền bằng background=true rồi xem bằng "
-                    "javis_process) với thư mục làm việc là brain, nên chạy được ffmpeg, python, "
+            _may = ("terminal thật (uneti_terminal, chạy nền bằng background=true rồi xem bằng "
+                    "uneti_process) với thư mục làm việc là brain, nên chạy được ffmpeg, python, "
                     "script dựng video... như trên máy chủ; ")
             _thieu = "Bạn KHÔNG có: "
         else:
@@ -423,9 +423,9 @@ class _ApiAuxEngine:
         sysprompt += (
             "\n\n[Sự thật hệ thống - năng lực của phiên này] Bạn đang chạy bằng engine API "
             f"'{self.provider}', KHÔNG phải Claude Code. Bạn có: {_may}tìm và đọc web "
-            "(javis_web_search, javis_web_fetch; chưa thấy trong danh sách thì tìm bằng "
-            "javis_search_tools rồi gọi qua javis_run_tool), các tool qua MCP Hub của Javis "
-            "(gồm tool đọc/ghi file trong vault và mọi MCP người dùng đã đấu vào Javis). "
+            "(uneti_web_search, uneti_web_fetch; chưa thấy trong danh sách thì tìm bằng "
+            "uneti_search_tools rồi gọi qua uneti_run_tool), các tool qua MCP Hub của UNETI AI "
+            "(gồm tool đọc/ghi file trong vault và mọi MCP người dùng đã đấu vào UNETI AI). "
             f"{_thieu}các "
             "connector gắn thẳng vào TÀI KHOẢN Claude - Gmail, Google Drive, Google Calendar "
             "gọi bằng tool native `mcp__<tên>__*` chỉ tồn tại trên engine Claude Code. "
@@ -519,7 +519,7 @@ class _ApiAuxEngine:
         Thư mục làm việc là brain của việc. Mỗi lượt một mã phiên riêng (`nen-<tag>-<ngẫu nhiên>`)
         nên thư mục hiện hành, biến môi trường và tiến trình nền của việc này không lẫn sang việc
         khác. Tiến trình chạy nền xong thì báo về khung chat của chủ nếu lượt biết (turn_context),
-        còn không thì về Javis Core của brain (`main._report_route`, nhánh khung chat không tồn tại)."""
+        còn không thì về UNETI AI Core của brain (`main._report_route`, nhánh khung chat không tồn tại)."""
         if not self.terminal or not self.vault_root:
             return None
         try:
@@ -808,12 +808,12 @@ def cli_cho_bash(cli) -> bool:
 
 
 def _build_api(spec, claude_cli_obj, mode, tag):
-    _mode = mode or getattr(claude_cli_obj, "javis_mode", None) or "full"
+    _mode = mode or getattr(claude_cli_obj, "uneti_mode", None) or "full"
     return _ApiAuxEngine(
         provider=spec["provider"],
         model=spec.get("model") or "",
         system_prompt=getattr(claude_cli_obj, "system_prompt", None),
-        vault_root=getattr(claude_cli_obj, "javis_vault", None),
+        vault_root=getattr(claude_cli_obj, "uneti_vault", None),
         mode=_mode,
         tag=tag or getattr(claude_cli_obj, "tag", "aux"),
         terminal=_mode == "full" and cli_cho_bash(claude_cli_obj),
@@ -827,29 +827,29 @@ def _build_codex(spec, claude_cli_obj, mode, tag, codex_profile=None):
                   model=spec.get("model") or None,
                   instructions=getattr(claude_cli_obj, "system_prompt", None))
     # Codex không có allowlist per-call như Claude → chặn ở tầng sandbox của chính nó.
-    # `codex_sandbox_cho_mode` còn đọc cờ JAVIS_CODEX_SANDBOX: trong Docker, bubblewrap không
+    # `codex_sandbox_cho_mode` còn đọc cờ UNETI_CODEX_SANDBOX: trong Docker, bubblewrap không
     # chạy nổi nên rào đó không phải "chặt hơn" mà là "chết hẳn", và cờ là đường thoát.
-    cc.sandbox = codex_sandbox_cho_mode(mode or getattr(claude_cli_obj, "javis_mode", None) or "full")
-    cc.vault_root = getattr(claude_cli_obj, "javis_vault", None)   # ảnh Codex vẽ về đúng brain
+    cc.sandbox = codex_sandbox_cho_mode(mode or getattr(claude_cli_obj, "uneti_mode", None) or "full")
+    cc.vault_root = getattr(claude_cli_obj, "uneti_vault", None)   # ảnh Codex vẽ về đúng brain
     if codex_profile:
         try:
-            cc.profile = codex_profile()   # profile javis = thấy MCP của Javis (POS, connector...)
+            cc.profile = codex_profile()   # profile uneti = thấy MCP của UNETI AI (POS, connector...)
         except Exception as e:
             print(f"[aux codex profile] {e}", file=sys.stderr)
-    # The turn key (X-Javis-Turn) rides on every query, as on a chat turn (main._apply_codex_hub). Without it a reminder
-    # or Kanban job on Codex reached the hub as "nobody", so javis_team op=dispatch refused it with "lượt không có danh
-    # tính" and the team never woke up. Only when the profile's `javis` entry IS the hub (hub on): an override under
-    # mcp_servers.javis with no hub entry would be a broken half-entry. No bound turn -> no key, nothing sent.
+    # The turn key (X-Uneti-Turn) rides on every query, as on a chat turn (main._apply_codex_hub). Without it a reminder
+    # or Kanban job on Codex reached the hub as "nobody", so uneti_team op=dispatch refused it with "lượt không có danh
+    # tính" and the team never woke up. Only when the profile's `uneti` entry IS the hub (hub on): an override under
+    # mcp_servers.uneti with no hub entry would be a broken half-entry. No bound turn -> no key, nothing sent.
     try:
         cc.hub_turn = bool(cc.profile) and bool(cfgmod.read_settings().get("mcp", {}).get("hub", True))
     except Exception as e:  # noqa: BLE001 - no key means "nobody", never a broken job
         print(f"[aux codex turn] {e}", file=sys.stderr)
     try:
         import mcp_hub
-        mcp_hub.dat_codex_vault(cc.extra_config, getattr(claude_cli_obj, "javis_vault", None))
+        mcp_hub.dat_codex_vault(cc.extra_config, getattr(claude_cli_obj, "uneti_vault", None))
         # The job's own level, not the profile's `full` (see mcp_hub.dat_codex_mode).
         mcp_hub.dat_codex_mode(cc.extra_config,
-                               mode or getattr(claude_cli_obj, "javis_mode", None) or "full")
+                               mode or getattr(claude_cli_obj, "uneti_mode", None) or "full")
     except Exception as e:
         print(f"[aux codex vault] {e}", file=sys.stderr)
     # Việc nền theo lịch: hub bắt buộc, không app ChatGPT - xem mcp_hub.CODEX_REQUIRED_KEY. Chat
@@ -900,16 +900,16 @@ def _build_grok(spec, claude_cli_obj, mode, tag):
 
     Entry MCP dựng bằng `grok_cli.hub_entry()` chứ KHÔNG viết tay: Grok đọc khoá `url`, còn
     `agy` đọc `serverUrl`. Chép nhầm khoá giữa hai engine là không có lấy một tool nào của
-    Javis mà không một câu lỗi nào - đúng thứ đã xảy ra với `agy` mấy bản liền.
+    UNETI AI mà không một câu lỗi nào - đúng thứ đã xảy ra với `agy` mấy bản liền.
     """
     import grok_cli as _g
-    muc = mode or getattr(claude_cli_obj, "javis_mode", None) or "full"
+    muc = mode or getattr(claude_cli_obj, "uneti_mode", None) or "full"
     gc = _g.GrokCLI(cwd=getattr(claude_cli_obj, "cwd", None),
                     tag=tag or getattr(claude_cli_obj, "tag", "aux"),
                     model=spec.get("model") or None,
                     instructions=getattr(claude_cli_obj, "system_prompt", None))
     gc.mode = muc
-    vault = getattr(claude_cli_obj, "javis_vault", None) or getattr(claude_cli_obj, "cwd", None)
+    vault = getattr(claude_cli_obj, "uneti_vault", None) or getattr(claude_cli_obj, "cwd", None)
     if vault:
         try:
             import mcp_hub
@@ -917,7 +917,7 @@ def _build_grok(spec, claude_cli_obj, mode, tag):
             if bool(cfgmod.read_settings().get("mcp", {}).get("hub", True)):
                 hub = _g.hub_entry(mcp_hub.hub_url(),
                                    {"Authorization": f"Bearer {mcp_hub.hub_token()}",
-                                    "X-Javis-Mode": muc, "X-Javis-Vault": str(vault)})
+                                    "X-Uneti-Mode": muc, "X-Uneti-Vault": str(vault)})
             _g.ghi_mcp_settings(vault, hub)
         except Exception as e:
             print(f"[aux grok mcp] {e}", file=sys.stderr)
@@ -934,18 +934,18 @@ def _build_antigravity(spec, claude_cli_obj, mode, tag):
       `antigravity_cli.co_quyen_cho_mode` - nó nói thẳng chuyện này, và rào tiền/đơn/đăng bài
       vẫn nằm ở MCP Hub chứ không ở CLI.
     - **Hình dạng entry MCP khác hẳn.** `agy` đọc khoá `serverUrl`, Grok đọc `url`. Chép nhầm
-      khoá là engine chạy trơn tru mà không có lấy một tool nào của Javis, không một tiếng
+      khoá là engine chạy trơn tru mà không có lấy một tool nào của UNETI AI, không một tiếng
       động - đúng thứ đã xảy ra mấy bản liền. Nên dựng entry bằng `antigravity_cli.hub_entry()`
       chứ không viết tay.
     """
     import antigravity_cli as _a
-    muc = mode or getattr(claude_cli_obj, "javis_mode", None) or "full"
+    muc = mode or getattr(claude_cli_obj, "uneti_mode", None) or "full"
     ac = _a.AntigravityCLI(cwd=getattr(claude_cli_obj, "cwd", None),
                            tag=tag or getattr(claude_cli_obj, "tag", "aux"),
                            model=spec.get("model") or None,
                            instructions=getattr(claude_cli_obj, "system_prompt", None))
     ac.mode = muc
-    vault = getattr(claude_cli_obj, "javis_vault", None) or getattr(claude_cli_obj, "cwd", None)
+    vault = getattr(claude_cli_obj, "uneti_vault", None) or getattr(claude_cli_obj, "cwd", None)
     if vault:
         try:
             import mcp_hub
@@ -953,7 +953,7 @@ def _build_antigravity(spec, claude_cli_obj, mode, tag):
             if bool(cfgmod.read_settings().get("mcp", {}).get("hub", True)):
                 hub = _a.hub_entry(mcp_hub.hub_url(),
                                    {"Authorization": f"Bearer {mcp_hub.hub_token()}",
-                                    "X-Javis-Mode": muc, "X-Javis-Vault": str(vault)})
+                                    "X-Uneti-Mode": muc, "X-Uneti-Vault": str(vault)})
             _a.ghi_mcp_settings(vault, hub)
         except Exception as e:
             print(f"[aux antigravity mcp] {e}", file=sys.stderr)
@@ -1108,11 +1108,11 @@ def _links_for_step(step: dict, cli, mode, tag, codex_profile, settings, claude_
                     else model_routing.usable_accounts(m, prov, field))
             mk = lambda key="", acc="": _ApiAuxEngine(   # noqa: E731
                 provider=prov, model=sp["model"], system_prompt=getattr(cli, "system_prompt", None),
-                vault_root=getattr(cli, "javis_vault", None),
-                mode=mode or getattr(cli, "javis_mode", None) or "full",
+                vault_root=getattr(cli, "uneti_vault", None),
+                mode=mode or getattr(cli, "uneti_mode", None) or "full",
                 tag=tag or getattr(cli, "tag", "aux"), reasoning=level if level in model_routing.LEVELS else "off",
                 api_key=key, account_id=acc,
-                terminal=(mode or getattr(cli, "javis_mode", None) or "full") == "full" and cli_cho_bash(cli))
+                terminal=(mode or getattr(cli, "uneti_mode", None) or "full") == "full" and cli_cho_bash(cli))
             if len(accs) > 1:
                 return [mk(a["key"], a["id"]) for a in accs]
             if accs:

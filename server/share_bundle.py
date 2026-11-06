@@ -1,9 +1,9 @@
 """
-share_bundle.py - Xuất/Nhập năng lực Javis (agent / skill / workflow) dưới dạng gói .zip để
+share_bundle.py - Xuất/Nhập năng lực UNETI AI (agent / skill / workflow) dưới dạng gói .zip để
 CHIA SẺ giữa các brain / người dùng.
 
-Gói "javis-bundle" = 1 file .zip:
-  javis-bundle.json          - manifest (kind, primary, items, app_version)
+Gói "uneti-bundle" = 1 file .zip:
+  uneti-bundle.json          - manifest (kind, primary, items, app_version)
   agents/<slug>.md           - agent (1 file)
   workflows/<slug>.md        - workflow (1 file)
   skills/<slug>/...          - skill (cả thư mục: SKILL.md + asset)
@@ -11,7 +11,7 @@ Gói "javis-bundle" = 1 file .zip:
 Gói KÈM PHỤ THUỘC để bên nhận chạy được ngay:
   workflow -> các agent nó tham chiếu (step.agent + verify_agent) -> skill của các agent đó
   agent    -> skill của agent
-Skill HỆ THỐNG (javis-builder/ingest/query/lint...) KHÔNG gói (bên nhận đã có sẵn theo app).
+Skill HỆ THỐNG (uneti-builder/ingest/query/lint...) KHÔNG gói (bên nhận đã có sẵn theo app).
 
 Nhập: đọc gói .zip (hoặc 1 file .md lẻ cho agent/workflow), ghi vào đúng thư mục brain. Rào an toàn:
   - chống zip-slip / path traversal (chỉ nhận agents/ workflows/ skills/, chặn '..', path tuyệt đối).
@@ -84,7 +84,7 @@ def build_bundle(kind, slug, *, agents_dir, workflows_dir, skills_root,
     """Trả (zip_bytes, filename) cho MỘT hoặc NHIỀU năng lực cùng loại + phụ thuộc.
 
     `slug` nhận str (một cái, như cũ) hoặc list/tuple (chọn nhiều - 16/08: trang Studio
-    thêm chọn tất cả / tải về đã chọn). Nhiều cái vẫn ra MỘT gói javis-bundle duy nhất:
+    thêm chọn tất cả / tải về đã chọn). Nhiều cái vẫn ra MỘT gói uneti-bundle duy nhất:
     manifest.items đã là danh sách từ đầu nên phía NHẬP không cần biết gì mới - gói 5
     workflow nhập y như gói 1 workflow kèm 4 phụ thuộc. (None, None) nếu không có gì.
     """
@@ -153,11 +153,11 @@ def build_bundle(kind, slug, *, agents_dir, workflows_dir, skills_root,
         return None, None
 
     # primary = cái ĐẦU TIÊN tìm thấy - giữ nguyên hình dạng manifest v1 để gói chọn-nhiều
-    # mở được bằng mọi bản Javis cũ (import chỉ đọc items + file, không đọc primary).
+    # mở được bằng mọi bản UNETI AI cũ (import chỉ đọc items + file, không đọc primary).
     goc = [i for i in items if i["type"] == kind and i["slug"] in slugs]
     prim = goc[0] if goc else None
     manifest = {
-        "format": "javis-bundle", "version": 1, "kind": kind,
+        "format": "uneti-bundle", "version": 1, "kind": kind,
         "primary": {"type": kind, "slug": (prim or {}).get("slug", slugs[0]),
                     "name": (prim or {}).get("name", slugs[0])},
         "items": items, "app_version": app_version,
@@ -165,11 +165,11 @@ def build_bundle(kind, slug, *, agents_dir, workflows_dir, skills_root,
     }
     buf = io.BytesIO()
     with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as z:
-        z.writestr("javis-bundle.json", json.dumps(manifest, ensure_ascii=False, indent=1))
+        z.writestr("uneti-bundle.json", json.dumps(manifest, ensure_ascii=False, indent=1))
         for arc, data in files.items():
             z.writestr(arc, data)
-    ten = (f"{_safe_name((prim or {}).get('name') or slugs[0])}.javis.zip" if len(goc) <= 1
-           else f"javis-{kind}-x{len(goc)}.javis.zip")
+    ten = (f"{_safe_name((prim or {}).get('name') or slugs[0])}.uneti.zip" if len(goc) <= 1
+           else f"uneti-{kind}-x{len(goc)}.uneti.zip")
     return buf.getvalue(), ten
 
 
@@ -207,9 +207,9 @@ def import_bundle(data: bytes, filename, *, agents_dir, workflows_dir, skills_ro
 
     def write_one(target: Path, blob: bytes, typ, slug, arc=None):
         key = f"{typ}:{slug}"
-        # Javis Core (0.185.0) is the platform's system assistant: its slug is reserved, and a bundled
-        # `agents/javis-core.md` would only shadow it.
-        if typ == "agent" and str(slug).lower() == "javis-core":
+        # UNETI AI Core (0.185.0) is the platform's system assistant: its slug is reserved, and a bundled
+        # `agents/uneti-ai-core.md` would only shadow it.
+        if typ == "agent" and str(slug).lower() == "uneti-ai-core":
             skp.add(key); return
         try:
             if target.exists() and not overwrite:
@@ -273,13 +273,13 @@ def import_bundle(data: bytes, filename, *, agents_dir, workflows_dir, skills_ro
             return False
 
         arcs = [i.filename.replace("\\", "/") for i in infos]
-        is_javis = "javis-bundle.json" in arcs or any(a.startswith(_ALLOWED_TOP) for a in arcs)
+        is_uneti = "uneti-bundle.json" in arcs or any(a.startswith(_ALLOWED_TOP) for a in arcs)
 
-        if is_javis:
+        if is_uneti:
             skip_skill = set()   # slug skill đã có (bỏ qua cả thư mục khi không ghi đè)
             for i in infos:
                 arc = i.filename.replace("\\", "/")
-                if arc == "javis-bundle.json" or _bad(arc, i):
+                if arc == "uneti-bundle.json" or _bad(arc, i):
                     continue
                 dst = _dst_for(arc, agents_dir, workflows_dir, skills_root)
                 if not dst:
@@ -299,8 +299,8 @@ def import_bundle(data: bytes, filename, *, agents_dir, workflows_dir, skills_ro
             cand = sorted([a for a in arcs if a.rsplit("/", 1)[-1] == "SKILL.md" and "__MACOSX/" not in a],
                           key=lambda a: (a.count("/"), a))
             if not cand:
-                res["errors"].append(localefmt.chu("Gói .zip không phải javis-bundle và không có SKILL.md - không rõ nhập gì.",
-                                                   "The .zip is not a javis-bundle and has no SKILL.md - unclear what to import."))
+                res["errors"].append(localefmt.chu("Gói .zip không phải uneti-bundle và không có SKILL.md - không rõ nhập gì.",
+                                                   "The .zip is not a uneti-bundle and has no SKILL.md - unclear what to import."))
                 return res
             sau = cand[0].count("/")
             # SKILL.md ngay ở gốc gói = cả gói là MỘT skill. Ngược lại mọi SKILL.md CÙNG CẤP nông

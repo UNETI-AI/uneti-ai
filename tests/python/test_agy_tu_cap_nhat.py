@@ -1,12 +1,12 @@
-"""Antigravity CLI (`agy`) phải tự lên bản mới, để model mới tự hiện trong Javis (0.137.0).
+"""Antigravity CLI (`agy`) phải tự lên bản mới, để model mới tự hiện trong UNETI AI (0.137.0).
 
     python tests/run.py agy_tu_cap_nhat
 
-Báo lỗi 14/10/2026: Gemini 4 Argon ra rồi mà Javis không có. Danh sách model của Antigravity lấy
+Báo lỗi 14/10/2026: Gemini 4 Argon ra rồi mà UNETI AI không có. Danh sách model của Antigravity lấy
 thẳng từ `agy models`, nên thứ kẹt là chính binary: bản Docker cài `agy` một lần vào ổ dữ liệu lúc
 khởi động rồi không bao giờ cập nhật, bản cài trên máy thì chỉ tự cập nhật khi người ta mở `agy` gõ
 tay. Cùng bệnh Claude Code đã chữa ở `claude_update`, khác một điều: đường này chạy cả trong Docker
-vì `agy` nằm ở thư mục của chính user chạy Javis.
+vì `agy` nằm ở thư mục của chính user chạy UNETI AI.
 """
 from _paths import ROOT, SERVER  # noqa: E402,F401
 import asyncio
@@ -16,7 +16,7 @@ import sys
 import tempfile
 import time
 
-os.environ["JAVIS_STATE_DIR"] = tempfile.mkdtemp(prefix="javis-agy-upd-")
+os.environ["UNETI_STATE_DIR"] = tempfile.mkdtemp(prefix="uneti-agy-upd-")
 
 import agy_update as au  # noqa: E402
 import antigravity_cli  # noqa: E402
@@ -65,7 +65,7 @@ try:
     check("vừa thử xong thì chưa tới hạn chạy lại", not au.den_han())
     check("qua 24 giờ thì tới hạn", au.den_han(time.time() + au.CHU_KY + 1))
 
-    # 2. Docker vẫn cập nhật (khác Claude Code): agy nằm ở thư mục của user chạy Javis
+    # 2. Docker vẫn cập nhật (khác Claude Code): agy nằm ở thư mục của user chạy UNETI AI
     deploy_info.deploy_mode = lambda: "docker"
     claude_update._chay, _t = _gia_chay("1.3.5", "1.4.0")
     _kq = au.cap_nhat("tu_dong")
@@ -102,9 +102,9 @@ try:
     check("không đổi bản thì giữ cache", "antigravity-cli" in main._PROV_MODELS_CACHE)
 
     # 7. Tắt được, và có vòng chạy lúc khởi động
-    os.environ["JAVIS_AGY_AUTO_UPDATE"] = "0"
-    check("JAVIS_AGY_AUTO_UPDATE=0 thì tắt", not au.bat())
-    os.environ.pop("JAVIS_AGY_AUTO_UPDATE", None)
+    os.environ["UNETI_AGY_AUTO_UPDATE"] = "0"
+    check("UNETI_AGY_AUTO_UPDATE=0 thì tắt", not au.bat())
+    os.environ.pop("UNETI_AGY_AUTO_UPDATE", None)
     check("mặc định bật", au.bat())
     src = (SERVER / "main.py").read_text(encoding="utf-8")
     check("server có vòng tự cập nhật agy lúc khởi động, không chặn Docker",

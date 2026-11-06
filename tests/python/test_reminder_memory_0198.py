@@ -10,12 +10,12 @@ import os
 import tempfile
 from pathlib import Path
 
-os.environ["JAVIS_STATE_DIR"] = tempfile.mkdtemp(prefix="javis-reminder-memory-state-")
+os.environ["UNETI_STATE_DIR"] = tempfile.mkdtemp(prefix="uneti-reminder-memory-state-")
 
 import reminders  # noqa: E402
 
 fails = []
-brain = Path(tempfile.mkdtemp(prefix="javis-reminder-memory-brain-"))
+brain = Path(tempfile.mkdtemp(prefix="uneti-reminder-memory-brain-"))
 
 
 def check(name, cond):

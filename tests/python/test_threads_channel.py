@@ -27,8 +27,8 @@ import tempfile
 import time
 from urllib.parse import parse_qs, urlparse
 
-os.environ["JAVIS_STATE_DIR"] = tempfile.mkdtemp(prefix="javis-threads-")
-os.environ["JAVIS_ALLOWED_HOSTS"] = "testserver"
+os.environ["UNETI_STATE_DIR"] = tempfile.mkdtemp(prefix="uneti-threads-")
+os.environ["UNETI_ALLOWED_HOSTS"] = "testserver"
 try:
     sys.stdout.reconfigure(encoding="utf-8")
 except Exception:

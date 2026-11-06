@@ -37,10 +37,10 @@ UNETI AI quyết định có ép đăng nhập hay không dựa vào cách serve
 | Chạy public (Docker/VPS/Hostinger), nghe `0.0.0.0`, `::` hoặc IP LAN | Có, tự bật |
 | Đã đặt mật khẩu trong trang Tài khoản | Có, ở mọi chế độ |
 
-Có thể ép cứng bằng biến môi trường `JAVIS_REQUIRE_LOGIN`:
+Có thể ép cứng bằng biến môi trường `UNETI_REQUIRE_LOGIN`:
 
-- `JAVIS_REQUIRE_LOGIN=1` : luôn bắt buộc đăng nhập, kể cả localhost. Nên đặt khi bạn mở UNETI AI qua tunnel (Cloudflare Tunnel, ngrok...) trên máy cá nhân.
-- `JAVIS_REQUIRE_LOGIN=0` : tắt bắt buộc đăng nhập.
+- `UNETI_REQUIRE_LOGIN=1` : luôn bắt buộc đăng nhập, kể cả localhost. Nên đặt khi bạn mở UNETI AI qua tunnel (Cloudflare Tunnel, ngrok...) trên máy cá nhân.
+- `UNETI_REQUIRE_LOGIN=0` : tắt bắt buộc đăng nhập.
 
 Nguyên tắc an toàn (fail-closed): nếu server nghe địa chỉ **không phải** thuần localhost thì UNETI AI mặc định coi là public và bật đăng nhập. Chi tiết biến môi trường xem [Cấu hình .env](16-cau-hinh-env.md).
 
@@ -53,8 +53,8 @@ Khi mở dashboard lần đầu trên server công khai mà chưa có admin, UNE
 **Cách 1 - Đặt sẵn admin bằng biến môi trường (khuyến nghị):**
 
 1. Trong cấu hình deploy (ví dụ compose của Hostinger), thêm 2 biến:
-   - `JAVIS_ADMIN_PASSWORD` : mật khẩu admin bạn chọn.
-   - `JAVIS_ADMIN_USER` : tên đăng nhập (tuỳ chọn, mặc định là `admin`).
+   - `UNETI_ADMIN_PASSWORD` : mật khẩu admin bạn chọn.
+   - `UNETI_ADMIN_USER` : tên đăng nhập (tuỳ chọn, mặc định là `admin`).
 2. Khởi động UNETI AI. Lúc boot, UNETI AI tự tạo admin từ 2 biến này và **đóng luôn** màn tạo tài khoản. Bạn mở app là vào thẳng màn đăng nhập.
 3. Đăng nhập bằng đúng user/password vừa đặt.
 
@@ -93,13 +93,13 @@ Khi đã có mật khẩu, khối **Tài khoản đăng nhập** hiện dòng "�
 
 **Quên mật khẩu hiện tại** thì không có đường vòng nào trong dashboard, phải sửa từ máy chủ.
 
-Chạy bằng Docker/Hostinger (từ 0.77.1): đổi `JAVIS_ADMIN_PASSWORD` (và `JAVIS_ADMIN_USER` nếu muốn) trong ô Environment rồi Redeploy. Lúc khởi động, UNETI AI thấy giá trị env khác lần trước nên đặt lại tài khoản admin theo nó: 2FA giữ nguyên, mọi phiên đăng nhập cũ bị huỷ. Env để nguyên thì không có gì thay đổi, nên mật khẩu bạn đổi trong dashboard không bị env ghi đè mỗi lần khởi động lại.
+Chạy bằng Docker/Hostinger (từ 0.77.1): đổi `UNETI_ADMIN_PASSWORD` (và `UNETI_ADMIN_USER` nếu muốn) trong ô Environment rồi Redeploy. Lúc khởi động, UNETI AI thấy giá trị env khác lần trước nên đặt lại tài khoản admin theo nó: 2FA giữ nguyên, mọi phiên đăng nhập cũ bị huỷ. Env để nguyên thì không có gì thay đổi, nên mật khẩu bạn đổi trong dashboard không bị env ghi đè mỗi lần khởi động lại.
 
 Cách thủ công (máy không dùng env):
 
 1. Dừng container (hoặc dừng UNETI AI).
 2. Xoá (hoặc làm rỗng) khối `"auth"` trong `settings.json` ở thư mục state (Docker: `/data/state/settings.json`).
-3. Đặt `JAVIS_ADMIN_PASSWORD` (và `JAVIS_ADMIN_USER` nếu muốn) rồi khởi động lại. UNETI AI tạo lại admin từ biến môi trường lúc boot.
+3. Đặt `UNETI_ADMIN_PASSWORD` (và `UNETI_ADMIN_USER` nếu muốn) rồi khởi động lại. UNETI AI tạo lại admin từ biến môi trường lúc boot.
 
 ### D. Đăng xuất
 
@@ -118,7 +118,7 @@ Chỉ nên làm khi chạy máy cá nhân, tuyệt đối không làm trên VPS.
 3. Xác nhận ở hộp thoại "Tắt đăng nhập? Ai mở dashboard cũng dùng được."
 4. UNETI AI xoá mật khẩu và **đăng xuất mọi phiên** đang mở.
 
-Lưu ý: nếu server vẫn đang chạy public (hoặc bạn đặt `JAVIS_REQUIRE_LOGIN=1`), tắt mật khẩu **không** làm dashboard mở toang, mà quay lại màn ép tạo tài khoản mới. Đăng nhập chỉ thật sự tắt khi server nghe localhost và không ép login.
+Lưu ý: nếu server vẫn đang chạy public (hoặc bạn đặt `UNETI_REQUIRE_LOGIN=1`), tắt mật khẩu **không** làm dashboard mở toang, mà quay lại màn ép tạo tài khoản mới. Đăng nhập chỉ thật sự tắt khi server nghe localhost và không ép login.
 
 ### F. Đổi tên workspace
 
@@ -142,9 +142,9 @@ UNETI AI chặn hai đường đó bằng một cổng gác đứng trước c�
 | Client không phải trình duyệt (không gửi `Origin`, ví dụ CLI, curl, MCP) | Cho qua |
 | Host là một địa chỉ IP | Bỏ qua bước kiểm Host |
 
-Allowlist gồm: `localhost`, `127.0.0.1`, `::1`, `0.0.0.0`, cộng tên miền riêng bạn đã đặt trong **Cài đặt → Tên miền & SSL**, cộng mọi tên trong biến môi trường `JAVIS_ALLOWED_HOSTS` (nhiều tên cách nhau dấu phẩy).
+Allowlist gồm: `localhost`, `127.0.0.1`, `::1`, `0.0.0.0`, cộng tên miền riêng bạn đã đặt trong **Cài đặt → Tên miền & SSL**, cộng mọi tên trong biến môi trường `UNETI_ALLOWED_HOSTS` (nhiều tên cách nhau dấu phẩy).
 
-Khi nào bạn cần đụng tới: chạy UNETI AI sau một reverse proxy với tên miền chưa khai trong app, mà lại **chưa** đặt mật khẩu. Lúc đó UNETI AI coi tên miền đó là lạ và trả 403. Cách sửa: đặt mật khẩu (bật cổng đăng nhập là bước kiểm Host tự bỏ qua), hoặc thêm tên miền vào `JAVIS_ALLOWED_HOSTS`.
+Khi nào bạn cần đụng tới: chạy UNETI AI sau một reverse proxy với tên miền chưa khai trong app, mà lại **chưa** đặt mật khẩu. Lúc đó UNETI AI coi tên miền đó là lạ và trả 403. Cách sửa: đặt mật khẩu (bật cổng đăng nhập là bước kiểm Host tự bỏ qua), hoặc thêm tên miền vào `UNETI_ALLOWED_HOSTS`.
 
 ## Token API - cửa cho CLI và script
 
@@ -183,7 +183,7 @@ Những trường được mã hoá:
 | `backup.token` | GitHub PAT dùng sao lưu brain |
 | `voice.elevenlabs_key` | API key ElevenLabs |
 
-Khoá dùng để mã hoá nằm ở tệp **`.secret_key`** trong thư mục state (`JAVIS_STATE_DIR`, Docker: `/data/state/.secret_key`). Tệp này sinh một lần, không lên git.
+Khoá dùng để mã hoá nằm ở tệp **`.secret_key`** trong thư mục state (`UNETI_STATE_DIR`, Docker: `/data/state/.secret_key`). Tệp này sinh một lần, không lên git.
 
 Hệ quả vận hành phải nhớ:
 
@@ -197,7 +197,7 @@ Hệ quả vận hành phải nhớ:
 | Cơ chế | Chi tiết thực tế |
 |---|---|
 | Lưu mật khẩu | Không lưu mật khẩu thô. UNETI AI băm bằng PBKDF2-HMAC-SHA256 (120.000 vòng) kèm salt ngẫu nhiên. |
-| Phiên đăng nhập | Cấp qua cookie `javis_session`, cookie dạng `httponly` (JavaScript không đọc được), `samesite=lax`. |
+| Phiên đăng nhập | Cấp qua cookie `uneti_session`, cookie dạng `httponly` (JavaScript không đọc được), `samesite=lax`. |
 | Hết hạn phiên | Mỗi phiên sống tối đa **30 ngày** rồi tự hết hạn, phải đăng nhập lại. |
 | Phiên qua khởi động lại | Phiên lưu ra tệp, nên **khởi động lại server không làm bạn bị đăng xuất**. |
 | Chống dò mật khẩu | Đếm số lần sai theo IP. Sai đủ số lần liên tiếp (8 lần) bị khoá tạm khoảng 5 phút; mỗi lần sai bị làm chậm nửa giây. Khi bị khoá, UNETI AI báo "Quá nhiều lần sai - thử lại sau ít phút." |
@@ -206,7 +206,7 @@ Hệ quả vận hành phải nhớ:
 | Cổng gác CSRF | Chặn request ghi từ nguồn gốc chéo, và chặn Host lạ khi chưa bật đăng nhập (xem mục riêng ở trên). |
 | Secret trên đĩa | API key và token trong `settings.json` mã hoá Fernet bằng `.secret_key` trong thư mục state. |
 
-Về cookie `secure`: mặc định UNETI AI **không** ép cookie `secure` để chạy được cả HTTP lẫn HTTPS (tránh kẹt vòng đăng nhập sau proxy HTTP như đường dẫn dạng `http://host/PORT/`). Nếu bạn chắc chắn chạy HTTPS đầu-cuối, bật `JAVIS_SECURE_COOKIE=1` trong biến môi trường (xem [Cấu hình .env](16-cau-hinh-env.md)). Truy cập qua đúng tên miền riêng thì UNETI AI tự bật `secure` mà không cần đặt biến này (dựa vào Host khớp tên miền, không suy từ `X-Forwarded-Proto`).
+Về cookie `secure`: mặc định UNETI AI **không** ép cookie `secure` để chạy được cả HTTP lẫn HTTPS (tránh kẹt vòng đăng nhập sau proxy HTTP như đường dẫn dạng `http://host/PORT/`). Nếu bạn chắc chắn chạy HTTPS đầu-cuối, bật `UNETI_SECURE_COOKIE=1` trong biến môi trường (xem [Cấu hình .env](16-cau-hinh-env.md)). Truy cập qua đúng tên miền riêng thì UNETI AI tự bật `secure` mà không cần đặt biến này (dựa vào Host khớp tên miền, không suy từ `X-Forwarded-Proto`).
 
 ## Bảng tra nhanh nút và trạng thái
 
@@ -226,10 +226,10 @@ Về cookie `secure`: mặc định UNETI AI **không** ép cookie `secure` đ�
 
 ## Mẹo
 
-- **Luôn đặt admin trước khi công khai.** Cách chắc nhất là đặt `JAVIS_ADMIN_USER` + `JAVIS_ADMIN_PASSWORD` khi deploy, để server không có lúc nào trống admin.
+- **Luôn đặt admin trước khi công khai.** Cách chắc nhất là đặt `UNETI_ADMIN_USER` + `UNETI_ADMIN_PASSWORD` khi deploy, để server không có lúc nào trống admin.
 - **Đặt mật khẩu đủ dài.** Tối thiểu 8 ký tự; dùng cụm dài, khó đoán.
 - **Chạy qua HTTPS khi truy cập từ xa.** Dùng tên miền riêng (ví dụ Hostinger `*.hstgr.cloud`) hoặc Cloudflare Tunnel thay vì phơi cổng 7777 thô ra Internet. Cách trỏ tên miền và bật HTTPS xem [Thương hiệu & tên miền riêng](15-thuong-hieu-ten-mien.md).
-- **Localhost + tunnel tự chạy thì bật `JAVIS_REQUIRE_LOGIN=1`.** Khi máy chỉ nghe localhost nhưng bạn tự chạy tunnel (cloudflared, ngrok...) bên ngoài UNETI AI, UNETI AI không tự biết là đang public, nên hãy ép login thủ công. Dùng mục **Truy cập từ xa** trong Cài đặt thì không cần: UNETI AI biết tunnel đang bật, tự bắt đăng nhập và chỉ chạy khi đã có mật khẩu.
+- **Localhost + tunnel tự chạy thì bật `UNETI_REQUIRE_LOGIN=1`.** Khi máy chỉ nghe localhost nhưng bạn tự chạy tunnel (cloudflared, ngrok...) bên ngoài UNETI AI, UNETI AI không tự biết là đang public, nên hãy ép login thủ công. Dùng mục **Truy cập từ xa** trong Cài đặt thì không cần: UNETI AI biết tunnel đang bật, tự bắt đăng nhập và chỉ chạy khi đã có mật khẩu.
 - **Bật xác thực 2 lớp (2FA) ngay sau lần đăng nhập đầu.** Lộ mật khẩu thì kẻ lạ vẫn thiếu mã TOTP trên điện thoại bạn.
 - **Sao lưu `.secret_key` cùng `settings.json`.** Thiếu một trong hai là phải nhập lại toàn bộ API key.
 
@@ -242,31 +242,31 @@ Lỗi của các bản trước 0.28.3, đã sửa. Trang đang mở còn giữ 
 Đúng như thiết kế. Đổi mật khẩu huỷ mọi phiên cũ để người đang mượn máy bạn không dùng tiếp được; đăng nhập lại bằng mật khẩu mới là xong.
 
 **Nhập đúng user/password nhưng vẫn quay lại màn đăng nhập (kẹt vòng đăng nhập).**
-Thường do cookie `secure` bị bật trong khi bạn đang truy cập qua HTTP (nhiều proxy phục vụ HTTP dạng `http://host/PORT/`). Đừng bật `JAVIS_SECURE_COOKIE` trừ khi bạn chắc chắn HTTPS đầu-cuối. Nếu đã lỡ bật, gỡ biến này rồi khởi động lại server.
+Thường do cookie `secure` bị bật trong khi bạn đang truy cập qua HTTP (nhiều proxy phục vụ HTTP dạng `http://host/PORT/`). Đừng bật `UNETI_SECURE_COOKIE` trừ khi bạn chắc chắn HTTPS đầu-cuối. Nếu đã lỡ bật, gỡ biến này rồi khởi động lại server.
 
 **Bị báo "Quá nhiều lần sai - thử lại sau ít phút."**
 Bạn (hoặc ai đó cùng IP) đã sai mật khẩu quá số lần cho phép. Đợi khoảng 5 phút rồi thử lại. Khởi động lại server cũng xoá bộ đếm này.
 
 **Mọi thao tác đều trả 403 "host không được phép".**
-Bạn đang vào UNETI AI bằng một tên miền mà UNETI AI chưa biết, trong lúc chưa đặt mật khẩu. Thêm tên miền đó vào `JAVIS_ALLOWED_HOSTS`, hoặc nhập nó ở **Cài đặt → Tên miền & SSL**, hoặc đơn giản là đặt mật khẩu.
+Bạn đang vào UNETI AI bằng một tên miền mà UNETI AI chưa biết, trong lúc chưa đặt mật khẩu. Thêm tên miền đó vào `UNETI_ALLOWED_HOSTS`, hoặc nhập nó ở **Cài đặt → Tên miền & SSL**, hoặc đơn giản là đặt mật khẩu.
 
 **Thao tác nào cũng báo 403 "cross-origin request bị chặn".**
-Bạn đang gọi API UNETI AI từ một trang khác (script, tiện ích, iframe của bên thứ ba). Đây là lớp chống CSRF chặn đúng việc của nó. Nếu đó là công cụ của chính bạn, thêm hostname của nó vào `JAVIS_ALLOWED_HOSTS`.
+Bạn đang gọi API UNETI AI từ một trang khác (script, tiện ích, iframe của bên thứ ba). Đây là lớp chống CSRF chặn đúng việc của nó. Nếu đó là công cụ của chính bạn, thêm hostname của nó vào `UNETI_ALLOWED_HOSTS`.
 
 **Quên mật khẩu.**
-Trên Windows, repo có sẵn script **`reset-auth.bat`** ở thư mục gốc dự án: chạy nó là xoá tài khoản/mật khẩu trong `server/settings.json` và đưa app về bộ cài đặt (nó in "OK - da xoa mat khau." rồi hướng dẫn khởi động lại). Nếu không dùng được script: sửa/xoá phần `auth` trong `settings.json` ở thư mục state (Docker: `/data/state`) rồi khởi động lại; hoặc đặt lại admin bằng `JAVIS_ADMIN_PASSWORD` sau khi đã xoá phần `auth` cũ.
+Trên Windows, repo có sẵn script **`reset-auth.bat`** ở thư mục gốc dự án: chạy nó là xoá tài khoản/mật khẩu trong `server/settings.json` và đưa app về bộ cài đặt (nó in "OK - da xoa mat khau." rồi hướng dẫn khởi động lại). Nếu không dùng được script: sửa/xoá phần `auth` trong `settings.json` ở thư mục state (Docker: `/data/state`) rồi khởi động lại; hoặc đặt lại admin bằng `UNETI_ADMIN_PASSWORD` sau khi đã xoá phần `auth` cũ.
 
 **Đổi máy/khôi phục backup xong thì mọi API key trống trơn.**
 Bạn chép `settings.json` mà không chép `.secret_key` đi cùng. Không có cách khôi phục: nhập lại key ở trang Models, Kênh và Cài đặt. Lần sau nhớ mang cả hai tệp.
 
 **Tắt đăng nhập rồi mà vẫn bị hỏi tài khoản.**
-Vì server vẫn đang public (hoặc `JAVIS_REQUIRE_LOGIN=1`). Ở chế độ này UNETI AI không cho tắt đăng nhập hoàn toàn, mà bắt tạo lại tài khoản. Muốn dùng không mật khẩu thì phải chạy server nghe thuần localhost.
+Vì server vẫn đang public (hoặc `UNETI_REQUIRE_LOGIN=1`). Ở chế độ này UNETI AI không cho tắt đăng nhập hoàn toàn, mà bắt tạo lại tài khoản. Muốn dùng không mật khẩu thì phải chạy server nghe thuần localhost.
 
 ## Liên quan
 
 - [Bắt đầu & thiết lập lần đầu](01-bat-dau-thiet-lap.md) - dựng UNETI AI và tạo admin lần đầu.
 - [Thương hiệu & tên miền riêng](15-thuong-hieu-ten-mien.md) - trỏ tên miền và bật HTTPS tự động.
-- [Cấu hình .env](16-cau-hinh-env.md) - danh sách biến môi trường bảo mật (`JAVIS_HOST`, `JAVIS_REQUIRE_LOGIN`, `JAVIS_ADMIN_USER/PASSWORD`, `JAVIS_SECURE_COOKIE`, `JAVIS_ALLOWED_HOSTS`, `JAVIS_STATE_DIR`).
+- [Cấu hình .env](16-cau-hinh-env.md) - danh sách biến môi trường bảo mật (`UNETI_HOST`, `UNETI_REQUIRE_LOGIN`, `UNETI_ADMIN_USER/PASSWORD`, `UNETI_SECURE_COOKIE`, `UNETI_ALLOWED_HOSTS`, `UNETI_STATE_DIR`).
 - [Plugins](20-plugins.md) - vì sao plugin do bạn cài phải bật riêng bằng biến môi trường.
 - [UNETI AI CLI (terminal)](24-cli-terminal.md) - dùng token API để gọi UNETI AI từ máy khác.
 - [Khắc phục sự cố & FAQ](17-khac-phuc-su-co.md) - các lỗi thường gặp khác.

@@ -12,7 +12,7 @@ import os
 import sys
 import tempfile
 
-os.environ["JAVIS_STATE_DIR"] = tempfile.mkdtemp(prefix="javis-wsguard-")
+os.environ["UNETI_STATE_DIR"] = tempfile.mkdtemp(prefix="uneti-wsguard-")
 try:
     sys.stdout.reconfigure(encoding="utf-8")
 except Exception:

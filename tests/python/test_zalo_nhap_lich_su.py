@@ -2,7 +2,7 @@
 
     python tests/run.py zalo_nhap_lich_su      (KHÔNG mạng, MCP giả)
 
-Chủ repo hỏi 16/10/2026: đăng nhập Zalo vào Javis lần đầu thì có đồng bộ được tin nhắn cũ không, làm thành một tuỳ chọn riêng.
+Chủ repo hỏi 16/10/2026: đăng nhập Zalo vào UNETI AI lần đầu thì có đồng bộ được tin nhắn cũ không, làm thành một tuỳ chọn riêng.
 javis-zalo đã tự kéo khoảng 2 tuần tin cũ về mỗi lần kết nối (`zalo_search_history`); nút "Nhập tin cũ" đổ chúng vào Hộp thư.
 
 Các rào file này canh:
@@ -18,7 +18,7 @@ import sys
 import tempfile
 import time
 
-os.environ["JAVIS_STATE_DIR"] = tempfile.mkdtemp(prefix="javis-znhap-")
+os.environ["UNETI_STATE_DIR"] = tempfile.mkdtemp(prefix="uneti-znhap-")
 try:
     sys.stdout.reconfigure(encoding="utf-8")
 except Exception:
@@ -132,7 +132,7 @@ zc.NHAP_TOI_DA = 5000
 # ---- 4. MCP cũ không có tool lịch sử: báo rõ, không ném
 HONG["v"] = True
 r4 = asyncio.run(zc.nhap_lich_su("zalo-1"))
-check("MCP không có zalo_search_history: trả lỗi rõ ràng", not r4.get("ok") and "javis-zalo" in (r4.get("loi") or ""), r4)
+check("MCP không có zalo_search_history: trả lỗi rõ ràng", not r4.get("ok") and "Zalo CLI" in (r4.get("loi") or ""), r4)
 HONG["v"] = False
 
 r5 = asyncio.run(zc.nhap_lich_su("khong-co"))

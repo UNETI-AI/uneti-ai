@@ -1,8 +1,8 @@
-# Contributing to Javis OS
+# Contributing to UNETI AI
 
 ***English** · [Tiếng Việt](docs/i18n/vi/CONTRIBUTING.md)*
 
-Thank you for wanting to help. Javis is built by a small team in Vietnam and is opening up to contributors everywhere, so English is welcome in every issue, pull request and review.
+Thank you for wanting to help. UNETI AI is built by a small team in Vietnam and is opening up to contributors everywhere, so English is welcome in every issue, pull request and review.
 
 By taking part you agree to follow the [Code of Conduct](CODE_OF_CONDUCT.md). Security problems go through [SECURITY.md](SECURITY.md), never a public issue.
 
@@ -18,12 +18,12 @@ For anything bigger than a small fix, open an issue first so the direction can b
 ## Getting set up
 
 ```bash
-git clone https://github.com/<you>/javis-os.git && cd javis-os
+git clone https://github.com/<you>/uneti-ai.git && cd uneti-ai
 python3 -m venv .venv && .venv/bin/pip install -r requirements.txt pytest
 .venv/bin/python -m uvicorn main:app --app-dir server --port 7777   # http://localhost:7777
 ```
 
-`install.sh` (Linux/macOS) and `install.ps1` (Windows) do the full install, including the CLI brains, if you want the complete app. To keep your experiments away from your real data, point `JAVIS_STATE_DIR` and `BRAINS_DIR` at a scratch folder.
+`install.sh` (Linux/macOS) and `install.ps1` (Windows) do the full install, including the CLI brains, if you want the complete app. To keep your experiments away from your real data, point `UNETI_STATE_DIR` and `BRAINS_DIR` at a scratch folder.
 
 ## Running the tests
 
@@ -49,7 +49,7 @@ The script finds `.venv` by itself and runs from any folder inside the repo. Tes
 
 - **Stay in scope.** No refactors or extra features beyond what the PR is about.
 - **Comments explain why** (a hidden constraint, a workaround, a past bug), never what the next line already says.
-- **No em dash character (U+2014) or en dash (U+2013)** anywhere, in code, docs or strings. Use a hyphen, comma or colon. The dashes trip up text-to-speech, and tests check the text Javis shows and speaks for them.
+- **No em dash character (U+2014) or en dash (U+2013)** anywhere, in code, docs or strings. Use a hyphen, comma or colon. The dashes trip up text-to-speech, and tests check the text UNETI AI shows and speaks for them.
 - **Language of the code:** new modules, identifiers and comments are written in English. When you edit an existing file, follow that file's language so it stays consistent; you do not need to translate code you are not changing.
 - **Text shown on screen is never hard-coded in one language:**
   - Dashboard: add a key to both `dashboard/i18n/vi.json` and `dashboard/i18n/en.json`, then call `t("your.key")`. `tests/js/test_i18n.mjs` fails on Vietnamese text in running JS code.
@@ -61,7 +61,7 @@ The maintainer's own working rules (release numbering, merge policy, how changel
 
 ## Translations
 
-Javis already **replies** in whatever language you write in. A translation adds the interface, the docs and the voice in that language. Three ways to help, from small to large:
+UNETI AI already **replies** in whatever language you write in. A translation adds the interface, the docs and the voice in that language. Three ways to help, from small to large:
 
 1. **The README.** The translated READMEs and quick starts (Chinese, Spanish, Japanese, Hindi, Portuguese, Korean, Russian, German, French, Indonesian) in `docs/i18n/<code>/` are machine translations: corrections from native speakers are very welcome, just keep the `translated-from` marker on the first line. For a new language, translate [README.md](README.md) and [QUICKSTART.en.md](QUICKSTART.en.md) into `docs/i18n/<code>/` (for example `docs/i18n/fr/README.md`), fix the relative links (they go three folders up: `../../../`), add your language to `LANGS` in `tools/check_translations.py`, then run `python tools/check_translations.py --bars` (rewrites the language bar and the flag row in every README and quick start) and `--stamp <file>` (adds the marker).
 2. **The dashboard.** Copy `dashboard/i18n/en.json` to `dashboard/i18n/<code>.json` and translate the values, never the keys. A half-finished file is fine: any key you have not translated yet shows in English.

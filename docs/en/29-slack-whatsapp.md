@@ -85,7 +85,7 @@ WhatsApp only works through Meta's official **WhatsApp Business Cloud API**. UNE
 ### Before you start
 
 - UNETI AI must be reachable over **HTTPS on a domain** (a VPS with a domain, see [DEPLOY.en.md](../../DEPLOY.en.md)). Meta refuses plain `http://` and IP addresses.
-- When no login password is set, the domain must be one UNETI AI knows (your custom domain, see [15 - Branding and domains](15-branding-and-domains.md), or `JAVIS_ALLOWED_HOSTS`), otherwise UNETI AI answers Meta with 403.
+- When no login password is set, the domain must be one UNETI AI knows (your custom domain, see [15 - Branding and domains](15-branding-and-domains.md), or `UNETI_ALLOWED_HOSTS`), otherwise UNETI AI answers Meta with 403.
 - Meta may charge for some conversations; check their current pricing page.
 
 ### 1. Create the Meta app (once)

@@ -115,7 +115,7 @@ Nút dừng chỉ dừng **phiên bạn đang xem**; phiên khác đang chạy n
 Từ 0.206.0, trong lúc UNETI AI đang làm bạn vẫn gõ và gửi tiếp được, giống Claude Code hay Codex. Gõ chữ vào ô nhập thì nút gửi hiện lại ngay cạnh nút dừng (chú thích "Gửi thêm vào việc đang làm"), trên máy tính nhấn Enter cũng được. Việc đang làm **không bị dừng**:
 
 - Với Claude Code và các bộ não dùng API key, UNETI AI đọc tin mới ở **bước kế tiếp** (sau lần dùng công cụ đang chạy) rồi làm luôn. Tin là lời sửa hướng thì UNETI AI áp dụng ngay, là việc mới thì UNETI AI nhận thêm, làm song song nếu được, và trả lời cả hai.
-- Từ 0.213.0, Codex (gói ChatGPT) cũng đọc tin mới ngay trong lượt, giống nút Enter của chính ứng dụng Codex: tin gửi lúc Codex đang chạy lệnh được chèn vào bước kế tiếp, tin gửi lúc Codex đang viết câu cuối thì Codex làm thêm một vòng trong cùng lượt để trả lời nốt. Muốn quay về cách cũ (để tin chờ tới lượt sau) thì đặt biến môi trường `JAVIS_CODEX_STEER=0` rồi khởi động lại UNETI AI.
+- Từ 0.213.0, Codex (gói ChatGPT) cũng đọc tin mới ngay trong lượt, giống nút Enter của chính ứng dụng Codex: tin gửi lúc Codex đang chạy lệnh được chèn vào bước kế tiếp, tin gửi lúc Codex đang viết câu cuối thì Codex làm thêm một vòng trong cùng lượt để trả lời nốt. Muốn quay về cách cũ (để tin chờ tới lượt sau) thì đặt biến môi trường `UNETI_CODEX_STEER=0` rồi khởi động lại UNETI AI.
 - Với Grok Build và Antigravity CLI (chạy một mạch, không nhận tin giữa chừng), hoặc khi UNETI AI đang viết câu trả lời cuối, tin của bạn **tự chạy thành lượt kế tiếp** ngay khi việc hiện tại xong. Không tin nào bị mất.
 
 Dưới tin bạn vừa gửi có một dòng nhỏ cho biết nó đang ở đâu: "UNETI AI sẽ đọc tin này ở bước kế tiếp", "UNETI AI đã đọc tin này", "UNETI AI làm tin này ngay sau khi xong việc hiện tại" hoặc "UNETI AI đang làm tin này". Gửi được nhiều tin liên tiếp, UNETI AI đọc theo đúng thứ tự. Muốn bỏ hẳn việc đang làm thì vẫn bấm nút dừng như cũ.
@@ -264,7 +264,7 @@ Chiều ngược lại cũng có: UNETI AI đưa được ảnh và file trong b
 
 - **Ảnh**: UNETI AI viết `![mô tả](attachments/ten-anh.png)` và dashboard vẽ ra ảnh thật trong bong bóng chat. Bấm vào ảnh là mở đúng vị trí file đó trong trang **Tệp tin**.
 - **File khác** (pdf, docx, xlsx...): UNETI AI viết link markdown, bấm vào mở file trong trang Tệp tin.
-- **Đường dẫn trong dấu nháy ngược** kiểu `Javis/loops/bao-cao-sang.md` cũng tự thành link mở file.
+- **Đường dẫn trong dấu nháy ngược** kiểu `UNETI/loops/bao-cao-sang.md` cũng tự thành link mở file.
 - **Wikilink** `[[Tên note]]` thành link điều hướng kiểu Wikipedia, bấm vào là UNETI AI đi tìm đúng note trong vault rồi mở ra.
 - Ảnh **không tải được nữa** (đã hết hạn trong vùng cache, bị xoá tay hoặc đổi tên) hiện thành một ô xám ghi **"Ảnh đã hết hạn"** thay cho icon vỡ. Thư mục `attachments/` và `inbox/` của brain là vùng cache: hết hạn 30 ngày hoặc chạm trần 300MB thì bị dọn.
 
@@ -292,7 +292,7 @@ Sơ đồ mermaid cần tải thư viện vẽ từ mạng; đang offline thì p
 
 UNETI AI tạo được ảnh ngay trong chat bằng chính **gói ChatGPT bạn đã đăng nhập** (OAuth), không cần mua thêm OpenAI API key. Cứ nói bằng lời, ví dụ "tạo cho anh ảnh chai nước mắm đặt trên bàn gỗ, nền tối, ảnh ngang".
 
-Bên dưới, UNETI AI gọi tool `javis_generate_image` (thuộc plugin đi kèm app `image-chatgpt`) với ba tham số:
+Bên dưới, UNETI AI gọi tool `uneti_generate_image` (thuộc plugin đi kèm app `image-chatgpt`) với ba tham số:
 
 | Tham số | Giá trị | Mặc định |
 |---|---|---|
@@ -315,7 +315,7 @@ Dán link video vào ô chat rồi nói bạn muốn gì, ví dụ "tóm tắt v
 
 Nhận mọi kiểu link: `youtube.com/watch?v=...`, `youtu.be/...`, Shorts, link phát trực tiếp, link có kèm danh sách phát hay mốc thời gian, và cả link nằm lẫn trong câu bạn gõ.
 
-Bên dưới, UNETI AI gọi tool `javis_youtube_read` (plugin đi kèm app `youtube-read`). Đây là thao tác **chỉ đọc** nên việc nền ở chế độ chỉ-đọc cũng tóm tắt được video, và nó chạy trên **mọi engine** - kể cả sáu engine API vốn không tự mở được trang web.
+Bên dưới, UNETI AI gọi tool `uneti_youtube_read` (plugin đi kèm app `youtube-read`). Đây là thao tác **chỉ đọc** nên việc nền ở chế độ chỉ-đọc cũng tóm tắt được video, và nó chạy trên **mọi engine** - kể cả sáu engine API vốn không tự mở được trang web.
 
 Vài điều cần biết:
 
@@ -323,7 +323,7 @@ Vài điều cần biết:
 - **Video riêng tư, giới hạn tuổi hoặc chặn theo vùng** cũng không đọc được, và UNETI AI nói rõ lý do nào trong số đó.
 - **Câu "YouTube nghi máy chủ này là robot" không phải lỗi video của bạn.** Gốc rễ là **danh tiếng địa chỉ IP**: YouTube đánh dấu dải IP của các nhà cung cấp máy chủ, nên cùng một video mở ở nhà thì được mà chạy trên VPS thì bị hỏi giấy. UNETI AI tự đổi lần lượt qua tám kiểu trình phát rồi mới nhờ tới yt-dlp, nên phần lớn ca đó tự vượt. Gặp câu đó nghĩa là cả chín đường đều bị từ chối.
   - Thử lại sau vài phút thường là xong, vì YouTube siết theo đợt.
-  - Lặp lại nhiều lần thì IP máy chủ đang bị đánh dấu nặng. Cách dứt điểm là đặt biến môi trường `JAVIS_YOUTUBE_PROXY` trỏ qua một proxy dân cư rồi khởi động lại, xem [Cấu hình .env](16-cau-hinh-env.md). Chỉ riêng lưu lượng YouTube đi qua đó.
+  - Lặp lại nhiều lần thì IP máy chủ đang bị đánh dấu nặng. Cách dứt điểm là đặt biến môi trường `UNETI_YOUTUBE_PROXY` trỏ qua một proxy dân cư rồi khởi động lại, xem [Cấu hình .env](16-cau-hinh-env.md). Chỉ riêng lưu lượng YouTube đi qua đó.
 - **Muốn biết chính xác đường nào hỏng** thì chạy ngay trên máy chủ:
   ```
   python server/youtube_read.py <link video>
@@ -528,7 +528,7 @@ Mở chat mới mà nhắc chuyện cũ ("làm tiếp landing page nước mắm
 
 ## Tin thoại
 
-Bảo UNETI AI "đọc cho tôi nghe", "gửi tin thoại" hay muốn nghe báo cáo thay vì đọc, UNETI AI gọi công cụ `javis_voice_note`: một đoạn nói ngắn (tối đa 1000 ký tự) được ghi thành file mp3 trong `attachments/voice/` của brain. Khung chat hiện trình phát ngay cạnh link, Telegram nhận dạng âm thanh. UNETI AI vẫn viết nội dung đó bằng chữ bên dưới. Giọng là Edge miễn phí, tự chọn theo ngôn ngữ của câu.
+Bảo UNETI AI "đọc cho tôi nghe", "gửi tin thoại" hay muốn nghe báo cáo thay vì đọc, UNETI AI gọi công cụ `uneti_voice_note`: một đoạn nói ngắn (tối đa 1000 ký tự) được ghi thành file mp3 trong `attachments/voice/` của brain. Khung chat hiện trình phát ngay cạnh link, Telegram nhận dạng âm thanh. UNETI AI vẫn viết nội dung đó bằng chữ bên dưới. Giọng là Edge miễn phí, tự chọn theo ngôn ngữ của câu.
 
 Nhắc hẹn còn có ô **Đọc thành tiếng**: tới giờ, câu nhắc hay kết quả báo cáo được gửi kèm tin thoại. Nếu UNETI AI đang mở trên máy hay điện thoại, tin thoại tự phát ngay như một cuộc gọi (trình duyệt chặn tự phát thì bấm nút phát).
 

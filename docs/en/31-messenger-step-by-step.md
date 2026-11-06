@@ -83,8 +83,8 @@ Done right: every permission shows **Ready for testing**. A missing one shows up
 
 - Open UNETI AI through its HTTPS domain, go to **Connections**, card **Facebook Messenger**, click **Connect**.
 - The form shows two rows, each with a **Copy** button:
-  - **Redirect address**, shaped like `https://<your-javis-domain>/messenger/oauth/callback`
-  - **Privacy policy link**, shaped like `https://<your-javis-domain>/messenger/privacy`
+  - **Redirect address**, shaped like `https://<your-uneti-domain>/messenger/oauth/callback`
+  - **Privacy policy link**, shaped like `https://<your-uneti-domain>/messenger/privacy`
 - Leave the form open; you come back to it in Part 3.
 
 **2.2. Put the redirect address into Facebook Login**

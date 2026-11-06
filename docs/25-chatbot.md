@@ -234,7 +234,7 @@ Học chỉ đổi việc **nói hay im**, không bao giờ đổi điều bot k
 
 **Ai chạy và tốn gì.** Mỗi tin đáng cân nhắc tốn một lượt model rẻ theo model "việc nền" bạn chọn ở trang **Models** (gói thuê bao hay API rẻ đều được), thêm khoảng vài giây; model chạy trong thư mục trống, không công cụ ghi hay chạy lệnh. Tin hiển nhiên không đáng (rỗng, chỉ có link, nhắn người khác khi chưa học được gì khác) và tin gọi tên rõ ràng không tốn lượt nào. Bộ phán xử dùng đủ trên **Zalo cá nhân** (cửa sổ tin, tin nối tiếp). Trên **Telegram** nó cũng quyết trong nhóm nhưng không có cửa sổ tin nối tiếp.
 
-**Cho người vận hành.** Muốn quan sát trước khi tin tưởng, đặt biến môi trường `JAVIS_REPLY_POLICY_SHADOW=1` rồi khởi động lại: mọi bot chạy thử, luật cũ vẫn quyết còn bộ phán xử chỉ ghi quyết định của nó để so sánh. Đây là công tắc của người vận hành, không có trong giao diện.
+**Cho người vận hành.** Muốn quan sát trước khi tin tưởng, đặt biến môi trường `UNETI_REPLY_POLICY_SHADOW=1` rồi khởi động lại: mọi bot chạy thử, luật cũ vẫn quyết còn bộ phán xử chỉ ghi quyết định của nó để so sánh. Đây là công tắc của người vận hành, không có trong giao diện.
 
 ### Bộ phán xử tự soát, và nhờ UNETI AI chỉnh (từ 0.77.0)
 
@@ -248,7 +248,7 @@ Ca học tức thì ở trên sửa từng tin một. Từ 0.77.0 còn có một
 
 Mỗi thay đổi phải dẫn đúng những tin của chính bot đó làm bằng chứng, nên chữ khách gõ trong nhóm không biến thành lệnh được. Hạn mức, việc nhường khi bạn gõ tay, quyền và nội dung câu trả lời vẫn nằm ngoài tầm.
 
-**Tự đo, tự hoàn.** Sau mỗi lần soát, máy so tỉ lệ bot bị chấm sai trước và sau. Sai nhiều hơn rõ rệt thì cả lần soát đó tự hoàn lại, và bạn nhận một tin báo. Chỗ nào nằm cứng trong mã (vòng soát không chỉnh được) thì nó ghi góp ý vào `Javis/gop-y-bo-phan-xu.md` trong brain của bot.
+**Tự đo, tự hoàn.** Sau mỗi lần soát, máy so tỉ lệ bot bị chấm sai trước và sau. Sai nhiều hơn rõ rệt thì cả lần soát đó tự hoàn lại, và bạn nhận một tin báo. Chỗ nào nằm cứng trong mã (vòng soát không chỉnh được) thì nó ghi góp ý vào `UNETI/gop-y-bo-phan-xu.md` trong brain của bot.
 
 **Bạn biết bằng cách nào.** Lần soát nào có chỉnh hay có góp ý thì gửi đúng một tin vào **hộp thư** (cái chuông) và Telegram của bạn, liệt kê từng thay đổi và mã lần soát.
 
@@ -261,7 +261,7 @@ UNETI AI đọc đúng số liệu của bộ phán xử (cùng báo cáo mà v�
 
 **Bot chăm khách không bao giờ thấy hai công cụ này.** Kho của bộ phán xử chứa chữ chat của mọi khách, nên chỉ phiên của chính bạn đọc và chỉnh được. Bot ở mức Được ghi hay Toàn quyền cũng không thấy.
 
-**Lưu ý gói thuê bao.** Vòng tự soát là việc chạy nền trên bộ não chính. Nếu đó là gói Claude Pro/Max thì đây thuộc loại dùng mà Anthropic không tính là cá nhân thông thường. Tần suất rất thấp (tối đa một lần mỗi ngày mỗi bot, chỉ khi có bằng chứng), nhưng an toàn nhất là để bộ não chính chạy bằng gói ChatGPT, Grok hoặc một API key. Người vận hành tắt hẳn vòng soát bằng biến môi trường `JAVIS_REPLY_POLICY_REVIEW=0`.
+**Lưu ý gói thuê bao.** Vòng tự soát là việc chạy nền trên bộ não chính. Nếu đó là gói Claude Pro/Max thì đây thuộc loại dùng mà Anthropic không tính là cá nhân thông thường. Tần suất rất thấp (tối đa một lần mỗi ngày mỗi bot, chỉ khi có bằng chứng), nhưng an toàn nhất là để bộ não chính chạy bằng gói ChatGPT, Grok hoặc một API key. Người vận hành tắt hẳn vòng soát bằng biến môi trường `UNETI_REPLY_POLICY_REVIEW=0`.
 
 ### Chế độ riêng tư của Telegram (đọc mục này nếu bot im trong nhóm)
 
@@ -600,7 +600,7 @@ Khác hẳn token API "chỉ chat" ở trang Cài đặt: token đó gọi `/cha
 
 1. Trang **Chatbot** → tab **Kênh** → **Thêm kênh** → chọn **API nội bộ**, đặt tên, bấm **Lưu**. Không có ô dán token: UNETI AI tự sinh khoá (`jvc_...`, 32 byte ngẫu nhiên) và **hiện đúng một lần**. Chép khoá sang máy chủ của bạn ngay. UNETI AI chỉ giữ bản băm, nên mất khoá thì không xem lại được, chỉ có thể xoay khoá mới.
 2. Gắn tài khoản đó cho một bot ở mức **Chỉ đọc** hoặc **Đọc tài liệu**, rồi bật bot.
-3. Máy chủ của bạn gọi `POST http://<máy UNETI AI>:<cổng>/chatbot-api/v1/turn` **trực tiếp**, không đi qua tên miền công khai. Mặc định chỉ chính máy chạy UNETI AI gọi được. Máy chủ gọi nằm ở container khác hay máy khác trong mạng nội bộ thì thêm địa chỉ của nó vào `JAVIS_CHATBOT_API_ALLOW` (xem **Giới hạn và nguồn gọi**).
+3. Máy chủ của bạn gọi `POST http://<máy UNETI AI>:<cổng>/chatbot-api/v1/turn` **trực tiếp**, không đi qua tên miền công khai. Mặc định chỉ chính máy chạy UNETI AI gọi được. Máy chủ gọi nằm ở container khác hay máy khác trong mạng nội bộ thì thêm địa chỉ của nó vào `UNETI_CHATBOT_API_ALLOW` (xem **Giới hạn và nguồn gọi**).
 
 Bấm **Sửa** tài khoản để **Xoay khoá** (khoá cũ ngừng chạy ngay, không cần khởi động lại bot) và chỉnh giới hạn tần suất.
 
@@ -638,7 +638,7 @@ Lỗi nào cũng có `code` để máy đọc và `error` để người đọc.
 Ví dụ:
 
 ```bash
-curl -s http://javis:7777/chatbot-api/v1/turn \
+curl -s http://uneti:7777/chatbot-api/v1/turn \
   -H "Authorization: Bearer jvc_..." -H "Content-Type: application/json" \
   -d '{"message_id":"mgr-1","conversation_id":"mgr-user-123","user":{"id":"123","name":"Nguyễn Văn A"},"scopes":["vai:nhan-vien"],"text":"Concept Khu vườn trên mây cần chuẩn bị gì?"}'
 ```
@@ -665,7 +665,7 @@ Tài liệu khớp **bất kỳ** scope nào trong danh sách thì lượt đó 
 ### Giới hạn và nguồn gọi
 
 - **Tần suất**: mặc định 20 lượt mỗi hội thoại trong 10 phút, 300 lượt mỗi giờ cho cả tài khoản. Chỉnh ở form sửa tài khoản.
-- **Nguồn gọi**: biến môi trường `JAVIS_CHATBOT_API_ALLOW` là danh sách CIDR, mặc định `127.0.0.0/8,::1/128` (chỉ chính máy chạy UNETI AI). Ngoài danh sách thì `403`. Máy chủ gọi nằm ở container khác thì thêm đúng địa chỉ của nó, hoặc đúng một mạng Docker mà hai bên dùng chung (ví dụ `JAVIS_CHATBOT_API_ALLOW=127.0.0.0/8,::1/128,172.20.0.0/16`), càng hẹp càng tốt. Đừng mở cả dải `172.16.0.0/12`: trên VPS chạy Docker có mở cổng ra ngoài, một số kết nối từ Internet vào sẽ hiện dưới địa chỉ cổng nội bộ của Docker và lọt qua. Request mang header chuyển tiếp (`X-Forwarded-For`, `X-Real-IP`...) cũng bị `403`, nên gọi qua Nginx Proxy Manager hay tunnel đều không vào được.
+- **Nguồn gọi**: biến môi trường `UNETI_CHATBOT_API_ALLOW` là danh sách CIDR, mặc định `127.0.0.0/8,::1/128` (chỉ chính máy chạy UNETI AI). Ngoài danh sách thì `403`. Máy chủ gọi nằm ở container khác thì thêm đúng địa chỉ của nó, hoặc đúng một mạng Docker mà hai bên dùng chung (ví dụ `UNETI_CHATBOT_API_ALLOW=127.0.0.0/8,::1/128,172.20.0.0/16`), càng hẹp càng tốt. Đừng mở cả dải `172.16.0.0/12`: trên VPS chạy Docker có mở cổng ra ngoài, một số kết nối từ Internet vào sẽ hiện dưới địa chỉ cổng nội bộ của Docker và lọt qua. Request mang header chuyển tiếp (`X-Forwarded-For`, `X-Real-IP`...) cũng bị `403`, nên gọi qua Nginx Proxy Manager hay tunnel đều không vào được.
 - **Dò khoá**: sai khoá quá 10 lần trong 5 phút từ một IP thì IP đó bị chặn 15 phút, ghi vào `auth_audit.jsonl` (chỉ 12 ký tự đầu), chung bộ đếm với token API.
 
 ### Hộp thư và Tiếp quản

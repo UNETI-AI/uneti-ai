@@ -14,11 +14,11 @@ class ResultViewTests(unittest.TestCase):
             calls.append(args)
             return '{"success":true,"data":[{"id":1,"body":"large"},{"id":2}]}'
         _, routes = mcp_hub._lazy_tools_and_route([], [], [], {'source_read': {'call': guarded}}, 5)
-        result = asyncio.run(routes['javis_run_tool']['call'](
+        result = asyncio.run(routes['uneti_run_tool']['call'](
             {'name': 'source_read', 'args': {'owner': 'fixture'}, 'result_view': {'pointer': '/data', 'limit': 1}}))
         self.assertEqual(calls, [{'owner': 'fixture'}])
         self.assertEqual(json.loads(result)['data'], [{'id': 1, 'body': 'large'}])
-        denied = asyncio.run(routes['javis_run_tool']['call'](
+        denied = asyncio.run(routes['uneti_run_tool']['call'](
             {'name': 'not_authorized', 'result_view': {'limit': 1}}))
         self.assertTrue(denied.startswith('ERROR:'))
         self.assertEqual(len(calls), 1)

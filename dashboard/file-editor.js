@@ -1,5 +1,5 @@
 /* file-editor.js - Khung sua file bung GIUA MAN HINH, goi tu link file trong chat.
-   window.JavisEditFile(brainRelPath): mo modal doc /files/read, sua text (.md co nut gat
+   window.UnetiEditFile(brainRelPath): mo modal doc /files/read, sua text (.md co nut gat
    Nguon/Xem), luu /files/write, xem truoc anh/pdf, file khac cho tai.
 
    Doc lap: tu chen CSS, gan modal vao <body> nen chay duoc tu MOI trang (chat toan trang,
@@ -28,9 +28,9 @@
   }
 
   // (i) button from info-tip.js; without it (node tests) the explanation is drawn inline.
-  function infoBtn() { var J = typeof window !== "undefined" && window.JavisInfo; return J ? J.btn(tw("info.more")) : ""; }
+  function infoBtn() { var J = typeof window !== "undefined" && window.UnetiInfo; return J ? J.btn(tw("info.more")) : ""; }
   function infoBody(html) {
-    var J = typeof window !== "undefined" && window.JavisInfo;
+    var J = typeof window !== "undefined" && window.UnetiInfo;
     return J ? J.body(html) : '<div class="info-body">' + html + "</div>";
   }
 
@@ -197,7 +197,7 @@
     modal.addEventListener("mousedown", function (e) { if (e.target === modal) close(); });
     modal.addEventListener("click", function (e) { if (e.target === modal) close(); });
     // Nut Back cua dien thoai (va cu vuot canh man hinh) phai dong trinh sua, khong phai thoat
-    // ca app. Truoc day khong co nhanh nay nen nguoi dung bam Back la bay ra khoi Javis - mot
+    // ca app. Truoc day khong co nhanh nay nen nguoi dung bam Back la bay ra khoi UNETI AI - mot
     // duong "lui" ma khong ai muon. Ca app khong dung History API o cho nao khac, nen chen mot
     // buoc o day khong dam vao dieu huong nao.
     window.addEventListener("popstate", function () {
@@ -368,7 +368,7 @@
     }
     function baoBamLai() {
       var c = tw("fedit.dl_tap_again");
-      if (window.JavisToast) window.JavisToast(c); else { try { alert(c); } catch (e) {} }
+      if (window.UnetiToast) window.UnetiToast(c); else { try { alert(c); } catch (e) {} }
     }
     btn.onclick = function () {
       if (tep && navigator.share) { chiaSe(tep); return; }
@@ -522,9 +522,9 @@
 
   function renderEditor(b, ceil, brainRel, d) {
     var isMd = extOf(brainRel) === ".md";
-    // .md + du bo may WYSIWYG (mdToHtml + JavisNoteEditor) -> soan nhu Word; con lai -> textarea nguon.
-    if (isMd && typeof window.mdToHtml === "function" && window.JavisNoteEditor) renderMdEditor(b, ceil, d);
-    else if (window.JavisHtmlPreview && window.JavisHtmlPreview.isHtmlPath(ceil)) renderHtmlEditor(b, ceil, d);
+    // .md + du bo may WYSIWYG (mdToHtml + UnetiNoteEditor) -> soan nhu Word; con lai -> textarea nguon.
+    if (isMd && typeof window.mdToHtml === "function" && window.UnetiNoteEditor) renderMdEditor(b, ceil, d);
+    else if (window.UnetiHtmlPreview && window.UnetiHtmlPreview.isHtmlPath(ceil)) renderHtmlEditor(b, ceil, d);
     else renderPlainEditor(b, ceil, d);
   }
 
@@ -532,7 +532,7 @@
   // highlighted editor. The preview draws the code currently in the editor (html-preview.js), so an
   // edit shows on the next switch back without saving first. Save and Ctrl+S work from either tab.
   function renderHtmlEditor(b, ceil, d) {
-    var HP = window.JavisHtmlPreview;
+    var HP = window.UnetiHtmlPreview;
     elActions.innerHTML = "";
     elBody.innerHTML = '<div class="jvfe-html mode-preview">' +
       '<div class="jvfe-html-prev"></div>' +
@@ -541,7 +541,7 @@
     var prev = box.querySelector(".jvfe-html-prev");
     var ta = box.querySelector(".jvfe-text");
     ta.value = d.content || "";
-    try { if (window.JavisCodeHL) window.JavisCodeHL.attach(ta, "html"); } catch (e) {}
+    try { if (window.UnetiCodeHL) window.UnetiCodeHL.attach(ta, "html"); } catch (e) {}
     var shown = null;   // the code the preview last drew, so switching tabs does not reload it for nothing
     function draw() {
       if (shown === ta.value) return;
@@ -575,11 +575,11 @@
     // .html, .css, .js, .json, .py... -> lop mau chong khit ben duoi (code-hl.js). Khong nhan
     // ra ngon ngu hoac file qua to thi attach tra null va o sua chay y nhu cu.
     try {
-      var lang = window.JavisCodeHL ? window.JavisCodeHL.langFromPath(ceil) : "";
-      if (lang) window.JavisCodeHL.attach(ta, lang);
+      var lang = window.UnetiCodeHL ? window.UnetiCodeHL.langFromPath(ceil) : "";
+      if (lang) window.UnetiCodeHL.attach(ta, lang);
     } catch (e) {}
     // Bo dem tu + ky tu (0.65.32), dung chung ham cua trinh sua dinh (console.js).
-    var NE0 = window.JavisNoteEditor;
+    var NE0 = window.UnetiNoteEditor;
     if (NE0 && NE0.ganDemTu) NE0.ganDemTu(elActions, function () { return { text: ta.value, md: false }; }, [ta]);
     appendSaveAndClose(b, ceil, function () { return ta.value; });
     focusNeuDuocPhep(ta);
@@ -587,7 +587,7 @@
 
   // .md: WYSIWYG 2 khung (ban render sua truc tiep + nguon markdown) dung LAI bo may editor cay.
   function renderMdEditor(b, ceil, d) {
-    var NE = window.JavisNoteEditor;
+    var NE = window.UnetiNoteEditor;
     elActions.innerHTML = "";
     elBody.innerHTML =
       '<div class="ne-body ne-md mode-source" id="jvfeNe">' +
@@ -657,11 +657,11 @@
   }
 
   if (typeof window !== "undefined") {
-    window.JavisEditFile = open;
-    window.JavisFileEditor = { open: open, close: close, openPdf: openPdf };
+    window.UnetiEditFile = open;
+    window.UnetiFileEditor = { open: open, close: close, openPdf: openPdf };
     // Trinh sua dinh (console.js) dung lai DUNG cai nut nay, khong chep lai logic:
     // mot cho sua la ca hai khung cung doi.
-    window.JavisShareBtn = shareBtn;
+    window.UnetiShareBtn = shareBtn;
   }
   if (typeof module !== "undefined" && module.exports) {
     module.exports = { ceilPath: ceilPath, laIOS: laIOS };

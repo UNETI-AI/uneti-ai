@@ -3,7 +3,7 @@
     python tests/run.py stable_prompt_cache      (no network)
 
 Field report 0.441.0 (issue #975): each new Claude Code chat read ~9k tokens from the prompt cache
-and WROTE 48-57k, about 30% of a day's usage. Claude Code gets Javis's prompt through
+and WROTE 48-57k, about 30% of a day's usage. Claude Code gets UNETI AI's prompt through
 `--append-system-prompt-file`, cached as ONE block, so a single changed character rewrites all of it.
 Before 0.445.0 that block held the clock (to the minute), today's token usage, the dashboard
 session id and the latest workflow run.
@@ -22,9 +22,9 @@ import sys
 import tempfile
 from pathlib import Path
 
-SCRATCH = Path(tempfile.mkdtemp(prefix="javis-stable-prompt-"))
-for key, relative in {"JAVIS_STATE_DIR": "state", "BRAINS_DIR": "brains", "OBSIDIAN_VAULT_PATH": "vault",
-                      "BRAIN_PATH": "brain", "SOURCES_PATH": "sources", "JAVIS_SESSIONS_DB": "sessions.sqlite3"}.items():
+SCRATCH = Path(tempfile.mkdtemp(prefix="uneti-stable-prompt-"))
+for key, relative in {"UNETI_STATE_DIR": "state", "BRAINS_DIR": "brains", "OBSIDIAN_VAULT_PATH": "vault",
+                      "BRAIN_PATH": "brain", "SOURCES_PATH": "sources", "UNETI_SESSIONS_DB": "sessions.sqlite3"}.items():
     os.environ[key] = str(SCRATCH / relative)
 
 try:

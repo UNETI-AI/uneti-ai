@@ -24,7 +24,7 @@ import os
 import sys
 import tempfile
 
-os.environ.setdefault("JAVIS_STATE_DIR", tempfile.mkdtemp(prefix="javis-dclark-"))
+os.environ.setdefault("UNETI_STATE_DIR", tempfile.mkdtemp(prefix="uneti-dclark-"))
 
 try:
     sys.stdout.reconfigure(encoding="utf-8")
@@ -203,7 +203,7 @@ async def _discord_session(close_code=None):
                         await ws.close(code=close_code)
                         return
                     await ws.send(json.dumps({"op": 0, "s": 1, "t": "READY", "d": {
-                        "session_id": "sess", "resume_gateway_url": "", "user": {"id": "999", "username": "javis"}}}))
+                        "session_id": "sess", "resume_gateway_url": "", "user": {"id": "999", "username": "uneti"}}}))
                     msgs = [
                         {"id": "1", "channel_id": "dm1", "author": {"id": "42", "username": "quy"}, "content": "hello", "type": 0},
                         {"id": "1", "channel_id": "dm1", "author": {"id": "42", "username": "quy"}, "content": "hello", "type": 0},

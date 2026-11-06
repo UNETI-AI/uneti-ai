@@ -1,7 +1,7 @@
 /* Trang Gói: xem gói đã cài, cài từ tệp .zip, bật tắt, gỡ.
  *
  * File riêng thay vì nhét vào console.js (đã ~7k dòng), theo đúng cách studio.js và
- * chatbots.js đang làm: console.js dựng khung rồi gọi window.JavisPacks.render(el).
+ * chatbots.js đang làm: console.js dựng khung rồi gọi window.UnetiPacks.render(el).
  *
  * Nguyên tắc của màn hình xác nhận: nó VẼ TỪ /packs/inspect chứ không tự đoán. Danh sách "gói
  * này chứa gì" viết tay trong JS thì sau vài tháng nó lệch khỏi thứ server thật sự cài, mà
@@ -16,6 +16,7 @@
   // giữa các máy.
   function ic(ten, opt) { return (window.ic ? window.ic(ten, opt) : ""); }
 
+  const tenGoi = (id) => String(id || "").replace(/^javis\./, "uneti.");
   const esc = (s) => (s || "").toString()
     .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
@@ -53,15 +54,15 @@
       (bien && bien[ten] != null) ? String(bien[ten]) : m);
   }
   // (i) button from info-tip.js; without it (node tests) the explanation is drawn inline.
-  function infoBtn() { var J = typeof window !== "undefined" && window.JavisInfo; return J ? J.btn(tw("info.more")) : ""; }
+  function infoBtn() { var J = typeof window !== "undefined" && window.UnetiInfo; return J ? J.btn(tw("info.more")) : ""; }
   function infoBody(html) {
-    var J = typeof window !== "undefined" && window.JavisInfo;
+    var J = typeof window !== "undefined" && window.UnetiInfo;
     return J ? J.body(html) : '<div class="info-body">' + html + "</div>";
   }
   // Tên nhóm của gói là tiếng Việt và là KHOÁ lọc (`data-kho-nhom`), nên chỉ dịch lúc vẽ; xem
-  // `JavisI18n.catLabel`. Tên lạ do gói cộng đồng tự đặt thì giữ nguyên.
+  // `UnetiI18n.catLabel`. Tên lạ do gói cộng đồng tự đặt thì giữ nguyên.
   function nhanNhom(ten) {
-    const i = (typeof window !== "undefined") && window.JavisI18n;
+    const i = (typeof window !== "undefined") && window.UnetiI18n;
     return i && typeof i.catLabel === "function" ? i.catLabel(ten) : (ten || "");
   }
 
@@ -74,7 +75,7 @@
     // tra bằng một object hàm, luôn trượt, và mọi tên gói rơi về tiếng Anh trong giao diện
     // tiếng Việt - hỏng lặng lẽ, vì vẫn có chữ để hiện nên trông như gói thiếu bản dịch chứ
     // không như một lỗi. Đã sống trong file này từ 0.55.22 tới 0.55.28.
-    const lang = (window.JavisI18n && JavisI18n.lang()) || "vi";
+    const lang = (window.UnetiI18n && UnetiI18n.lang()) || "vi";
     return v[lang] || v.en || Object.values(v)[0] || mac || "";
   }
 
@@ -292,7 +293,7 @@
     modal(
       pkmDau(d, esc(nn(d.name, d.id))
           + (d.version ? '<span class="pkm-ver">v' + esc(d.version) + '</span>' : ""),
-        '<code>' + esc(d.id) + '</code>'
+        '<code>' + esc(tenGoi(d.id)) + '</code>'
           + (d.author && d.author.name
               ? ' · ' + tw("store.inspect.author", { ten: esc(d.author.name) }) : ""))
       + '<div class="pkm-than">'
@@ -451,7 +452,7 @@
   // trong ca đã có kết nối chạy, tức là ca hiếm hơn, còn ca thường thì im lặng.
   //
   // Dùng chung cho cả thẻ trong kho lẫn dấu × trên trang Kết nối - hai lối vào một hành động
-  // thì phải hỏi y hệt nhau. Vì thế nó nằm ở `window.JavisPacks`.
+  // thì phải hỏi y hệt nhau. Vì thế nó nằm ở `window.UnetiPacks`.
   async function goApp(ten, id) {
     const p = await postJson("/connect/core-toggle", { id: id, off: true, plan: true });
     if (!p || !p.ok) {
@@ -490,7 +491,7 @@
     // Thứ tự, đúng như `console.js iconInner` cho phần logo:
     //   đường dẫn/URL ảnh (logo hãng)  -> <img>
     //   tên icon Lucide                -> SVG trên ô màu nhạt
-    //   trợ lý (agent)                 -> chân dung trợ lý y như trang Cộng sự (`JavisAvatar`)
+    //   trợ lý (agent)                 -> chân dung trợ lý y như trang Cộng sự (`UnetiAvatar`)
     //   còn lại                        -> icon của LOẠI (skill = mảnh ghép, quy trình, công cụ...)
     //
     // `ic()` KHÔNG tự nhận đường dẫn (đó là việc của `iconInner`), nên bỏ nhánh <img> là mọi
@@ -505,8 +506,8 @@
         + '" alt="" loading="lazy"></div>';
     }
     const kind = (g && g.kind) || "bundle";
-    const A = typeof window !== "undefined" && window.JavisAvatar;
-    if (kind === "agent" && A && A.html && window.JavisPet) {
+    const A = typeof window !== "undefined" && window.UnetiAvatar;
+    if (kind === "agent" && A && A.html && window.UnetiPet) {
       try { return '<div class="kho-ava kho-ava-agent">' + A.html({ slug: g.id || "" }, 40) + '</div>'; }
       catch (e) { /* the mascot library is not ready: fall back to the kind icon */ }
     }
@@ -540,7 +541,7 @@
     const moi = coBanMoi(g);
     if (g.nguon === "app") {
       return g.installed
-        ? { nhan: tw("store.btn.remove_from_javis"), lop: "kho-btn kho-btn-go", act: "coreoff" }
+        ? { nhan: tw("store.btn.remove_from_uneti"), lop: "kho-btn kho-btn-go", act: "coreoff" }
         : { nhan: tw("store.btn.reinstall"), lop: "kho-btn kho-btn-chinh", act: "coreon" };
     }
     if (moi) {
@@ -593,7 +594,7 @@
     // của một gói đã cài bản cũ hiện "v1.0.1" ngay trên dòng "Đã cài trên máy" - tức là nói
     // với người dùng rằng họ đang chạy 1.0.1, đúng lúc họ chạy 1.0.0. Gói đã cài thì để dòng
     // "Đã cài" kể chuyện phiên bản, một chỗ duy nhất và nói đủ cả hai số.
-    const meta = [g.id, g.installed ? "" : (g.version ? "v" + g.version : ""),
+    const meta = [tenGoi(g.id), g.installed ? "" : (g.version ? "v" + g.version : ""),
                   (g.author && g.author.name) || ""].filter(Boolean).map(esc).join(" · ");
     // A description shows at most three lines and an ellipsis (`.kho-mo-ta`, 0.407.0); a long one
     // also gets the (i) on the name, which holds the full text.
@@ -640,7 +641,7 @@
   // per-device convenience, so it lives in localStorage and the page works without it.
   const SAP = { "de-xuat": "store.sort.recommended", "moi": "store.sort.recent", "ten": "store.sort.name" };
   function docSap() {
-    try { const v = localStorage.getItem("javis.kho.sap"); return SAP[v] ? v : "de-xuat"; }
+    try { const v = localStorage.getItem("uneti.kho.sap"); return SAP[v] ? v : "de-xuat"; }
     catch (e) { return "de-xuat"; }
   }
   // Stable: ties keep the catalog's own order, which is how the Store owner lays it out.
@@ -685,7 +686,7 @@
     // Danh mục cache 6 giờ ở phía server (`packs_store.TTL`). Với việc TÌM một gói mới thì 6
     // giờ là hợp lý. Với việc BIẾT gói mình đã cài có bản mới chưa thì nó sai một cách im
     // lặng: mở trang ra vẫn là danh mục của sáng nay, không dấu hiệu gì, và người dùng kết
-    // luận là Javis không có tính năng cập nhật.
+    // luận là UNETI AI không có tính năng cập nhật.
     //
     // Nên khi bản đang cầm đã quá cũ, lấy lại MỘT lần ở nền rồi vẽ lại. Không đụng TTL của
     // server (các nơi khác vẫn hưởng cache), chỉ trang Kho mới trả cái giá một request nhỏ.
@@ -938,7 +939,7 @@
     const ss = host.querySelector ? host.querySelector("#pkSap") : null;
     if (ss) ss.onchange = () => {
       _kho.sap = SAP[ss.value] ? ss.value : "de-xuat"; _kho.trang = 1;
-      try { localStorage.setItem("javis.kho.sap", _kho.sap); } catch (e) {}
+      try { localStorage.setItem("uneti.kho.sap", _kho.sap); } catch (e) {}
       lai();
     };
     const sn = host.querySelector ? host.querySelector("#pkNhom") : null;
@@ -1165,7 +1166,7 @@
         esc(tw("plzip.off_body")) + (v.zipAskedOn ? " " + esc(tw("plzip.off_zip")) : ""));
       if (k === "vault") return canh("vang", "info", esc(tw("plzip.vault_title")), esc(tw("plzip.vault_body")));
       if (k === "gate") return canh("vang", "triangle-alert", esc(tw("plzip.gate_title")),
-        tw("plzip.gate_body", { bien: "<code>JAVIS_ENABLE_USER_PLUGINS=false</code>" }));
+        tw("plzip.gate_body", { bien: "<code>UNETI_ENABLE_USER_PLUGINS=false</code>" }));
       return "";
     }).join("");
 
@@ -1242,7 +1243,7 @@
     const xoa = (d.vault || {}).xoa || [];
     const giu = (d.vault || {}).giu || [];
     modal(pkmDau(d, tw("store.rm.heading", { ten: esc(nn(d.name, d.id)) }),
-                 '<code>' + esc(d.id) + '</code>')
+                 '<code>' + esc(tenGoi(d.id)) + '</code>')
       + '<div class="pkm-than">'
       + '<div class="pkm-canh do"><div class="pkm-canh-tieu">' + ic("triangle-alert")
       + tw("store.rm.lose") + '</div>'
@@ -1339,7 +1340,7 @@
       + '<div class="kho-khoi">'
       + (d.disabled
         ? '<div class="conn-guide" style="border-left:3px solid var(--warn,#e0a33e);padding-left:10px;margin-bottom:12px">'
-          + tw("store.disabled_env", { bien: '<code>JAVIS_DISABLE_PACKS</code>' }) + '</div>'
+          + tw("store.disabled_env", { bien: '<code>UNETI_DISABLE_PACKS</code>' }) + '</div>'
         : "")
       + '<div id="pkKho"></div>'
       + '</div>';
@@ -1374,7 +1375,7 @@
   // xanh y nguyên khi phép so bị đảo ngược. `veKho` phơi ra cùng lý do: ô tìm trong kho
   // chỉ gõ được đúng một chữ rồi văng con trỏ, và chỉ có gõ THẬT qua đường vẽ lại mới bắt
   // được lỗi đó.
-  window.JavisPacks = { render: render, moKho: moKho, LOAI: LOAI, goApp: goApp, hoi: hoi,
+  window.UnetiPacks = { render: render, moKho: moKho, LOAI: LOAI, goApp: goApp, hoi: hoi,
                         coBanMoi: coBanMoi, nutThe: nutThe, theKho: theKho,
                         ghiConTro: ghiConTro, traConTro: traConTro, veKho: veKho,
                         caiGoiKho: caiGoiKho, caiPluginZip: caiPluginZip,

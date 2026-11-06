@@ -1,6 +1,6 @@
 """Kho gói: đọc một file index công khai, cache lại, và hỏng thì hỏng cho tử tế.
 
-Kho là gì trong Javis
+Kho là gì trong UNETI AI
 ---------------------
 Đúng một file JSON đặt ở đâu đó công khai (mặc định là repo GitHub của người phát hành). Không
 có máy chủ nào phải nuôi, không có cơ sở dữ liệu, không có tài khoản. Người phát hành sửa file
@@ -26,7 +26,7 @@ Hỏng thì hỏng cho tử tế
 -----------------------
 Ba trạng thái, không cái nào là một cục lỗi ném vào mặt người dùng: còn cache thì vẫn vẽ được
 lưới kèm một dòng nói số liệu đã cũ; không cache thì trạng thái rỗng kèm lời nhắc vẫn cài được
-từ tệp; `format_version` lạ thì nói thẳng là kho cần bản Javis mới hơn, chứ không đọc nửa vời
+từ tệp; `format_version` lạ thì nói thẳng là kho cần bản UNETI AI mới hơn, chứ không đọc nửa vời
 rồi hiện sai.
 """
 from __future__ import annotations
@@ -46,12 +46,12 @@ FORMAT_VERSION = 1
 
 # Kho mặc định. Người dùng đổi được trong Cài đặt, nên đây chỉ là điểm khởi đầu.
 #
-# Kho nằm ở REPO RIÊNG chứ không trong repo Javis OS, và đó là điểm mấu chốt của cả tầng này:
+# Kho nằm ở REPO RIÊNG chứ không trong repo UNETI AI, và đó là điểm mấu chốt của cả tầng này:
 # thêm một gói vào kho không còn dính gì tới việc ra bản mới của app. Người phát hành đẩy một
-# commit vào `javis-store`, và mọi máy đang chạy Javis thấy ngay ở lần làm mới danh mục kế tiếp.
+# commit vào `javis-store`, và mọi máy đang chạy UNETI AI thấy ngay ở lần làm mới danh mục kế tiếp.
 #
 # Tách repo còn mở được đường đóng góp: người lạ gửi Pull Request vào kho, chủ kho đọc mã rồi mới
-# trộn - mà không ai phải có quyền ghi vào mã nguồn Javis.
+# trộn - mà không ai phải có quyền ghi vào mã nguồn UNETI AI.
 STORE_MAC_DINH = ("https://raw.githubusercontent.com/blogminhquy/javis-store/"
                   "main/index.json")
 
@@ -109,17 +109,23 @@ def _upstream(v) -> dict:
             "synced": synced if re.match(r"^\d{4}-\d{2}-\d{2}$", synced) else ""}
 
 
-def _lam_sach(m: dict) -> dict:
-    """Giữ đúng những trường Javis biết dùng. Trường lạ bị bỏ, không bao giờ đi tiếp.
+def _ten_ban_nay(v):
+    if isinstance(v, dict):
+        return {k: _ten_ban_nay(x) for k, x in v.items()}
+    return re.sub(r"\bJavis(?: OS)?\b", "UNETI AI", v)
 
-    Đây là ranh giới giữa "dữ liệu người khác viết" và "thứ Javis hiển thị"."""
+
+def _lam_sach(m: dict) -> dict:
+    """Giữ đúng những trường UNETI AI biết dùng. Trường lạ bị bỏ, không bao giờ đi tiếp.
+
+    Đây là ranh giới giữa "dữ liệu người khác viết" và "thứ UNETI AI hiển thị"."""
     tai = m.get("download") or {}
     return {
         "id": _chuoi(m.get("id"), 64),
-        "name": _map_nn(m.get("name")),
-        "description": _map_nn(m.get("description"), MAX_MO_TA),
+        "name": _ten_ban_nay(_map_nn(m.get("name"))),
+        "description": _ten_ban_nay(_map_nn(m.get("description"), MAX_MO_TA)),
         "version": _chuoi(m.get("version"), 32),
-        "author": {"name": _chuoi((m.get("author") or {}).get("name"), 64)},
+        "author": {"name": _ten_ban_nay(_chuoi((m.get("author") or {}).get("name"), 64))},
         "kind": _chuoi(m.get("kind"), 16) if _chuoi(m.get("kind"), 16) in LOAI else "bundle",
         # Id connector gói này cấp. Kho dùng nó để không hiện HAI thẻ cho cùng một dịch vụ khi
         # app vẫn còn bản của mình. Cắt cả số lượng lẫn độ dài như mọi trường khác: đây vẫn là
@@ -131,7 +137,7 @@ def _lam_sach(m: dict) -> dict:
         "replaces": [_chuoi(x, 64) for x in (m.get("replaces") or [])[:10]
                      if isinstance(m.get("replaces"), list) and _chuoi(x, 64)],
         "category": _chuoi(m.get("category"), 32),
-        "category_label": _map_nn(m.get("category_label"), 40),
+        "category_label": _ten_ban_nay(_map_nn(m.get("category_label"), 40)),
         # `tier` là thứ người phát hành KHAI, chỉ để lọc và để hiện nhãn. Bậc THẬT do trình cài
         # tự tính từ tệp đã tải về - xem `pack_install.soi`. Khai một đằng đóng gói một nẻo thì
         # màn hình xác nhận vẫn nói đúng sự thật.
@@ -201,12 +207,12 @@ async def lay(lam_moi: bool = False) -> dict:
         if not isinstance(d, dict):
             raise ValueError(localefmt.chu("gốc phải là object", "the root must be an object"))
         if str(d.get("format")) != FORMAT:
-            raise ValueError(localefmt.chu("tệp này không phải danh mục gói của Javis", "this file is not a Javis pack catalog"))
+            raise ValueError(localefmt.chu("tệp này không phải danh mục gói của UNETI AI", "this file is not a UNETI AI pack catalog"))
         fv = int(d.get("format_version") or 0)
         if fv > FORMAT_VERSION:
             # Đọc nửa vời một định dạng mới hơn là cách chắc chắn để hiện sai. Nói thẳng.
-            raise ValueError(localefmt.chu(f"kho này cần bản Javis mới hơn (định dạng v{fv})",
-                                           f"this store needs a newer Javis (format v{fv})"))
+            raise ValueError(localefmt.chu(f"kho này cần bản UNETI AI mới hơn (định dạng v{fv})",
+                                           f"this store needs a newer UNETI AI (format v{fv})"))
         goi = [_lam_sach(x) for x in (d.get("packs") or [])[:MAX_GOI] if isinstance(x, dict)]
         # Mục thiếu id hoặc thiếu chỗ tải thì bỏ: hiện một thẻ bấm vào không cài được thì tệ
         # hơn là không hiện.
@@ -223,7 +229,7 @@ async def lay(lam_moi: bool = False) -> dict:
             else:
                 tuyet_doi = urljoin(u, ic)
                 g["icon"] = tuyet_doi if urlparse(tuyet_doi).netloc == urlparse(u).netloc else ""
-        store = {"name": _chuoi((d.get("store") or {}).get("name"), 80),
+        store = {"name": _ten_ban_nay(_chuoi((d.get("store") or {}).get("name"), 80)),
                  "url": _chuoi((d.get("store") or {}).get("url"), 300)}
         _ghi_cache({"fetched_at": time.time(), "packs": goi, "store": store, "url": u})
         return {"ok": True, "packs": goi, "store": store, "stale": False,

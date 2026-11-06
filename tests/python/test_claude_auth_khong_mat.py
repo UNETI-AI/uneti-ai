@@ -26,7 +26,7 @@ import subprocess
 import sys
 import tempfile
 
-os.environ["JAVIS_STATE_DIR"] = tempfile.mkdtemp(prefix="javis-cauth-")
+os.environ["UNETI_STATE_DIR"] = tempfile.mkdtemp(prefix="uneti-cauth-")
 
 import claude_cli   # noqa: E402
 

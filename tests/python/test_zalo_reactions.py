@@ -2,13 +2,13 @@
 
     python tests/run.py zalo_reactions      (no network)
 
-Owner 2026-10-26: "khách hàng đọc được emoji reaction trên zalo và javis thả được reaction vào", then "Khách chỉ thả
+Owner 2026-10-26: "khách hàng đọc được emoji reaction trên zalo và uneti thả được reaction vào", then "Khách chỉ thả
 reaction thì bot có trả lời không? phần này tự học trong bộ phán xử, đừng fix cứng" and "bot được tự thả dựa theo bộ
 phán xử luôn". This file guards:
   1. A reaction lands in the inbox as one line saying who reacted, with what, and to which message (the bot's own
      reply included: its id is attached when its echo comes back).
   2. The account's own reactions never count as the owner typing; the bot's own one is filed as the bot's.
-  3. A customer's reaction reaches the decider (the Agent, or the judge in a group) as an event; nothing in Javis
+  3. A customer's reaction reaches the decider (the Agent, or the judge in a group) as an event; nothing in UNETI AI
      answers or ignores it on its own. Taking a reaction back is only recorded.
   4. The bot reacts only when the Agent (`[CAM_XUC:<name>]`) or the judge (`"reaction"`) says so, on the customer's
      message, never on a reaction; the marker never reaches the customer.
@@ -22,7 +22,7 @@ import tempfile
 import time
 from pathlib import Path
 
-os.environ["JAVIS_STATE_DIR"] = tempfile.mkdtemp(prefix="javis-reactions-")
+os.environ["UNETI_STATE_DIR"] = tempfile.mkdtemp(prefix="uneti-reactions-")
 try:
     sys.stdout.reconfigure(encoding="utf-8")
 except Exception:

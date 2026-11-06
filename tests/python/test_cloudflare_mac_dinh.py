@@ -1,8 +1,8 @@
-"""Cloudflare là kết nối dựng sẵn của Javis, đi đôi với GitHub (chủ repo 2026-11-05).
+"""Cloudflare là kết nối dựng sẵn của UNETI AI, đi đôi với GitHub (chủ repo 2026-11-05).
 
     python tests/run.py cloudflare_mac_dinh
 
-Trước đây Cloudflare chỉ có trong Javis Store (gói `javis.cloudflare`, rồi `javis.cloudflare-oauth`
+Trước đây Cloudflare chỉ có trong UNETI AI Store (gói `javis.cloudflare`, rồi `javis.cloudflare-oauth`
 cho đường đăng nhập web). Giờ cả hai cách nằm trong `system/mcp-catalog.json`, gom một thẻ nhóm.
 
 Test canh ba điều:
@@ -84,7 +84,7 @@ with tempfile.TemporaryDirectory() as td:
     kho = Path(td) / "packs"
     kho.mkdir()
     goc_dir, packs.PACKS_DIR = packs.PACKS_DIR, kho
-    goc_env = os.environ.pop("JAVIS_DISABLE_PACKS", None)
+    goc_env = os.environ.pop("UNETI_DISABLE_PACKS", None)
     try:
         lam_goi(kho, "javis.cloudflare", "cloudflare")
         lam_goi(kho, "javis.cloudflare-oauth", "cloudflare-oauth")
@@ -107,7 +107,7 @@ with tempfile.TemporaryDirectory() as td:
     finally:
         packs.PACKS_DIR = goc_dir
         if goc_env is not None:
-            os.environ["JAVIS_DISABLE_PACKS"] = goc_env
+            os.environ["UNETI_DISABLE_PACKS"] = goc_env
         lam_moi()
 
 if _fails:

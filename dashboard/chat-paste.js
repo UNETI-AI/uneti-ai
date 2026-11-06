@@ -124,6 +124,6 @@
 
   var api = { INLINE_CHARS: INLINE_CHARS, INLINE_LINES: INLINE_LINES, isLong: isLong,
     lineCount: lineCount, offer: offer, insertAt: insertAt, textFile: textFile };
-  if (root) root.JavisPaste = api;
+  if (root) root.UnetiPaste = api;
   if (typeof module !== "undefined" && module.exports) module.exports = api;
 })(typeof window !== "undefined" ? window : null);

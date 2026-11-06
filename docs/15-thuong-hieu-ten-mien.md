@@ -2,7 +2,7 @@
 
 ***Tiếng Việt** · [English](en/15-branding-and-domains.md)*
 
-Trang này hướng dẫn hai việc: đổi logo/avatar của UNETI AI thành ảnh của bạn, và trỏ một tên miền riêng (ví dụ `javis.tencuaban.com`) vào UNETI AI để chạy qua HTTPS. Các thao tác nằm trong **Cài đặt → Chung**.
+Trang này hướng dẫn hai việc: đổi logo/avatar của UNETI AI thành ảnh của bạn, và trỏ một tên miền riêng (ví dụ `uneti.tencuaban.com`) vào UNETI AI để chạy qua HTTPS. Các thao tác nằm trong **Cài đặt → Chung**.
 
 ## Tính năng này là gì
 
@@ -16,7 +16,7 @@ Lưu ý quan trọng ngay từ đầu: phần **Tên miền riêng** chỉ hoạ
 Cả hai tính năng nằm trong **Cài đặt → Chung**. Trong tab Chung có hai thẻ:
 
 - Ô **ẢNH ĐẠI DIỆN**: có ảnh xem trước, nút **Tải ảnh lên** và nút **Khôi phục mặc định**.
-- Ô **TÊN MIỀN & SSL**: có ô nhập (chỗ trống ghi "vd: javis.tencuaban.com"), nút **Lưu & kiểm tra**, hai badge trạng thái DNS và SSL, hai nút **Bật SSL** và **Kiểm tra lại**, cùng wizard ba bước đổi nội dung theo đúng môi trường VPS/Hostinger.
+- Ô **TÊN MIỀN & SSL**: có ô nhập (chỗ trống ghi "vd: uneti.tencuaban.com"), nút **Lưu & kiểm tra**, hai badge trạng thái DNS và SSL, hai nút **Bật SSL** và **Kiểm tra lại**, cùng wizard ba bước đổi nội dung theo đúng môi trường VPS/Hostinger.
 
 Mỗi lần mở Cài đặt, UNETI AI tự nạp lại giá trị đang dùng, kiểm tra DNS/HTTPS và đưa ra đúng bước tiếp theo.
 
@@ -55,9 +55,9 @@ Phần này giả định bạn đã deploy UNETI AI bằng Docker trên VPS, đ
 ### Bước A: nhập và lưu tên miền
 
 1. Mở **Cài đặt → Chung**, tìm ô **TÊN MIỀN & SSL**.
-2. Nhập tên miền (hoặc tên miền con) bạn muốn dùng vào ô, ví dụ `javis.tencuaban.com`. Không cần gõ `https://`; nếu có gõ, UNETI AI tự bỏ.
+2. Nhập tên miền (hoặc tên miền con) bạn muốn dùng vào ô, ví dụ `uneti.tencuaban.com`. Không cần gõ `https://`; nếu có gõ, UNETI AI tự bỏ.
 3. Bấm nút **Lưu & kiểm tra** (hoặc nhấn Enter trong ô nhập). UNETI AI hiện **Đang lưu và kiểm tra…**, lưu tên miền, rồi tự chạy kiểm tra DNS/SSL và vẽ wizard ba bước ngay trên UI.
-4. Nếu tên miền sai định dạng, UNETI AI báo: **Tên miền không hợp lệ (vd: javis.tencuaban.com)**. Sửa lại rồi lưu tiếp.
+4. Nếu tên miền sai định dạng, UNETI AI báo: **Tên miền không hợp lệ (vd: uneti.tencuaban.com)**. Sửa lại rồi lưu tiếp.
 
 Muốn **xóa** tên miền: xóa trống ô nhập rồi bấm **Lưu & kiểm tra**. UNETI AI báo **Đã xoá tên miền.** và ẩn phần hướng dẫn.
 
@@ -70,7 +70,7 @@ Sau khi lưu (hoặc khi bấm **Kiểm tra lại**), wizard hiện bước **2.
    | Trường | Giá trị |
    |---|---|
    | Loại (Type) | A |
-   | Tên (Name/Host) | tên miền bạn vừa nhập, ví dụ `javis.tencuaban.com` |
+   | Tên (Name/Host) | tên miền bạn vừa nhập, ví dụ `uneti.tencuaban.com` |
    | Trỏ tới (Value/Points to) | địa chỉ IP máy chủ VPS của bạn (UNETI AI tự dò và điền sẵn IP này trong wizard) |
 
 2. Đợi DNS lan (vài phút đến vài giờ), bấm **Kiểm tra lại**. Khi DNS đúng, bước 2 chuyển sang dấu ✓ và dòng mô tả đổi thành "Bản ghi A đã trỏ đúng IP máy chủ."
@@ -108,8 +108,8 @@ Cần một tài khoản Cloudflare miễn phí và một tên miền đang dùn
 
 1. Vào [one.dash.cloudflare.com](https://one.dash.cloudflare.com), mục **Networks**, chọn **Tunnels**, bấm **Create a tunnel**, chọn **Cloudflared**, đặt tên.
 2. Ở bước cài connector, bấm sao chép dòng lệnh (bản Windows hay Mac đều được). **Không cần chạy lệnh đó**, chỉ cần dán nguyên dòng vào ô **Token tunnel Cloudflare** trong UNETI AI. UNETI AI tự lấy token ra.
-3. Sang bước **Public Hostname**: chọn tên miền con (ví dụ `javis.tencuaban.com`), Service chọn **HTTP**, ô URL điền địa chỉ dịch vụ UNETI AI hiện ra (mặc định `127.0.0.1:7777`, có nút sao chép).
-4. Quay lại UNETI AI, chọn **Tên miền riêng**, bấm **Bật truy cập từ xa**. Khi trạng thái là **Đang chạy**, UNETI AI đọc tên miền bạn vừa đặt và hiện link `https://javis.tencuaban.com`.
+3. Sang bước **Public Hostname**: chọn tên miền con (ví dụ `uneti.tencuaban.com`), Service chọn **HTTP**, ô URL điền địa chỉ dịch vụ UNETI AI hiện ra (mặc định `127.0.0.1:7777`, có nút sao chép).
+4. Quay lại UNETI AI, chọn **Tên miền riêng**, bấm **Bật truy cập từ xa**. Khi trạng thái là **Đang chạy**, UNETI AI đọc tên miền bạn vừa đặt và hiện link `https://uneti.tencuaban.com`.
 
 Token được mã hoá khi lưu, không bao giờ gửi ngược ra trình duyệt, và đưa cho `cloudflared` qua biến môi trường chứ không nằm trên dòng lệnh.
 
@@ -173,7 +173,7 @@ Dòng trạng thái dưới cùng của card có thể là:
 | Không kết nối được cổng 443 - Caddy/HTTPS chưa chạy, hoặc cổng 80/443 bị proxy khác chiếm | Không ai trả lời ở cổng 443. | Bật lớp HTTPS theo lệnh UNETI AI gợi ý, và kiểm tra cổng 80/443 có bị dịch vụ khác chiếm không. |
 | Đã lưu trong UNETI AI; còn bước đặt DOMAIN_NAME và Redeploy trên Hostinger. | Hostinger: route Traefik chưa khớp tên miền. | Làm bước 3 của wizard Hostinger. |
 | Hãy nhập và lưu tên miền trước. | Bấm Bật SSL khi ô tên miền còn trống. | Nhập tên miền rồi lưu. |
-| Tên miền không hợp lệ (vd: javis.tencuaban.com) | Chuỗi nhập không đúng dạng tên miền. | Bỏ khoảng trắng, bỏ đường dẫn phía sau, gõ dạng `ten.tencuaban.com`. |
+| Tên miền không hợp lệ (vd: uneti.tencuaban.com) | Chuỗi nhập không đúng dạng tên miền. | Bỏ khoảng trắng, bỏ đường dẫn phía sau, gõ dạng `ten.tencuaban.com`. |
 | Bật SSL thất bại | Server từ chối bật. | Đọc thêm dòng lý do đi kèm. |
 | Không kiểm tra được (lỗi mạng). | Trình duyệt không gọi được server. | Thử lại sau ít phút. |
 | Lỗi mạng khi lưu / Lỗi mạng khi bật SSL | Mất kết nối giữa chừng. | Thử lại. |
@@ -184,7 +184,7 @@ Dòng trạng thái dưới cùng của card có thể là:
 - Để chống lạm dụng, trước khi cấp chứng chỉ Caddy hỏi UNETI AI (qua cổng gác nội bộ `/tls-check`) và chỉ cấp cho đúng tên miền bạn đã nhập trong app. Người lạ trỏ DNS bừa vào IP máy chủ sẽ không ép được server xin chứng chỉ lung tung.
 - Khi đổi hoặc xóa tên miền trên VPS dùng Caddy, bạn chỉ cần sửa trong ô **TÊN MIỀN & SSL** rồi bấm **Lưu & kiểm tra**, sau đó **Bật SSL** cho tên miền mới. Hostinger cần Redeploy khi đổi route Traefik.
 - Việc bật Caddy (chạy lệnh `docker compose ... up -d` với file cấu hình HTTPS) và mở cổng 80/443 là bước deploy hạ tầng, nằm ngoài giao diện này. Xem hướng dẫn deploy chi tiết trong `DEPLOY.md` của dự án.
-- Khi bạn vào UNETI AI đúng bằng tên miền riêng qua HTTPS, server tự đánh dấu cookie đăng nhập là `secure`, khỏi phải đặt `JAVIS_SECURE_COOKIE` thủ công. Xem [Bảo mật & tài khoản](14-bao-mat-tai-khoan.md).
+- Khi bạn vào UNETI AI đúng bằng tên miền riêng qua HTTPS, server tự đánh dấu cookie đăng nhập là `secure`, khỏi phải đặt `UNETI_SECURE_COOKIE` thủ công. Xem [Bảo mật & tài khoản](14-bao-mat-tai-khoan.md).
 
 ## Nếu bạn deploy trên Hostinger (khác cách trên)
 
@@ -225,7 +225,7 @@ Xoá file là về giao diện gốc. Trần 512 KB.
 - **Màu ở chế độ sáng:** biến màu của chế độ sáng khai trong `:root[data-theme="light"]`, đặc
   hơn `:root`. Muốn đổi màu cho cả hai chế độ thì khai cả hai khối, ví dụ
   `:root{--accent:#e4572e}` và `:root[data-theme="light"]{--accent:#e4572e}`.
-- **Chế độ mặc định:** thêm dòng `/* javis-default-mode: light */` (hoặc `dark`, `auto`) trong
+- **Chế độ mặc định:** thêm dòng `/* uneti-default-mode: light */` (hoặc `dark`, `auto`) trong
   4 KB đầu file để chọn sáng/tối cho thiết bị chưa từng tự chọn. Người dùng đã tự chọn thì giữ
   lựa chọn của họ.
 

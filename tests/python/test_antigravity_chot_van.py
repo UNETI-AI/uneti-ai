@@ -14,7 +14,7 @@ import os
 import sys
 import tempfile
 
-os.environ.setdefault("JAVIS_STATE_DIR", tempfile.mkdtemp(prefix="javis-agychot-"))
+os.environ.setdefault("UNETI_STATE_DIR", tempfile.mkdtemp(prefix="uneti-agychot-"))
 
 from antigravity_cli import _chot_van, AntigravityCLI  # noqa: E402
 

@@ -8,7 +8,7 @@ import time
 
 from _paths import ROOT, SERVER  # noqa: E402,F401
 
-os.environ.setdefault("JAVIS_STATE_DIR", tempfile.mkdtemp(prefix="javis-ttnm-"))
+os.environ.setdefault("UNETI_STATE_DIR", tempfile.mkdtemp(prefix="uneti-ttnm-"))
 import asyncio  # noqa: E402
 
 import main  # noqa: E402
@@ -38,7 +38,7 @@ chay_tiep = []
 async def runner(text, do_sau):
     chay_tiep.append((text, do_sau))
 
-brain_root = tempfile.mkdtemp(prefix="javis-ttnm-brain-")
+brain_root = tempfile.mkdtemp(prefix="uneti-ttnm-brain-")
 os.makedirs(os.path.join(brain_root, "exports"))
 video = os.path.join(brain_root, "exports", "gioi-thieu.mp4")
 open(video, "w").close()
@@ -113,14 +113,14 @@ async def gia_hom(owner, text, **kw):
     return {"id": "i1"}
 
 main._bo_vao_hom_thu = gia_hom
-os.environ.pop("JAVIS_LONG_TURN_NOTIFY_S", None)
+os.environ.pop("UNETI_LONG_TURN_NOTIFY_S", None)
 asyncio.run(main._bao_luot_dai_xong("s1", "brain", "chat:s1:1", "hi", "Hello", 12))
 check("a short turn does not ring the bell", hom == [])
 asyncio.run(main._bao_luot_dai_xong("s1", "brain", "chat:s1:2", "make the video",
                                     "**Video is ready**\n[video.mp4](exports/video.mp4)", 640))
 check("a long turn leaves its answer in the bell of its own chat", bool(hom) and hom[-1][0] == "web:s1")
 kw = hom[-1][2] if hom else {}
-check("the notice pushes only where Javis is not on screen, once per turn",
+check("the notice pushes only where UNETI AI is not on screen, once per turn",
       kw.get("push_if_away") is True and kw.get("dedup") == "turn:chat:s1:2")
 check("the notice says how long it took", "10" in str(kw.get("label") or ""), kw.get("label"))
 hom.clear()

@@ -5,12 +5,12 @@
 Hai báo cáo 13/10/2026:
 
 1. Tin chủ / nhân viên trả lời bằng điện thoại không vào Hộp thư bot. Gốc ở javis-zalo: `mcp.js` bỏ mọi tin
-   `isSelf` khỏi bộ đệm sống. javis-zalo 1.3.0 giữ chúng kèm `isSelf: true`, nên phía Javis phải chịu được:
+   `isSelf` khỏi bộ đệm sống. javis-zalo 1.3.0 giữ chúng kèm `isSelf: true`, nên phía UNETI AI phải chịu được:
    - tin tay của chủ vào Hộp thư như "người thật" và bot nhường cuộc chat đó;
    - tiếng vọng câu bot vừa gửi KHÔNG bị ghi lần hai (đã có từ trước);
    - tiếng vọng ẢNH bot vừa gửi cũng không (không có chữ để so, trước đây sẽ bị tính là chủ nhắn tay
      và bot im 10 phút);
-   - câu chủ gõ ở Hộp thư (Javis đã tự ghi) không hiện hai lần.
+   - câu chủ gõ ở Hộp thư (UNETI AI đã tự ghi) không hiện hai lần.
 2. Bot đăng nguyên câu "You've hit your session limit · resets 4:40am (UTC)" vào nhóm, tag người hỏi. Câu đó về
    như một câu trả lời bình thường chứ không phải lỗi, nên lọt qua nhánh lỗi kỹ thuật.
 """
@@ -21,7 +21,7 @@ import sys
 import tempfile
 import time
 
-os.environ["JAVIS_STATE_DIR"] = tempfile.mkdtemp(prefix="javis-zself-")
+os.environ["UNETI_STATE_DIR"] = tempfile.mkdtemp(prefix="uneti-zself-")
 try:
     sys.stdout.reconfigure(encoding="utf-8")
 except Exception:
@@ -168,7 +168,7 @@ async def chay():
 asyncio.run(chay())
 
 # ============================================================
-# 5. Câu chủ gõ ở Hộp thư được nhớ là tiếng vọng (Javis đã tự ghi nó)
+# 5. Câu chủ gõ ở Hộp thư được nhớ là tiếng vọng (UNETI AI đã tự ghi nó)
 # ============================================================
 src = (SERVER / "routes" / "conversations.py").read_text(encoding="utf-8")
 check("trả lời tay ở Hộp thư nhớ tiếng vọng trước khi gửi", "await _gui_tin(c, txt, tieng_vong=True)" in src)

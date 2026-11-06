@@ -4,7 +4,7 @@
 #   powershell -ExecutionPolicy Bypass -File bootstrap.ps1 [-Dir <folder>] [-LogFile <path>]
 #
 # Steps: make sure Git exists (winget, else the official Git for Windows installer), clone
-# Javis into %USERPROFILE%\UNETI-AI (or reuse the clone already there), then hand over to
+# UNETI AI into %USERPROFILE%\UNETI-AI (or reuse the clone already there), then hand over to
 # install.ps1 -NoStart, which checks and installs Python, Node, the four CLI brains, the venv,
 # .env and the login auto-start. The setup wizard opens the app itself on its last page.
 #
@@ -60,7 +60,7 @@ function Finish($code) {
     if (-not $NoPause) { Read-Host "Nhan Enter de dong cua so nay" | Out-Null }
   } else {
     Line ""
-    Ok "Xong. Lan sau mo Javis bang bieu tuong UNETI AI tren Desktop hoac Start menu."
+    Ok "Xong. Lan sau mo UNETI AI bang bieu tuong UNETI AI tren Desktop hoac Start menu."
     if (-not $NoPause) { Start-Sleep -Seconds 3 }
   }
   exit $code
@@ -107,14 +107,14 @@ if (-not (Have "git")) {
 Ok ((git --version) 2>&1)
 
 # ---------------------------------------------------------------- [B] ma nguon
-Step "B" "Tai Javis ve may"
+Step "B" "Tai UNETI AI ve may"
 if (Test-Path (Join-Path $Dir ".git")) {
   # Re-running the setup (repair, or after a failed step) must not touch an existing clone:
   # it holds the user's brain, and updates go through the Update button.
-  Ok "Da co ban Javis o $Dir, giu nguyen (cap nhat bang nut Cap nhat trong app)"
+  Ok "Da co ban UNETI AI o $Dir, giu nguyen (cap nhat bang nut Cap nhat trong app)"
 } else {
   if ((Test-Path $Dir) -and (Get-ChildItem -Force $Dir | Select-Object -First 1)) {
-    Err "Thu muc $Dir da co file nhung khong phai ban Javis tai bang git."
+    Err "Thu muc $Dir da co file nhung khong phai ban UNETI AI tai bang git."
     Line "    Doi ten hoac chuyen thu muc do di cho khac, roi chay lai UNETI-AI-Setup.exe."
     Finish 1
   }
@@ -122,7 +122,7 @@ if (Test-Path (Join-Path $Dir ".git")) {
   # rolls back on this history, which a --depth clone can refuse to do.
   git clone --filter=blob:none --branch $Branch $Repo $Dir
   if ($LASTEXITCODE -ne 0 -or -not (Test-Path (Join-Path $Dir "install.ps1"))) {
-    Err "Khong tai duoc Javis tu $Repo (kiem tra mang Internet)."
+    Err "Khong tai duoc UNETI AI tu $Repo (kiem tra mang Internet)."
     Finish 1
   }
   Ok "Da tai ve $Dir"

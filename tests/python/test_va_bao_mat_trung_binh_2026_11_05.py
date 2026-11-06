@@ -7,7 +7,7 @@ No network.
   7. A pack declaring `replaces:` inherits the old pack's "on" state only when it is the official store's release of
      that id (sha256 listed in the default store index), never for a zip from elsewhere.
   8. The Origin check tells localhost ports apart (a page on localhost:3000 cannot POST or open a WebSocket to
-     localhost:7777), and the "any localhost origin may read the API" CORS opening is off unless JAVIS_DEV_CORS=1.
+     localhost:7777), and the "any localhost origin may read the API" CORS opening is off unless UNETI_DEV_CORS=1.
   9. docker-publish.yml run by hand only publishes from main.
  12. A share link of a note at the brain root no longer serves media from inbox/, memory/ or dot folders.
  13. Custom connector tools named forward_*, share_*, trash_*, transfer_* ... count as writes, not reads.
@@ -16,11 +16,11 @@ import os
 import sys
 import tempfile
 
-_STATE = tempfile.mkdtemp(prefix="javis-audit-mid-")
-_BRAINS = tempfile.mkdtemp(prefix="javis-audit-mid-brains-")
-os.environ["JAVIS_STATE_DIR"] = _STATE
+_STATE = tempfile.mkdtemp(prefix="uneti-audit-mid-")
+_BRAINS = tempfile.mkdtemp(prefix="uneti-audit-mid-brains-")
+os.environ["UNETI_STATE_DIR"] = _STATE
 os.environ["BRAINS_DIR"] = _BRAINS
-os.environ.pop("JAVIS_DEV_CORS", None)
+os.environ.pop("UNETI_DEV_CORS", None)
 
 from _paths import ROOT, SERVER  # noqa: E402,F401
 from pathlib import Path  # noqa: E402
@@ -85,7 +85,7 @@ check("8. a WebSocket from another localhost port is refused",
 check("8. a WebSocket from the dashboard itself passes", w.ws_decision("localhost:7777", "http://localhost:7777", False)
       is None)
 check("8. a public domain behind a proxy is unaffected",
-      w.csrf_decision("POST", "javis.example.com", "https://javis.example.com", True) is None)
+      w.csrf_decision("POST", "uneti.example.com", "https://uneti.example.com", True) is None)
 
 import main  # noqa: E402
 from fastapi.testclient import TestClient  # noqa: E402

@@ -95,7 +95,7 @@ with tempfile.TemporaryDirectory() as td:
     kho = Path(td) / "packs"
     kho.mkdir()
     goc_dir, packs.PACKS_DIR = packs.PACKS_DIR, kho
-    goc_env = os.environ.pop("JAVIS_DISABLE_PACKS", None)
+    goc_env = os.environ.pop("UNETI_DISABLE_PACKS", None)
     try:
         lam_moi()
         so_goc = len(mcp_catalog.tat_ca())
@@ -175,7 +175,7 @@ with tempfile.TemporaryDirectory() as td:
             ("spec lạ", "format: javis-pack\nspec: 99\nid: acme.x\n", "spec"),
             ("YAML hỏng", "format: javis-pack\nspec: 1\n  id: [khong dong\n", "lỗi"),
             ("compat không khớp",
-             "format: javis-pack\nspec: 1\nid: acme.x\ncompat: {app: '>=99.0.0'}\n", "cần Javis"),
+             "format: javis-pack\nspec: 1\nid: acme.x\ncompat: {app: '>=99.0.0'}\n", "cần UNETI AI"),
             ("id khai lệch tên thư mục",
              "format: javis-pack\nspec: 1\nid: khac-han\n", "khác tên thư mục"),
         ):
@@ -198,7 +198,7 @@ with tempfile.TemporaryDirectory() as td:
         lam_goi(kho, "config", khai_id="config")
         lam_moi()
         b = [p for p in packs.installed() if p["id"] == "config"][0]
-        check("từ chối id gói trùng tên module của Javis",
+        check("từ chối id gói trùng tên module của UNETI AI",
               not b["ok"] and "module" in (b["error"] or ""))
         shutil.rmtree(kho / "config")
 
@@ -217,11 +217,11 @@ with tempfile.TemporaryDirectory() as td:
         # ─────────────── 6. Công tắc tắt sạch ───────────────
         lam_moi()
         check("trước khi tắt vẫn còn gói", len(mcp_catalog.load()) == so_goc + 1)
-        os.environ["JAVIS_DISABLE_PACKS"] = "true"
+        os.environ["UNETI_DISABLE_PACKS"] = "true"
         lam_moi()
-        check("JAVIS_DISABLE_PACKS tắt sạch mọi gói", len(mcp_catalog.load()) == so_goc)
+        check("UNETI_DISABLE_PACKS tắt sạch mọi gói", len(mcp_catalog.load()) == so_goc)
         check("và kho gốc vẫn đủ", mcp_catalog.get("composio") is not None)
-        os.environ.pop("JAVIS_DISABLE_PACKS", None)
+        os.environ.pop("UNETI_DISABLE_PACKS", None)
         lam_moi()
         check("bỏ biến môi trường thì gói quay lại", len(mcp_catalog.load()) == so_goc + 1)
 
@@ -244,9 +244,9 @@ with tempfile.TemporaryDirectory() as td:
               packs.asset_path("../..", "x.png") is None)
         check("file không tồn tại trả None", packs.asset_path("acme.asset", "khong-co.png") is None)
     finally:
-        os.environ.pop("JAVIS_DISABLE_PACKS", None)
+        os.environ.pop("UNETI_DISABLE_PACKS", None)
         if goc_env is not None:
-            os.environ["JAVIS_DISABLE_PACKS"] = goc_env
+            os.environ["UNETI_DISABLE_PACKS"] = goc_env
         packs.PACKS_DIR = goc_dir
         lam_moi()
 
@@ -286,14 +286,14 @@ for f in (".gitignore", ".dockerignore"):
 # Đọc VERSION phải neo vào CÂY MÃ NGUỒN, không suy từ STATE_DIR
 # ============================================================
 # Lỗi thật ở 0.55.26: `PROJECT_ROOT` suy từ `STATE_DIR.parent`, đúng khi chạy từ gốc repo với
-# state mặc định, và SAI ở mọi bản cài có đặt `JAVIS_STATE_DIR` - Docker `/data/state` ra
+# state mặc định, và SAI ở mọi bản cài có đặt `UNETI_STATE_DIR` - Docker `/data/state` ra
 # `/data`, chỗ không có VERSION. `_app_version()` trả rỗng, `_hop_compat` so với (0,0,0), nên
-# MỌI gói khai `compat.app` bị từ chối ở bước validate: "cần Javis >=0.55.25, bản này là "
+# MỌI gói khai `compat.app` bị từ chối ở bước validate: "cần UNETI AI >=0.55.25, bản này là "
 # (bỏ trống). Cả kho không cài được gì, trên đúng những bản cài người dùng thật đang chạy.
 
 # Chạy với STATE_DIR mặc định thì mã CŨ cũng qua (state mặc định nằm trong cây repo), nên
 # phép kiểm ở tiến trình này không bắt được lỗi. Phải nạp `packs` trong một tiến trình con có
-# `JAVIS_STATE_DIR` trỏ đi CHỖ KHÁC - đúng hình dạng của Docker và của bản cài thật.
+# `UNETI_STATE_DIR` trỏ đi CHỖ KHÁC - đúng hình dạng của Docker và của bản cài thật.
 import subprocess
 
 with tempfile.TemporaryDirectory() as _td:
@@ -301,11 +301,11 @@ with tempfile.TemporaryDirectory() as _td:
         [sys.executable, "-c",
          "import packs;print(packs._app_version());print(packs._hop_compat('>=0.0.1')[0])"],
         cwd=str(SERVER), capture_output=True, text=True,
-        env={**os.environ, "JAVIS_STATE_DIR": _td, "PYTHONIOENCODING": "utf-8"})
+        env={**os.environ, "UNETI_STATE_DIR": _td, "PYTHONIOENCODING": "utf-8"})
     _dong = [x.strip() for x in (_r.stdout or "").splitlines() if x.strip()]
 
 _that = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
-check("đặt JAVIS_STATE_DIR đi chỗ khác thì VẪN đọc được VERSION",
+check("đặt UNETI_STATE_DIR đi chỗ khác thì VẪN đọc được VERSION",
       len(_dong) >= 1 and _dong[0] == _that)
 check("nên gói khai compat vẫn cài được, không chết ở bước validate",
       len(_dong) >= 2 and _dong[1] == "True")
@@ -326,7 +326,7 @@ check("gói đòi bản tương lai thì bị chặn, kèm lý do có số", not
 check("lý do nêu cả mốc cần lẫn bản đang chạy",
       _ban in packs._hop_compat(">=99.0.0")[1])
 
-# Không đọc nổi VERSION là lỗi CỦA JAVIS. Từ chối mọi gói vì tệp của chính mình không đọc được
+# Không đọc nổi VERSION là lỗi CỦA UNETI. Từ chối mọi gói vì tệp của chính mình không đọc được
 # thì hỏng nặng hơn nhiều so với cho cài một gói có thể hơi mới - người dùng đã đọc màn hình
 # xác nhận và tự bấm đồng ý. Cùng tinh thần với luật sẵn có: dải cú pháp lạ coi như không giới hạn.
 _goc_ver = packs._app_version

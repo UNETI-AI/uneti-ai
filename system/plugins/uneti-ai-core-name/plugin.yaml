@@ -1,0 +1,12 @@
+name: Tên và phong cách của UNETI AI Core
+name_en: "UNETI AI Core's name and style"
+slug: uneti-ai-core-name
+version: 1.0.0
+description: Cho người dùng đặt tên riêng và phong cách nói chuyện cho UNETI AI Core của brain này, ngay trong chat. Tên hiện trên trang Cộng sự. Chỉ phiên của chủ thấy tool này.
+description_en: "Lets the person give this brain's UNETI AI Core its own name and way of talking, right in chat. The name shows on the Partners page. Only the owner's own sessions see this tool."
+author: UNETI AI (bundled)
+enabled: true
+min_mode: safe
+tools:
+  - uneti_core_name
+hooks: []

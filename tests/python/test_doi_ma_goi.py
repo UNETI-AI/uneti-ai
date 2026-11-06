@@ -21,8 +21,8 @@ import tempfile
 import zipfile
 from pathlib import Path
 
-os.environ["JAVIS_STATE_DIR"] = tempfile.mkdtemp(prefix="javis-doima-")
-os.environ["JAVIS_ENABLE_USER_PLUGINS"] = "true"
+os.environ["UNETI_STATE_DIR"] = tempfile.mkdtemp(prefix="uneti-doima-")
+os.environ["UNETI_ENABLE_USER_PLUGINS"] = "true"
 
 import packs           # noqa: E402
 import pack_install    # noqa: E402
@@ -72,17 +72,17 @@ def cai(du_lieu, brain, enable=True):
 BRAIN = Path(tempfile.mkdtemp(prefix="brain-doima-"))
 
 # ---- gói cũ, mã tiếng Việt ----
-s0, r0 = cai(goi_zip("javis.javis-trong-chatgpt", "1.0.0", "javis-trong-chatgpt"), BRAIN)
+s0, r0 = cai(goi_zip("javis.javis-trong-chatgpt", "1.0.0", "uneti-trong-chatgpt"), BRAIN)
 check("cài gói cũ", r0.get("ok"), r0)
-du_lieu_cu = STATE_DIR / "plugin-data" / "javis-trong-chatgpt"
+du_lieu_cu = STATE_DIR / "plugin-data" / "uneti-trong-chatgpt"
 du_lieu_cu.mkdir(parents=True, exist_ok=True)
 (du_lieu_cu / "kho.json").write_text('{"tokens": {"abc": 1}}', encoding="utf-8")
 check("skill gói cũ nằm trong brain", (BRAIN / "skills" / "tu-van" / "SKILL.md").is_file())
 
 # ---- danh mục Store trước khi cập nhật ----
-KHO = [{"id": "javis.gate", "version": "2.0.0", "name": {"vi": "Javis Gate"},
+KHO = [{"id": "javis.gate", "version": "2.0.0", "name": {"vi": "UNETI AI Gate"},
         "replaces": ["javis.javis-trong-chatgpt"]},
-       {"id": "javis.javis-trong-chatgpt", "version": "1.0.0", "name": {"vi": "Javis trong ChatGPT"}}]
+       {"id": "javis.javis-trong-chatgpt", "version": "1.0.0", "name": {"vi": "UNETI AI trong ChatGPT"}}]
 up = pack_updates.find_updates(KHO, pack_install.doc_so())
 check("chuông báo bản mới cho gói đổi mã", any(u["id"] == "javis.gate" and u["from"] == "1.0.0" for u in up), up)
 import packs_store  # noqa: E402
@@ -91,7 +91,7 @@ check("danh mục giữ trường replaces đã làm sạch", sach["replaces"] =
 check("replaces kiểu lạ (chuỗi) thành rỗng", packs_store._lam_sach({"id": "a", "replaces": "abc"})["replaces"] == [])
 
 # ---- 1. soi gói mới ----
-moi = goi_zip("javis.gate", "2.0.0", "javis-gate", replaces=["javis.javis-trong-chatgpt", "javis.khong-cai"])
+moi = goi_zip("javis.gate", "2.0.0", "uneti-gate", replaces=["javis.javis-trong-chatgpt", "uneti.khong-cai"])
 s1 = pack_install.soi(moi, "gate.zip")
 check("soi: gói mới hợp lệ, connector cùng tên gói cũ KHÔNG bị coi là trùng",
       s1.get("ok") and "demo-svc" in s1.get("connectors", []), s1.get("error") or s1.get("warning"))
@@ -115,19 +115,19 @@ check("gói cũ đang bật thì bản thay nó cũng bật, dù màn hình gử
       so["javis.gate"]["enabled"] is True and r1.get("enabled") is True)
 check("thư mục gói cũ đã gỡ", not (packs.PACKS_DIR / "javis.javis-trong-chatgpt").exists())
 check("connector của gói mới đầy đủ trong sổ", so["javis.gate"]["connectors"] == ["demo-svc"], so["javis.gate"])
-du_lieu_moi = STATE_DIR / "plugin-data" / "javis-gate"
+du_lieu_moi = STATE_DIR / "plugin-data" / "uneti-gate"
 check("dữ liệu plugin (token) chuyển sang tên mới",
       (du_lieu_moi / "kho.json").is_file() and not du_lieu_cu.exists())
-check("sổ ghi bí danh plugin cũ -> mới", so["javis.gate"].get("plugin_aliases") == {"javis-trong-chatgpt": "javis-gate"})
-check("packs.plugin_alias đọc ra bí danh", packs.plugin_alias("javis-trong-chatgpt") == "javis-gate")
-check("plugin không đổi tên thì không có bí danh", packs.plugin_alias("javis-gate") == "")
+check("sổ ghi bí danh plugin cũ -> mới", so["javis.gate"].get("plugin_aliases") == {"uneti-trong-chatgpt": "uneti-gate"})
+check("packs.plugin_alias đọc ra bí danh", packs.plugin_alias("uneti-trong-chatgpt") == "uneti-gate")
+check("plugin không đổi tên thì không có bí danh", packs.plugin_alias("uneti-gate") == "")
 
 # ---- 3. địa chỉ cũ tới plugin mới ----
 plugins_host.invalidate()
-tr = plugins_host.tim_http("javis-trong-chatgpt", "mcp", "POST")
-check("/ext/<slug cũ>/mcp tới plugin mới", tr is not None and tr[0].slug == "javis-gate", tr)
-check("địa chỉ mới vẫn chạy", plugins_host.tim_http("javis-gate", "mcp", "POST") is not None)
-check("đường không có thì vẫn không có", plugins_host.tim_http("javis-trong-chatgpt", "khong-co", "POST") is None)
+tr = plugins_host.tim_http("uneti-trong-chatgpt", "mcp", "POST")
+check("/ext/<slug cũ>/mcp tới plugin mới", tr is not None and tr[0].slug == "uneti-gate", tr)
+check("địa chỉ mới vẫn chạy", plugins_host.tim_http("uneti-gate", "mcp", "POST") is not None)
+check("đường không có thì vẫn không có", plugins_host.tim_http("uneti-trong-chatgpt", "khong-co", "POST") is None)
 
 # ---- 4. năng lực trong brain đi theo gói mới ----
 sv = pack_vault.doc_so("javis.gate")
@@ -140,14 +140,14 @@ check("skill không bị bỏ qua như 'của người khác'",
 s2, r2 = cai(goi_zip("javis.gate-pro", "3.0.0", "gate-pro", replaces=["javis.gate"]), BRAIN)
 so = pack_install.doc_so()
 check("đổi tên lần hai: bí danh cũ nhất cũng trỏ về tên mới nhất",
-      so["javis.gate-pro"].get("plugin_aliases") == {"javis-trong-chatgpt": "gate-pro", "javis-gate": "gate-pro"},
+      so["javis.gate-pro"].get("plugin_aliases") == {"uneti-trong-chatgpt": "gate-pro", "uneti-gate": "gate-pro"},
       so["javis.gate-pro"].get("plugin_aliases"))
 plugins_host.invalidate()
-tr = plugins_host.tim_http("javis-trong-chatgpt", "mcp", "POST")
+tr = plugins_host.tim_http("uneti-trong-chatgpt", "mcp", "POST")
 check("địa chỉ gốc vẫn tới plugin mới nhất", tr is not None and tr[0].slug == "gate-pro")
 
 # ---- 6. replaces một mã không cài: không đụng gì ----
-s3, r3 = cai(goi_zip("javis.crm", "1.0.1", "crm", replaces=["javis.khach-hang-crm"], ten_skill="cham-soc"), BRAIN,
+s3, r3 = cai(goi_zip("javis.crm", "1.0.1", "crm", replaces=["uneti.khach-hang-crm"], ten_skill="cham-soc"), BRAIN,
              enable=False)
 check("replaces mã không cài: cài bình thường, không thay gì", r3.get("ok") and r3.get("replaced") == [], r3)
 check("không có gói cũ để thừa hưởng: bật hay tắt đúng như màn hình chọn",
@@ -157,8 +157,8 @@ check("không có gói cũ để thừa hưởng: bật hay tắt đúng như m�
 src = (SERVER / "routes" / "packs.py").read_text(encoding="utf-8")
 check("route danh mục: ẩn thẻ mã cũ và đánh dấu thẻ mới đã cài",
       "bi_thay" in src and "replaces_installed" in src)
-man = packs.ma_thay_the({"replaces": ["javis.a", "javis.a", "../x", "javis.self", 3]}, "javis.self")
-check("ma_thay_the: bỏ trùng, bỏ mã sai, bỏ chính nó", man == ["javis.a", "3"], man)
+man = packs.ma_thay_the({"replaces": ["uneti.a", "uneti.a", "../x", "uneti.self", 3]}, "uneti.self")
+check("ma_thay_the: bỏ trùng, bỏ mã sai, bỏ chính nó", man == ["uneti.a", "3"], man)
 
 print()
 print("ALL PASS" if not _fails else f"{len(_fails)} FAIL: {_fails}")

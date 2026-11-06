@@ -4,7 +4,7 @@ Teams page.
 Owner, 2026-11-04: "sắp xếp thứ tự Project kéo thả như Brain ... các tag và các project hoặc ghim và cả đoạn chat".
 Projects and pinned chats keep their order in the session store (sort_order, pin_order). Tags live inside each agent
 file and each team row, so their order is a list of tag KEYS per page, in settings.json under "ui_order", like the
-brain order (brain_order.py): every device that opens this Javis shows the same order. A tag not in the list comes
+brain order (brain_order.py): every device that opens this UNETI AI shows the same order. A tag not in the list comes
 after the ordered ones, by name.
 """
 from __future__ import annotations

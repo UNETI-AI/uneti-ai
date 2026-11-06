@@ -9,7 +9,7 @@ câu trả lời chỉ hiện khi model viết xong. Test giữ:
   `delta` từng mẩu, lệnh gọi tool gom đúng từ các mảnh, `text` cuối mang cờ `streamed`;
 - Anthropic Messages: text_delta ra từng mẩu, tool_use gom từ input_json_delta, khối thinking giữ nguyên;
 - đường lui: endpoint từ chối stream, endpoint trả JSON thường, lỗi giữa luồng, rớt mạng trước chữ đầu;
-- vòng đang ép gọi tool không hiện chữ xem trước; JAVIS_API_STREAM_TOOLS=0 tắt hẳn;
+- vòng đang ép gọi tool không hiện chữ xem trước; UNETI_API_STREAM_TOOLS=0 tắt hẳn;
 - dashboard hiện `delta` và không in lại câu đã hiện.
 """
 from _paths import ROOT, SERVER  # noqa: E402,F401
@@ -20,8 +20,8 @@ import tempfile
 import threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
-os.environ["JAVIS_STATE_DIR"] = tempfile.mkdtemp(prefix="javis-asv-")
-os.environ.pop("JAVIS_API_STREAM_TOOLS", None)
+os.environ["UNETI_STATE_DIR"] = tempfile.mkdtemp(prefix="uneti-asv-")
+os.environ.pop("UNETI_API_STREAM_TOOLS", None)
 
 import engine  # noqa: E402
 
@@ -81,7 +81,7 @@ BASE = f"http://127.0.0.1:{_srv.server_address[1]}"
 engine.OPENAI_URL = BASE + "/v1/chat/completions"
 engine.ANTHROPIC_URL = BASE + "/v1/messages"
 
-TOOLS = [{"fn": "tra_doanh_thu", "server": "javis", "name": "tra_doanh_thu", "description": "tra doanh thu",
+TOOLS = [{"fn": "tra_doanh_thu", "server": "uneti", "name": "tra_doanh_thu", "description": "tra doanh thu",
           "schema": {"type": "object", "properties": {"ky": {"type": "string"}}}}]
 CALLS = []
 
@@ -206,12 +206,12 @@ async def run():
     engine._KHONG_STREAM_VONG.clear()
 
     # ─────────── 7. Tắt bằng biến môi trường ───────────
-    os.environ["JAVIS_API_STREAM_TOOLS"] = "0"
+    os.environ["UNETI_API_STREAM_TOOLS"] = "0"
     PLAN[:] = [lambda h, b: js(h, 200, {"choices": [{"message": {"role": "assistant", "content": "Tắt"}}]})]
     SEEN.clear()
     evs = await openai(None)
-    check("JAVIS_API_STREAM_TOOLS=0 thì gọi non-stream như cũ", SEEN[0].get("stream") is False and not deltas(evs))
-    os.environ.pop("JAVIS_API_STREAM_TOOLS")
+    check("UNETI_API_STREAM_TOOLS=0 thì gọi non-stream như cũ", SEEN[0].get("stream") is False and not deltas(evs))
+    os.environ.pop("UNETI_API_STREAM_TOOLS")
 
     # ─────────── 8. Anthropic Messages ───────────
     PLAN[:] = [

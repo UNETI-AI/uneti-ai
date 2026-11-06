@@ -13,7 +13,7 @@ import tempfile
 from pathlib import Path
 from unittest.mock import patch
 
-os.environ["JAVIS_STATE_DIR"] = tempfile.mkdtemp(prefix="javis-files-raw-")
+os.environ["UNETI_STATE_DIR"] = tempfile.mkdtemp(prefix="uneti-files-raw-")
 try:
     sys.stdout.reconfigure(encoding="utf-8")
 except Exception:
@@ -30,7 +30,7 @@ def check(name, cond, extra=""):
         _fails.append(name)
 
 
-tmp = Path(tempfile.mkdtemp(prefix="javis-files-raw-brain-"))
+tmp = Path(tempfile.mkdtemp(prefix="uneti-files-raw-brain-"))
 
 
 def serve(name, dl=False):

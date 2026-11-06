@@ -29,7 +29,7 @@ These 2 pieces of information are required. Do this in the Telegram app (phone o
 ### Getting the Bot token (from BotFather)
 
 1. In Telegram, find the account **@BotFather** (with a blue tick) and open the chat.
-2. Type `/newbot` and follow the prompts: give the bot a display name, then a username ending in `bot` (for example `my_javis_bot`).
+2. Type `/newbot` and follow the prompts: give the bot a display name, then a username ending in `bot` (for example `my_uneti_bot`).
 3. BotFather returns a token like `123456789:ABCdef...`. That is the **Bot token**. Keep it secret; anyone with it controls the bot.
 
 ### Getting your Chat ID (and other users')

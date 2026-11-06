@@ -1,11 +1,11 @@
-"""The model row on the Javis Core card (0.461.0; owner 04/11/2026: Javis Core showed no model, so it looked like it had
+"""The model row on the UNETI AI Core card (0.461.0; owner 04/11/2026: UNETI AI Core showed no model, so it looked like it had
 none; agreed design: name the main model it follows, let the card pin it, one pin shared with the Core chat model bar).
 
     python tests/run.py core_model_card_api
 
 No network, no model.
-- GET /javis-core/model: no pin = follows the main model and says which; `run_*` is what the next Core turn runs on.
-- POST /javis-core/model pins Javis Core as a whole (same `core_provider/core_model` as the Core chat model bar), and
+- GET /uneti-ai-core/model: no pin = follows the main model and says which; `run_*` is what the next Core turn runs on.
+- POST /uneti-ai-core/model pins UNETI AI Core as a whole (same `core_provider/core_model` as the Core chat model bar), and
   an empty provider removes the pin. Unknown provider = 400.
 - The card and the Core chat model bar read and write the same pin, both ways.
 - A pin that cannot run (no key) says so and shows the main model as what runs.
@@ -16,7 +16,7 @@ import sys
 import tempfile
 from pathlib import Path
 
-os.environ["JAVIS_STATE_DIR"] = tempfile.mkdtemp(prefix="javis-core-card-")
+os.environ["UNETI_STATE_DIR"] = tempfile.mkdtemp(prefix="uneti-ai-core-card-")
 try:
     sys.stdout.reconfigure(encoding="utf-8")
 except Exception:
@@ -32,11 +32,11 @@ def check(name, cond, extra=""):
 
 
 import config as cfgmod  # noqa: E402
-import javis_core  # noqa: E402
+import uneti_core  # noqa: E402
 import main  # noqa: E402
 from fastapi.testclient import TestClient  # noqa: E402
 
-if os.environ["JAVIS_STATE_DIR"] not in str(cfgmod.STATE_DIR):
+if os.environ["UNETI_STATE_DIR"] not in str(cfgmod.STATE_DIR):
     print(f"FAIL state dir is not the temp dir: {cfgmod.STATE_DIR}. STOP.")
     sys.exit(1)
 
@@ -50,14 +50,14 @@ def mcfg():
 
 client = TestClient(main.app, base_url="http://127.0.0.1:8080")
 store = main.get_store()
-core = store.create_session(brain="brain", channel=javis_core.CHANNEL)
+core = store.create_session(brain="brain", channel=uneti_core.CHANNEL)
 
-v = client.get("/javis-core/model").json()
+v = client.get("/uneti-ai-core/model").json()
 check("no pin: the card follows the main model and names it",
       v.get("pinned") is False and v.get("main_provider") == "anthropic-cli" and v.get("main_model") == "opus", v)
 check("no pin: what runs is the main model", (v.get("run_provider"), v.get("run_model")) == ("anthropic-cli", "opus"), v)
 
-r = client.post("/javis-core/model", data={"provider": "groq", "model": "qwen3-32b"})
+r = client.post("/uneti-ai-core/model", data={"provider": "groq", "model": "qwen3-32b"})
 d = r.json()
 check("pinning from the card answers with the new view", r.status_code == 200 and d.get("ok") and d.get("pinned") is True and
       d.get("pinned_provider") == "groq" and d.get("pinned_model") == "qwen3-32b" and d.get("pin_ok") is True, d)
@@ -69,21 +69,21 @@ check("...and the Core chat model bar shows it", meta.get("pinned_provider") == 
 check("the main model is left alone", (mcfg().get("main") or {}).get("provider") == "anthropic-cli", mcfg().get("main"))
 
 client.post(f"/sessions/{core}/model", data={"provider": "anthropic-cli", "model": "sonnet"})
-v = client.get("/javis-core/model").json()
+v = client.get("/uneti-ai-core/model").json()
 check("a pin set from the Core chat shows on the card",
       v.get("pinned_provider") == "anthropic-cli" and v.get("pinned_model") == "sonnet" and v.get("run_model") == "sonnet", v)
 
-r = client.post("/javis-core/model", data={"provider": "", "model": "whatever"})
+r = client.post("/uneti-ai-core/model", data={"provider": "", "model": "whatever"})
 d = r.json()
 check("empty provider: follow the main model again", d.get("ok") and d.get("pinned") is False and
       not mcfg().get("core_provider") and not mcfg().get("core_model"), (d, mcfg()))
 check("...and the Core chat model bar follows too", not client.get(f"/sessions/{core}/meta").json().get("pinned_provider"))
 
-r = client.post("/javis-core/model", data={"provider": "no-such-brain", "model": "x"})
+r = client.post("/uneti-ai-core/model", data={"provider": "no-such-brain", "model": "x"})
 check("an unknown provider is refused and nothing changes", r.status_code == 400 and not mcfg().get("core_provider"), r.text)
 
 cfgmod.update_settings({"model": {"core_provider": "openrouter", "core_model": "x/y"}})
-v = client.get("/javis-core/model").json()
+v = client.get("/uneti-ai-core/model").json()
 check("a pin with no key says it cannot run and shows the main model running",
       v.get("pinned") is True and v.get("pin_ok") is False and v.get("run_provider") == "anthropic-cli", v)
 cfgmod.update_settings({"model": {"core_provider": "", "core_model": ""}})
@@ -92,17 +92,17 @@ src = (SERVER / "main.py").read_text(encoding="utf-8")
 check("one writer of the Core pin", src.count('{"model": {"core_provider": prov, "core_model": mdl}}') == 1 and
       src.count("await _set_core_pin(") == 3)
 
-# 2026-11-05: Javis Core's card is the ordinary agent editor; its Model field saves the same pin.
+# 2026-11-05: UNETI AI Core's card is the ordinary agent editor; its Model field saves the same pin.
 B = Path(tempfile.mkdtemp(prefix="core-card-brain-"))
 (B / "agents").mkdir()
-r = client.post("/agents", data={"slug": "javis-core", "name": "Javis Core", "role": "r", "prompt": "p",
+r = client.post("/agents", data={"slug": "uneti-ai-core", "name": "UNETI AI Core", "role": "r", "prompt": "p",
                                  "model": "qwen3-32b", "model_provider": "groq", "reasoning": "high", "brain": str(B)})
-check("saving the agent form pins Javis Core", r.status_code == 200 and mcfg().get("core_provider") == "groq"
+check("saving the agent form pins UNETI AI Core", r.status_code == 200 and mcfg().get("core_provider") == "groq"
       and mcfg().get("core_model") == "qwen3-32b" and mcfg().get("core_reasoning") == "high", (r.text, mcfg()))
-g = client.get("/agents/get", params={"slug": "javis-core", "brain": str(B)}).json()
+g = client.get("/agents/get", params={"slug": "uneti-ai-core", "brain": str(B)}).json()
 check("...and the form reads it back", g.get("model") == "qwen3-32b" and g.get("model_provider") == "groq"
       and g.get("reasoning") == "high", g)
-client.post("/agents", data={"slug": "javis-core", "name": "Javis Core", "role": "r", "prompt": "p", "model": "",
+client.post("/agents", data={"slug": "uneti-ai-core", "name": "UNETI AI Core", "role": "r", "prompt": "p", "model": "",
                              "model_provider": "", "brain": str(B)})
 check("Default in the form = follow the main model", not mcfg().get("core_provider"), mcfg())
 

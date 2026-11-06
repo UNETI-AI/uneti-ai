@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Sinh logo + favicon + icon PWA của Javis từ hình linh vật.
+"""Sinh logo + favicon + icon PWA của UNETI AI từ hình linh vật.
 
     python tools/gen_logo.py
 

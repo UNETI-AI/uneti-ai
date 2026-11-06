@@ -1,28 +1,28 @@
 <!-- translated-from: QUICKSTART.en.md sha256:2f4928f341af -->
-# Javis OS - Inicio rápido
+# UNETI AI - Inicio rápido
 
 *[English](../../../QUICKSTART.en.md) · [Tiếng Việt](../../../QUICKSTART.md) · [简体中文](../zh/QUICKSTART.md) · **Español** · [日本語](../ja/QUICKSTART.md) · [हिन्दी](../hi/QUICKSTART.md) · [Português](../pt-BR/QUICKSTART.md) · [한국어](../ko/QUICKSTART.md) · [Русский](../ru/QUICKSTART.md) · [Deutsch](../de/QUICKSTART.md) · [Français](../fr/QUICKSTART.md) · [Bahasa Indonesia](../id/QUICKSTART.md)*
 
 > Esta es una traducción automática de la guía de inicio rápido en inglés.
 
-Pon Javis OS en marcha en pocos minutos. Guías completas: [docs/en/](../../../docs/en/README.md).
+Pon UNETI AI en marcha en pocos minutos. Guías completas: [docs/en/](../../../docs/en/README.md).
 
 ## Ordenador personal (Windows, macOS) - descarga el instalador
 
-Instala Javis como cualquier otra app: descarga un archivo, ábrelo y tendrás un icono JAVIS OS para usar cada día. El instalador revisa qué le falta al equipo (Git, Python, Node, los cerebros de IA) e instala solo eso.
+Instala UNETI AI como cualquier otra app: descarga un archivo, ábrelo y tendrás un icono UNETI AI para usar cada día. El instalador revisa qué le falta al equipo (Git, Python, Node, los cerebros de IA) e instala solo eso.
 
-- **Windows 10/11:** descarga [JavisOS-Setup.exe](https://github.com/uneti-ai/uneti-ai/releases/download/desktop/JavisOS-Setup.exe), haz doble clic y pulsa Next hasta el final. Una ventana negra muestra el progreso (unos minutos). Al terminar hay un icono JAVIS OS en el Escritorio y en el menú Inicio.
-- **macOS 11 o posterior:** descarga [JavisOS-macOS.dmg](https://github.com/uneti-ai/uneti-ai/releases/download/desktop/JavisOS-macOS.dmg), ábrelo, arrastra **JAVIS OS** a **Applications** y ábrelo desde Launchpad. La primera vez se abre Terminal para instalar (puede pedirte crear una cuenta de administrador de Javis y la contraseña del Mac una vez).
+- **Windows 10/11:** descarga [UNETI-AI-Setup.exe](https://github.com/uneti-ai/uneti-ai/releases/download/desktop/UNETI-AI-Setup.exe), haz doble clic y pulsa Next hasta el final. Una ventana negra muestra el progreso (unos minutos). Al terminar hay un icono UNETI AI en el Escritorio y en el menú Inicio.
+- **macOS 11 o posterior:** descarga [UNETI-AI-macOS.dmg](https://github.com/uneti-ai/uneti-ai/releases/download/desktop/UNETI-AI-macOS.dmg), ábrelo, arrastra **UNETI AI** a **Applications** y ábrelo desde Launchpad. La primera vez se abre Terminal para instalar (puede pedirte crear una cuenta de administrador de UNETI AI y la contraseña del Mac una vez).
 
-Al hacer clic en el icono, Javis se abre en su propia ventana (sin barra de direcciones), arranca con el equipo y el botón **Update** de la app funciona como siempre. Tus datos están en la carpeta `JavisOS` de tu carpeta de usuario; desinstalar la app conserva esa carpeta.
+Al hacer clic en el icono, UNETI AI se abre en su propia ventana (sin barra de direcciones), arranca con el equipo y el botón **Update** de la app funciona como siempre. Tus datos están en la carpeta `UNETI-AI` de tu carpeta de usuario; desinstalar la app conserva esa carpeta.
 
 Los dos instaladores aún no están firmados, así que el equipo pregunta una vez:
 - Windows muestra "Windows protected your PC": pulsa **More info** y luego **Run anyway**.
-- macOS dice que no puede abrir la app: ve a **System Settings → Privacy & Security**, baja y pulsa **Open Anyway**, y vuelve a abrir JAVIS OS.
+- macOS dice que no puede abrir la app: ve a **System Settings → Privacy & Security**, baja y pulsa **Open Anyway**, y vuelve a abrir UNETI AI.
 
 ## Opción 1 - VPS de Hostinger (Docker Manager, en un clic)
 
-> 🛒 **¿Aún no tienes VPS?** [Consigue un VPS de Hostinger aquí](https://www.hostinger.com?REFERRALCODE=UTRBLOGMIDSN). Trae Docker Manager integrado, así que Javis se instala en un clic. Cuando esté listo, vuelve a los pasos de abajo.
+> 🛒 **¿Aún no tienes VPS?** [Consigue un VPS de Hostinger aquí](https://www.hostinger.com?REFERRALCODE=UTRBLOGMIDSN). Trae Docker Manager integrado, así que UNETI AI se instala en un clic. Cuando esté listo, vuelve a los pasos de abajo.
 
 1. hPanel → VPS → **Docker Manager** → **Compose** → **Compose from URL**.
 2. Pega esta URL:
@@ -31,9 +31,9 @@ Los dos instaladores aún no están firmados, así que el equipo pregunta una ve
    ```
 3. (Opcional, para HTTPS + un dominio) define esto en el cuadro **Environment**:
    ```
-   DOMAIN_NAME=javis.<vps-hostname>.hstgr.cloud
+   DOMAIN_NAME=uneti.<vps-hostname>.hstgr.cloud
    ```
-   (El hostname está en hPanel → VPS, p. ej. `javis.srv1782015.hstgr.cloud`.)
+   (El hostname está en hPanel → VPS, p. ej. `uneti.srv1782015.hstgr.cloud`.)
 4. **Deploy**. Espera de 1-3 minutos. Abre la app con el botón **Open** (o en `https://<DOMAIN_NAME>`).
 5. En el primer arranque, la pantalla te pide crear una cuenta de administrador. Después, inicia sesión en Claude Code una vez desde el terminal del contenedor: `claude auth login --claudeai`.
 
@@ -52,7 +52,7 @@ Abre http://localhost:7777. Para HTTPS mediante Caddy, añade `-f docker-compose
 
 1. Instala Python 3.12 + Node 22.
 2. En la carpeta del proyecto, ejecuta `setup.bat` una vez: crea .venv, instala las dependencias e instala por ti los dos motores CLI (Claude Code, Codex).
-3. `start-javis.bat` para ejecutarlo en segundo plano (`stop-javis.bat` para detenerlo).
+3. `start-uneti.bat` para ejecutarlo en segundo plano (`stop-uneti.bat` para detenerlo).
 4. Abre http://localhost:7777.
 
 ## Una vez en marcha

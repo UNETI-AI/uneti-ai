@@ -4,7 +4,7 @@
 
 The owner: "Phần nhiệm vụ của tôi đang chưa được nối lên phần thông báo ... hãy thông báo tất cả những gì có ở trong
 phần của tôi". Before, only habits and the appointments with a reminder chosen were announced: a task with a time never
-was, and an appointment Javis made from chat (reminder left empty, the page showing "15 minutes before") neither.
+was, and an appointment UNETI AI made from chat (reminder left empty, the page showing "15 minutes before") neither.
 Now a timed task is announced at its time, an empty appointment reminder means 15 minutes before, and a morning list
 names everything on today with the count of overdue tasks. "No reminder" ("0") still means none.
 """
@@ -73,7 +73,7 @@ check("no long dash in the messages", all(chr(0x2014) not in s and chr(0x2013) n
                                             for s in (txt, my_tasks.timed_text(task, "10:00"))))
 
 # ---- the tick: everything goes out once, through the reminder group ----
-brain = Path(tempfile.mkdtemp(prefix="javis-nhacviec-"))
+brain = Path(tempfile.mkdtemp(prefix="uneti-nhacviec-"))
 sent = []
 
 

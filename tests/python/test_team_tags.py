@@ -11,8 +11,8 @@ import tempfile
 import time
 from pathlib import Path
 
-os.environ["JAVIS_STATE_DIR"] = tempfile.mkdtemp(prefix="javis-team-tags-")
-BR = Path(tempfile.mkdtemp(prefix="javis-team-tags-brain-")).resolve()
+os.environ["UNETI_STATE_DIR"] = tempfile.mkdtemp(prefix="uneti-team-tags-")
+BR = Path(tempfile.mkdtemp(prefix="uneti-team-tags-brain-")).resolve()
 (BR / "agents").mkdir()
 for slug, name in (("lan", "Lan"), ("minh", "Minh")):
     (BR / "agents" / f"{slug}.md").write_text(f"---\nname: {name}\nrole: Thành viên\n---\nBạn là {name}.\n",

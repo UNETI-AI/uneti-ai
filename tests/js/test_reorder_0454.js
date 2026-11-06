@@ -36,7 +36,7 @@ check("the project menu offers Reorder projects", ses.indexOf('window.t("reorder
 check("the pinned group has a Reorder button", ses.indexOf("cside-reorder") >= 0 && ses.indexOf('"/sessions/pin-order"') >= 0);
 check("the Partners tag menu offers Reorder tags", ws.indexOf('t("reorder.menu_tags")') >= 0 && ws.indexOf('saveTags("tags_agents"') >= 0);
 check("the Teams tag menu offers Reorder tags", tm.indexOf('tw("reorder.menu_tags")') >= 0 && tm.indexOf('saveTags("tags_teams"') >= 0);
-check("both pages redraw when the order changes", ws.indexOf('"javis:order-changed"') >= 0 && tm.indexOf('"javis:order-changed"') >= 0);
+check("both pages redraw when the order changes", ws.indexOf('"uneti:order-changed"') >= 0 && tm.indexOf('"uneti:order-changed"') >= 0);
 check("reorder-dialog.js runs before the pages that use it",
   napTruoc("reorder-dialog.js", ["sessions-ui.js", "workspace.js", "teams.js"], html));
 ["reorder.menu_projects", "reorder.menu_tags", "reorder.title_projects", "reorder.title_pins", "reorder.title_tags",

@@ -11,9 +11,9 @@ import tempfile
 import time
 from pathlib import Path
 
-os.environ["JAVIS_STATE_DIR"] = tempfile.mkdtemp(prefix="javis-team-retry-")
-os.environ.pop("JAVIS_TEAM_AUTO_RETRIES", None)
-STATE = Path(os.environ["JAVIS_STATE_DIR"])
+os.environ["UNETI_STATE_DIR"] = tempfile.mkdtemp(prefix="uneti-team-retry-")
+os.environ.pop("UNETI_TEAM_AUTO_RETRIES", None)
+STATE = Path(os.environ["UNETI_STATE_DIR"])
 
 import sessions  # noqa: E402
 import task_store  # noqa: E402
@@ -70,9 +70,9 @@ check("plan out of quota: wait for the reset time the CLI gave", lim and lim["ki
       and lim["at"] == reset + team_retry.LIMIT_GRACE_S, lim)
 check("plan reset too far away: block as before",
       plan(f"Claude AI usage limit reached|{int(NOW + 3 * 86400)}", provider="anthropic-cli") is None)
-os.environ["JAVIS_TEAM_AUTO_RETRIES"] = "0"
-check("JAVIS_TEAM_AUTO_RETRIES=0 switches it off", plan("Overloaded") is None)
-os.environ.pop("JAVIS_TEAM_AUTO_RETRIES")
+os.environ["UNETI_TEAM_AUTO_RETRIES"] = "0"
+check("UNETI_TEAM_AUTO_RETRIES=0 switches it off", plan("Overloaded") is None)
+os.environ.pop("UNETI_TEAM_AUTO_RETRIES")
 steps = [{"kind": "work", "agent_key": "a", "brief": "x", "job_revision": 1, "status": "failed"},
          {"kind": "work", "agent_key": "a", "brief": "x", "job_revision": 1, "status": "failed"},
          {"kind": "work", "agent_key": "a", "brief": "y", "job_revision": 1, "status": "failed"},
@@ -181,7 +181,7 @@ import team_step_report as SR  # noqa: E402
 
 
 def directive(**op):
-    return f"\n<!-- JAVIS_TEAM: {json.dumps(op, ensure_ascii=False)} -->"
+    return f"\n<!-- UNETI_TEAM: {json.dumps(op, ensure_ascii=False)} -->"
 
 
 check("report: outcome defaults to succeeded, files deduplicated",
@@ -207,7 +207,7 @@ check("a step reporting failed stops the job for the owner", t["status"] == "tea
       and "Chưa nối POS" in t["block_reason"], (t["status"], t["block_kind"], t["block_reason"]))
 check("no synthesis turn is spent on a failed step", not [c for c in fake.calls if c["role"] == "synthesize"])
 last_agent = [m for m in ss.get_team_messages_page(T["session_id"], limit=50)["messages"] if m["author_kind"] == "agent"][-1]
-check("the report block is not shown in the chat", "JAVIS_TEAM" not in last_agent["content"]
+check("the report block is not shown in the chat", "UNETI_TEAM" not in last_agent["content"]
       and (last_agent.get("meta") or {}).get("report", {}).get("outcome") == "failed")
 
 fake.calls.clear()

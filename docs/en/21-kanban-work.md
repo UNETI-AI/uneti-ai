@@ -262,7 +262,7 @@ Remember that work created through chat still sits in the queue of the brain you
 
 Since 0.25.2 UNETI AI **says so at hand-over time**: handing work into a board that is **Off** or in **Observe** makes it report that the job is queued rather than running, plus how to turn it on. Before that it always ended with "the job runs in the background, the result will come back on its own" regardless of the mode, a false promise UNETI AI itself had no way to know was false. The background work strip in the chat box also turns yellow in exactly this situation.
 
-This works on **every brain** since 0.17.1, through the `javis_task` tool. Before that only Claude Code and ChatGPT/Codex could hand work over from chat, because the only route was an HTTP call through a machine command that only those two engines could run. The API engines (OpenRouter, OpenAI, Anthropic, Gemini, Groq, Ollama) accepted the instruction then did nothing, and reported no error. If you ever met "I asked for a job and the board stayed empty", it was most likely this bug.
+This works on **every brain** since 0.17.1, through the `uneti_task` tool. Before that only Claude Code and ChatGPT/Codex could hand work over from chat, because the only route was an HTTP call through a machine command that only those two engines could run. The API engines (OpenRouter, OpenAI, Anthropic, Gemini, Groq, Ollama) accepted the instruction then did nothing, and reported no error. If you ever met "I asked for a job and the board stayed empty", it was most likely this bug.
 
 Two things that tool deliberately does **not** do:
 
@@ -284,9 +284,9 @@ Details in [Self-learning](22-self-learning.md).
 
 ## Where the board's data lives
 
-- **The main source**: the `kanban.sqlite3` file in UNETI AI's state folder (the `JAVIS_STATE_DIR` variable, defaulting to the `server/` folder). It holds the lifecycle, the runs and the event log. It sits deliberately outside the brain so running work is not overwritten by git sync.
+- **The main source**: the `kanban.sqlite3` file in UNETI AI's state folder (the `UNETI_STATE_DIR` variable, defaulting to the `server/` folder). It holds the lifecycle, the runs and the event log. It sits deliberately outside the brain so running work is not overwritten by git sync.
 - **Record of outside actions** (since 0.238.0): `once_ledger.sqlite3` next to `kanban.sqlite3`, noting which actions of which job are done. Finished entries older than 30 days are removed.
-- **A readable copy**: `Javis/kanban.json` in the brain, rewritten every time the board changes. That file exists for backup and so older UNETI AI builds can read it; editing it by hand changes nothing in the real queue.
+- **A readable copy**: `UNETI/kanban.json` in the brain, rewritten every time the board changes. That file exists for backup and so older UNETI AI builds can read it; editing it by hand changes nothing in the real queue.
 - An old board from earlier UNETI AI versions is imported exactly once, and work stuck "running" under the old process is returned to the queue.
 - Work completed or cancelled over **3 days** ago is archived automatically so the board does not bloat.
 
@@ -294,7 +294,7 @@ Details in [Self-learning](22-self-learning.md).
 
 | Parameter | Value |
 | --- | --- |
-| Workers running in parallel | 2 (change it with the `JAVIS_KANBAN_MAX_WORKERS` environment variable, clamped between 1 and 8, counted across all brains) |
+| Workers running in parallel | 2 (change it with the `UNETI_KANBAN_MAX_WORKERS` environment variable, clamped between 1 and 8, counted across all brains) |
 | The dispatcher's scan interval | 5 seconds, and woken immediately when new work arrives |
 | Task lease / heartbeat | 90 seconds / 20 seconds |
 | Time ceiling for the specification step | 3 minutes |
@@ -360,7 +360,7 @@ That is an empty promise and has been banned since 0.9.289: a UNETI AI answer tu
 Three possibilities, in order of likelihood: you are standing in **another brain** (switch brains at the top of the dashboard), the work finished over 3 days ago and was archived, or someone called a cleanup endpoint.
 
 **Background work eats your whole quota.**
-Each job is a real AI session. Lower the parallel worker count with `JAVIS_KANBAN_MAX_WORKERS=1`, or set the mode to **Off** when you do not need it. Watch the consumption on the [Usage](23-usage-and-cost.md) page, which separates "UNETI AI running by itself" from "You typing".
+Each job is a real AI session. Lower the parallel worker count with `UNETI_KANBAN_MAX_WORKERS=1`, or set the mode to **Off** when you do not need it. Watch the consumption on the [Usage](23-usage-and-cost.md) page, which separates "UNETI AI running by itself" from "You typing".
 
 ## Related
 
@@ -372,4 +372,4 @@ Each job is a real AI session. Lower the parallel worker count with `JAVIS_KANBA
 - [Connections and business data](09-connections-and-business-data.md) - the real data sources for `mcp-read` work.
 - [Usage: tokens and cost](23-usage-and-cost.md) - how much background work consumes.
 - [Tasks and Dataview in notes](19-tasks-and-dataview.md) - task checkboxes in markdown files, entirely different from this page.
-- [.env configuration](16-env-configuration.md) - `JAVIS_STATE_DIR`, `JAVIS_KANBAN_MAX_WORKERS`.
+- [.env configuration](16-env-configuration.md) - `UNETI_STATE_DIR`, `UNETI_KANBAN_MAX_WORKERS`.

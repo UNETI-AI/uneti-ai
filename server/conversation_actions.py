@@ -11,8 +11,8 @@ so before anyone clicks:
     `javis-zalo friend block`. Instagram and comment threads: the API has no block, so the action is not offered.
   - Delete. A Facebook or Instagram comment thread: the top-level comment is deleted on the platform (its replies go
     with it). A Threads reply (0.448.0) cannot be deleted by anyone but its author, so it is hidden under the post. Zalo personal account: the conversation is deleted on Zalo (`javis-zalo conv delete`). Messenger and
-    Instagram direct messages: Meta lets no app delete them, so only the copy in Javis goes. In every case the
-    conversation then leaves the Javis inbox. When the platform refuses, nothing is deleted in Javis either, so the
+    Instagram direct messages: Meta lets no app delete them, so only the copy in UNETI AI goes. In every case the
+    conversation then leaves the UNETI AI inbox. When the platform refuses, nothing is deleted in UNETI AI either, so the
     owner can retry instead of losing the record of something still online.
 
 Each function takes a conversation as `conversations.chi_tiet` returns it and never raises: errors come back as text.
@@ -70,8 +70,8 @@ def capabilities(c: dict) -> list:
 
 
 def _no(what: str) -> dict:
-    return {"ok": False, "error": localefmt.chu(f"Kênh này không cho {what} qua Javis",
-                                                f"This channel does not allow {what} from Javis")}
+    return {"ok": False, "error": localefmt.chu(f"Kênh này không cho {what} qua UNETI AI",
+                                                f"This channel does not allow {what} from UNETI AI")}
 
 
 def _messenger_creds(c: dict) -> dict:

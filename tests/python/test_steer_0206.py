@@ -1,4 +1,4 @@
-"""0.206.0: send more while Javis is working.
+"""0.206.0: send more while UNETI AI is working.
 
 Covers: the inbox (nothing held when no turn runs, held while one runs, read once, leftovers returned at the end, the
 read callback, the pending cap), the API engines' tool loop reading a message sent while a tool was running (a fake
@@ -13,10 +13,10 @@ import asyncio
 import os
 # 0.438.5: vòng tool mặc định gọi model dạng stream. File này thử logic vòng tool trên đường non-stream
 # (giả lập client.post / máy chủ trả JSON), đường đó vẫn là đường lui. Đường stream: test_api_stream_vong.py.
-os.environ["JAVIS_API_STREAM_TOOLS"] = "0"
+os.environ["UNETI_API_STREAM_TOOLS"] = "0"
 import tempfile
 
-os.environ["JAVIS_STATE_DIR"] = tempfile.mkdtemp(prefix="javis-steer-")
+os.environ["UNETI_STATE_DIR"] = tempfile.mkdtemp(prefix="uneti-steer-")
 
 import steer_inbox as si  # noqa: E402
 

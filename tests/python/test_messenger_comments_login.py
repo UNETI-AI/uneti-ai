@@ -6,7 +6,7 @@ No network: Graph is faked. Guarded, in order of what would hurt most if it brok
 
   1. Comments are threads like Pancake shows them: a top-level comment opens conversation
      `cmt:<comment id>`, a reply under it joins that same conversation, the Page's own comments
-     (every reply Javis sends) are skipped, so the bot never answers itself.
+     (every reply UNETI AI sends) are skipped, so the bot never answers itself.
   2. Sending to a comment conversation posts a reply under the top-level comment, never a
      Messenger message, and shows no typing indicator.
   3. Modes: "reply" runs a bot turn told the comment is public, "inbox" only records it,
@@ -26,7 +26,7 @@ import sys
 import tempfile
 from urllib.parse import parse_qs, urlparse
 
-os.environ["JAVIS_STATE_DIR"] = tempfile.mkdtemp(prefix="javis-messenger-cmt-")
+os.environ["UNETI_STATE_DIR"] = tempfile.mkdtemp(prefix="uneti-messenger-cmt-")
 
 try:
     sys.stdout.reconfigure(encoding="utf-8")
@@ -72,7 +72,7 @@ top = messenger_bot.comment_event(change(TOP, POST)["value"], PAGE)
 rep = messenger_bot.comment_event(change(REPLY, TOP)["value"], PAGE)
 check("a top-level comment is its own thread", top and top["root_id"] == TOP, top)
 check("a reply under it joins that thread", rep and rep["root_id"] == TOP, rep)
-check("the Page's own comment (a reply Javis sent) is skipped",
+check("the Page's own comment (a reply UNETI AI sent) is skipped",
       messenger_bot.comment_event(change("555_102", TOP, who=PAGE)["value"], PAGE) is None)
 check("an edited comment is skipped", messenger_bot.comment_event(change(TOP, POST, verb="edited")["value"], PAGE) is None)
 check("a reaction or a post is skipped",
@@ -184,7 +184,7 @@ check("a reply typed in the inbox goes under the comment",
 
 async def _photo_refused():
     bot = messenger_bot.MessengerBot({"page_id": PAGE, "access_token": TOKEN, "app_secret": SECRET}, "", None)
-    p = os.path.join(os.environ["JAVIS_STATE_DIR"], "bang-gia.pdf")
+    p = os.path.join(os.environ["UNETI_STATE_DIR"], "bang-gia.pdf")
     with open(p, "wb") as f:
         f.write(b"%PDF-1.4")
     return await bot.send_file(p, "", chat="cmt:" + TOP)
@@ -233,7 +233,7 @@ check("posting row: warning when pages_manage_posts is missing, green when prese
 # ============================================================
 APP = "987654321098765"
 APP_SECRET = "d" * 32
-REDIRECT = "https://javis.example.com/messenger/oauth/callback"
+REDIRECT = "https://uneti.example.com/messenger/oauth/callback"
 USER_SHORT = "EAAshort" + "s" * 50
 USER_LONG = "EAAlong" + "l" * 50
 
@@ -347,7 +347,7 @@ from fastapi.testclient import TestClient  # noqa: E402
 
 # Behind the owner's HTTPS proxy, as on a VPS: the request arrives on localhost with forwarded headers.
 client = TestClient(main.app, base_url="http://localhost",
-                    headers={"x-forwarded-proto": "https", "x-forwarded-host": "javis.example.com"})
+                    headers={"x-forwarded-proto": "https", "x-forwarded-host": "uneti.example.com"})
 check("callback and privacy page are public paths",
       "/messenger/oauth/callback" in main._AUTH_PUBLIC_EXACT and "/messenger/privacy" in main._AUTH_PUBLIC_EXACT)
 r = client.get("/messenger/privacy")
@@ -355,8 +355,8 @@ check("privacy page served as HTML", r.status_code == 200 and "Privacy policy" i
 r = client.get("/messenger/setup")
 d = r.json()
 check("setup gives the redirect address and the privacy address to paste into Meta",
-      d.get("oauth_redirect") == "https://javis.example.com/messenger/oauth/callback"
-      and d.get("privacy_url") == "https://javis.example.com/messenger/privacy", d)
+      d.get("oauth_redirect") == "https://uneti.example.com/messenger/oauth/callback"
+      and d.get("privacy_url") == "https://uneti.example.com/messenger/privacy", d)
 r = client.get("/messenger/oauth/callback", params={"state": "nope", "code": "x"})
 check("callback with an unknown state shows an error page, not a crash",
       r.status_code == 200 and "⚠" in r.text, r.status_code)
@@ -387,7 +387,7 @@ d = r.json()
 res = {x["page_id"]: x for x in d.get("results", [])}
 check("finish connects only Pages from the login, with the long-lived user token",
       [c[0] for c in seen_connect] == [PAGE, "222333444555"] and seen_connect[0][1] == USER_LONG
-      and seen_connect[0][2] == "https://javis.example.com/messenger/webhook", seen_connect)
+      and seen_connect[0][2] == "https://uneti.example.com/messenger/webhook", seen_connect)
 check("finish reports each Page on its own", d.get("ok") and res[PAGE]["ok"] and not res["222333444555"]["ok"]
       and res["222333444555"]["error"] == "lỗi 210", d)
 acc = channel_accounts.owner_of(PAGE, "messenger") or {}

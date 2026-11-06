@@ -15,7 +15,7 @@ A plugin is **one folder** with 2 files:
 
 A plugin gives UNETI AI two things:
 
-- **A tool**: something an engine can call, for example `javis_now` (asking what time it is in Vietnam) or `javis_generate_image` (creating an image). Plugin tools go through the MCP Hub, so **every engine can use them**, not only Claude Code.
+- **A tool**: something an engine can call, for example `uneti_now` (asking what time it is in Vietnam) or `uneti_generate_image` (creating an image). Plugin tools go through the MCP Hub, so **every engine can use them**, not only Claude Code.
 - **A hook**: code that runs **around each tool call**. The current build supports two events around tools: `pre_tool_call` (before the tool runs) and `post_tool_call` (after it finishes). When no plugin registers a hook, UNETI AI wraps nothing at all, so it costs nothing. A third event, `chatbot_turn_context`, runs once per dedicated-bot turn and lets a plugin add one line of context (see [below](#chatbot-turn-context-hook-chatbot_turn_context)).
 
 Plugin tools **respect UNETI AI's 3 permission levels** exactly like any other tool, so a loop running read-only cannot call a plugin's write tool.
@@ -39,7 +39,7 @@ Open the dashboard (default port 7777), look at the left navigation rail, click 
 Right under the heading are three introductory blocks:
 
 1. A description line: "Plugins add native **tools** (callable by engines) and **hooks** to UNETI AI without touching the core, usable on EVERY engine (Claude Code, Codex, API) through the hub, respecting the 3 permission levels like any other tool."
-2. An orange warning box (shown only when this machine turns user plugins off): "**⚠ Plugins you installed are turned off on this machine.** This machine sets the environment variable `JAVIS_ENABLE_USER_PLUGINS=false` so global and brain plugins do not run. Remove it (or set it to true) and restart UNETI AI. Bundled plugins keep running normally."
+2. An orange warning box (shown only when this machine turns user plugins off): "**⚠ Plugins you installed are turned off on this machine.** This machine sets the environment variable `UNETI_ENABLE_USER_PLUGINS=false` so global and brain plugins do not run. Remove it (or set it to true) and restart UNETI AI. Bundled plugins keep running normally."
 3. A grey signpost line: "Drop a GLOBAL plugin (used by EVERY brain) into `<the real path on your machine>` · each plugin is `plugin.yaml` + `plugin.py`. Or tell UNETI AI in the chat box: 'create a plugin ...'."
 
 The path on the third line is the **real** path on the machine running UNETI AI, so copy it from the screen rather than typing it from the documentation.
@@ -55,8 +55,8 @@ Each plugin is a card. Read it top to bottom:
 | Source label | Meaning | Where it lives |
 |---|---|---|
 | **Bundled** (green) | A plugin shipped with the app, published by UNETI AI, trusted | `system/plugins/<slug>/` in the install folder |
-| **Global** (blue) | A plugin you installed, shared by **every brain** | UNETI AI's state folder, `<JAVIS_STATE_DIR>/plugins/<slug>/` |
-| **This brain** (orange) | A plugin you installed, used by **one brain** only | `<brain>/plugins/<slug>/` (an older brain may have `<brain>/Javis/plugins/<slug>/`) |
+| **Global** (blue) | A plugin you installed, shared by **every brain** | UNETI AI's state folder, `<UNETI_STATE_DIR>/plugins/<slug>/` |
+| **This brain** (orange) | A plugin you installed, used by **one brain** only | `<brain>/plugins/<slug>/` (an older brain may have `<brain>/UNETI/plugins/<slug>/`) |
 
 On a slug collision, the later source wins: a "This brain" plugin named `datetime-vn` replaces the "Bundled" one of the same name.
 
@@ -88,9 +88,9 @@ For a **Bundled** plugin, UNETI AI does not edit the app's files: your on/off ch
 
 For **Global** and **This brain** plugins, UNETI AI writes `enabled: true/false` straight into that plugin's `plugin.yaml`.
 
-Enabling and disabling takes effect immediately with no restart: UNETI AI refreshes the hub's cache so the tool appears or disappears on the next chat turn, and the brain's capability index `Javis/index.md` is rebuilt too.
+Enabling and disabling takes effect immediately with no restart: UNETI AI refreshes the hub's cache so the tool appears or disappears on the next chat turn, and the brain's capability index `UNETI/index.md` is rebuilt too.
 
-The one exception: if you enable a **Global/This brain** plugin on a machine that sets `JAVIS_ENABLE_USER_PLUGINS=false`, UNETI AI shows a dialog saying it was enabled in the manifest BUT this machine turns user-installed plugins off, and to remove that variable (or set it to true) and restart. The card then switches to **⚠ off by env**.
+The one exception: if you enable a **Global/This brain** plugin on a machine that sets `UNETI_ENABLE_USER_PLUGINS=false`, UNETI AI shows a dialog saying it was enabled in the manifest BUT this machine turns user-installed plugins off, and to remove that variable (or set it to true) and restart. The card then switches to **⚠ off by env**.
 
 ### Step 3: Check that the tool reached the engine
 
@@ -104,16 +104,16 @@ These ship with the app (the **Bundled** label). All are on by default except `t
 
 | Name on the card | slug | Tools provided | Minimum level | Default |
 |---|---|---|---|---|
-| Time and date (timezone picked in Settings) | `datetime-vn` | `javis_now`, `javis_date_add` | read only | On |
-| Recurring jobs and reminders | `javis-schedule` | `javis_schedule` | write (safe) | On |
-| Queue Kanban work | `javis-task` | `javis_task` | write (safe) | On |
-| Attach another MCP | `javis-connect` | `javis_add_mcp` | write (safe) | On |
-| Create and view images (ChatGPT) | `image-chatgpt` | `javis_generate_image`, `javis_describe_image` | write (safe); viewing: read only | On |
-| Read YouTube videos | `youtube-read` | `javis_youtube_read` | read only | On |
+| Time and date (timezone picked in Settings) | `datetime-vn` | `uneti_now`, `uneti_date_add` | read only | On |
+| Recurring jobs and reminders | `uneti-schedule` | `uneti_schedule` | write (safe) | On |
+| Queue Kanban work | `uneti-task` | `uneti_task` | write (safe) | On |
+| Attach another MCP | `uneti-connect` | `uneti_add_mcp` | write (safe) | On |
+| Create and view images (ChatGPT) | `image-chatgpt` | `uneti_generate_image`, `uneti_describe_image` | write (safe); viewing: read only | On |
+| Read YouTube videos | `youtube-read` | `uneti_youtube_read` | read only | On |
 | Meta Ads (Graph API) | `meta-ads-graph` | `meta_ads_accounts`, `meta_ads_insights`, `meta_ads_campaigns`, `meta_ads_get` | read only | On |
 | Facebook Pages (Graph API) | `meta-pages-graph` | `fb_pages_list`, `fb_page_posts`, `fb_page_comments`, `fb_page_post`, `fb_page_photo`, `fb_page_album`, `fb_page_video`, `fb_page_edit`, `fb_page_delete`, `fb_page_reply` | full power | On |
 | Facebook monitoring (Apify) | `fb-monitor-apify` | `fb_monitor` | read only | On |
-| Tool usage log | `tool-audit` | `javis_tool_stats` + the `post_tool_call` hook | read only | **Off** |
+| Tool usage log | `tool-audit` | `uneti_tool_stats` + the `post_tool_call` hook | read only | **Off** |
 
 What each one does:
 
@@ -121,10 +121,10 @@ What each one does:
 - **Attach another MCP**: have UNETI AI attach a new MCP source right from chat, and it **appears on the Connections page** under "Connected" like an account you added by hand, shared by every brain. Before this plugin, UNETI AI had no way to write into the connection store, so all it could do was run `claude mcp add`; that server landed in Claude Code's own configuration where the other six brains could not see it, and on the Connections page it did not sit under "Connected" but fell into the collapsed "Connections already in Claude Code and Codex" section (closed by default), so it looked as if nothing had been added. Three safety rails: the permission level defaults to **read only** (raise it yourself on the Connections page if you want writes); a source that runs a **local command** (stdio) is added **disabled** so you read the command before enabling it; and a service already in the Connections catalogue (Gmail, Calendar, POS...) makes UNETI AI point at the right card rather than spawning a parallel hand-declared copy. If the connection test fails, the entry **stays** on the Connections page with the reason rather than vanishing silently.
 - **Zalo extras (the `javis.zalo` pack on UNETI AI Store)**: since 0.73.0 the Zalo tools that fill what the standard MCP lacks no longer ship inside the app, so people who do not use Zalo do not carry them. The pack has image and file sending (`zalo_send_image`), tagging the right people, notes, reminders and polls in a group (`zalo_group_members`, `zalo_send_mention`, `zalo_create_note`, `zalo_create_reminder`, `zalo_create_poll`) and reading group images (`zalo_read_images`). UNETI AI offers it right after you scan the Zalo QR; on a machine that already used Zalo, the Connections page shows an install button. Details in [Zalo](12-zalo-agent-mcp.md).
 - **Time and date (VN)**: tells UNETI AI today's date, the time and the weekday in Vietnam time (UTC+7), and computes relative dates ("in 3 days", "last week"). Pure standard library, no network needed. It is also the simplest example plugin to read when you want to write your own.
-- **Recurring jobs and reminders**: lets you create, list and cancel recurring jobs and reminders **right in a chat sentence**, with no YAML typing. Repeating, durable work is written to `Javis/loops/<slug>.md` (editable in Obsidian); one-off reminders or cron schedules go into the reminder store. Details in [Recurring jobs and reminders](08-recurring-jobs.md).
+- **Recurring jobs and reminders**: lets you create, list and cancel recurring jobs and reminders **right in a chat sentence**, with no YAML typing. Repeating, durable work is written to `UNETI/loops/<slug>.md` (editable in Obsidian); one-off reminders or cron schedules go into the reminder store. Details in [Recurring jobs and reminders](08-recurring-jobs.md).
 - **Create images (ChatGPT)**: generates images from a description using the **ChatGPT plan** you are signed in to (OAuth), with no OpenAI API key. Images are saved into the brain's `attachments/` then embedded straight into the answer. It requires ChatGPT connected on the **Models** page; without it the tool returns a sentence saying ChatGPT (OAuth) is not connected and telling you to sign in on the Models page and try again.
 - **Read YouTube videos**: paste a video link into chat and ask for a summary. The plugin fetches the video's **real subtitles** (the route the YouTube player uses) so UNETI AI reads the dialogue rather than guessing from the title. No API key, no YouTube sign-in, and it works on **every engine**, including API engines that cannot open a URL. When YouTube blocks the server it cycles through six player variants before falling back to yt-dlp, which gets past most robot-suspicion cases. A video with no subtitles, a private video or one YouTube blocks makes the tool state the reason plainly so UNETI AI does not invent anything. A long video that got truncated continues when you ask it to "keep reading". Details in [Chat](02-chat-and-voice.md).
-- **Per-chat Zalo rules**: set the behaviour for each Zalo group or customer in words (stay silent, report every message, report on keywords, nudge when a reply is over N minutes late). The rules are written to `Javis/zalo/<slug>.md` so they can be read and edited.
+- **Per-chat Zalo rules**: set the behaviour for each Zalo group or customer in words (stay silent, report every message, report on keywords, nudge when a reply is over N minutes late). The rules are written to `UNETI/zalo/<slug>.md` so they can be read and edited.
 - **Safe Zalo sending**: sends Zalo messages in place of the raw tool. It locks onto the listening account and can only send to chats on the watch list; when a name matches several people it refuses and forces a question back. The two Zalo plugins are shared with [the Zalo channel](12-zalo-agent-mcp.md).
 - **Meta Ads (Graph API)**: reads Facebook/Instagram advertising figures (ad accounts, campaigns, performance). **Read only, spends no money.** Requires the "Meta Ads (Facebook & Instagram)" connection on the Connections page.
 - **Facebook Pages (Graph API)**: manages Pages. Reading the Page list, posts and comments is read-only; posting, uploading photos, albums and videos, editing text, deleting posts and replying to comments are **real, public** actions and need the full-power level. Uses the Pages connected on the Facebook Messenger card on the Connections page (or the store's Facebook Pages connection if installed earlier).
@@ -140,7 +140,7 @@ Since 0.55.23, a **Package** installed on the **Capabilities > Install store** p
 They differ from the other three sources in three ways:
 
 - **Enabling, disabling and removing all happen in the Install store**, not here. A plugin travels with its whole package, so toggling it separately only causes confusion. The card on this page has a button that takes you straight there.
-- **`JAVIS_ENABLE_USER_PLUGINS` does not apply to packages.** A package goes through the installer, meaning you saw the screen listing every code file before clicking agree, and its code signature is checked on every load.
+- **`UNETI_ENABLE_USER_PLUGINS` does not apply to packages.** A package goes through the installer, meaning you saw the screen listing every code file before clicking agree, and its code signature is checked on every load.
 - **The code in the package is locked to its content.** At install time, UNETI AI records a fingerprint of all the code in the package. On every load it recomputes and compares: one byte off and the plugin **does not run**, with the card stating that the code in the package changed since you agreed to install it. To keep using it, reinstall from the Install store to review and confirm again.
 
 A note when editing by hand: opening a package's `plugin.py` in a Windows editor and saving is enough to shift the fingerprint, because many editors change the line endings. That is not a bug, the file content genuinely differs. To modify a plugin, edit it in your own plugin folder rather than inside a package.
@@ -173,7 +173,7 @@ The chat box you type into runs at the full level, so all three kinds are callab
 
 There are two places, depending on whether the plugin should be shared or private:
 
-- **Global** (recommended): `<JAVIS_STATE_DIR>/plugins/<slug>/`. Every brain sees it and every engine can call it. The real path is already shown on the signpost line of the Plugins page, so copy it from there. `JAVIS_STATE_DIR` defaults to the project's `server/` folder; on Docker/VPS it is usually `/data/state`.
+- **Global** (recommended): `<UNETI_STATE_DIR>/plugins/<slug>/`. Every brain sees it and every engine can call it. The real path is already shown on the signpost line of the Plugins page, so copy it from there. `UNETI_STATE_DIR` defaults to the project's `server/` folder; on Docker/VPS it is usually `/data/state`.
 - **One brain only**: `<brain>/plugins/<slug>/`. Only that brain can use it. Suitable when the plugin is tightly bound to one brain's data.
 
 `<slug>` is the folder name and must be lowercase ASCII without diacritics, starting with a letter or digit, containing only letters, digits, dots, underscores and hyphens. Get the character set wrong and UNETI AI skips the plugin, reporting "invalid slug".
@@ -229,17 +229,17 @@ Since 0.162.0, UNETI AI **loads the plugins you install by default**: a plugin w
 To block user plugins on a machine altogether (for example a shared server):
 
 1. Open the `.env` file in the project root (create it if absent, see [.env configuration](16-env-configuration.md)).
-2. Add one line: `JAVIS_ENABLE_USER_PLUGINS=false`
+2. Add one line: `UNETI_ENABLE_USER_PLUGINS=false`
 3. Save the file and **restart UNETI AI**.
 
-Off accepts `0`, `false`, `no` or `off` (case insensitive). The old name `JAVIS_ENABLE_VAULT_PLUGINS` still works, but when both are set the new name wins.
+Off accepts `0`, `false`, `no` or `off` (case insensitive). The old name `UNETI_ENABLE_VAULT_PLUGINS` still works, but when both are set the new name wins.
 
 ## Safety rails (read before installing an unfamiliar plugin)
 
 This is the most important part of this page.
 
 - **Plugins you install run real Python code, inside UNETI AI's own server process.** They have that process's rights: reading and writing files, calling the network, reading environment variables. Since 0.162.0 the project owner chose to **load them by default**; the remaining guard is each plugin's own **Enable** switch (`enabled: true` in `plugin.yaml`).
-- **Only enable a plugin once you have read its code.** Note: anyone who can write into a `plugins/` folder (including the model, since it can write into the brain) can also write `enabled: true`. On a shared server, or one that runs bots for strangers, set `JAVIS_ENABLE_USER_PLUGINS=false`.
+- **Only enable a plugin once you have read its code.** Note: anyone who can write into a `plugins/` folder (including the model, since it can write into the brain) can also write `enabled: true`. On a shared server, or one that runs bots for strangers, set `UNETI_ENABLE_USER_PLUGINS=false`.
 - **Bundled plugins (the "Bundled" label) are not subject to this switch** because they ship with the UNETI AI release. They keep working even when the machine sets `false`.
 - **A plugin UNETI AI creates from chat is always disabled** (`enabled: false`) and at the `readonly` level. UNETI AI never enables it for you; you must read the code then click **Enable** yourself.
 - **Do not write plugins that perform money, order, messaging or publishing actions.** Those should go through MCP connections and the permission system, where the blocks and logs already exist. A plugin should be `min_mode: readonly` unless you deliberately need otherwise.
@@ -302,9 +302,9 @@ Rails UNETI AI enforces, which a plugin cannot loosen:
 - A callback that raises or takes longer than **2 seconds** is skipped and logged, and the reply goes on. A synchronous callback runs in a worker thread so it cannot stall other chats.
 - Each callback gets **its own copy** of the keys: whatever one plugin edits, the next one does not see.
 
-All three kinds of turn fire the hook: the live turn, the Inbox **Reply for me / Suggest a reply** turn (the sender is whoever wrote the last message of that chat), and the **Try bot** turn. A try turn carries `trial: true` and the try page's synthetic sender (`javis-try-user`, chat `javis-try`), the same stand-in a try turn already uses for every per-person check. That id matches nobody real, so a roster-style plugin shows its "stranger" path. A plugin that wants to treat try turns differently reads `trial`.
+All three kinds of turn fire the hook: the live turn, the Inbox **Reply for me / Suggest a reply** turn (the sender is whoever wrote the last message of that chat), and the **Try bot** turn. A try turn carries `trial: true` and the try page's synthetic sender (`uneti-try-user`, chat `uneti-try`), the same stand-in a try turn already uses for every per-person check. That id matches nobody real, so a roster-style plugin shows its "stranger" path. A plugin that wants to treat try turns differently reads `trial`.
 
-A plugin using this hook sits behind the usual rails: a user-installed plugin only runs with `JAVIS_ENABLE_USER_PLUGINS=true`, a Package plugin goes through the installer, and it should declare `min_mode: readonly` when it only reads.
+A plugin using this hook sits behind the usual rails: a user-installed plugin only runs with `UNETI_ENABLE_USER_PLUGINS=true`, a Package plugin goes through the installer, and it should declare `min_mode: readonly` when it only reads.
 
 ## Own page and HTTP routes (since 0.64.26)
 
@@ -332,18 +332,18 @@ tools UNETI AI already has, that door carries five tools only the outside AI see
 
 | Tool | What it does | Access level |
 |---|---|---|
-| `javis_chat_find` | Find chats by title (accents ignored) or content | Any |
-| `javis_chat_read` | Read the last messages of a chat | Any |
-| `javis_chat_send` | Post into a chat as if the owner typed it, wait for the answer | Full only |
-| `javis_chat_result` | Read the answer when UNETI AI takes long | Any |
-| `javis_chat_note` | Save a note of the outside chat: what the owner said and decided (since 0.441.0) | Draft, Full |
+| `uneti_chat_find` | Find chats by title (accents ignored) or content | Any |
+| `uneti_chat_read` | Read the last messages of a chat | Any |
+| `uneti_chat_send` | Post into a chat as if the owner typed it, wait for the answer | Full only |
+| `uneti_chat_result` | Read the answer when UNETI AI takes long | Any |
+| `uneti_chat_note` | Save a note of the outside chat: what the owner said and decided (since 0.441.0) | Draft, Full |
 
 - **A posted message runs exactly like a typed one:** it goes through the dashboard's own chat loop, so the answer
   streams on every open tab, has a Stop button, is saved to History, written to `memory/conversations` and fed to
   self-learning. Its bubble is labelled **via ChatGPT** or **via Claude**.
 - **A chat that is answering** takes the message as a follow-up, as when the owner types while UNETI AI works.
 - **Only the owner's chats** (main chat, partner chats). Customer chats and team chats can't be read or posted to.
-- **A note does not run UNETI AI:** `javis_chat_note` only saves, so it costs UNETI AI's brain nothing, yet it goes
+- **A note does not run UNETI AI:** `uneti_chat_note` only saves, so it costs UNETI AI's brain nothing, yet it goes
   through the same path as a chat turn: History, conversation log and self-learning. Each outside chat gets its own
   conversation **From ChatGPT: <title>** (in the interface language); with an `id` the note goes into that
   UNETI AI chat instead. UNETI AI can't read ChatGPT's or Claude's history, so this is how the outside AI sends over
@@ -356,7 +356,7 @@ tools UNETI AI already has, that door carries five tools only the outside AI see
 | What you see | Meaning / action |
 |---|---|
 | **● running** (green) | The plugin is loaded and its tools are available to the engine |
-| **⚠ off by env** (orange) | You enabled the plugin but this machine sets `JAVIS_ENABLE_USER_PLUGINS=false` |
+| **⚠ off by env** (orange) | You enabled the plugin but this machine sets `UNETI_ENABLE_USER_PLUGINS=false` |
 | **⚠ error** (red) | The manifest is broken or the code failed to load; the reason appears under the chip row |
 | **○ off** (grey) | The plugin is present but disabled, exposing no tools |
 | **● enabled (not loaded)** (orange) | A rare state: enabled but not loaded for some other reason. Reload the page, and if it persists check the server log |
@@ -376,18 +376,18 @@ tools UNETI AI already has, that door carries five tools only the outside AI see
 - Put plugins in **Global** unless there is a clear reason to bind one to a brain. Global does not depend on the brain, so switching brains keeps it usable.
 - If you do not use a plugin, **disable** it rather than deleting the folder, so re-enabling later is one click.
 - Disabling unused plugins also shortens the tool list handed to the model, helping it pick the right tool.
-- To see what capabilities UNETI AI currently sees (agents, skills, workflows, loops, plugins), open the brain's `Javis/index.md` file through the **Files** page; it is rebuilt every time you enable or disable a plugin.
+- To see what capabilities UNETI AI currently sees (agents, skills, workflows, loops, plugins), open the brain's `UNETI/index.md` file through the **Files** page; it is rebuilt every time you enable or disable a plugin.
 
 ## Common problems
 
-- **The card reads "⚠ off by env":** this machine sets `JAVIS_ENABLE_USER_PLUGINS=false`. Remove that line from `.env` (or set `true`) and restart UNETI AI. The variable is only read at startup.
+- **The card reads "⚠ off by env":** this machine sets `UNETI_ENABLE_USER_PLUGINS=false`. Remove that line from `.env` (or set `true`) and restart UNETI AI. The variable is only read at startup.
 - **The environment variable is set and it is still blocked:** check that the `.env` file is in the project root, that the line has no leading `#`, and that the value is `true` (or `1`/`yes`/`on`). On Docker, set the variable in the container's Environment section rather than in a file on the host.
 - **A newly dropped plugin does not appear on the page:** the folder must be **directly** inside the plugins folder (no extra nesting) and must contain `plugin.py` (or `__init__.py`). Without that, UNETI AI does not consider it a plugin. The folder name must also be a valid slug (lowercase, no diacritics).
 - **The card reads "⚠ error" with "plugin.py missing":** the folder has only `plugin.yaml`. Add the code file.
 - **The card reads "⚠ error" with "manifest error: ...":** `plugin.yaml` has invalid YAML. Most often a description containing a colon without quotes.
 - **The card reads "⚠ error" with "no register(ctx) function":** `plugin.py` has no `register` function, or you named it something else. It must be named exactly `register` and take one parameter.
 - **The card reads "⚠ error" with a Python error name (`ModuleNotFoundError`, say):** the plugin code uses a library not installed in UNETI AI's Python environment. Install it into the virtual environment UNETI AI actually runs in, then restart.
-- **The plugin is running but the engine does not see the tool:** most likely the tool name **collides** with an existing MCP or core tool. UNETI AI does not let a plugin take a core tool's place, so it skips the colliding tool and writes a line to the server log. Rename the tool in `plugin.py` (a private prefix is the safest approach). Core names that cannot be reused: `javis_connections`, `javis_read_file`, `javis_list_dir`, `javis_write_file`, `javis_use_skill`.
+- **The plugin is running but the engine does not see the tool:** most likely the tool name **collides** with an existing MCP or core tool. UNETI AI does not let a plugin take a core tool's place, so it skips the colliding tool and writes a line to the server log. Rename the tool in `plugin.py` (a private prefix is the safest approach). Core names that cannot be reused: `uneti_connections`, `uneti_read_file`, `uneti_list_dir`, `uneti_write_file`, `uneti_use_skill`.
 - **The tool returns `ERROR: tool '<name>' needs a higher permission level`:** the run is permission-restricted. If it is a recurring job, raise that job's mode (see [Recurring jobs and reminders](08-recurring-jobs.md)); if it is your own plugin, review the `min_mode` declared in `register_tool`.
 - **The tool returns "not connected ...":** the plugin needs a connection you have not attached. Follow the instruction in the error exactly, usually going to the **Connections** page (or **Models** for the image plugin).
 - **Clicking Enable reports "plugin not found":** the list on screen is stale compared to disk (you just deleted or renamed the folder). Reload the page.
@@ -398,7 +398,7 @@ tools UNETI AI already has, that door carries five tools only the outside AI see
 - [Skills](06-skills.md) - when what you lack is know-how rather than running code.
 - [Connections and business data](09-connections-and-business-data.md) - attaching external data sources; the Meta Ads, Facebook Pages and Apify plugins take their tokens from here.
 - [Models and engines](10-models-and-engines.md) - why every engine can call plugin tools.
-- [Recurring jobs and reminders](08-recurring-jobs.md) - the three permission levels of background work, and the `javis-schedule` plugin.
+- [Recurring jobs and reminders](08-recurring-jobs.md) - the three permission levels of background work, and the `uneti-schedule` plugin.
 - [Zalo Agent MCP](12-zalo-agent-mcp.md) - Zalo now uses the MCP of UNETI AI's own `javis-zalo` CLI and no longer has its own plugin.
 - [.env configuration](16-env-configuration.md) - how to set an environment variable and restart.
 - [Agents and Workflows](07-agents-and-workflows.md) - UNETI AI's other kinds of capability.

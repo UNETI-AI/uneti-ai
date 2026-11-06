@@ -1,6 +1,6 @@
 /* tasks.js - the Tasks page ("Nhiệm vụ", 0.422.0). Spec: docs/dev/2026-10-nhiem-vu-spec.md.
  *
- * One page replaces the old Kanban and Recurring work pages. Phase 1 draws the "Javis does" tab from data
+ * One page replaces the old Kanban and Recurring work pages. Phase 1 draws the "UNETI AI does" tab from data
  * the server already keeps: Kanban jobs, reminders, loops and page watches, plus incidents for the
  * "Run errors" list. Everything is merged in the browser by pure functions (`model`, tested under node);
  * `mount(el)` fetches, draws and wires the actions.
@@ -25,10 +25,10 @@
   function isoOf(d) { return d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate()); }
   function hmOf(d) { return pad2(d.getHours()) + ":" + pad2(d.getMinutes()); }
   function addDays(iso, n) { var d = new Date(iso + "T12:00:00"); d.setDate(d.getDate() + n); return isoOf(d); }
-  function LOC() { return (typeof window !== "undefined" && window.JavisI18n && window.JavisI18n.locale && window.JavisI18n.locale()) || "vi-VN"; }
+  function LOC() { return (typeof window !== "undefined" && window.UnetiI18n && window.UnetiI18n.locale && window.UnetiI18n.locale()) || "vi-VN"; }
 
   // ---------- model: merge the sources into items, recurring jobs and failures (pure) ----------
-  var CORE = "javis-core";   // Javis Core's slug in GET /agents (server/javis_core.py SLUG)
+  var CORE = "uneti-ai-core";   // UNETI AI Core's slug in GET /agents (server/uneti_core.py SLUG)
   var FIN = { done: 1, cancel: 1 };
 
   function agentOf(card) {
@@ -210,9 +210,9 @@
       return ka < kb ? -1 : ka > kb ? 1 : 0;
     });
   }
-  // How a Javis job is scheduled on the server from the repeat picker (pure): a cron where cron can say it,
+  // How a UNETI AI job is scheduled on the server from the repeat picker (pure): a cron where cron can say it,
   // otherwise a fixed step (repeat_min) from a start time. rule = {unit: min|hour|day|week|month|year, n, days}.
-  function javisSchedule(rule, date, time) {
+  function unetiSchedule(rule, date, time) {
     var hm = String(time || "08:00").split(":"), h = Number(hm[0]) || 0, m = Number(hm[1]) || 0;
     var at = (date || isoOf(new Date())) + "T" + pad2(h) + ":" + pad2(m);
     if (!rule) return { at: at };
@@ -322,7 +322,7 @@
     var start = function (t) { return t.date || (t.created_at ? isoOf(new Date(t.created_at * 1000)) : today); };
     ((store && store.tasks) || []).forEach(function (t) {
       var base = { src: "mine", ref: t.id, title: t.title, desc: t.notes || "", who: "me", proj: tagsOf(t)[0] || "", tags: tagsOf(t), time: t.time || "",
-        kind: t.kind || "task", fromJavis: !!t.from_javis, raw: t, end: t.end || "" };
+        kind: t.kind || "task", fromUneti: !!t.from_uneti, raw: t, end: t.end || "" };
       if (t.kind === "appt") {
         // Appointments are not ticked: they turn "past" on their own once their time is over.
         // A time skipped on purpose ("Skip this time") is not shown; the next one is.
@@ -493,7 +493,7 @@
       hN: H.length, hDue: hDue, hDone: hDone };
   }
 
-  var model_ = { pulseCalc: pulseCalc, starsOn: starsOn, isTaskItem: isTaskItem, apptState: apptState, habitCalc: habitCalc, habitStats: habitStats, habitLines: habitLines, usualTime: usualTime, model: model, mineModel: mineModel, occursOn: occursOn, nextOcc: nextOcc, prevOcc: prevOcc, repHuman: repHuman, inList: inList, tagsOf: tagsOf, subOrder: subOrder, linksIn: linksIn, byTime: byTime, byTimeline: byTimeline, cronFor: cronFor, javisSchedule: javisSchedule, kanbanState: kanbanState, addDays: addDays };
+  var model_ = { pulseCalc: pulseCalc, starsOn: starsOn, isTaskItem: isTaskItem, apptState: apptState, habitCalc: habitCalc, habitStats: habitStats, habitLines: habitLines, usualTime: usualTime, model: model, mineModel: mineModel, occursOn: occursOn, nextOcc: nextOcc, prevOcc: prevOcc, repHuman: repHuman, inList: inList, tagsOf: tagsOf, subOrder: subOrder, linksIn: linksIn, byTime: byTime, byTimeline: byTimeline, cronFor: cronFor, unetiSchedule: unetiSchedule, kanbanState: kanbanState, addDays: addDays };
   if (typeof module !== "undefined" && module.exports) { module.exports = model_; return; }
 
   // ---------- page ----------
@@ -505,7 +505,7 @@
     ["habit", "flame", "nv.l.habit", "c-habit"], ["done", "circle-check", "nv.l.done", "c-done"]];
   var COLORS = ["#ef4444", "#f97316", "#eab308", "#22c55e", "#14b8a6", "#3b82f6", "#8b5cf6", "#ec4899", "#64748b"];
   var PAGE = 6;
-  var LS = "javis.nv.";
+  var LS = "uneti.nv.";
   function lsGet(k, d) { try { var v = localStorage.getItem(LS + k); return v == null ? d : v; } catch (e) { return d; } }
   function lsSet(k, v) { try { localStorage.setItem(LS + k, v); } catch (e) { /* private mode */ } }
 
@@ -576,7 +576,7 @@
     applyHidden();
     render();
   }
-  // The model of the open tab: the "Mine" lists or the "Javis does" lists.
+  // The model of the open tab: the "Mine" lists or the "UNETI AI does" lists.
   function M() { return S.tab === "me" ? S.me : S.ai; }
   function today() { return S.ai.today; }
   // Items removed with "undo" still pending stay hidden until the server confirms.
@@ -594,7 +594,7 @@
     var busy = S.ai && (S.ai.items.some(function (i) { return i.st === "run"; }) || S.ai.recurring.some(function (r) { return r.running; }));
     S.poll = setTimeout(async function () {
       if (!S || !document.body.contains(S.root)) return;
-      if (document.hidden || S.sheet || S.layer || S.sel || (window.JavisTaskStats && window.JavisTaskStats.isEditing())) { schedulePoll(); return; }
+      if (document.hidden || S.sheet || S.layer || S.sel || (window.UnetiTaskStats && window.UnetiTaskStats.isEditing())) { schedulePoll(); return; }
       await load(); render(); schedulePoll();
     }, busy ? 5000 : 30000);
   }
@@ -638,7 +638,7 @@
     return id ? ((S.bots && S.bots.bots) || []).find(function (b) { return b.id === id; }) || { id: id, name: id } : null;
   }
   function agentName(slug) {
-    if (slug === CORE) return "Javis Core";
+    if (slug === CORE) return "UNETI AI Core";
     if (slug === "me") return tw("nv.me");
     if (botOf(slug)) return botOf(slug).name;
     var a = (S.agents || []).find(function (x) { return x.slug === slug; });
@@ -648,8 +648,8 @@
     var bt = botOf(slug), px = size || 18;
     if (bt) return '<span class="nv-av nv-botav" style="width:' + px + "px;height:" + px + 'px">' + ic(bt.icon || "headset") + "</span>";
     var a = (S.agents || []).find(function (x) { return x.slug === slug; }) || { slug: slug };
-    if (window.JavisAvatar && window.JavisAvatar.html) {
-      try { return window.JavisAvatar.html(a, size || 18, "idle"); } catch (e) { /* fall through */ }
+    if (window.UnetiAvatar && window.UnetiAvatar.html) {
+      try { return window.UnetiAvatar.html(a, size || 18, "idle"); } catch (e) { /* fall through */ }
     }
     return '<span class="nv-av" style="width:' + (size || 18) + "px;height:" + (size || 18) + 'px"></span>';
   }
@@ -691,7 +691,7 @@
     if (it.rep) parts.push(ic("repeat") + esc(it.rep));
     else if (it.mode === "remind") parts.push(ic("bell") + esc(tw("nv.mode.remind")));
     if (it.src === "mine") {
-      if (it.fromJavis) parts.push(avatar(CORE, 14) + esc(tw("nv.from_javis")));
+      if (it.fromUneti) parts.push(avatar(CORE, 14) + esc(tw("nv.from_uneti")));
     } else parts.push(avatar(it.who, 14) + esc(agentName(it.who)));
     if (it.took) parts.push(esc(tw("nv.took", { n: Math.max(1, Math.round(it.took / 60)) })));
     // "Moved n times" sits with the tags on one line (owner, 2026-11-04: chips in one compact row).
@@ -843,7 +843,7 @@
   }
   // An overdue task needs no extra buttons (owner, 2026-11-04: as few as possible): the tick already means done; Move and
   // Delete are icons left of the star, which keeps the rightmost column on every row. My tab has no "..." menu: everything
-  // it held (edit, give to Javis, move to another brain, delete) is in the task's details, one tap on the row.
+  // it held (edit, give to UNETI AI, move to another brain, delete) is in the task's details, one tap on the row.
   // Every open task of mine (owner, 2026-11-04): Move and Delete as icons, left of the star. A repeat moves or skips only
   // this time and deletes the whole repeat; a missed one also offers Skip.
   // An appointment (owner, 2026-11-05): Move and Delete like a task; a repeating one also Skip this time (Move and Skip
@@ -936,7 +936,7 @@
       return h + (R.length ? R.map(function (r) { return repRow(r); }).join("") : empty);
     }
     if (v === "habit") return h + habitView();
-    if (v === "stats") return h + (window.JavisTaskStats ? window.JavisTaskStats.html(statsCtx()) : "");
+    if (v === "stats") return h + (window.UnetiTaskStats ? window.UnetiTaskStats.html(statsCtx()) : "");
     if (v === "err") return h + failsHtml();
     if (v === "log") return h + logHtml();
     if (v === "today") {
@@ -1040,7 +1040,7 @@
     var P = pins("who"), busy = {};
     S.ai.items.forEach(function (i) { if (!FIN[i.st]) busy[i.who] = (busy[i.who] || 0) + 1; });
     var A = (S.agents || []).slice();
-    if (!A.some(function (a) { return a.slug === CORE; })) A.unshift({ slug: CORE, name: "Javis Core" });
+    if (!A.some(function (a) { return a.slug === CORE; })) A.unshift({ slug: CORE, name: "UNETI AI Core" });
     // A chatbot whose assistant is not in this brain gets its own row once it owns a job (0.429.0).
     var owned = {};
     S.ai.items.concat(S.ai.recurring).forEach(function (i) { owned[i.who] = 1; });
@@ -1086,8 +1086,8 @@
     var nMe = S.me.items.filter(function (i) { return !FIN[i.st] && !i.over && (i.date === today() || !i.date); }).length;
     var nAi = S.ai.items.filter(function (i) { return !FIN[i.st]; }).length;
     return '<div class="nv-tabs" role="tablist">'
-      // 2026-11-04 (owner): short labels "Của Javis" / "Của tôi"; mine has no icon, only its count.
-      // 0.428.0: Javis's tasks first (owner: opening the page shows what Javis is doing), then mine.
+      // 2026-11-04 (owner): short labels "Của UNETI AI" / "Của tôi"; mine has no icon, only its count.
+      // 0.428.0: UNETI AI's tasks first (owner: opening the page shows what UNETI AI is doing), then mine.
       + '<button type="button" role="tab" data-act="tab" data-v="ai" aria-selected="' + (S.tab === "ai") + '" class="' + (S.tab === "ai" ? "on" : "") + '">' + avatar(CORE, 18) + "<span>" + esc(tw("nv.tab.ai_s")) + '</span><span class="nv-n">' + nAi + "</span></button>"
       + '<button type="button" role="tab" data-act="tab" data-v="me" aria-selected="' + (S.tab === "me") + '" class="' + (S.tab === "me" ? "on" : "") + '">' + "<span>" + esc(tw("nv.tab.me_s")) + '</span><span class="nv-n">' + nMe + "</span></button></div>";
   }
@@ -1185,13 +1185,13 @@
     var t = it.raw, rep = !!t.repeat, occ = it.occ || null, done = it.sc ? it.doneToday : it.st === "done";
     var h = '<div class="nv-dhead nv-mhead">' + (habitOn(t) ? habitCk(t, "big") : it.sc ? (done ? '<span class="nv-ck on big" data-act="uncheck" data-id="' + esc(it.id) + '" role="checkbox" aria-checked="true" tabindex="0" aria-label="' + esc(tw("nv.a.uncheck")) + '">' + ic("check") + "</span>" : '<span class="nv-ck big" data-act="check" data-id="' + esc(it.id) + '" role="checkbox" aria-checked="false" tabindex="0" aria-label="' + esc(tw("nv.a.check", { t: it.title })) + '"></span>') : ck(it).replace('class="nv-ck', 'class="nv-ck big'))
       + '<textarea class="nv-titleed" data-mtitle="' + esc(t.id) + '" rows="1" aria-label="' + esc(tw("nv.f.what")) + '">' + esc(t.title) + "</textarea></div>" + tagRow(t, t.id);
-    if (t.from_javis) h += '<div class="nv-from">' + avatar(CORE, 16) + esc(tw("nv.from_javis_long")) + "</div>";
+    if (t.from_uneti) h += '<div class="nv-from">' + avatar(CORE, 16) + esc(tw("nv.from_uneti_long")) + "</div>";
     h += '<div class="nv-sec2">'
       + '<button type="button" class="nv-kv nv-kvb" data-act="pick-date" data-id="' + esc(it.id) + '"><span>' + ic("clock") + esc(tw("nv.k.when")) + "</span><span>" + esc(whenIso(occ && rep ? occ : t.date, t.time)) + "</span></button>"
       + '<button type="button" class="nv-kv nv-kvb" data-act="pick-rep" data-id="' + esc(it.id) + '"><span>' + ic("repeat") + esc(tw("nv.k.repeat")) + "</span><span>" + esc(rep ? repHuman(t.repeat) : tw("nv.f.rep_none")) + "</span></button>"
       + (rep && t.kind !== "appt" ? '<div class="nv-kv"><span>' + ic("flame", "c-habit") + esc(tw("nv.h.is_habit")) + '</span><button type="button" class="nv-sw" role="switch" aria-checked="' + habitOn(t) + '" aria-label="' + esc(tw("nv.h.is_habit")) + '" data-act="htog" data-id="m:' + esc(t.id) + '"><span></span></button></div>' : "") + "</div>";
     var acts = (done ? "" : '<button type="button" class="nv-btn pri" data-act="check" data-id="' + esc(it.id) + '">' + ic("check") + esc(tw("nv.a.done")) + "</button>")
-      + '<button type="button" class="nv-btn" data-act="tojavis" data-id="' + esc(it.id) + '">' + avatar(CORE, 16) + esc(tw("nv.a.tojavis")) + "</button>";
+      + '<button type="button" class="nv-btn" data-act="touneti" data-id="' + esc(it.id) + '">' + avatar(CORE, 16) + esc(tw("nv.a.touneti")) + "</button>";
     h += subsHtml(t);
     h += '<div class="nv-sec2"><div class="nv-acts">' + acts + "</div></div>";
     h += '<div class="nv-sec2"><textarea class="nv-ta" data-mnotes="' + esc(t.id) + '" placeholder="' + esc(tw("nv.notes_ph")) + '" aria-label="' + esc(tw("nv.notes_ph")) + '">' + esc(t.notes || "") + "</textarea>" + noteLinks(t) + "</div>";
@@ -1261,7 +1261,7 @@
     if (src === "mine") {
       if (it.id.indexOf("mo:") === 0 || it.id.indexOf("md:") === 0) return [["open", "pencil", "nv.a.edit"]];
       out.push(["edit", "pencil", "nv.a.edit"]);
-      if (!it.appt) out.push(["tojavis", "bot", "nv.a.tojavis"]);
+      if (!it.appt) out.push(["touneti", "bot", "nv.a.touneti"]);
       if ((S.brains || []).length > 1) { out.push(["move", "arrow-right-left", "nv.a.move"]); out.push(["copy", "copy", "nv.a.copy"]); }
       out.push(["del", "trash-2", "nv.a.del"]);
       return out;
@@ -1276,8 +1276,8 @@
     return out;
   }
   function menuButtons(it) {
-    // The drawer of my task already has "Give to Javis" next to Done.
-    return menuDefs(it).filter(function (m) { return !(it.src === "mine" && m[0] === "tojavis"); }).map(function (m) { return '<button type="button" class="nv-btn sm' + (m[0] === "del" ? " ghost danger" : "") + '" data-act="m-' + m[0] + '" data-id="' + esc(it.id) + '">' + ic(m[1]) + esc(tw(m[2])) + "</button>"; }).join("");
+    // The drawer of my task already has "Give to UNETI AI" next to Done.
+    return menuDefs(it).filter(function (m) { return !(it.src === "mine" && m[0] === "touneti"); }).map(function (m) { return '<button type="button" class="nv-btn sm' + (m[0] === "del" ? " ghost danger" : "") + '" data-act="m-' + m[0] + '" data-id="' + esc(it.id) + '">' + ic(m[1]) + esc(tw(m[2])) + "</button>"; }).join("");
   }
 
   // ---------- sheets: menu, brains, project, date picker, repeat picker ----------
@@ -1383,9 +1383,9 @@
     h += '<div class="nv-dpt"><label>' + ic("clock") + '<select class="nv-inp" data-dp="time"' + (d.date ? "" : " disabled") + ">" + times + '</select></label><input type="time" class="nv-inp" data-dp="other" aria-label="' + esc(tw("nv.dp.other")) + '" title="' + esc(tw("nv.dp.other")) + '"' + (d.date ? "" : " disabled") + "></div>";
     return h + '<div class="nv-acts two"><button type="button" class="nv-btn ghost" data-act="dp-clear">' + esc(tw("nv.dp.clear")) + '</button><button type="button" class="nv-btn pri" data-act="dp-ok">' + esc(tw("nv.dp.ok")) + "</button></div>";
   }
-  // Repeat picker: "Every [n] [unit]", weekday circles for weeks. Minutes and hours only for Javis jobs.
+  // Repeat picker: "Every [n] [unit]", weekday circles for weeks. Minutes and hours only for UNETI AI jobs.
   function repPickerHtml(sh) {
-    var r = sh.r, units = sh.javis ? ["min", "hour", "day", "week", "month", "year"] : ["day", "week", "month", "year"];
+    var r = sh.r, units = sh.uneti ? ["min", "hour", "day", "week", "month", "year"] : ["day", "week", "month", "year"];
     var h = '<div class="nv-rp"><span>' + esc(tw("nv.rp.every")) + '</span><input type="number" class="nv-inp nv-rpn" min="1" max="365" value="' + (r.n || 1) + '" data-rp="n" aria-label="' + esc(tw("nv.rp.n")) + '"><select class="nv-inp" data-rp="unit" aria-label="' + esc(tw("nv.rp.unit")) + '">'
       + units.map(function (u) { return '<option value="' + u + '"' + (r.unit === u ? " selected" : "") + ">" + esc(tw(RP_KEYS[u])) + "</option>"; }).join("") + "</select></div>";
     if (r.unit === "week") {
@@ -1395,7 +1395,7 @@
   }
 
   // ---------- habits: list head, mascot, checkbox, streak card (0.424.0) ----------
-  // The mascot is Javis's own star (dashboard/pet.js): all feeling sits in the eyes, no mouth.
+  // The mascot is UNETI AI's own star (dashboard/pet.js): all feeling sits in the eyes, no mouth.
   var PET_STAR = "M145 81 Q160 59.4 175 81 L177.9 85.1 Q195.8 110.7 225.8 119.9 L230.6 121.3 Q255.7 128.9 239.8 149.8 L236.8 153.8 Q217.9 178.8 218.5 210.1 L218.6 215.1 Q219.1 241.4 194.3 232.8 L189.6 231.1 Q160 220.8 130.4 231.1 L125.7 232.8 Q100.9 241.4 101.4 215.1 L101.5 210.1 Q102.1 178.8 83.2 153.8 L80.2 149.8 Q64.3 128.9 89.4 121.3 L94.2 119.9 Q124.2 110.7 142.1 85.1 Z";
   var PET_EYES = {
     neutral: '<ellipse rx="7.2" ry="17.5"/>', curious: '<ellipse cy="-2" rx="8.4" ry="21"/>', excited: '<ellipse cy="-1" rx="9.2" ry="22.5"/>',
@@ -1406,7 +1406,7 @@
     love: '<path d="M0 11 C-15 0 -13 -13 -5.5 -13 C-2 -13 0 -10 0 -7.5 C0 -10 2 -13 5.5 -13 C13 -13 15 0 0 11 Z"/>',
     gang: ['<path class="pl" d="M-8 -9 L6 0 L-8 9"/>', '<path class="pl" d="M8 -9 L-6 0 L8 9"/>']
   };
-  // Javis's own star, small and still (owner, 2026-11-04: "Javis" in the add form shows the star, not an avatar).
+  // UNETI AI's own star, small and still (owner, 2026-11-04: "UNETI AI" in the add form shows the star, not an avatar).
   function jmini() {
     return '<svg class="nv-jmini" viewBox="56 50 208 200" aria-hidden="true"><path d="' + PET_STAR + '" fill="#fd6100"/><g fill="#201e1e"><ellipse cx="145" cy="156" rx="9" ry="20"/><ellipse cx="175" cy="156" rx="9" ry="20"/></g></svg>';
   }
@@ -1461,7 +1461,7 @@
     return habitHead() + (H.length ? H.map(habitRow).join("") : '<div class="nv-empty">' + esc(tw("nv.h.empty")) + "</div>");
   }
   // The streak card under a habit's details: big number, three tiles, a month calendar (rest days thread the chain),
-  // the reminder choice, and what Javis has learned about it.
+  // the reminder choice, and what UNETI AI has learned about it.
   function streakCard(t) {
     var k = habitCalc(t, today()); if (!k) return "";
     var td = today(), off = S.stkOff || 0, base = new Date(td + "T12:00:00"); base.setDate(1); base.setMonth(base.getMonth() + off);
@@ -1472,7 +1472,7 @@
     var cells = "", nDone = 0, nIce = 0, anyJ = false;
     for (var i = 0; i < lead; i++) cells += '<span class="sd e"></span>';
     for (var n = 1; n <= nDays; n++) {
-      var d = first.slice(0, 8) + pad2(n), st = k.days[d], wd = (lead + n - 1) % 7, jv = k.by[d] && k.by[d].by === "javis";
+      var d = first.slice(0, 8) + pad2(n), st = k.days[d], wd = (lead + n - 1) % 7, jv = k.by[d] && k.by[d].by === "uneti";
       if (st === "f") { nDone++; if (jv) anyJ = true; }
       if (st === "i") nIce++;
       var cls = "sd";
@@ -1506,10 +1506,10 @@
       + msg + '<div class="nv-stk-tiles"><div><b>' + nDone + "</b><span>" + esc(tw("nv.h.t_done")) + "</span></div><div><b>" + nIce + "</b><span>" + esc(tw("nv.h.frozen")) + "</span></div><div><b>" + k.best + "</b><span>" + esc(tw("nv.h.longest")) + "</span></div></div>"
       + '<div class="nv-stk-mh"><b>' + esc(base.toLocaleDateString(LOC(), { month: "long", year: "numeric" })) + '</b><span><button type="button" class="nv-x" data-act="hmon" data-v="-1" aria-label="' + esc(tw("nv.dp.prev")) + '"' + (canPrev ? "" : " disabled") + ">" + ic("chevron-left") + '</button><button type="button" class="nv-x" data-act="hmon" data-v="1" aria-label="' + esc(tw("nv.dp.next")) + '"' + (canNext ? "" : " disabled") + ">" + ic("chevron-right") + "</button></span></div>"
       + '<div class="nv-stk-cal">' + [1, 2, 3, 4, 5, 6, 0].map(function (w) { return '<span class="wh">' + esc(tw(WD_KEYS[w])) + "</span>"; }).join("") + cells + "</div>"
-      + (anyJ ? '<div class="nv-stk-leg"><i class="jv"></i>' + esc(tw("nv.h.by_javis")) + "</div>" : "")
+      + (anyJ ? '<div class="nv-stk-leg"><i class="jv"></i>' + esc(tw("nv.h.by_uneti")) + "</div>" : "")
       + '<div class="nv-stk-rem">' + remind + "</div></div>";
   }
-  // When "Javis reminds on its own" nudges today: an hour after the usual time (or the set time), earlier while frozen.
+  // When "UNETI AI reminds on its own" nudges today: an hour after the usual time (or the set time), earlier while frozen.
   function autoAt(t, k) {
     var base = usualTime(t) || t.time || t.habit.at || "21:00", m = Number(base.slice(0, 2)) * 60 + Number(base.slice(3, 5));
     m = k && k.frozen ? Math.max(6 * 60, m - 30) : Math.min(23 * 60, m + 30);
@@ -1530,7 +1530,7 @@
   // 0.426.0: a job queued right away keeps the old board's "review the result when done" box, its explanation behind (i).
   function jobOpts(f) {
     if (f.edit || f.date || f.rule || f.mode !== "do") return "";
-    var J = window.JavisInfo, more = tw("info.more");
+    var J = window.UnetiInfo, more = tw("info.more");
     return '<div class="nv-fld nv-opts"><div class="nv-apr"><label class="nv-prep"><input type="checkbox" data-act="fset" data-k="appr" data-v="' + (f.appr ? "" : "1") + '"' + (f.appr ? " checked" : "") + "><span>" + esc(tw("kanban.need_approve")) + "</span></label>"
       + (J ? J.btn(more) : "") + "</div>" + (J ? J.body(esc(tw("kanban.need_approve_info"))) : "") + "</div>";
   }
@@ -1569,7 +1569,7 @@
     }
     return head
       + '<label class="nv-fld"><span>' + esc(tw("nv.f.what")) + '</span><textarea class="nv-ta" id="nvW" required placeholder="' + esc(me ? tw("nv.f.what_ph_me") : tw("nv.f.what_ph")) + '">' + esc(f.text || "") + "</textarea></label>"
-      + (f.edit ? "" : '<div class="nv-fld"><span>' + esc(tw("nv.f.who")) + "</span>" + seg("who", [["me", "nv.me", ic("circle-user")], ["ai", "nv.javis", jmini()]]) + "</div>")
+      + (f.edit ? "" : '<div class="nv-fld"><span>' + esc(tw("nv.f.who")) + "</span>" + seg("who", [["me", "nv.me", ic("circle-user")], ["ai", "nv.uneti", jmini()]]) + "</div>")
       + (me || f.script ? "" : '<div class="nv-fld"><span>' + esc(tw("nv.k.how")) + "</span>" + seg("mode", [["do", "nv.mode.do"], ["remind", "nv.mode.remind"]]) + "</div>")
       + '<div class="nv-row2"><div class="nv-fld"><span>' + esc(tw("nv.k.when")) + '</span><button type="button" class="nv-pick" data-act="pick-date" data-id="new">' + ic("clock") + '<span class="nv-lbl">' + esc(f.date ? whenIso(f.date, f.time) : me ? tw("nv.d.none") : tw("nv.f.asap")) + "</span>" + ic("chevron-right") + "</button></div>"
       + '<div class="nv-fld"><span>' + esc(tw("nv.k.repeat")) + '</span><button type="button" class="nv-pick" data-act="pick-rep" data-id="new"' + (f.edit && f.cronLocked ? " disabled" : "") + ">" + ic("repeat") + '<span class="nv-lbl">' + esc(repTxt) + "</span>" + ic("chevron-right") + "</button></div></div>"
@@ -1625,7 +1625,7 @@
         location: f.loc || "", repeat: f.rule && f.rule.unit !== "min" && f.rule.unit !== "hour" ? f.rule : null, tags: f.tags || [],
         prep: f.prep ? (f.prepT || tw("nv.ap.prep_default")) : "" });
       if (r && r.ok !== false && f.prep) {
-        // "Ask Javis to prepare": a reminder that does the job 30 minutes before the start.
+        // "Ask UNETI AI to prepare": a reminder that does the job 30 minutes before the start.
         var at = fromMin(toMin(f.time) - 30);
         await createReminder((f.prepT || tw("nv.ap.prep_default")) + " (" + txt + ", " + f.date + " " + f.time + ")", "do", f.date, at, null);
       }
@@ -1646,7 +1646,7 @@
   }
   async function createReminder(txt, mode, date, time, rule, opts) {
     var body = Object.assign({ brain: brain(), text: txt, label: txt.slice(0, 80), mode: mode === "remind" ? "notify" : "task", muc_quyen: "full", created_by: "dashboard" },
-      opts || {}, javisSchedule(rule, date || today(), time || "08:00"));
+      opts || {}, unetiSchedule(rule, date || today(), time || "08:00"));
     var r = await postJSON("/reminders", body);
     if (r && r.ok === false && r.can_force) {
       if (!window.confirm(r.error + "\n\n" + tw("nv.f.force"))) return null;
@@ -1658,9 +1658,9 @@
 
   // ---------- pickers state ----------
   function pickTarget(id) {
-    if (id === "new") return { date: S.form.date, time: S.form.time, rule: S.form.rule, javis: S.form.who !== "me" };
+    if (id === "new") return { date: S.form.date, time: S.form.time, rule: S.form.rule, uneti: S.form.who !== "me" };
     var it = find(id), t = it && it.raw;
-    return { date: (it.occ && t.repeat ? it.occ : t.date) || null, time: t.time || "", rule: t.repeat || null, javis: false, task: t };
+    return { date: (it.occ && t.repeat ? it.occ : t.date) || null, time: t.time || "", rule: t.repeat || null, uneti: false, task: t };
   }
   async function applyPick(id, patch) {
     if (id === "new") { Object.assign(S.form, patch); S.sheet = null; renderLayer(); return; }
@@ -1783,14 +1783,14 @@
         if (it.src === "loop") return act(postForm("/loops/move", { slug: it.ref, from_brain: b, to_brain: to }), tw("nv.ok.moved"));
         return;
       }
-      case "tojavis": case "m-tojavis": return giveToJavis(it);
-      case "m-tome": return takeFromJavis(it);
+      case "touneti": case "m-touneti": return giveToUneti(it);
+      case "m-tome": return takeFromUneti(it);
       case "grant":
         if (!window.confirm(tw("kanban.confirm_grant"))) return;
         return act(postForm("/kanban/task/grant", { brain: b, id: it.ref }), tw("nv.ok.granted"));
       case "approve": return act(postForm("/kanban/task/move", { brain: b, id: it.ref, status: "done" }), tw("nv.ok.approved"));
       case "resolve": return act(postJSON("/incidents/resolve", { id: id }), tw("nv.ok.resolved"));
-      case "gochan": if (window.JavisNav && window.JavisNav.go) window.JavisNav.go("channels"); return;
+      case "gochan": if (window.UnetiNav && window.UnetiNav.go) window.UnetiNav.go("channels"); return;
       case "orch": return act(postForm("/kanban/orchestration", { brain: b, mode: el.dataset.v }), el.dataset.v === "off" ? tw("nv.orch.off_ok") : tw("nv.orch.on_ok"));
       case "overall": {
         var L = S.me.items.filter(function (i) { return i.over && i.id.indexOf("m:") === 0; });
@@ -1929,7 +1929,7 @@
       }
       case "pick-rep": {
         var tg2 = pickTarget(id), wd = new Date((tg2.date || today()) + "T12:00:00").getDay();
-        S.sheet = { kind: "rep", id: id, javis: tg2.javis, r: tg2.rule ? JSON.parse(JSON.stringify(tg2.rule)) : { unit: "day", n: 1, days: [wd] } }; return renderLayer();
+        S.sheet = { kind: "rep", id: id, uneti: tg2.uneti, r: tg2.rule ? JSON.parse(JSON.stringify(tg2.rule)) : { unit: "day", n: 1, days: [wd] } }; return renderLayer();
       }
       case "dp-set": S.sheet.d.date = el.dataset.v || null; if (!S.sheet.d.date) S.sheet.d.time = ""; if (S.sheet.d.date) S.sheet.d.vm = S.sheet.d.date.slice(0, 7); return renderLayer();
       case "dp-mon": { var x = new Date(S.sheet.d.vm + "-15T12:00:00"); x.setMonth(x.getMonth() + Number(el.dataset.v)); S.sheet.d.vm = isoOf(x).slice(0, 7); return renderLayer(); }
@@ -1946,24 +1946,24 @@
     if (r.src === "loop") return postForm("/loops/toggle", { brain: b, slug: r.ref });
     return postJSON("/watch/action", { id: r.ref, action: on ? "resume" : "pause", brain: b });
   }
-  // "Give to Javis": a dated task becomes a reminder that does the job, an undated one a Kanban job; mine goes away.
-  async function giveToJavis(it) {
+  // "Give to UNETI AI": a dated task becomes a reminder that does the job, an undated one a Kanban job; mine goes away.
+  async function giveToUneti(it) {
     var t = it.raw; S.sheet = null; S.sel = null;
     var r = t.date || t.repeat ? await createReminder(t.title + (t.notes ? "\n" + t.notes : ""), "do", t.date, t.time, t.repeat)
       : await postForm("/kanban/task", { brain: brain(), title: t.title.slice(0, 120), intent: t.title + (t.notes ? "\n" + t.notes : ""), priority: 2 });
     if (!r || r.ok === false) { if (r) toast(r.error || tw("nv.err.generic")); return; }
     var del = await mine({ __url: "/my-tasks/delete", id: t.id, handoff: true });
     await load(); render();
-    toast(tw("nv.ok.tojavis"), function () {
+    toast(tw("nv.ok.touneti"), function () {
       var cancel = t.date || t.repeat ? postForm("/reminders/delete", { brain: brain(), id: r.id }) : postForm("/kanban/task/delete", { brain: brain(), id: r.id });
       Promise.all([cancel, mine({ __url: "/my-tasks/restore", task: del.task })]).then(load).then(render);
     });
   }
-  // "Do it myself": the Javis job becomes my task (same title and date), the Javis job is cancelled after the undo window.
-  async function takeFromJavis(it) {
+  // "Do it myself": the UNETI AI job becomes my task (same title and date), the UNETI AI job is cancelled after the undo window.
+  async function takeFromUneti(it) {
     S.sheet = null; S.sel = null;
     var raw = it.raw || {}, ts = it.src === "reminder" ? stamp(raw.due_at) : { date: it.date, time: it.time };
-    var r = await mine({ __url: "/my-tasks", title: it.desc && it.desc.length < 300 ? it.desc : it.title, date: ts.date || null, time: ts.time || "", from_javis: true });
+    var r = await mine({ __url: "/my-tasks", title: it.desc && it.desc.length < 300 ? it.desc : it.title, date: ts.date || null, time: ts.time || "", from_uneti: true });
     if (!r || r.ok === false) { toast((r && r.error) || tw("nv.err.generic")); return; }
     var b = brain();
     later(it.id, tw("nv.ok.tome"), function () {
@@ -1987,7 +1987,7 @@
     return '<svg class="nv-pring" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" class="rb"/><circle cx="12" cy="12" r="9" class="rf" transform="rotate(-90 12 12)" stroke-dasharray="'
       + C.toFixed(2) + '" stroke-dashoffset="' + (C * (1 - from)).toFixed(2) + '" data-to="' + (C * (1 - pct)).toFixed(2) + '" data-pct="' + pct + '"/></svg>';
   }
-  // The four tiles (clean days, priorities, today, habits) and Javis's line for the open list.
+  // The four tiles (clean days, priorities, today, habits) and UNETI AI's line for the open list.
   function pulseHtml(v) {
     var p = pulse(), n = p.today.length, pct = n ? p.todayDone / n : 0;
     var tile = function (k, cls, icon, val, label, aria) {
@@ -2184,7 +2184,7 @@
   }
   // ---- sounds (owner, 2026-11-06: "nút tích nghe thật đã tai, nút phá băng cũng vậy") ----
   // The synth lives in ui-sound.js with the on/off switch beside the light/dark one; nothing plays when it is off.
-  function sfx(kind) { try { if (window.JavisSound) window.JavisSound.play(kind); } catch (e) { /* no sound is fine */ } }
+  function sfx(kind) { try { if (window.UnetiSound) window.UnetiSound.play(kind); } catch (e) { /* no sound is fine */ } }
   // ---- effects (all of them skipped with reduced motion) ----
   function calm() { return window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches; }
   function buzz(p) { try { if (navigator.vibrate) navigator.vibrate(p); } catch (e) { /* desktop */ } }
@@ -2282,9 +2282,9 @@
       if (act_ === "fset") { keepFormText(); S.form[a.dataset.k] = a.dataset.v;
         if (a.dataset.k === "kind" && a.dataset.v === "appt") { S.form.who = "me"; if (!S.form.date) S.form.date = today(); if (!S.form.time) S.form.time = fromMin(Math.ceil((toMin(hmOf(new Date())) + 30) / 30) * 30); } if (a.dataset.k === "who" && a.dataset.v === "me" && S.form.rule && (S.form.rule.unit === "min" || S.form.rule.unit === "hour")) S.form.rule = null; renderLayer(); return; }
       if (act_ === "new") { openForm(null); return; }
-      if (act_ === "st-range") { if (window.JavisTaskStats) window.JavisTaskStats.openRange(a, statsCtx()); return; }
-      if (act_ === "st-mins") { if (window.JavisTaskStats) window.JavisTaskStats.toggleMinutes(statsCtx()); return; }
-      if (act_ === "st-give") { var gi = find(id); if (gi) { giveToJavis(gi).then(function () { if (window.JavisTaskStats) window.JavisTaskStats.refresh(); render(); }); } return; }
+      if (act_ === "st-range") { if (window.UnetiTaskStats) window.UnetiTaskStats.openRange(a, statsCtx()); return; }
+      if (act_ === "st-mins") { if (window.UnetiTaskStats) window.UnetiTaskStats.toggleMinutes(statsCtx()); return; }
+      if (act_ === "st-give") { var gi = find(id); if (gi) { giveToUneti(gi).then(function () { if (window.UnetiTaskStats) window.UnetiTaskStats.refresh(); render(); }); } return; }
       if (act_ === "pick-date" || act_ === "pick-rep") { if (id === "new") keepFormText(); }
       doAct(act_, id, a);
       return;
@@ -2333,7 +2333,7 @@
       await act(mine({ __url: "/my-tasks", title: qt, date: qd, tags: qv.indexOf("proj:") === 0 ? [qv.slice(5)] : [] }), tw("nv.f.added"));
       buzz(10); popStar(tw("nv.pu.sp_first"), "excited"); return;
     }
-    if (f.dataset.stmins && window.JavisTaskStats) return window.JavisTaskStats.saveMinutes(f, statsCtx());
+    if (f.dataset.stmins && window.UnetiTaskStats) return window.UnetiTaskStats.saveMinutes(f, statsCtx());
     if (f.dataset.pform) {
       var name = S.root.querySelector("#nvPName").value.trim(); if (!name) return;
       var sh = S.sheet; S.sheet = null;
@@ -2400,10 +2400,10 @@
 
   async function mount(el) {
     if (S) unmount();
-    var tab = "ai";   // 0.428.0: the page always opens on Javis's tasks; each tab still remembers its list
+    var tab = "ai";   // 0.428.0: the page always opens on UNETI AI's tasks; each tab still remembers its list
     S = { root: el, tab: tab, view: lsGet("view." + tab, "today"), q: "", sel: null, layer: null, sheet: null, form: null, hidden: {}, showDone: false,
       hmsgHide: lsGet("hmsgx", "") === isoOf(new Date()), pmsgHide: lsGet("pmsgx", "") === isoOf(new Date()), moreWho: lsGet("moreWho", "") === "1", moreProj: lsGet("moreProj", "") === "1", phone: { screen: "home" }, agents: null, ai: null, me: null, my: null, subOpen: {} };
-    var legacy = lsGet("view", "");   // the old Scheduled link sets "rep" for the Javis tab
+    var legacy = lsGet("view", "");   // the old Scheduled link sets "rep" for the UNETI AI tab
     if (legacy) { try { localStorage.removeItem(LS + "view"); } catch (e2) { /* ignore */ } if (legacy === "rep") { S.tab = "ai"; S.view = "rep"; } }
     el.classList.add("nv-root");
     el.innerHTML = '<div class="nv-desk"><nav class="nv-side" aria-label="' + esc(tw("nv.title")) + '"></nav><section class="nv-main"><div class="nv-top"></div>'
@@ -2444,7 +2444,7 @@
     S = null;
   }
 
-  // Javis opens a Kanban job on screen (ui-actions.js, action open_task): Javis tab, details of that job.
+  // UNETI AI opens a Kanban job on screen (ui-actions.js, action open_task): UNETI AI tab, details of that job.
   async function show(ref) {
     if (!S || !S.ai) return false;
     var id = "k:" + String(ref || "").replace(/^k:/, "");
@@ -2455,5 +2455,5 @@
     return true;
   }
 
-  window.JavisTasks = { mount: mount, unmount: unmount, show: show, ready: function () { return !!(S && S.ai); }, morning: function (force) { return morning(force); }, _model: model_ };
+  window.UnetiTasks = { mount: mount, unmount: unmount, show: show, ready: function () { return !!(S && S.ai); }, morning: function (force) { return morning(force); }, _model: model_ };
 })();

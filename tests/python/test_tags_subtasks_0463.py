@@ -24,7 +24,7 @@ from fastapi.testclient import TestClient
 import my_tasks  # noqa: E402
 
 fails = []
-roots = {"brain": Path(tempfile.mkdtemp(prefix="javis-tag-a-")), "other": Path(tempfile.mkdtemp(prefix="javis-tag-b-"))}
+roots = {"brain": Path(tempfile.mkdtemp(prefix="uneti-tag-a-")), "other": Path(tempfile.mkdtemp(prefix="uneti-tag-b-"))}
 
 
 def check(name, cond):
@@ -43,7 +43,7 @@ feat = my_tasks.MyTasks(my_tasks.MyTasksDeps(brain_root=lambda b: str(roots.get(
                                              atomic_write_text=atomic_write))
 
 # ---- an old store: one project, no tags ----
-store = roots["brain"] / "Javis" / "my-tasks.json"
+store = roots["brain"] / "UNETI" / "my-tasks.json"
 store.parent.mkdir(parents=True, exist_ok=True)
 store.write_text(json.dumps({"tasks": [{"id": "m_old", "title": "Old", "project": "p_a", "status": "open"},
                                        {"id": "m_none", "title": "No project", "status": "open"}],

@@ -3,11 +3,11 @@
    0.65.22 (chủ dự án chốt 01/10): bỏ công tắc "Tập trung" và bỏ luật phải gọi tên. Rào chỉ còn
    bật ở đường Live (app.js đặt enabled theo đường gọi): im IDLE_MS thì ngắt nhà cung cấp cho đỡ
    tốn hạn mức, rồi CÂU NÓI THẬT đầu tiên (wakes) là nối lại. Đường Cơ bản không có gì để ngắt nên
-   nghe suốt cuộc gọi. Không dùng Groq: chữ "Javis" trình duyệt hay chép thành "David", bắt buộc gọi
+   nghe suốt cuộc gọi. Không dùng Groq: chữ "UNETI AI" trình duyệt hay chép thành "David", bắt buộc gọi
    tên là đúng khâu từng làm cuộc gọi không nối lại được. */
 (function (root) {
   "use strict";
-  const wake = /^(?:(?:hey|hi|hello|ê|này|alo|chào)\s+)?(?:javis|jarvis)(?=$|[\s,.!?:;])/iu;
+  const wake = /^(?:(?:hey|hi|hello|ê|này|alo|chào)\s+)?(?:u\s*n[eê]\s*ti(?:\s+ai)?|jarvis)(?=$|[\s,.!?:;])/iu;
   // Câu mở đầu GẦN GIỐNG tên gọi mà Web Speech hay chép lệch ("David ơi", "Gia vít"). KHÔNG mở
   // rào: chỉ cho phép đưa âm thanh cho tai nghe lại, rồi rào xét lại trên chữ của tai (0.65.15).
   const IDLE_MS = 30000;      // chủ dự án 01/10: 20 giây hơi ít
@@ -70,5 +70,5 @@
   }
   const api = { Attention, SpeechLevel, IDLE_MS };
   if (typeof module === 'object' && module.exports) module.exports = api;
-  else root.JavisVoiceAttention = api;
+  else root.UnetiVoiceAttention = api;
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -7,7 +7,7 @@ UNETI AI là một AI agent cá nhân + Second Brain. "Bộ não" của nó là 
 
 > ⚠️ **An toàn:** UNETI AI chạy Claude với toàn quyền trên máy. Khi chạy public (Docker/VPS/Hostinger),
 > UNETI AI **tự bật bắt buộc đăng nhập** - mở app ra là màn **tạo tài khoản admin / đăng nhập**, không
-> ai điều khiển được khi chưa đặt mật khẩu. (Chạy nội bộ muốn tắt: `JAVIS_REQUIRE_LOGIN=0`.)
+> ai điều khiển được khi chưa đặt mật khẩu. (Chạy nội bộ muốn tắt: `UNETI_REQUIRE_LOGIN=0`.)
 
 ---
 
@@ -23,16 +23,16 @@ Hostinger pull image + chạy. Mở app bằng `http://<ip-vps>:7777` (IP xem �
 màn **tạo tài khoản admin**.
 
 > 🌐 **Muốn LINK RIÊNG có HTTPS (bỏ `:7777`, để mic/voice chạy) mà KHÔNG cần mua tên miền?** Dùng
-> `docker-compose.hostinger.yml` + đặt `DOMAIN_NAME=javis.<hostname-vps>.hstgr.cloud` - xem mục
+> `docker-compose.hostinger.yml` + đặt `DOMAIN_NAME=uneti.<hostname-vps>.hstgr.cloud` - xem mục
 > **"Link mặc định + HTTPS trên Hostinger"** ở phần HTTPS bên dưới. Compose gốc này chỉ vào được bằng IP:7777.
 
 **3 việc làm 1 lần:**
-1. **Để image GHCR ở chế độ Public:** GitHub → repo `javis-os` → **Packages** → `javis-os`
+1. **Để image GHCR ở chế độ Public:** GitHub → repo `uneti-ai` → **Packages** → `uneti-ai`
    → *Package settings* → Visibility = **Public** (để Hostinger pull không cần đăng nhập registry).
    Image do CI tự build mỗi lần push lên `main` (xem mục Cập nhật).
 2. **Tạo tài khoản admin an toàn** (Claude chạy full quyền nên không để ai cũng tạo được):
    - **Cách A (khuyến nghị):** trong compose Hostinger, điền hai trường có sẵn
-     `JAVIS_ADMIN_USER` + `JAVIS_ADMIN_PASSWORD` → admin tạo sẵn lúc khởi động,
+     `UNETI_ADMIN_USER` + `UNETI_ADMIN_PASSWORD` → admin tạo sẵn lúc khởi động,
      mở app ra **đăng nhập luôn**.
    - **Cách B:** bỏ trống → mở app **ngay sau khi deploy** và tự đặt tên đăng nhập + mật khẩu
      (tối thiểu 8 ký tự). Lưu ý: khi chưa có admin, **ai mở link trước sẽ tạo được admin**, nên đừng
@@ -49,10 +49,10 @@ màn **tạo tài khoản admin**.
 
 Cần Docker. Chưa có? `curl -fsSL https://get.docker.com | sh`
 ```bash
-mkdir javis && cd javis
+mkdir uneti && cd uneti
 curl -fsSLO https://raw.githubusercontent.com/uneti-ai/uneti-ai/main/docker-compose.yml
 
-docker compose run --rm javis claude auth login --claudeai   # ĐĂNG NHẬP CLAUDE 1 LẦN (link + code)
+docker compose run --rm uneti claude auth login --claudeai   # ĐĂNG NHẬP CLAUDE 1 LẦN (link + code)
 docker compose up -d                                          # pull image GHCR + chạy
 ```
 Mở `http://<ip-vps>:7777` (hoặc qua tunnel ở dưới) → ra màn tạo tài khoản admin.
@@ -67,7 +67,7 @@ docker compose down        # tắt
 docker compose build --pull && docker compose up -d   # cập nhật
 ```
 
-Mọi ghi chú / vault / settings nằm trong Docker volume (`javis-data`, `claude-auth`) →
+Mọi ghi chú / vault / settings nằm trong Docker volume (`uneti-data`, `claude-auth`) →
 **không mất** khi restart hay update.
 
 ### 🔒 HTTPS tự động
@@ -96,21 +96,21 @@ link riêng chạy HTTPS mà không cần mua tên miền. **Lưu ý (đã kiể
    https://raw.githubusercontent.com/uneti-ai/uneti-ai/main/docker-compose.hostinger.yml
    ```
 3. Ô **Environment** của mẫu mới chỉ còn 3 trường có ý nghĩa:
-   - `DOMAIN_NAME`: đặt `javis.<hostname-vps>.hstgr.cloud`
-     (vd `javis.srv1782015.hstgr.cloud`), hoặc tên miền riêng đã trỏ DNS A về IP VPS.
-   - `JAVIS_ADMIN_USER`: tên đăng nhập, mặc định `admin`.
-   - `JAVIS_ADMIN_PASSWORD`: mật khẩu mạnh anh tự đặt; để trống thì phải tự tạo tài khoản trên
+   - `DOMAIN_NAME`: đặt `uneti.<hostname-vps>.hstgr.cloud`
+     (vd `uneti.srv1782015.hstgr.cloud`), hoặc tên miền riêng đã trỏ DNS A về IP VPS.
+   - `UNETI_ADMIN_USER`: tên đăng nhập, mặc định `admin`.
+   - `UNETI_ADMIN_PASSWORD`: mật khẩu mạnh anh tự đặt; để trống thì phải tự tạo tài khoản trên
      màn chạy lần đầu ngay sau khi deploy (ai mở link trước sẽ tạo được admin).
-   - `JAVIS_AUTO_UPDATE` (tuỳ chọn): đặt `true` thì UNETI AI TỰ cập nhật mỗi ngày. Bỏ trống thì
+   - `UNETI_AUTO_UPDATE` (tuỳ chọn): đặt `true` thì UNETI AI TỰ cập nhật mỗi ngày. Bỏ trống thì
      vẫn cập nhật được bằng nút **⬆ Cập nhật ngay** trong app - từ 0.55.56 stack Hostinger đã
      kèm sẵn Watchtower nên nút đó có ngay từ lần cài đầu.
 
-   Các trường kỹ thuật cũ như `JAVIS_HOST`, `JAVIS_PORT`, đường dẫn state/brain và
+   Các trường kỹ thuật cũ như `UNETI_HOST`, `UNETI_PORT`, đường dẫn state/brain và
    `CLAUDE_CWD` đã được dọn khỏi form; Docker image vẫn tự dùng đúng giá trị mặc định.
 4. **Deploy** → đợi 1-3 phút Traefik cấp SSL → mở `https://<DOMAIN_NAME>`.
 
 > **Mở ra là có link VPS (từ 0.302.0):** trên VPS không có Traefik (Ubuntu 26 trắng), bỏ trống `DOMAIN_NAME` cũng
-> được. Gateway đọc tên VPS (`srvXXXX.hstgr.cloud`) và tự cấp HTTPS cho cả `javis.srvXXXX.hstgr.cloud` lẫn chính
+> được. Gateway đọc tên VPS (`srvXXXX.hstgr.cloud`) và tự cấp HTTPS cho cả `uneti.srvXXXX.hstgr.cloud` lẫn chính
 > `srvXXXX.hstgr.cloud` (từ 0.304.0; tên nào trỏ về máy thì tên đó có chứng chỉ). **Cài đặt → Tên miền** cho biết
 > link đã chạy chưa, hay còn đang chờ chứng chỉ. Bấm **Open** ra `http://<ip>:7777`, trang tự chuyển sang link
 > HTTPS đó ngay khi nó chạy và đúng là UNETI AI này. Thêm `?stay=1` vào link IP nếu muốn ở lại. Ứng dụng cài từ Catalog
@@ -119,21 +119,21 @@ link riêng chạy HTTPS mà không cần mua tên miền. **Lưu ý (đã kiể
 > phải đặt `DOMAIN_NAME` một lần: mở UNETI AI bằng IP → **Cài đặt → Tên miền** có sẵn dòng để sao chép.
 >
 > **VPS Hostinger cài Ubuntu 26 (hoặc hệ điều hành trắng, không có Traefik) - từ 0.300.0:** vẫn dán ĐÚNG link trên,
-> không phải đổi gì. Compose có thêm container `javis-gateway` (Caddy): thấy cổng 80/443 trống là nó tự xin và tự gia
+> không phải đổi gì. Compose có thêm container `uneti-gateway` (Caddy): thấy cổng 80/443 trống là nó tự xin và tự gia
 > hạn SSL Let's Encrypt cho `DOMAIN_NAME`; máy có Traefik của Hostinger thì nó đứng yên nhường Traefik. Cần hai điều:
 > máy đã có Docker (Docker Manager cài sẵn, hoặc `curl -fsSL https://get.docker.com | sh`), và tường lửa mở cổng
-> 80 + 443. Trước khi Deploy, kiểm tra tên miền đã trỏ về VPS: `ping javis.<hostname-vps>.hstgr.cloud` phải ra
-> đúng IP VPS (tên miền riêng thì tạo bản ghi A về IP VPS). Xem log `javis-gateway` để biết nó đang làm gì.
+> 80 + 443. Trước khi Deploy, kiểm tra tên miền đã trỏ về VPS: `ping uneti.<hostname-vps>.hstgr.cloud` phải ra
+> đúng IP VPS (tên miền riêng thì tạo bản ghi A về IP VPS). Xem log `uneti-gateway` để biết nó đang làm gì.
 >
 > **Traefik không lo việc cập nhật.** Traefik (hay Caddy) chỉ lo HTTPS cho tên miền. Cập nhật là việc của container
-> `javis-watchtower` đi kèm, nên nút **⬆ Cập nhật ngay** trong app chạy như nhau trên Ubuntu 24 lẫn 26.
+> `uneti-watchtower` đi kèm, nên nút **⬆ Cập nhật ngay** trong app chạy như nhau trên Ubuntu 24 lẫn 26.
 
 > Thiếu `DOMAIN_NAME` thì vẫn deploy được (chạy tạm ở `:7777`, chưa có HTTPS), và từ 0.302.0 nút **Open** mở
 > `http://<ip-vps>:7777` chứ không ra `localhost` nữa (nút Open đi theo tên miền trong nhãn Traefik, bản cũ ghi
 > `localhost` ở đó). Không biết hostname VPS? Mở UNETI AI bằng IP → **Cài đặt → Tên miền**: UNETI AI tự dò và hiện sẵn
-> dòng `DOMAIN_NAME=javis.srvXXXX.hstgr.cloud` kèm nút sao chép. Không thấy ô Environment? Bấm **Manage → sửa .yaml**,
+> dòng `DOMAIN_NAME=uneti.srvXXXX.hstgr.cloud` kèm nút sao chép. Không thấy ô Environment? Bấm **Manage → sửa .yaml**,
 > đổi hai dòng nhãn thành `- traefik.enable=true` và
-> `- traefik.http.routers.javis.rule=Host(\`javis.srv1782015.hstgr.cloud\`)`.
+> `- traefik.http.routers.uneti.rule=Host(\`uneti.srv1782015.hstgr.cloud\`)`.
 > **Điểm mấu chốt:** nhãn Traefik gắn thẳng vào service, **KHÔNG khai báo
 > `networks:` / `external: traefik-proxy`** (chỗ này trước đây làm deploy báo "network not found").
 > **Đừng ghép thêm `docker-compose.https.yml` trên Hostinger**: nó publish cổng 80/443, đụng Traefik của họ. Compose
@@ -145,10 +145,10 @@ link riêng chạy HTTPS mà không cần mua tên miền. **Lưu ý (đã kiể
 Không cần đặt `DOMAIN` lúc chạy nữa - bật Caddy một lần rồi khai báo tên miền trong giao diện.
 1. Bật Caddy (On-Demand TLS): `docker compose -f docker-compose.yml -f docker-compose.https.yml up -d`
    *(cần Docker Compose v2.23.1+ - kiểm tra `docker compose version`)*
-2. Mở `http://<ip-vps>:7777` → **Cài đặt → Giọng nói, thương hiệu & truy cập → Tên miền & SSL** → nhập `javis.tencuaban.com` → **Lưu & kiểm tra**.
-3. Wizard hiện đúng bản ghi DNS cần tạo (A: `javis.tencuaban.com → <ip-vps>`) và có nút sao chép.
+2. Mở `http://<ip-vps>:7777` → **Cài đặt → Giọng nói, thương hiệu & truy cập → Tên miền & SSL** → nhập `uneti.tencuaban.com` → **Lưu & kiểm tra**.
+3. Wizard hiện đúng bản ghi DNS cần tạo (A: `uneti.tencuaban.com → <ip-vps>`) và có nút sao chép.
    Trỏ DNS xong, đợi lan.
-4. Mở `https://javis.tencuaban.com` → Caddy **tự xin + gia hạn** chứng chỉ ở lần mở đầu, cookie
+4. Mở `https://uneti.tencuaban.com` → Caddy **tự xin + gia hạn** chứng chỉ ở lần mở đầu, cookie
    Secure tự bật. Xong.
 
 > An toàn: Caddy hỏi backend (`/tls-check`) trước khi xin cert → **chỉ** cấp cho đúng tên miền bạn đã
@@ -168,11 +168,11 @@ riêng, không bản nào thấy brain hay tài khoản của bản nào.
 
 | Biến | Vì sao phải khác | Trùng thì bị gì |
 |---|---|---|
-| `JAVIS_NAME` | Docker đặt tên container theo phạm vi cả máy | `name is already in use`, bản sau không lên |
-| `JAVIS_HOST_PORT` | Một cổng máy chủ chỉ một container giữ được | `port is already allocated` |
+| `UNETI_NAME` | Docker đặt tên container theo phạm vi cả máy | `name is already in use`, bản sau không lên |
+| `UNETI_HOST_PORT` | Một cổng máy chủ chỉ một container giữ được | `port is already allocated` |
 | `DOMAIN_NAME` | Mỗi link phải trỏ về đúng một bản | Hai bản giành nhau một link |
 
-Bỏ trống cả ba = `javis` + cổng `7777`, tức **y hệt cách cài cũ** - đang chạy một bản thì không
+Bỏ trống cả ba = `uneti` + cổng `7777`, tức **y hệt cách cài cũ** - đang chạy một bản thì không
 phải sửa gì.
 
 ### Trên Hostinger Docker Manager
@@ -180,8 +180,8 @@ phải sửa gì.
 Deploy `docker-compose.hostinger.yml` **thêm một lần nữa** thành stack mới, điền Environment:
 
 ```
-Stack 1:  DOMAIN_NAME=shop.srv1782015.hstgr.cloud     (JAVIS_NAME, JAVIS_HOST_PORT bỏ trống)
-Stack 2:  DOMAIN_NAME=canhan.srv1782015.hstgr.cloud   JAVIS_NAME=javis-canhan   JAVIS_HOST_PORT=7778
+Stack 1:  DOMAIN_NAME=shop.srv1782015.hstgr.cloud     (UNETI_NAME, UNETI_HOST_PORT bỏ trống)
+Stack 2:  DOMAIN_NAME=canhan.srv1782015.hstgr.cloud   UNETI_NAME=uneti-canhan   UNETI_HOST_PORT=7778
 ```
 
 Wildcard DNS `*.hstgr.cloud` có sẵn nên tên miền phụ nào cũng trỏ được ngay, Traefik tự cấp SSL.
@@ -192,41 +192,41 @@ Một máy chỉ có **một cổng 443**, nên Caddy phải đứng NGOÀI mọ
 máy**:
 
 ```bash
-docker network create javis-web
+docker network create uneti-web
 curl -fsSLO https://raw.githubusercontent.com/uneti-ai/uneti-ai/main/docker-compose.proxy.yml
-docker compose -f docker-compose.proxy.yml -p javis-proxy up -d
+docker compose -f docker-compose.proxy.yml -p uneti-proxy up -d
 ```
 
 Rồi mỗi bản một **thư mục riêng**:
 
 ```bash
-mkdir -p ~/javis-shop && cd ~/javis-shop
+mkdir -p ~/uneti-shop && cd ~/uneti-shop
 curl -fsSLO https://raw.githubusercontent.com/uneti-ai/uneti-ai/main/docker-compose.yml
 curl -fsSLO https://raw.githubusercontent.com/uneti-ai/uneti-ai/main/docker-compose.multi.yml
 cat > .env <<'EOF'
-JAVIS_NAME=javis-shop
-JAVIS_HOST_PORT=7777
-JAVIS_BIND=127.0.0.1
+UNETI_NAME=uneti-shop
+UNETI_HOST_PORT=7777
+UNETI_BIND=127.0.0.1
 DOMAIN_NAME=shop.tencuaban.com
-JAVIS_ADMIN_USER=admin
-JAVIS_ADMIN_PASSWORD=matkhau-manh-cua-ban
+UNETI_ADMIN_USER=admin
+UNETI_ADMIN_PASSWORD=matkhau-manh-cua-ban
 EOF
 chmod 600 .env
 
 CF="-f docker-compose.yml -f docker-compose.multi.yml"
-docker compose $CF run --rm javis claude auth login --claudeai   # đăng nhập Claude cho BẢN NÀY
+docker compose $CF run --rm uneti claude auth login --claudeai   # đăng nhập Claude cho BẢN NÀY
 docker compose $CF up -d
 ```
 
-Bản thứ hai làm y hệt ở `~/javis-canhan`, đổi `.env` thành `javis-canhan` / `7778` /
+Bản thứ hai làm y hệt ở `~/uneti-canhan`, đổi `.env` thành `uneti-canhan` / `7778` /
 `canhan.tencuaban.com`. Trỏ DNS bản ghi A cho từng tên miền phụ về IP VPS là xong - proxy **tự
 phát hiện bản mới qua nhãn Docker**, không phải sửa gì ở proxy, cũng không phải restart nó.
 
-> Mỗi bản là một tài khoản admin riêng, nên đặt `JAVIS_ADMIN_*` cho **từng** `.env` (mật khẩu
+> Mỗi bản là một tài khoản admin riêng, nên đặt `UNETI_ADMIN_*` cho **từng** `.env` (mật khẩu
 > khác nhau). Bỏ trống thì bản đó mở ra màn tạo tài khoản, ai vào link trước sẽ tạo được admin,
 > nên phải tạo ngay sau khi chạy.
 
-> `JAVIS_BIND=127.0.0.1` thu cổng về loopback vì đã có proxy lo HTTPS. Vẫn vào gỡ rối được bằng
+> `UNETI_BIND=127.0.0.1` thu cổng về loopback vì đã có proxy lo HTTPS. Vẫn vào gỡ rối được bằng
 > `ssh -L 7777:localhost:7777 user@<ip-vps>` khi DNS chưa lan tới.
 
 **Cập nhật** vẫn là `./update.sh` trong từng thư mục - script đọc `.env` của thư mục đang đứng
@@ -239,11 +239,11 @@ Caddy tranh cổng 443.
 Clone vào thư mục khác rồi đặt hai biến trước khi chạy:
 
 ```bash
-JAVIS_NAME=javis-shop JAVIS_PORT=7778 ./install.sh
+UNETI_NAME=uneti-shop UNETI_PORT=7778 ./install.sh
 ```
 
-Dịch vụ systemd sẽ là `javis-shop.service` (`journalctl -u javis-shop -f`) thay vì ghi đè
-`javis.service` của bản trước. Phần HTTPS tự lo bằng nginx/Caddy sẵn có trên máy.
+Dịch vụ systemd sẽ là `uneti-shop.service` (`journalctl -u uneti-shop -f`) thay vì ghi đè
+`uneti.service` của bản trước. Phần HTTPS tự lo bằng nginx/Caddy sẵn có trên máy.
 
 ### Cái gì dùng chung, cái gì riêng
 
@@ -263,14 +263,14 @@ Mở giao diện UNETI AI từ máy khác mà KHÔNG cần mở port / không c�
 2. Bật tunnel: `docker compose --profile tunnel up -d`
 3. Lấy URL: `docker compose logs tunnel | grep trycloudflare` → mở `https://<ngẫu-nhiên>.trycloudflare.com` trên trình duyệt bất kỳ, đăng nhập mật khẩu. Giờ xem & thao tác UNETI AI từ xa.
 
-**URL cố định (tên miền riêng, kiểu `*.hstgr.cloud`):** tạo *named tunnel* ở Cloudflare Zero Trust (miễn phí) → lấy token → `TUNNEL_TOKEN=...` vào `.env` → đổi dòng `command` của service `tunnel` sang bản `run --token` (comment sẵn trong `docker-compose.yml`), trỏ tới `http://javis:7777`. Quick tunnel đổi URL mỗi lần restart; named tunnel cho URL ổn định.
+**URL cố định (tên miền riêng, kiểu `*.hstgr.cloud`):** tạo *named tunnel* ở Cloudflare Zero Trust (miễn phí) → lấy token → `TUNNEL_TOKEN=...` vào `.env` → đổi dòng `command` của service `tunnel` sang bản `run --token` (comment sẵn trong `docker-compose.yml`), trỏ tới `http://uneti:7777`. Quick tunnel đổi URL mỗi lần restart; named tunnel cho URL ổn định.
 
 ---
 
 ## Cách 2 - Cài trực tiếp lên Linux/macOS (không Docker)
 
 ```bash
-git clone https://github.com/uneti-ai/uneti-ai.git javis && cd javis
+git clone https://github.com/uneti-ai/uneti-ai.git uneti && cd uneti
 chmod +x install.sh && ./install.sh
 ```
 
@@ -279,14 +279,14 @@ boot (systemd) và in ra địa chỉ. Nếu nó báo Claude chưa đăng nhập
 ```bash
 claude auth login --claudeai
 ```
-Quản lý dịch vụ: `journalctl -u javis -f` · `sudo systemctl restart javis`
+Quản lý dịch vụ: `journalctl -u uneti -f` · `sudo systemctl restart uneti`
 
 ---
 
 ## Cách 3 - Windows (máy cá nhân)
 
-Double-click `setup.bat` (chạy hiện cửa sổ) hoặc `start-javis.vbs` (chạy ngầm).
-Dừng bằng `stop-javis.bat`. Mở http://localhost:7777
+Double-click `setup.bat` (chạy hiện cửa sổ) hoặc `start-uneti.vbs` (chạy ngầm).
+Dừng bằng `stop-uneti.bat`. Mở http://localhost:7777
 
 ---
 
@@ -294,9 +294,9 @@ Dừng bằng `stop-javis.bat`. Mở http://localhost:7777
 
 | Biến | Ý nghĩa | Mặc định |
 |---|---|---|
-| `JAVIS_HOST` | Địa chỉ nghe. `127.0.0.1` = chỉ máy này; `0.0.0.0` = mọi nơi (Docker tự đặt) | `127.0.0.1` |
-| `JAVIS_PORT` | Cổng | `7777` |
-| `JAVIS_STATE_DIR` | Nơi UNETI AI ghi state (settings, sessions, loop config) | `server/` (Docker: `/data/state`) |
+| `UNETI_HOST` | Địa chỉ nghe. `127.0.0.1` = chỉ máy này; `0.0.0.0` = mọi nơi (Docker tự đặt) | `127.0.0.1` |
+| `UNETI_PORT` | Cổng | `7777` |
+| `UNETI_STATE_DIR` | Nơi UNETI AI ghi state (settings, sessions, loop config) | `server/` (Docker: `/data/state`) |
 | `OBSIDIAN_VAULT_PATH` | Vault Second Brain chính | `vault/` trong repo (Docker: `/data/vault`) |
 | `BRAIN_PATH` | Thư mục brain | `brain/` trong repo (Docker: `/data/brain`) |
 | `CLAUDE_CWD` | Thư mục dự phòng của Claude CLI (chat chạy trong thư mục brain) | repo root |
@@ -319,21 +319,21 @@ Dừng bằng `stop-javis.bat`. Mở http://localhost:7777
 >   Chưa muốn đổi file compose thì bật riêng cũng được: `docker compose --profile update up -d`.
 >   Chỉ Watchtower được cấp quyền Docker (socket); app UNETI AI KHÔNG → an toàn. Không có nó cũng
 >   được, khung sẽ chỉ *báo có bản mới* + chỉ cách cập nhật tay.
-> - **Có nút mà bấm không chạy, container `javis-watchtower` cứ Restarting:** stack dựng bằng
+> - **Có nút mà bấm không chạy, container `uneti-watchtower` cứ Restarting:** stack dựng bằng
 >   compose trước 0.65.20 dùng image `containrrr/watchtower` (đã ngừng phát triển), log báo
 >   `client version 1.25 is too old`. Docker mới từ chối bản đó. Dựng lại MỘT LẦN bằng compose
 >   mới (Hostinger: Docker Manager, dán lại URL compose rồi Deploy; VPS: hai lệnh ở trên), compose
 >   mới dùng bản fork `ghcr.io/nicholas-fedor/watchtower:1` tự thương lượng phiên bản với Docker.
 > - **Bấm cập nhật mà vẫn đứng ở bản cũ, `image:` trong file compose là một tên lạ** (ví dụ
->   `javis-cwi:pc-0.206.0`, không có `ghcr.io/...`): đây là image tự đóng gói, thường gặp khi nhờ
+>   `uneti-cwi:pc-0.206.0`, không có `ghcr.io/...`): đây là image tự đóng gói, thường gặp khi nhờ
 >   AI chuyển UNETI AI từ máy tính lên VPS bằng `docker save` rồi `docker load`. Image đó không nằm trên
 >   kho nào nên kéo lại hay Redeploy vẫn ra đúng bản cũ (từ 0.267.0 trang Cập nhật nói thẳng điều này).
 >   Đổi sang image chính thức MỘT LẦN, dữ liệu giữ nguyên vì nó nằm trong các thư mục gắn vào:
 >   ```bash
->   cd /opt/javis                      # thư mục có file compose
+>   cd /opt/uneti                      # thư mục có file compose
 >   cp compose.yml compose.yml.bak     # tên file có thể là docker-compose.yml
 >   docker compose config | grep -A1 "target:"   # đường dẫn bên trong phải là /data, /brains,
->                                                 # /home/javis/.claude, /home/javis/.codex
+>                                                 # /home/uneti/.claude, /home/uneti/.codex
 >   sed -i 's#^\(\s*image:\s*\).*#\1ghcr.io/uneti-ai/uneti-ai:latest#' compose.yml
 >   docker compose up -d --pull always
 >   ```
@@ -341,9 +341,9 @@ Dừng bằng `stop-javis.bat`. Mở http://localhost:7777
 >   service thì mở file sửa tay đúng dòng của UNETI AI. Muốn có nút cập nhật trong app thì thêm service
 >   `watchtower` y như trong [`docker-compose.yml`](docker-compose.yml). Lỗi quyền ghi sau khi đổi: thư
 >   mục gắn vào phải thuộc user 10001 của container, chạy `sudo chown -R 10001:10001 brains data claude-auth codex-auth`.
-> - **Muốn TỰ cập nhật, khỏi bấm nút:** đặt `JAVIS_AUTO_UPDATE=true` trong `.env` (Hostinger: ô
+> - **Muốn TỰ cập nhật, khỏi bấm nút:** đặt `UNETI_AUTO_UPDATE=true` trong `.env` (Hostinger: ô
 >   Environment) rồi dựng lại. Mặc định tắt vì tự cập nhật là app tự khởi động lại bất cứ lúc
->   nào có bản mới, cắt ngang việc nền. Chu kỳ đổi bằng `JAVIS_AUTO_UPDATE_INTERVAL` (giây).
+>   nào có bản mới, cắt ngang việc nền. Chu kỳ đổi bằng `UNETI_AUTO_UPDATE_INTERVAL` (giây).
 > - **Native/Windows:** nút chạy `update.sh` (git pull + restart) giúp bạn.
 
 Repo & image GHCR đều **Public** → `git clone`/`pull` và `docker pull` không cần đăng nhập.
@@ -351,17 +351,17 @@ Repo & image GHCR đều **Public** → `git clone`/`pull` và `docker pull` kh�
 Mỗi khi bạn push code mới, trên VPS chỉ cần:
 
 ```bash
-cd javis && ./update.sh
+cd uneti && ./update.sh
 ```
 
 Script tự `git pull` rồi:
 - **Docker**: `docker compose build && docker compose up -d` - dữ liệu trong volume KHÔNG mất.
-- **Native (systemd)**: `pip install -r requirements.txt` + `systemctl restart javis`.
+- **Native (systemd)**: `pip install -r requirements.txt` + `systemctl restart uneti`.
 
 Ép chế độ: `./update.sh docker` hoặc `./update.sh native`. Làm tay tương đương:
 ```bash
 git pull && docker compose build && docker compose up -d          # Docker
-git pull && ./.venv/bin/pip install -r requirements.txt && sudo systemctl restart javis   # Native
+git pull && ./.venv/bin/pip install -r requirements.txt && sudo systemctl restart uneti   # Native
 ```
 
 Trên máy Windows của bạn, đẩy code lên GitHub: `git add -A && git commit -m "..." && git push`

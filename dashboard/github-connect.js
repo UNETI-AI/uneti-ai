@@ -1,7 +1,7 @@
 /* github-connect.js - GitHub inside chat, phase G1 (0.362.0, docs/dev/2026-10-github-trong-chat-spec.md).
  *
  * Three pieces, one module:
- *   1. The GitHub card on the Connections page. It is built into Javis (owner, 2026-10-27): always shown, connected
+ *   1. The GitHub card on the Connections page. It is built into UNETI AI (owner, 2026-10-27): always shown, connected
  *      or not, no Store pack. Connect with a token, or reuse the brain-backup token after the server checks it.
  *      The card also lists the repos cloned in this brain, each with "Remove from brain" (the clone only; GitHub
  *      is never touched, and the server refuses while work would be lost).
@@ -62,11 +62,11 @@
   }
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
   function ic(n) { return typeof window.ic === "function" ? window.ic(n) : ""; }
-  function infoBtn() { return window.JavisInfo ? window.JavisInfo.btn(tw("info.more")) : ""; }
-  function infoBody(html) { return window.JavisInfo ? window.JavisInfo.body(html) : '<div class="info-body">' + html + "</div>"; }
-  function chatBrain() { try { return (window.JavisSessions && window.JavisSessions.brain()) || "brain"; } catch (e) { return "brain"; } }
+  function infoBtn() { return window.UnetiInfo ? window.UnetiInfo.btn(tw("info.more")) : ""; }
+  function infoBody(html) { return window.UnetiInfo ? window.UnetiInfo.body(html) : '<div class="info-body">' + html + "</div>"; }
+  function chatBrain() { try { return (window.UnetiSessions && window.UnetiSessions.brain()) || "brain"; } catch (e) { return "brain"; } }
   function pageBrain() { try { return (window.currentBrainPath && window.currentBrainPath()) || chatBrain(); } catch (e) { return chatBrain(); } }
-  function sid() { try { return (window.JavisSessions && window.JavisSessions.current()) || ""; } catch (e) { return ""; } }
+  function sid() { try { return (window.UnetiSessions && window.UnetiSessions.current()) || ""; } catch (e) { return ""; } }
   function narrow() { return !!(window.matchMedia && window.matchMedia("(max-width: 860px)").matches); }
   function api(url, body) {
     var opt = { credentials: "same-origin" };
@@ -111,7 +111,7 @@
         : "";
     }
     // Like every other connection card: the account as a chip with a green dot (owner, 01/11/2026). Repos are picked
-    // in the chat box, so "Pick repos for Javis" only shows while the app is on no account at all, when the chat list
+    // in the chat box, so "Pick repos for UNETI AI" only shows while the app is on no account at all, when the chat list
     // would be empty.
     var acts = '<div class="conn-accounts">' + (st.connected
       ? '<span class="conn-chip gh-acc"><span class="cdot hok">●</span> ' + esc(st.login ? "@" + st.login : "GitHub") + "</span>" +
@@ -161,7 +161,7 @@
   }
   // The repos of this brain, one row each with its switches. Checks and Numbers open in the same dialog and come back here.
   function openRepos(local) {
-    var M = window.JavisConnModal;
+    var M = window.UnetiConnModal;
     if (!M) return;
     var back = function () { openRepos(local); };
     var m = M.open(M.head(esc(tw("gh.local_head", { n: local.length })) + infoBtn()) + '<div class="conn-form gh-local">' +
@@ -197,7 +197,7 @@
   }
   // Local check commands of one repo (spec 7.2): suggested from its CI, editable, one command per line.
   async function openChecks(name, back) {
-    var M = window.JavisConnModal;
+    var M = window.UnetiConnModal;
     if (!M) return;
     var d = await api("/github/local/checks?brain=" + encodeURIComponent(pageBrain()) + "&full_name=" + encodeURIComponent(name));
     if (!d || d.ok === false) { window.alert((d && d.error) || tw("gh.err_net")); return; }
@@ -225,7 +225,7 @@
   }
   // Numbers per engine and model for one repo (spec 13.2): pick a model with data, not with a hunch.
   async function openMetrics(name, back) {
-    var M = window.JavisConnModal;
+    var M = window.UnetiConnModal;
     if (!M) return;
     var d = await api("/github/local/metrics?full_name=" + encodeURIComponent(name));
     var rows = (d && d.rows) || [];
@@ -244,7 +244,7 @@
   // The connect dialog (0.430.0): "Sign in with GitHub" first (the device flow of the UNETI AI GitHub App, no token to
   // make or copy), a pasted token below it for whoever prefers that, and the brain-backup token when there is one.
   function openForm(st) {
-    var M = window.JavisConnModal;
+    var M = window.UnetiConnModal;
     if (!M) return;
     var html = M.head(esc(tw("gh.dialog_head"))) + '<div class="conn-form gh-form">' +
       '<div class="gh-signin"><button class="s-btn gh-signin-btn" type="button" data-f="signin">' + LOGO + "<span>" +
@@ -277,9 +277,9 @@
   }
 
   // Device flow, step by step in the same dialog: get a code, show it with "Open GitHub" and "Copy", poll until the
-  // person presses Authorize, then offer "Pick repos for Javis" when the app is not installed anywhere yet.
+  // person presses Authorize, then offer "Pick repos for UNETI AI" when the app is not installed anywhere yet.
   async function signIn() {
-    var M = window.JavisConnModal;
+    var M = window.UnetiConnModal;
     if (!M) return;
     var m = M.open(M.head(esc(tw("gh.dialog_head"))) + '<div class="conn-form gh-form"><div class="lv-meta">' +
       esc(tw("gh.loading")) + "</div></div>", 560);
@@ -334,7 +334,7 @@
   }
   // Signed in but the app is on no account yet: the last step, picking repos on GitHub.
   function pickRepos(st) {
-    var M = window.JavisConnModal;
+    var M = window.UnetiConnModal;
     if (!M) return;
     var m = M.open(M.head(esc(tw("gh.signed_in", { login: st.login || "?" }))) + '<div class="conn-form gh-form">' +
       '<div class="lv-meta">' + esc(tw("gh.pick_repos_how")) + "</div>" +
@@ -350,7 +350,7 @@
   var attached = [], held = null, heldBrain = "", heldBase = {}, seq = 0;
   function names() { return attached.map(function (r) { return r.full_name; }); }
   function announce() {
-    try { window.dispatchEvent(new CustomEvent("javis:github-repos-changed", { detail: { sid: sid(), repos: attached } })); } catch (e) {}
+    try { window.dispatchEvent(new CustomEvent("uneti:github-repos-changed", { detail: { sid: sid(), repos: attached } })); } catch (e) {}
   }
   function renderChip() {
     var host = document.getElementById("cpChips");
@@ -361,7 +361,7 @@
     if (!chip) {
       chip = document.createElement("button");
       chip.type = "button"; chip.id = "ghChip"; chip.className = "cp-pin gh-chip";
-      chip.addEventListener("click", function (e) { e.stopPropagation(); if (window.JavisComposerMenu) window.JavisComposerMenu.openItem("github"); });
+      chip.addEventListener("click", function (e) { e.stopPropagation(); if (window.UnetiComposerMenu) window.UnetiComposerMenu.openItem("github"); });
     }
     var after = document.getElementById("pinChip") || document.getElementById("limitBtn");
     if (chip.parentElement !== host || chip.previousElementSibling !== after) host.insertBefore(chip, after ? after.nextSibling : null);
@@ -430,7 +430,7 @@
         }, Promise.resolve(d)).then(apply);
       }
       apply(null);
-      if (window.JavisAttach) window.JavisAttach.note((d && d.error) || tw("gh.err_net"));
+      if (window.UnetiAttach) window.UnetiAttach.note((d && d.error) || tw("gh.err_net"));
     });
   }
 
@@ -766,14 +766,14 @@
   }
 
   function init() {
-    if (window.JavisComposerMenu) {
-      window.JavisComposerMenu.register({ id: "github", order: 25, icon: LOGO, label: "gh.menu",
+    if (window.UnetiComposerMenu) {
+      window.UnetiComposerMenu.register({ id: "github", order: 25, icon: LOGO, label: "gh.menu",
         hint: function () { return chipText(held || names(), 18); }, panel: panel });
     }
-    window.addEventListener("javis:sessions-changed", refresh);
+    window.addEventListener("uneti:sessions-changed", refresh);
     window.addEventListener("resize", renderChip);
-    window.addEventListener("javis:i18n", renderChip);
-    window.addEventListener("javis:pinned-folder-changed", renderChip);
+    window.addEventListener("uneti:i18n", renderChip);
+    window.addEventListener("uneti:pinned-folder-changed", renderChip);
     refresh();
     // CI and merges move on their own: refresh the icons and the chip every 30 seconds while the page is visible.
     setInterval(function () {
@@ -784,6 +784,6 @@
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();
 
-  window.JavisGithubRepos = { mount: mount, claimPending: claimPending, refresh: refresh, decorate: decorate, openDetail: openDetail,
+  window.UnetiGithubRepos = { mount: mount, claimPending: claimPending, refresh: refresh, decorate: decorate, openDetail: openDetail,
     current: function () { return attached.slice(); } };
 })();

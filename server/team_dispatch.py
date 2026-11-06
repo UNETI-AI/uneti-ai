@@ -1,6 +1,6 @@
-"""Javis Core giao việc cho một nhóm có sẵn rồi báo kết quả về đúng chỗ đã giao (0.357.0, issue #826).
+"""UNETI AI Core giao việc cho một nhóm có sẵn rồi báo kết quả về đúng chỗ đã giao (0.357.0, issue #826).
 
-Chủ nói với Javis Core (web chat, Telegram, Zalo...) một mục tiêu; Core chọn nhóm và gọi `javis_team` op=dispatch. Việc đi
+Chủ nói với UNETI AI Core (web chat, Telegram, Zalo...) một mục tiêu; Core chọn nhóm và gọi `uneti_team` op=dispatch. Việc đi
 đúng đường của trang Nhóm: một tin giao việc trong khung chat nhóm (`TeamRunner.submit`, `as_job`), nên hàng đợi, trưởng
 nhóm điều phối, nghiệm thu và lịch sử là của nhóm như khi chủ tự gõ. Không có bộ điều phối hay kho thứ hai.
 
@@ -46,7 +46,7 @@ def check_caller(turn: Optional[dict]) -> dict:
         raise DispatchError("không rõ ai đang giao việc (lượt không có danh tính), nên không giao việc cho nhóm. "
                             "Chủ giao ở trang Nhóm trên dashboard.")
     if turn.get("kenh") == "team" or turn.get("team_gate"):
-        raise DispatchError("một bước việc của nhóm không được mở việc ở nhóm. Chỉ chủ hay Javis Core giao việc cho nhóm.")
+        raise DispatchError("một bước việc của nhóm không được mở việc ở nhóm. Chỉ chủ hay UNETI AI Core giao việc cho nhóm.")
     if not turn.get("la_chu") and turn.get("kenh") not in SCHEDULED:
         raise DispatchError("chỉ chủ mới giao việc cho nhóm được.")
     return turn
@@ -54,7 +54,7 @@ def check_caller(turn: Optional[dict]) -> dict:
 
 def report_to(turn: dict) -> str:
     """Nơi báo kết quả, theo đúng định dạng `owner_chat` của việc nền: web:<phiên> cho dashboard, còn lại là chat_id của
-    lượt (kênh nhắn đã gắn tiền tố zalo:, slack:...; việc nền mang sẵn nơi báo của nó). Rỗng: Javis Core và hòm thư."""
+    lượt (kênh nhắn đã gắn tiền tố zalo:, slack:...; việc nền mang sẵn nơi báo của nó). Rỗng: UNETI AI Core và hòm thư."""
     if turn.get("kenh") == "dashboard":
         sid = _s(turn.get("session_id") or turn.get("chat_id"))
         return f"web:{sid}" if sid else ""
@@ -174,7 +174,7 @@ def phase(task: dict, acc: Optional[dict], team: Optional[dict] = None) -> tuple
         if kind in _OWNER_BLOCKS or "approval" in kind:
             return "needs_owner", localefmt.chu(
                 "Đang chờ chủ quyết trên thẻ việc ở trang Nhóm (UNETI AI không tự duyệt thay): {r}",
-                "Waiting for the owner on the job card in Teams (Javis never approves for you): {r}", r=reason or kind), True, False
+                "Waiting for the owner on the job card in Teams (UNETI AI never approves for you): {r}", r=reason or kind), True, False
         return "blocked", localefmt.chu("Việc bị chặn ({k}): {r}", "The job is blocked ({k}): {r}", k=kind or "-",
                                         r=reason or "-"), True, False
     if st == "team_running":

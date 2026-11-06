@@ -17,7 +17,7 @@ After a few chat turns, UNETI AI opens a **separate learning process** to re-rea
 
 Before writing, the code adds two more scans: a **secret-key scan** (API keys, Telegram tokens, JWTs, database connection strings, lines labelled "password") and a **prompt-injection scan** for things like "ignore all previous instructions". Anything caught is blocked, not written, and the reason goes into the log. The same holds in the other direction: the conversation content handed to the learning process has its imperative sentences neutralised, so a message a customer sent in cannot steer the learning loop.
 
-Finally, UNETI AI only allows writes into the brain's `memory/`, `Memory/`, `Wiki/`, `skills/`, `.claude/skills/`, `agents/`, `workflows/` and `Javis/` folders. Any path escaping that list is restored immediately.
+Finally, UNETI AI only allows writes into the brain's `memory/`, `Memory/`, `Wiki/`, `skills/`, `.claude/skills/`, `agents/`, `workflows/` and `UNETI/` folders. Any path escaping that list is restored immediately.
 
 ## Where to open it in UNETI AI
 
@@ -245,7 +245,7 @@ One reassuring point: git here only tracks **distilled knowledge** (memories, Wi
 
 ## The "Learning log" block
 
-The last block on the page shows at most the 10 most recent entries, gathered from the three newest log files in the brain's `Javis/learn-log/` (one `YYYY-MM-DD.md` file per day).
+The last block on the page shows at most the 10 most recent entries, gathered from the three newest log files in the brain's `UNETI/learn-log/` (one `YYYY-MM-DD.md` file per day).
 
 Each entry has a timestamp, a kind (`learn` or `curator`), the run reason (`auto` when self-fired, `manual` when you clicked), the status (`auto-write` or `dry-run` with the downgrade reason), then the list of what was learned as `fact=[...] wiki=[...] skill=[...]`, plus the commit hash if any. The body is a Vietnamese summary of the batch, along with a **Blocked** section listing each item a gate stopped and why.
 
@@ -301,7 +301,7 @@ This page works on the brain selected at the top of the screen. Switch to the ri
 It runs once every 24 hours, and skips brains silent for over 14 days. Beyond that, when no Wiki note changed it skips the round to save cost, and the log records the reason as "no Wiki note changed". To see it now, click **🧹 Curator now**.
 
 **You are worried self-learning will damage handwritten notes.**
-The learning process has no write permission. The writing code does not overwrite an existing memory file, an existing Wiki note or an existing skill, deletes nothing, only edits an existing agent or workflow when there is a clear reason and you have not locked the file, and may only touch the `memory/`, `Wiki/`, `skills/`, `agents/`, `workflows/` and `Javis/` folders. Any path escaping that is restored immediately.
+The learning process has no write permission. The writing code does not overwrite an existing memory file, an existing Wiki note or an existing skill, deletes nothing, only edits an existing agent or workflow when there is a clear reason and you have not locked the file, and may only touch the `memory/`, `Wiki/`, `skills/`, `agents/`, `workflows/` and `UNETI/` folders. Any path escaping that is restored immediately.
 
 ## Related
 

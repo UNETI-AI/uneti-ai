@@ -14,7 +14,7 @@ Rules (each one keeps cost and side effects bounded):
 - Never a step that may already have acted: a Work/Help step (tools on) retries only when it is KNOWN to have made zero
   tool calls. Plan and Synthesize steps have no tools, so they may always retry.
 - At most `max_retries()` failures in one chain (same kind, member, brief and job revision). After that the job blocks as
-  before and the owner decides. The owner can switch it off with JAVIS_TEAM_AUTO_RETRIES=0.
+  before and the owner decides. The owner can switch it off with UNETI_TEAM_AUTO_RETRIES=0.
 """
 from __future__ import annotations
 
@@ -49,7 +49,7 @@ PLAN_NAMES = {"claude-code": "Claude", "codex": "ChatGPT", "grok-cli": "SuperGro
 
 def max_retries() -> int:
     try:
-        return max(0, min(10, int(os.environ.get("JAVIS_TEAM_AUTO_RETRIES", str(DEFAULT_MAX_RETRIES)))))
+        return max(0, min(10, int(os.environ.get("UNETI_TEAM_AUTO_RETRIES", str(DEFAULT_MAX_RETRIES)))))
     except ValueError:
         return DEFAULT_MAX_RETRIES
 

@@ -31,7 +31,7 @@ check("touchMain is shared so the placeholder can say the right thing", A.touchM
 
 // ---- the reply box ----
 const vt = CV.slice(CV.indexOf("  function veThread() {"), CV.indexOf("  // The phone's \"who replies\" sheet"));
-check("the reply box asks the shared rule, with its own IME tracking", /var A = window\.JavisActs, soan = A \? A\.trackComposition\(ta\)/.test(vt) &&
+check("the reply box asks the shared rule, with its own IME tracking", /var A = window\.UnetiActs, soan = A \? A\.trackComposition\(ta\)/.test(vt) &&
   /var send = A \? A\.enterSends\(e, soan\(\)\)/.test(vt) && /if \(send\) \{ e\.preventDefault\(\); gui\(c\); \}/.test(vt));
 check("CANARY: no Enter-sends-always handler left in the Chatbot page",
   !/if \(e\.key === "Enter" && !e\.shiftKey && !e\.isComposing\) \{ e\.preventDefault\(\); gui\(c\); \}/.test(CV));
@@ -42,7 +42,7 @@ check("the box's spoken label names it, without key hints", /aria-label="' \+ es
   !/Enter/.test(VI["ib.cin_aria"]) && !/Enter/.test(EN["ib.cin_aria"]));
 
 // ---- dictation ----
-check("dictating: Enter sends the recording only where Enter sends a message", /var sends = window\.JavisActs \? window\.JavisActs\.enterSends\(e, false\)/.test(DICT) &&
+check("dictating: Enter sends the recording only where Enter sends a message", /var sends = window\.UnetiActs \? window\.UnetiActs\.enterSends\(e, false\)/.test(DICT) &&
   // 2026-11-05: not only from the box, also from the page (the focus falls there once the mic hides), see
   // test_dictate_enter_sends.js.
   /if \(sends && enterSendsFrom\(e\.target, /.test(DICT));

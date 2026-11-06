@@ -13,8 +13,8 @@ import os
 import tempfile
 from pathlib import Path
 
-os.environ["JAVIS_STATE_DIR"] = tempfile.mkdtemp(prefix="javis-hub-swr-")
-BRAIN = Path(tempfile.mkdtemp(prefix="javis-hub-swr-brain-"))
+os.environ["UNETI_STATE_DIR"] = tempfile.mkdtemp(prefix="uneti-hub-swr-")
+BRAIN = Path(tempfile.mkdtemp(prefix="uneti-hub-swr-brain-"))
 
 import mcp_client  # noqa: E402
 import mcp_hub  # noqa: E402

@@ -2,7 +2,7 @@
 //
 //   node tools/webhook_ui_narrow_check.mjs http://127.0.0.1:7791 /tmp/shots
 //
-// Start a LOCAL Javis first with a temporary state folder and outgoing calls refused, then create one hook and send it a
+// Start a LOCAL UNETI AI first with a temporary state folder and outgoing calls refused, then create one hook and send it a
 // few events (docs/webhook-platform/staging-pilot-pack.md, "UI check"). The script opens the Webhooks page and the first
 // hook's popup (0.432.0), takes the four parts (Configuration, Events with one event opened, Health, the test-send
 // preview) as PNG files, and fails when the page scrolls sideways or throws. It never presses Send, Stop receiving,
@@ -20,8 +20,8 @@ const p = await b.newPage({ viewport: { width: 390, height: 900 } });
 const errs = [];
 p.on("pageerror", (e) => errs.push(e.message));
 await p.goto(base + "/", { waitUntil: "networkidle" });
-await p.waitForFunction(() => window.JavisNav && window.JavisNav.go, null, { timeout: 20000 });
-await p.evaluate(() => { const w = document.getElementById("setupWizard"); if (w) w.remove(); window.JavisNav.go("webhooks"); });
+await p.waitForFunction(() => window.UnetiNav && window.UnetiNav.go, null, { timeout: 20000 });
+await p.evaluate(() => { const w = document.getElementById("setupWizard"); if (w) w.remove(); window.UnetiNav.go("webhooks"); });
 await p.waitForSelector(".wh-row", { timeout: 15000 });
 await p.screenshot({ path: out + "/0-list.png" });
 await p.locator(".wh-row").first().click();

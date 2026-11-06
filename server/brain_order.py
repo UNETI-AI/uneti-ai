@@ -6,7 +6,7 @@ brain_label), so a brain renamed "2-PSC Advisor" kept its folder's place.
 
 Now:
 - The owner can set the order by hand (the brain picker's Reorder mode). It is stored in settings.json as a list of
-  folder names under "brain_order", so every device that opens this Javis shows the same order.
+  folder names under "brain_order", so every device that opens this UNETI AI shows the same order.
 - A brain not in that list (new, or never ordered) comes after the ordered ones, sorted by its label the way a person
   reads it: numbers by value ("2-..." before "10-..."), case and accents ignored.
 

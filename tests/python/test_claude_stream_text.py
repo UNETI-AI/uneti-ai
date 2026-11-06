@@ -120,10 +120,10 @@ check("ResultMessage dọn trạng thái, final giữ nguyên", SID not in cst._
       and [e for e in evs if e["type"] == "final"][0]["content"] == "x")
 
 # 9. Tắt bằng biến môi trường thì quay lại như cũ.
-os.environ["JAVIS_CLAUDE_STREAM_TEXT"] = "0"
+os.environ["UNETI_CLAUDE_STREAM_TEXT"] = "0"
 evs = run([se({"type": "content_block_delta", "index": 0, "delta": {"type": "text_delta", "text": "z"}})])
-check("JAVIS_CLAUDE_STREAM_TEXT=0 thì không phát mẩu", texts(evs) == [])
-os.environ.pop("JAVIS_CLAUDE_STREAM_TEXT")
+check("UNETI_CLAUDE_STREAM_TEXT=0 thì không phát mẩu", texts(evs) == [])
+os.environ.pop("UNETI_CLAUDE_STREAM_TEXT")
 
 # 10. Móc nằm DƯỚI hai móc còn lại, cài từ factory, không đụng file engine bị khoá.
 cli = (ROOT / "server" / "claude_cli.py").read_text(encoding="utf-8")

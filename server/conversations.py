@@ -581,7 +581,7 @@ def own_messages_without_id(channel: str, account_id: str, external_chat_id: str
     """Messages this account sent in a chat (the bot, or the owner from the inbox) since `since` that still have no
     channel message id, newest first: `[{id, text}]` (0.334.0). Never raises.
 
-    Javis writes those rows before Zalo gives the message an id; the id comes back with the message's echo in the read
+    UNETI AI writes those rows before Zalo gives the message an id; the id comes back with the message's echo in the read
     loop (`zalo_personal_channel.attach_echo_id`). A customer's reaction names the message by that id, so without
     it a heart on the bot's price quote could not be told apart from a heart on anything else."""
     try:
@@ -1464,7 +1464,7 @@ def insights(since: float, until: float, account: str = "") -> dict:
       - `chats` / `new_chats`: chats where a customer wrote, and private chats whose very first message is in the period;
       - `hours`: customer messages per hour of the day (24 numbers, the brain's time zone).
 
-    0.401.0 (owner, 2026-10-29: "ở nick Javis Vũ anh không trả lời tý nào mà nó tính 45% câu do A.I. lo"): the totals mixed
+    0.401.0 (owner, 2026-10-29: "ở nick UNETI AI Vũ anh không trả lời tý nào mà nó tính 45% câu do A.I. lo"): the totals mixed
     every account, so one account's hand replies lowered another one's A.I. share. `account` (the inbox account key,
     `"<channel>:<id>"`) keeps one account only, and `by_account` gives each account its own A.I., hand and customer counts."""
     import localefmt
@@ -1561,7 +1561,7 @@ def chu_thich_anh(text: str) -> str:
 
     MCP của javis-zalo chuẩn hoá tin không phải chữ bằng `extractMessageText` (src/utils/extract-message-text.js; bản 1.6.2 cũ là
     `content.title || content.href || "[<msgType>]"`). Với ảnh hai bản ra cùng kết quả vì ảnh có `description` rỗng: ảnh CÓ chú thích
-    thì `text` là chú thích; ảnh trơn thì `text` là đường dẫn ảnh, hoặc "[chat.photo]". Javis
+    thì `text` là chú thích; ảnh trơn thì `text` là đường dẫn ảnh, hoặc "[chat.photo]". UNETI AI
     cũng tự thay chữ trống bằng "[Zalo cá nhân: khách gửi image]". Cả ba loại "nền" đó không phải lời của người gửi nên trả rỗng."""
     t = " ".join(str(text or "").split())
     return "" if (not t or _NEN_ANH.match(t)) else t

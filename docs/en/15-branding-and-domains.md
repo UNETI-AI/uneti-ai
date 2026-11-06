@@ -2,7 +2,7 @@
 
 *[Tiếng Việt](../15-thuong-hieu-ten-mien.md) · **English***
 
-This page covers two things: changing UNETI AI's logo/avatar to your own image, and pointing a custom domain (`javis.yourname.com`, say) at UNETI AI so it runs over HTTPS. Both live under **Settings → General**.
+This page covers two things: changing UNETI AI's logo/avatar to your own image, and pointing a custom domain (`uneti.yourname.com`, say) at UNETI AI so it runs over HTTPS. Both live under **Settings → General**.
 
 ## What this feature is
 
@@ -16,7 +16,7 @@ One important note up front: the **Custom domain** section only works when you d
 Both features are under **Settings → General**. The General tab contains two cards:
 
 - The **AVATAR** box: a preview image, an **Upload image** button and a **Restore default** button.
-- The **DOMAIN AND SSL** box: an input (placeholder "e.g. javis.yourname.com"), a **Save and check** button, two status badges for DNS and SSL, two buttons **Enable SSL** and **Check again**, plus a three-step wizard whose content matches your actual VPS/Hostinger environment.
+- The **DOMAIN AND SSL** box: an input (placeholder "e.g. uneti.yourname.com"), a **Save and check** button, two status badges for DNS and SSL, two buttons **Enable SSL** and **Check again**, plus a three-step wizard whose content matches your actual VPS/Hostinger environment.
 
 Every time you open Settings, UNETI AI reloads the current values, checks DNS/HTTPS and shows the correct next step.
 
@@ -55,7 +55,7 @@ This section assumes you deployed UNETI AI with Docker on a VPS, enabled Caddy (
 ### Step A: enter and save the domain
 
 1. Open **Settings → General** and find the **DOMAIN AND SSL** box.
-2. Enter the domain (or subdomain) you want in the input, for example `javis.yourname.com`. No need to type `https://`; if you do, UNETI AI strips it.
+2. Enter the domain (or subdomain) you want in the input, for example `uneti.yourname.com`. No need to type `https://`; if you do, UNETI AI strips it.
 3. Click **Save and check** (or press Enter in the input). UNETI AI shows **Saving and checking…**, saves the domain, then runs the DNS/SSL check and draws the three-step wizard right in the UI.
 4. If the domain is malformed, UNETI AI reports that the domain is invalid and gives the example format. Fix it and save again.
 
@@ -70,7 +70,7 @@ After saving (or when you click **Check again**), the wizard shows step **2. Poi
    | Field | Value |
    |---|---|
    | Type | A |
-   | Name/Host | the domain you just entered, e.g. `javis.yourname.com` |
+   | Name/Host | the domain you just entered, e.g. `uneti.yourname.com` |
    | Value/Points to | your VPS server's IP address (UNETI AI detects and prefills this IP in the wizard) |
 
 2. Wait for DNS to propagate (a few minutes to a few hours), then click **Check again**. Once DNS is right, step 2 turns into a ✓ and the description changes to say the A record points at the server IP.
@@ -108,8 +108,8 @@ You need a free Cloudflare account and a domain that uses Cloudflare DNS.
 
 1. Go to [one.dash.cloudflare.com](https://one.dash.cloudflare.com), **Networks**, **Tunnels**, click **Create a tunnel**, pick **Cloudflared** and give it a name.
 2. On the connector install step, copy the command (the Windows or the Mac one, either works). **You do not need to run it**: paste the whole line into the **Cloudflare tunnel token** box in UNETI AI, and UNETI AI picks the token out of it.
-3. On the **Public Hostname** step: pick a subdomain (for example `javis.yourdomain.com`), set Service to **HTTP** and put the service address UNETI AI shows in the URL box (by default `127.0.0.1:7777`, with a copy button).
-4. Back in UNETI AI, pick **Your own domain** and click **Turn on remote access**. Once the status reads **Running**, UNETI AI reads the hostname you set and shows the link `https://javis.yourdomain.com`.
+3. On the **Public Hostname** step: pick a subdomain (for example `uneti.yourdomain.com`), set Service to **HTTP** and put the service address UNETI AI shows in the URL box (by default `127.0.0.1:7777`, with a copy button).
+4. Back in UNETI AI, pick **Your own domain** and click **Turn on remote access**. Once the status reads **Running**, UNETI AI reads the hostname you set and shows the link `https://uneti.yourdomain.com`.
 
 The token is stored encrypted, never sent back to the browser, and handed to `cloudflared` through an environment variable rather than on the command line.
 
@@ -173,7 +173,7 @@ The status line at the bottom of the card can read:
 | Cannot reach port 443, Caddy/HTTPS is not running or another proxy holds ports 80/443 | Nothing answers on port 443. | Enable the HTTPS layer with the command UNETI AI suggests, and check whether another service holds ports 80/443. |
 | Saved in UNETI AI; the DOMAIN_NAME and Redeploy steps on Hostinger remain. | Hostinger: the Traefik route does not match the domain yet. | Do step 3 of the Hostinger wizard. |
 | Enter and save a domain first. | You clicked Enable SSL with the domain field empty. | Enter a domain and save. |
-| Invalid domain (e.g. javis.yourname.com) | The string is not shaped like a domain. | Drop spaces, drop any trailing path, type it as `name.yourname.com`. |
+| Invalid domain (e.g. uneti.yourname.com) | The string is not shaped like a domain. | Drop spaces, drop any trailing path, type it as `name.yourname.com`. |
 | Enabling SSL failed | The server refused to enable it. | Read the accompanying reason line. |
 | Could not check (network error). | The browser could not reach the server. | Try again in a few minutes. |
 | Network error while saving / Network error while enabling SSL | The connection dropped midway. | Try again. |
@@ -184,7 +184,7 @@ The status line at the bottom of the card can read:
 - To prevent abuse, before issuing a certificate Caddy asks UNETI AI (through the internal `/tls-check` gate) and only issues for the exact domain you entered in the app. A stranger pointing DNS at your server IP cannot force it to request arbitrary certificates.
 - To change or remove the domain on a Caddy VPS, just edit the **DOMAIN AND SSL** field, click **Save and check**, then **Enable SSL** for the new domain. Hostinger needs a Redeploy when the Traefik route changes.
 - Enabling Caddy (running `docker compose ... up -d` with the HTTPS config file) and opening ports 80/443 are infrastructure deploy steps outside this interface. See the detailed deploy guide in the project's `DEPLOY.md`.
-- When you reach UNETI AI through the custom domain over HTTPS, the server marks the login cookie `secure` on its own, with no need to set `JAVIS_SECURE_COOKIE` manually. See [Security and accounts](14-security-and-accounts.md).
+- When you reach UNETI AI through the custom domain over HTTPS, the server marks the login cookie `secure` on its own, with no need to set `UNETI_SECURE_COOKIE` manually. See [Security and accounts](14-security-and-accounts.md).
 
 ## If you deploy on Hostinger (a different path)
 

@@ -38,8 +38,8 @@ _DEPS: PluginZipDeps = None
 
 
 def _deny():
-    return JSONResponse({"ok": False, "error": localefmt.chu("Cần đăng nhập vào Javis để cài plugin.",
-                                                         "Sign in to Javis to install plugins.")},
+    return JSONResponse({"ok": False, "error": localefmt.chu("Cần đăng nhập vào UNETI AI để cài plugin.",
+                                                         "Sign in to UNETI AI to install plugins.")},
                         status_code=401)
 
 

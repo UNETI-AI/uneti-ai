@@ -4,7 +4,7 @@
 
    Chủ repo báo 01/09/2026: trong khung chat hiện ra một câu anh KHÔNG hề gõ, nội dung như
    lời bài hát nghe nhầm, nằm ở bong bóng bên phải (tức là tin của NGƯỜI DÙNG). Câu hỏi đi
-   kèm: "Javis có tự nhập liệu vào chat được không?".
+   kèm: "UNETI AI có tự nhập liệu vào chat được không?".
 
    Câu trả lời của code: server KHÔNG bao giờ ghi được tin vai "user" - mọi kết quả việc nền
    đẩy về đều là "assistant". Chỗ duy nhất sinh ra tin của người dùng là dashboard, và ngoài
@@ -15,7 +15,7 @@
      1. Đua trạng thái ở stopListening: bấm rồi thả Space thật nhanh thì onstart chưa chạy,
         isListening còn false, lệnh dừng rơi vào hư không -> mic kẹt mở, onend còn tự khởi
         động lại, và 1.5 giây im lặng sau khi nghe được gì đó là tự gửi.
-     2. Barge-in rình suốt đời trang: micStream không bao giờ được đóng, nên mỗi lần Javis đọc
+     2. Barge-in rình suốt đời trang: micStream không bao giờ được đóng, nên mỗi lần UNETI AI đọc
         thành tiếng là bộ rình ngắt lời chạy, và một tiếng động đủ to sẽ TỰ mở mic. */
 const fs = require("fs");
 const path = require("path");
@@ -54,7 +54,7 @@ check("onerror hạ cờ _starting", /onerror = \(event\) => \{\s*\n\s*this\._st
 // kịp đọc, nên tới lượt đọc thì isListening đã false, _muteRecognition thoát ngay và cờ không
 // bao giờ bật. Ngắt lời vì thế chưa từng chạy một lần nào (chủ dự án thử thật 15/09).
 // Chốt đúng là cờ `handsFree` do app.js đồng bộ. Ý ĐỊNH của mục này giữ nguyên: rảnh tay tắt
-// thì Javis đọc trong im lặng, không được tự nghe rồi biến tiếng TV thành tin nhắn.
+// thì UNETI AI đọc trong im lặng, không được tự nghe rồi biến tiếng TV thành tin nhắn.
 check("_startBargeMonitor thoát sớm khi KHÔNG trong cuộc nói chuyện bằng giọng",
   /_startBargeMonitor\(\) \{[\s\S]{0,1800}if \(!this\._resumeAfterTTS && !this\.handsFree\) return;/.test(voice));
 check("app.js đồng bộ handsFree sang voice.js (và tắt ngay khi mic hỏng)",
@@ -70,11 +70,11 @@ check("onTranscript vẫn gửi thẳng, không qua bước xác nhận",
 // Chỗ thứ 5 (0.55.63) là sendMessage TỰ GỌI LẠI CHÍNH NÓ sau khi file đính kèm tải lên
 // xong - cùng một lượt Enter của người dùng bị hoãn, không phải một đường gửi mới.
 // Chỗ thứ 6 (0.57.17) cùng kiểu HOÃN chứ không phải đường mới: người dùng nói chen ngang lúc
-// Javis đang trả lời thì phải dừng lượt cũ trước, mà server chỉ nhận tin mới khi job cũ đã
+// UNETI AI đang trả lời thì phải dừng lượt cũ trước, mà server chỉ nhận tin mới khi job cũ đã
 // dừng hẳn, nên câu ấy được gửi lại khi `turn_done` về (guiTinCho).
 // Chỗ thứ 7 (0.58.2) VẪN là hoãn: mất WebSocket thì câu được giữ lại rồi gửi khi nối lại
 // (guiTinDutMang). Trước đó chỗ này vứt tin lặng lẽ - trên iPhone là câu nói bốc hơi.
-// Chỗ thứ 10 (0.65.28) VẪN là hoãn: trong cuộc gọi, câu nói lúc Javis đang trả lời không dừng
+// Chỗ thứ 10 (0.65.28) VẪN là hoãn: trong cuộc gọi, câu nói lúc UNETI AI đang trả lời không dừng
 // lượt cũ nữa mà xếp hàng, gửi khi lượt xong và loa đọc xong (guiCauChoLuot).
 const goiGui = (app.match(/(?<!function )\bsendMessage\(/g) || []).length;
 // 0.349.0: nút "Gửi lại câu này" nhường chỗ cho nút Tua lại, vốn chỉ đưa câu hỏi về ô nhập, không tự gửi: bớt một chỗ.
@@ -85,7 +85,7 @@ check("có 11 chỗ gọi sendMessage (giọng nói, Enter, nút gửi, sau khi 
 check("chỗ thứ 11 chỉ gửi câu đã nói dở, khi chuyển đường Cơ bản",
   /function chuyenSangCoBan\(cauDangNoi = ""[\s\S]{0,500}if \(cauDangNoi\) sendMessage\(cauDangNoi\);/.test(app));
 // Chỗ thứ 11 (0.203.0) KHÔNG phải mic tự gửi: người dùng bấm Nghe trên thẻ cuộc gọi hẹn giờ, đường giọng cơ bản
-// gửi câu mở đầu nhờ Javis đọc nhắc hẹn (goiDenTheoLich, test_incoming_call_0203.js).
+// gửi câu mở đầu nhờ UNETI AI đọc nhắc hẹn (goiDenTheoLich, test_incoming_call_0203.js).
 // Reconnect sends and cancellation across chats execute in test_voice_app_session.js.
 check("chỗ thứ 5 nằm TRONG sendMessage và chỉ chạy sau Promise.all của file đang tải",
   /Promise\.all\(dangTai\.map\(a => a\.xong[\s\S]{0,300}sendMessage\(text, opts\);/.test(app));
@@ -93,7 +93,7 @@ check("chỗ thứ 6 là tin hoãn, chỉ gửi sau khi lượt cũ đã dừng"
   /function guiTinCho\(\) \{[\s\S]{0,550}if \(t\) sendMessage\(t,opts\);/.test(app)
   && /if \(isActive && _tinChoLuot\) guiTinCho\(\);/.test(app));
 
-// ---- 4. Server không tự nhập liệu: việc nền luôn là tin của Javis ----
+// ---- 4. Server không tự nhập liệu: việc nền luôn là tin của UNETI AI ----
 check("push_to_chat ghi vai assistant, không bao giờ là user",
   /def push_to_chat[\s\S]{0,1900}append_message\(sid, "assistant", clean\)/.test(server));
 // Năm chỗ ghi vai "user": bốn đường nhập liệu và một thao tác duyệt quy trình.
@@ -106,17 +106,17 @@ check("push_to_chat ghi vai assistant, không bao giờ là user",
 const ghiUser = (server.match(/append_message\([^)]*"user"/g) || []).length;
 // 0.64.66 thêm chỗ thứ sáu: lượt nối tiếp sau khi việc chạy nền xong (_start_followup_turn)
 // ghi tin mở lượt, có đánh dấu "[Việc chạy nền đã xong]", để mở lại hội thoại vẫn hiểu vì sao
-// Javis tự nói tiếp. Không phải chữ của mic nên không đụng luật "mic không tự gửi".
+// UNETI AI tự nói tiếp. Không phải chữ của mic nên không đụng luật "mic không tự gửi".
 // 0.206.0 thêm chỗ thứ bảy: tin GÕ thêm trong lúc lượt đang chạy (action "steer", steer_inbox.py), ghi ngay khi tới để
 // lịch sử đúng thứ tự. Người dùng tự gõ và bấm gửi, không phải mic tự gửi.
 // 0.213.0 adds the eighth: a message typed on a chat channel (Telegram, Zalo...) while a turn runs is written to the
 // session when that turn reads it (steer_inbox sink in _tg_answer). Typed and sent by the owner, never the mic.
 // 0.236.0 adds the ninth, inside voice_live_ws: a message with files TYPED in the chat during a Live call (the "ask"
 // frame) is stored there instead of by an ordinary chat turn. Typed and sent by the owner, never the mic.
-// 0.441.0 adds the tenth, main._gate_luu_luot: a Javis Gate note (chat_bridge.ghi_chep) in which ChatGPT or Claude
+// 0.441.0 adds the tenth, main._gate_luu_luot: a UNETI AI Gate note (chat_bridge.ghi_chep) in which ChatGPT or Claude
 // records what the OWNER said in that outside chat. It carries the Gate block naming its source, and no engine runs on
 // it. Written by an outside AI the owner connected and allowed (Draft or Full level), never the mic.
-check("chỉ 10 chỗ ghi vai user (web + bot + 3 Live + duyệt quy trình + nối tiếp việc nền + gửi thêm lúc đang chạy, web và kênh + ghi chép Javis Gate)", ghiUser === 10, ghiUser);
+check("chỉ 10 chỗ ghi vai user (web + bot + 3 Live + duyệt quy trình + nối tiếp việc nền + gửi thêm lúc đang chạy, web và kênh + ghi chép UNETI AI Gate)", ghiUser === 10, ghiUser);
 check("chỗ thứ sáu nằm TRONG _start_followup_turn",
   /async def _start_followup_turn[\s\S]{0,1600}store\.append_message\(conv_sid, "user", text\)/.test(server));
 const approvalBody = server.slice(server.indexOf('if action == "wf_resume":'), server.indexOf('if action == "resume_now":'));

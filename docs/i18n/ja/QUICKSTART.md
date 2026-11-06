@@ -1,28 +1,28 @@
 <!-- translated-from: QUICKSTART.en.md sha256:2f4928f341af -->
-# Javis OS - クイックスタート
+# UNETI AI - クイックスタート
 
 *[English](../../../QUICKSTART.en.md) · [Tiếng Việt](../../../QUICKSTART.md) · [简体中文](../zh/QUICKSTART.md) · [Español](../es/QUICKSTART.md) · **日本語** · [हिन्दी](../hi/QUICKSTART.md) · [Português](../pt-BR/QUICKSTART.md) · [한국어](../ko/QUICKSTART.md) · [Русский](../ru/QUICKSTART.md) · [Deutsch](../de/QUICKSTART.md) · [Français](../fr/QUICKSTART.md) · [Bahasa Indonesia](../id/QUICKSTART.md)*
 
 > このページは英語版クイックスタートの自動翻訳です。
 
-数分で Javis OS を動かせます。詳しいガイド：[docs/en/](../../../docs/en/README.md)。
+数分で UNETI AI を動かせます。詳しいガイド：[docs/en/](../../../docs/en/README.md)。
 
 ## パソコン（Windows、macOS）- インストーラーをダウンロード
 
-Javis を普通のアプリのようにインストールできます。ファイルを 1 つダウンロードして開けば、毎日クリックする JAVIS OS アイコンができます。インストーラーはパソコンに足りないもの（Git、Python、Node、AI ブレイン）を確認し、足りない分だけをインストールします。
+UNETI AI を普通のアプリのようにインストールできます。ファイルを 1 つダウンロードして開けば、毎日クリックする UNETI AI アイコンができます。インストーラーはパソコンに足りないもの（Git、Python、Node、AI ブレイン）を確認し、足りない分だけをインストールします。
 
-- **Windows 10/11:** [JavisOS-Setup.exe](https://github.com/uneti-ai/uneti-ai/releases/download/desktop/JavisOS-Setup.exe) をダウンロードし、ダブルクリックして最後まで Next を押します。黒いウィンドウに進行状況が表示されます（数分）。完了するとデスクトップとスタートメニューに JAVIS OS アイコンができます。
-- **macOS 11 以降:** [JavisOS-macOS.dmg](https://github.com/uneti-ai/uneti-ai/releases/download/desktop/JavisOS-macOS.dmg) をダウンロードして開き、**JAVIS OS** を **Applications** にドラッグしてから Launchpad で開きます。初回はターミナルが開いてインストールします（Javis の管理者アカウントの設定と、Mac のパスワードを一度求められることがあります）。
+- **Windows 10/11:** [UNETI-AI-Setup.exe](https://github.com/uneti-ai/uneti-ai/releases/download/desktop/UNETI-AI-Setup.exe) をダウンロードし、ダブルクリックして最後まで Next を押します。黒いウィンドウに進行状況が表示されます（数分）。完了するとデスクトップとスタートメニューに UNETI AI アイコンができます。
+- **macOS 11 以降:** [UNETI-AI-macOS.dmg](https://github.com/uneti-ai/uneti-ai/releases/download/desktop/UNETI-AI-macOS.dmg) をダウンロードして開き、**UNETI AI** を **Applications** にドラッグしてから Launchpad で開きます。初回はターミナルが開いてインストールします（UNETI AI の管理者アカウントの設定と、Mac のパスワードを一度求められることがあります）。
 
-アイコンをクリックすると Javis は専用ウィンドウ（アドレスバーなし）で開き、パソコンの起動時に自動で動き、アプリ内の **Update** ボタンも通常どおり使えます。データはユーザーフォルダ内の `JavisOS` フォルダにあり、アプリをアンインストールしてもこのフォルダは残ります。
+アイコンをクリックすると UNETI AI は専用ウィンドウ（アドレスバーなし）で開き、パソコンの起動時に自動で動き、アプリ内の **Update** ボタンも通常どおり使えます。データはユーザーフォルダ内の `UNETI-AI` フォルダにあり、アプリをアンインストールしてもこのフォルダは残ります。
 
 どちらのインストーラーもまだコード署名されていないため、初回に確認が表示されます:
 - Windows で「Windows protected your PC」と出たら、**More info** を押してから **Run anyway** を押します。
-- macOS で開けないと表示されたら、**System Settings → Privacy & Security** を開き、下にスクロールして **Open Anyway** を押し、もう一度 JAVIS OS を開きます。
+- macOS で開けないと表示されたら、**System Settings → Privacy & Security** を開き、下にスクロールして **Open Anyway** を押し、もう一度 UNETI AI を開きます。
 
 ## 方法 1 - Hostinger VPS（Docker Manager、ワンクリック）
 
-> 🛒 **VPS をまだお持ちでない方へ：** [Hostinger VPS はこちら](https://www.hostinger.com?REFERRALCODE=UTRBLOGMIDSN)。Docker Manager が標準搭載なので、Javis はワンクリックで入ります。準備ができたら下の手順に戻ってください。
+> 🛒 **VPS をまだお持ちでない方へ：** [Hostinger VPS はこちら](https://www.hostinger.com?REFERRALCODE=UTRBLOGMIDSN)。Docker Manager が標準搭載なので、UNETI AI はワンクリックで入ります。準備ができたら下の手順に戻ってください。
 
 1. hPanel → VPS → **Docker Manager** → **Compose** → **Compose from URL**。
 2. 次の URL を貼り付けます。
@@ -31,9 +31,9 @@ Javis を普通のアプリのようにインストールできます。ファ�
    ```
 3. （任意。HTTPS + ドメインを使う場合）**Environment** 欄に次を設定します。
    ```
-   DOMAIN_NAME=javis.<vps-hostname>.hstgr.cloud
+   DOMAIN_NAME=uneti.<vps-hostname>.hstgr.cloud
    ```
-   （ホスト名は hPanel → VPS で確認できます。例：`javis.srv1782015.hstgr.cloud`。）
+   （ホスト名は hPanel → VPS で確認できます。例：`uneti.srv1782015.hstgr.cloud`。）
 4. **Deploy** を押します。1-3 分待ちます。**Open** ボタン（または `https://<DOMAIN_NAME>`）でアプリを開きます。
 5. 初回起動時に、管理者アカウントの作成を求める画面が表示されます。そのあと、コンテナのターミナルで Claude Code に一度だけサインインします：`claude auth login --claudeai`。
 
@@ -52,7 +52,7 @@ http://localhost:7777 を開きます。Caddy 経由で HTTPS を使う場合は
 
 1. Python 3.12 + Node 22 をインストールします。
 2. プロジェクトのフォルダで `setup.bat` を一度実行します。.venv を作成し、依存関係をインストールし、2 つの CLI エンジン（Claude Code、Codex）もインストールしてくれます。
-3. `start-javis.bat` でバックグラウンド実行します（停止は `stop-javis.bat`）。
+3. `start-uneti.bat` でバックグラウンド実行します（停止は `stop-uneti.bat`）。
 4. http://localhost:7777 を開きます。
 
 ## 起動したら

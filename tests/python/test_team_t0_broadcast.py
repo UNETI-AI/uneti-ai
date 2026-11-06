@@ -9,8 +9,8 @@ import os
 import tempfile
 from pathlib import Path
 
-os.environ["JAVIS_STATE_DIR"] = tempfile.mkdtemp(prefix="javis-t0-")
-BR = Path(tempfile.mkdtemp(prefix="javis-t0-brain-"))
+os.environ["UNETI_STATE_DIR"] = tempfile.mkdtemp(prefix="uneti-t0-")
+BR = Path(tempfile.mkdtemp(prefix="uneti-t0-brain-"))
 (BR / "agents").mkdir()
 (BR / "agents" / "viet-bai.md").write_text("---\nname: Viết bài\n---\nBạn viết bài.\n", encoding="utf-8", newline="\n")
 

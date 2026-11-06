@@ -13,21 +13,21 @@
   "use strict";
   var t = function (k, v) { return (window.t ? window.t(k, v) : k); };
   // Gọi sang module nạp chậm (teams.js, packs.js: nap-cham.js, 0.417.0): nạp nhóm nếu chưa có rồi gọi.
-  var nhom = function (ten, fn) { return window.JavisNapCham ? window.JavisNapCham.goi(ten, fn) : fn(); };
+  var nhom = function (ten, fn) { return window.UnetiNapCham ? window.UnetiNapCham.goi(ten, fn) : fn(); };
   // (i) button from info-tip.js; without it (node tests) the explanation is drawn inline.
-  function infoBtn() { var J = typeof window !== "undefined" && window.JavisInfo; return J ? J.btn(t("info.more")) : ""; }
+  function infoBtn() { var J = typeof window !== "undefined" && window.UnetiInfo; return J ? J.btn(t("info.more")) : ""; }
   function infoBody(html) {
-    var J = typeof window !== "undefined" && window.JavisInfo;
+    var J = typeof window !== "undefined" && window.UnetiInfo;
     return J ? J.body(html) : '<div class="info-body">' + html + "</div>";
   }
   var ic = function (n, o) { return (window.ic ? window.ic(n, o) : ""); };
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]; }); }
   function khongDau(s) { return String(s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/\u0111/g, "d").replace(/\u0110/g, "D").toLowerCase(); }
-  function brain() { try { return window.JavisSessions ? window.JavisSessions.brain() : "brain"; } catch (e) { return "brain"; } }
+  function brain() { try { return window.UnetiSessions ? window.UnetiSessions.brain() : "brain"; } catch (e) { return "brain"; } }
   async function api(url, opt) { var r = await fetch(url, opt); return r.json(); }
   function fd(o) { var f = new FormData(); Object.keys(o).forEach(function (k) { f.append(k, o[k]); }); return f; }
 
-  function avatar(a, size, state) { return window.JavisAvatar ? window.JavisAvatar.html(a, size, state) : ic("bot"); }
+  function avatar(a, size, state) { return window.UnetiAvatar ? window.UnetiAvatar.html(a, size, state) : ic("bot"); }
   function agentOf(slug) { return S.agents.find(function (a) { return a.slug === slug || a.name === slug; }) || {slug: slug || ""}; }
   // daTai = đã tải được danh sách ÍT NHẤT MỘT LẦN. Phân biệt "brain mới tinh, chưa có cộng sự
   // nào" với "gọi /agents hỏng nên không biết có gì": cả hai đều để lại mảng rỗng, nhưng cái
@@ -38,7 +38,7 @@
   var lanDung = 0;
   // Khung được dựng khi từ điển i18n CHƯA về: mọi t() trong khung khi đó trả về chính cái khoá
   // (`ws.tab_agent`...). Trang này không có data-i18n nên applyDom không cứu được, và nó cũng không
-  // tự nghe "javis:i18n"; console.js hỏi cờ này rồi dựng lại trang đúng một lần khi từ điển về.
+  // tự nghe "uneti:i18n"; console.js hỏi cờ này rồi dựng lại trang đúng một lần khi từ điển về.
   var dungKhiChuaCoTuDien = false;
   // Phiên chat của BỘ NÃO CHÍNH đang mở trước khi vào trang này, để lúc rời trang trả khung
   // chat về đúng cuộc đang dở (xem traKhungChat).
@@ -54,7 +54,7 @@
       // Send has two owners: this lock and a running turn in app.js. Set the lock and let app.js
       // decide, so leaving the page mid-turn does not re-enable send.
       b.dataset.wsLock = value ? "" : "1";
-      if (window.JavisSyncActiveUI) window.JavisSyncActiveUI(); else b.disabled = !value;
+      if (window.UnetiSyncActiveUI) window.UnetiSyncActiveUI(); else b.disabled = !value;
     });
     var files = S.el && S.el.querySelector("#wsFiles"); if (files) files.disabled = !value;
     var run = S.el && S.el.querySelector("#wsRun");
@@ -72,7 +72,7 @@
   // cộng sự ghim mà hai tuần không gọi sẽ tụt xuống cuối và cái ghim thành vô nghĩa.
   function sapXep(ds, khoa) {
     return ds.slice().sort(function (a, b) {
-      // Javis Core (0.185.0, `system`) is always first, ahead of the pinned ones.
+      // UNETI AI Core (0.185.0, `system`) is always first, ahead of the pinned ones.
       var sa = a.system ? 1 : 0, sb = b.system ? 1 : 0;
       if (sa !== sb) return sb - sa;
       var ga = a.pinned ? 1 : 0, gb = b.pinned ? 1 : 0;
@@ -90,7 +90,7 @@
   // "..." để đổi tên cả nhóm. Dữ liệu vẫn là field `group` sẵn có trong frontmatter, nên
   // Studio, ô lọc và menu "Chuyển sang nhóm" đều nhìn thấy cùng một thứ.
   var NHOM_MD = "Chung";
-  var KHOA_THU = "javis_ws_thu";                 // localStorage: nhóm đang THU GỌN, theo loại
+  var KHOA_THU = "uneti_ws_thu";                 // localStorage: nhóm đang THU GỌN, theo loại
   function nhomCua(x) { return (String((x && x.group) || "").trim()) || NHOM_MD; }
   function docThu() {
     try { return JSON.parse(localStorage.getItem(KHOA_THU) || "{}") || {}; }
@@ -119,7 +119,7 @@
   // nằm lẫn giữa danh sách theo giờ chat. Mỗi mục vẫn chỉ hiện một lần.
   function gomNhom(ds, nhomLoc, nhomTrong, can) {
     var ra = [];
-    // Javis Core (0.185.0): its own first block, above "needs you" and the pinned ones, with no heading (the row
+    // UNETI AI Core (0.185.0): its own first block, above "needs you" and the pinned ones, with no heading (the row
     // carries the System badge).
     var he = (ds || []).filter(function (x) { return x.system; });
     if (he.length) { ra.push({ he: true, nhom: "", items: he }); ds = (ds || []).filter(function (x) { return !x.system; }); }
@@ -155,7 +155,7 @@
   // Auto is on right now. Same leading-space trick as TAG_NONE, so it never clashes with a real tag.
   var TAG_AUTO = " auto";
   function autoBat(rs, slug) { var r = rs && rs[slug]; return !!(r && r.enabled && r.status === "active"); }
-  // Javis Core's Auto is always on (owner, 05/11/2026): its row shows the switch on even before the server's list is in.
+  // UNETI AI Core's Auto is always on (owner, 05/11/2026): its row shows the switch on even before the server's list is in.
   function coreAutoRow(x) {
     var r = S.rs[x.slug] || {};
     return { slug: x.slug, name: x.name, enabled: true, status: "active", goals_open: r.goals_open || 0 };
@@ -203,7 +203,7 @@
   }
   // 0.454.0: the owner's own tag order (reorder-dialog.js, saved for this page), else by name.
   function thuTuTag(ds) {
-    var R = typeof window !== "undefined" && window.JavisReorder;
+    var R = typeof window !== "undefined" && window.UnetiReorder;
     return R ? R.sortTags(ds, "tags_agents", function (g) { return g.key; }, function (g) { return g.ten; })
       : ds.sort(function (a, b) { return a.ten.localeCompare(b.ten, "vi"); });
   }
@@ -331,7 +331,7 @@
   function danhSach() { return S.loai === "agent" ? S.agents : S.workflows; }
   function kenh(item) { return (S.loai === "agent" ? "agent:" : "workflow:") + item.slug; }
   function dangChon() { var slug = S.chon[S.loai]; return danhSach().find(function (x) { return x.slug === slug; }) || null; }
-  var VI_TRI_KEY = "javis_workspace_view";
+  var VI_TRI_KEY = "uneti_workspace_view";
   function docViTri() {
     try {
       var v = JSON.parse(localStorage.getItem(VI_TRI_KEY) || "null");
@@ -386,7 +386,7 @@
   // làm nghẽn luồng phụ của server. Có sự kiện trong lúc đang đếm thì đếm lại đúng một lần sau khi xong.
   var _demDang = false, _demLai = false;
   async function loadJobCounts() {
-    var round = lanDung, b0 = brain(), AJ = window.JavisAgentJobs;
+    var round = lanDung, b0 = brain(), AJ = window.UnetiAgentJobs;
     if (!AJ || !AJ.loadCounts) return false;
     if (_demDang) { _demLai = true; return false; }
     _demDang = true;
@@ -481,7 +481,7 @@
   // dùng chung trạng thái `S.rs`. Khoá trong lúc chờ server (bấm hai lần không gửi hai lệnh); chỉ server xác nhận mới
   // đổi; lỗi thì về đúng trạng thái thật và nói lý do (toggleAgent luôn phát sự kiện tải lại).
   function doiAuto(slug, wantOn) {
-    var row = S.rs[slug], RA = window.JavisResonanceAgent;
+    var row = S.rs[slug], RA = window.UnetiResonanceAgent;
     if (!RA || !row || S.rsSaving[slug]) return false;
     var question = wantOn ? "" : RA.offConfirmText(row);
     if (question && !window.confirm(question)) { veDanhSach(); return false; }
@@ -524,9 +524,9 @@
 
   // ---------- dựng khung ----------
   function render(el, opts) {
-    // Đọc TRƯỚC khi vẽ gì: khung bên dưới dùng t() ngay lúc dựng. Thiếu JavisI18n thì không bao giờ
+    // Đọc TRƯỚC khi vẽ gì: khung bên dưới dùng t() ngay lúc dựng. Thiếu UnetiI18n thì không bao giờ
     // có sự kiện để dựng lại, nên coi như đã xong thay vì đòi một lần dựng lại không ai gọi.
-    dungKhiChuaCoTuDien = !!(window.JavisI18n && window.JavisI18n.ready && !window.JavisI18n.ready());
+    dungKhiChuaCoTuDien = !!(window.UnetiI18n && window.UnetiI18n.ready && !window.UnetiI18n.ready());
     S.el = el; active = true; ready = false;
     // DỰNG LẠI TỪ ĐẦU, không nối tiếp lần trước. Trang này còn được dựng lại NGAY TẠI CHỖ khi
     // người dùng đổi bộ não (console.js gọi thẳng renderPage, không đi qua navigateTo nên roi()
@@ -614,7 +614,7 @@
     el.querySelector(".ws-panel-close").onclick = function () { datPhai(false); };
     el.querySelector("#wsNew").onclick = function () { taoMoi(S.loai); };
     el.querySelector("#wsImport").onclick = function () {
-      if (window.JavisStudio) window.JavisStudio.importItems(async function () {
+      if (window.UnetiStudio) window.UnetiStudio.importItems(async function () {
         if (!active) return;
         await taiDanhSach(); veTrai(); chonMacDinh();
       });
@@ -622,12 +622,12 @@
     // Một ngăn kéo cho cả hai phạm vi (của trợ lý / chỉ cuộc này), công tắc nằm ở đầu ngăn.
     // Quy trình không có tài liệu riêng, nên ở tab Quy trình nút này vẫn mở tài liệu của cuộc.
     el.querySelector("#wsFiles").onclick = function () {
-      if (!ready || !window.JavisChatSide) return;
+      if (!ready || !window.UnetiChatSide) return;
       var x = dangChon();
-      if (S.loai === "agent" && x && window.JavisChatSide.moTaiLieu) window.JavisChatSide.moTaiLieu(x.slug, x.name);
-      else window.JavisChatSide.moKhungCuoc();
+      if (S.loai === "agent" && x && window.UnetiChatSide.moTaiLieu) window.UnetiChatSide.moTaiLieu(x.slug, x.name);
+      else window.UnetiChatSide.moKhungCuoc();
     };
-    el.querySelector("#wsStore").onclick = function () { nhom("packs", function () { if (window.JavisPacks && window.JavisPacks.moKho) window.JavisPacks.moKho(S.loai, "workspace", t("page.workspace.label")); }); };
+    el.querySelector("#wsStore").onclick = function () { nhom("packs", function () { if (window.UnetiPacks && window.UnetiPacks.moKho) window.UnetiPacks.moKho(S.loai, "workspace", t("page.workspace.label")); }); };
     el.querySelector("#wsNewChat").onclick = function () { var x = dangChon(); if (x) moPhien(x, true); };
     var page = el.querySelector("#wsPage");
     el.querySelector("#wsLeftBtn").onclick = function () { page.classList.toggle("left-open"); };
@@ -653,8 +653,8 @@
     });
     // Nhớ chỗ đang đứng: mở lại trang mà rơi về mục đầu danh sách thì mỗi lần ghé qua trang
     // khác rồi quay lại là mất chỗ, trong khi cộng sự đang dùng thường chỉ là một hai mục.
-    try { var l = localStorage.getItem("javis_ws_loai"); if (l === "agent" || l === "workflow") S.loai = l; S.chon.agent = localStorage.getItem("javis_ws_agent"); S.chon.workflow = localStorage.getItem("javis_ws_workflow"); } catch (e) {}
-    try { var r = localStorage.getItem("javis_ws_rtab"); S.tabPhai = TAB_PHAI.indexOf(r) >= 0 ? r : "lichsu"; } catch (e) { S.tabPhai = "lichsu"; }
+    try { var l = localStorage.getItem("uneti_ws_loai"); if (l === "agent" || l === "workflow") S.loai = l; S.chon.agent = localStorage.getItem("uneti_ws_agent"); S.chon.workflow = localStorage.getItem("uneti_ws_workflow"); } catch (e) {}
+    try { var r = localStorage.getItem("uneti_ws_rtab"); S.tabPhai = TAB_PHAI.indexOf(r) >= 0 ? r : "lichsu"; } catch (e) { S.tabPhai = "lichsu"; }
     // Chỉ tab của TRỢ LÝ được nhớ qua localStorage. Quy trình mở trang là về Cài đặt: "khởi
     // đầu vào luôn cài đặt" là điều chủ dự án muốn, nhớ tab cũ qua F5 là làm ngược lại.
     S.tabCua = { agent: S.tabPhai, workflow: "cai" };
@@ -678,10 +678,10 @@
     return new Promise(function (resolve) {
       var cmd = {kind: kind, slug: slug, sid: sid || "", resolve: resolve};
       if (active) { selectCommand(cmd); return; }
-      if (!window.JavisNav) { resolve(false); return; }
+      if (!window.UnetiNav) { resolve(false); return; }
       if (pendingCommand) pendingCommand.resolve(false);
       pendingCommand = cmd;
-      window.JavisNav.go("workspace");
+      window.UnetiNav.go("workspace");
     });
   }
   // Mở trang Cộng sự ở ĐÚNG tab (menu nhanh của linh vật: "Trợ lý" / "Quy trình"). Khác
@@ -696,11 +696,11 @@
     S.loai = loai; S.nhom = "";
     luuChon();
     if (active) { veTrai(); chonMacDinh(); return true; }
-    if (!window.JavisNav) return false;
-    window.JavisNav.go("workspace");
+    if (!window.UnetiNav) return false;
+    window.UnetiNav.go("workspace");
     return true;
   }
-  function luuChon() { try { localStorage.setItem("javis_ws_loai", S.loai); if (S.chon.agent) localStorage.setItem("javis_ws_agent", S.chon.agent); if (S.chon.workflow) localStorage.setItem("javis_ws_workflow", S.chon.workflow); } catch (e) {} }
+  function luuChon() { try { localStorage.setItem("uneti_ws_loai", S.loai); if (S.chon.agent) localStorage.setItem("uneti_ws_agent", S.chon.agent); if (S.chon.workflow) localStorage.setItem("uneti_ws_workflow", S.chon.workflow); } catch (e) {} }
 
   // ---------- ô tìm thu gọn ----------
   // Nút kính lúp bung ô nhập ra; ô nhập RỖNG mà mất tiêu điểm thì tự thu lại. Esc xoá chữ,
@@ -730,14 +730,14 @@
   // Cây thư mục là node MƯỢN của màn chính, chỉ có MỘT bản. Rời tab (hay rời trang) mà không
   // trả thì màn chính và trang Trò chuyện mất hẳn panel Vault - cùng bài học với tab Thư mục
   // của trang Trò chuyện (xem sessions-ui.js chonTab).
-  function traCayThuMuc() { try { if (window.JavisVaultPanel) window.JavisVaultPanel.giveBack(); } catch (e) {} }
+  function traCayThuMuc() { try { if (window.UnetiVaultPanel) window.UnetiVaultPanel.giveBack(); } catch (e) {} }
   function chonTabPhai(tab) {
     var el = S.el; if (!el) return;
     S.tabPhai = TAB_PHAI.indexOf(tab) >= 0 ? tab : "cai";
     if (S.tabPhai === "viec" && S.loai !== "agent") S.tabPhai = "cai";
     if (S.tabCua) S.tabCua[S.loai] = S.tabPhai;
     // Tab của quy trình chỉ sống trong lần mở trang này (xem S.tabCua), không ghi xuống.
-    if (S.loai !== "workflow") { try { localStorage.setItem("javis_ws_rtab", S.tabPhai); } catch (e) {} }
+    if (S.loai !== "workflow") { try { localStorage.setItem("uneti_ws_rtab", S.tabPhai); } catch (e) {} }
     el.querySelectorAll("[data-rtab]").forEach(function (b) { b.classList.toggle("active", b.dataset.rtab === S.tabPhai); });
     el.querySelectorAll("[data-rpane]").forEach(function (p) { p.classList.toggle("on", p.dataset.rpane === S.tabPhai); });
     var jb = el.querySelector('[data-rtab="viec"]');
@@ -756,8 +756,8 @@
     var host = S.el && S.el.querySelector("#wsRightJobs");
     if (_congViec) { _congViec.destroy(); _congViec = null; }
     if (!host) return;
-    if (!item || S.loai !== "agent" || !window.JavisAgentJobs) { host.innerHTML = ""; return; }
-    _congViec = window.JavisAgentJobs.mount(host, { slug: item.slug, name: item.name || item.slug, brain: brain,
+    if (!item || S.loai !== "agent" || !window.UnetiAgentJobs) { host.innerHTML = ""; return; }
+    _congViec = window.UnetiAgentJobs.mount(host, { slug: item.slug, name: item.name || item.slug, brain: brain,
       noAssign: !!item.system,
       // Trợ lý KHÁC trong brain: người nhận việc kiểm chứng khi bấm "Giao kiểm chứng" trên một thẻ.
       agents: function () {
@@ -768,10 +768,10 @@
       openTeam: function (teamId, taskId) {
         // teams.js nạp chậm (nap-cham.js, 0.417.0): chờ nó rồi mở.
         nhom(["congviec", "teams"], function () {
-          if (window.JavisTeams && window.JavisTeams.open) window.JavisTeams.open(teamId, taskId);
+          if (window.UnetiTeams && window.UnetiTeams.open) window.UnetiTeams.open(teamId, taskId);
         });
       },
-      openWork: function () { if (window.JavisNav && window.JavisNav.go) window.JavisNav.go("kanban"); } });
+      openWork: function () { if (window.UnetiNav && window.UnetiNav.go) window.UnetiNav.go("kanban"); } });
   }
 
   // (0.62.0 đã bỏ hàm dongBoNhomForm ở đây. Nó tồn tại chỉ để vá một xung đột tự gây ra:
@@ -782,7 +782,7 @@
   // Nhóm TRỐNG (tạo bằng "+ Nhóm mới" mà chưa kéo ai vào) không tồn tại ở đâu trên đĩa - nhóm
   // là tập hợp cộng sự có cùng `group` - nên nhớ tạm trong localStorage theo brain và loại; hễ
   // có cộng sự mang tên nhóm đó là xoá khỏi sổ vì nhóm đã "thật".
-  var KHOA_NHOM_TRONG = "javis_ws_nhom_trong";
+  var KHOA_NHOM_TRONG = "uneti_ws_nhom_trong";
   function khoaTrong() { return brain() + "|" + S.loai; }
   function docNhomTrong() {
     try { var o = JSON.parse(localStorage.getItem(KHOA_NHOM_TRONG) || "{}") || {}; return (o[khoaTrong()] || []).slice(); }
@@ -835,7 +835,7 @@
     veTrai(); veGiua(dangChon());
   }
   function moBangNhom(neo) {
-    var cs = window.JavisChatSide; if (!cs || !cs.menu) return;
+    var cs = window.UnetiChatSide; if (!cs || !cs.menu) return;
     var dem = demNhom();
     var rows = [
       { label: t("ws.all_groups"), icon: "layers", on: !S.nhom, run: function () { chonNhom(""); } },
@@ -856,7 +856,7 @@
   }
   // Hộp chức năng của MỘT nhóm, đi sâu trong cùng bảng nổi (như project bên Trò chuyện).
   function moChucNangNhom(neo, g) {
-    var cs = window.JavisChatSide; if (!cs || !cs.menu) return;
+    var cs = window.UnetiChatSide; if (!cs || !cs.menu) return;
     cs.menu(neo, [
       { label: g, icon: "folder", wrap: true, run: function () { chonNhom(g); } },
       { sep: true },
@@ -895,7 +895,7 @@
     var ic0 = !S.nhom ? "layers" : S.nhom === TAG_NONE ? "circle" : S.nhom === TAG_AUTO ? "zap" : "tag";
     // 0.195.0: the bar markup is shared with the Teams page (tag-picker.js), so both look and behave the same.
     bar.innerHTML =
-      window.JavisTagPicker.barHtml({ label: nhanTag(S.nhom), icon: ic0, canClear: !!S.nhom,
+      window.UnetiTagPicker.barHtml({ label: nhanTag(S.nhom), icon: ic0, canClear: !!S.nhom,
                                       pickTitle: t("ws.tag_pick_title"), clearTitle: t("ws.tag_clear_title") }) +
       // Kết quả thao tác tag (gộp tag, lỗi một phần) nằm ngay dưới thanh, sống tới lần thao tác kế.
       (S.tagNote ? '<div class="ws-tag-note' + (S.tagNote.loi ? " loi" : "") + '" role="status">' +
@@ -906,14 +906,14 @@
     var nx = bar.querySelector(".ws-tag-note-x"); if (nx) nx.onclick = function () { S.tagNote = null; veThanhTag(bar); };
   }
   function moBangTag(neo) {
-    var cs = window.JavisChatSide; if (!cs || !cs.menu) return;
+    var cs = window.UnetiChatSide; if (!cs || !cs.menu) return;
     var dem = demTag(danhSach());
     var rows = [
       { label: t("ws.tag_all"), icon: "layers", right: String(danhSach().length), on: !S.nhom, run: function () { chonNhom(""); } },
       { label: t("ws.tag_none"), icon: "circle", right: String(dem.khong), on: S.nhom === TAG_NONE,
         run: function () { chonNhom(TAG_NONE); } },
     ];
-    if (window.JavisResonanceAgent) {
+    if (window.UnetiResonanceAgent) {
       var soAuto = danhSach().filter(function (x) { return autoBat(S.rs, x.slug); }).length;
       rows.push({ label: t("ws.tag_auto"), icon: "zap", right: String(soAuto), on: S.nhom === TAG_AUTO,
         run: function () { chonNhom(TAG_AUTO); } });
@@ -925,10 +925,10 @@
                   acts: [{ icon: "ellipsis-vertical", title: t("ws.tag_acts"), run: function () { moChucNangTag(neo, g); } }] });
     });
     // 0.454.0: drag the tags into the owner's own order.
-    if (dem.tags.length > 1 && window.JavisReorder) {
+    if (dem.tags.length > 1 && window.UnetiReorder) {
       rows.push({ sep: true });
       rows.push({ label: t("reorder.menu_tags"), icon: "arrow-up-down", run: function () {
-        var R = window.JavisReorder;
+        var R = window.UnetiReorder;
         R.open({ title: t("reorder.title_tags"), items: dem.tags.map(function (g) { return { id: g.key, label: g.ten, icon: "tag" }; }),
           save: function (keys) { return R.saveTags("tags_agents", keys); } });
       } });
@@ -937,7 +937,7 @@
   }
   // `g` = {ten, key}: gửi server TÊN (server tự so theo khoá), giữ trạng thái trang theo KHOÁ.
   function moChucNangTag(neo, g) {
-    var cs = window.JavisChatSide; if (!cs || !cs.menu) return;
+    var cs = window.UnetiChatSide; if (!cs || !cs.menu) return;
     cs.menu(neo, [
       { label: g.ten, icon: "tag", wrap: true, run: function () { chonNhom(g.key); } },
       { sep: true },
@@ -1129,15 +1129,15 @@
     // tay dễ nhầm với dấu ghim) và nhãn Auto nhỏ khi Auto đang bật. Tag không vẽ trên thẻ nữa (đã có ô lọc theo tag ở đầu
     // cột, tên tag vẫn đọc được ở tooltip). Dấu ghim không vẽ: thẻ ghim đã nằm dưới tiêu đề "Đã ghim".
     var laAgent = S.loai === "agent";
-    var he = laAgent && !!x.system;   // Javis Core: no Auto switch, no "..." menu (the server refuses those anyway)
+    var he = laAgent && !!x.system;   // UNETI AI Core: no Auto switch, no "..." menu (the server refuses those anyway)
     var tg = laAgent ? tagsCua(x) : [];
-    var bd = laAgent && S.jc && window.JavisAgentJobs && window.JavisAgentJobs.badgeHtml
-      ? window.JavisAgentJobs.badgeHtml(S.jc[x.slug]) : "";
+    var bd = laAgent && S.jc && window.UnetiAgentJobs && window.UnetiAgentJobs.badgeHtml
+      ? window.UnetiAgentJobs.badgeHtml(S.jc[x.slug]) : "";
     // 0.190.0: the Auto switch and the time sit in the corner cluster (.ws-item-end), so only a badge needs a third line.
     var coTt = !!bd;
     // 0.191.1: the job state as one dot on the avatar of the avatar strip (data-st, colours in console.css).
-    var jst = laAgent && S.jc && window.JavisAgentJobs && window.JavisAgentJobs.statusOf
-      ? window.JavisAgentJobs.statusOf(S.jc[x.slug]) : "";
+    var jst = laAgent && S.jc && window.UnetiAgentJobs && window.UnetiAgentJobs.statusOf
+      ? window.UnetiAgentJobs.statusOf(S.jc[x.slug]) : "";
     var title = laAgent ? [x.name, x.role || ""].concat(tg.length ? [t("ws.tags_aria") + ": " + tg.join(", ")] : [])
       .filter(Boolean).join("\n") : "";
     var nTin = laAgent ? chuaDoc(x.slug) : 0;
@@ -1156,9 +1156,9 @@
       // công tắc Auto đứng chung một cụm nhỏ ở góc dưới phải của thẻ. Công tắc có trên MỌI trợ lý, tắt thì màu xám.
       // Cụm nằm ngoài nút chọn mục (không lồng nút trong nút); CSS đặt nó BÊN TRONG thẻ.
       (laAgent ? '<div class="ws-item-end">' + gioNhanHtml(x.last_chat_at) + tinHtml(x) +
-        // 2026-11-05 (owner): Javis Core shows the same switch, always on and locked.
-        (window.JavisResonanceAgent
-          ? window.JavisResonanceAgent.rowToggleHtml(he ? coreAutoRow(x) : S.rs[x.slug],
+        // 2026-11-05 (owner): UNETI AI Core shows the same switch, always on and locked.
+        (window.UnetiResonanceAgent
+          ? window.UnetiResonanceAgent.rowToggleHtml(he ? coreAutoRow(x) : S.rs[x.slug],
               { saving: !he && !!S.rsSaving[x.slug], locked: he }) : "") + '</div>' : "") +
       (he ? "" : '<button type="button" class="ws-item-more" data-more="' + esc(x.slug) + '" title="' +
         esc(t("ws.manage")) + '" aria-label="' + esc(t("ws.manage")) + '">' + ic("ellipsis-vertical") + '</button>') +
@@ -1173,7 +1173,7 @@
         // 2026-11-05: warm the chat this partner last opened in, so the click finds it ready.
         var x = danhSach().find(function (m) { return m.slug === b.dataset.slug; });
         var sid = x && _phienGanNhat[khoaGanNhat(x)];
-        try { if (sid && window.JavisSessions && window.JavisSessions.prefetch) window.JavisSessions.prefetch(sid); } catch (e) {}
+        try { if (sid && window.UnetiSessions && window.UnetiSessions.prefetch) window.UnetiSessions.prefetch(sid); } catch (e) {}
       });
       b.addEventListener("mouseleave", anTheMini);
       b.addEventListener("focus", function () { hienTheMini(b); });
@@ -1425,7 +1425,7 @@
     return tatCa.map(function (g) { return { ten: g.ten, key: g.key, on: coKhoa.has(g.key) }; });
   }
   function veMenuTag(item, m, focusKhoa) {
-    var TP = window.JavisTagPicker;   // 0.195.0: shared with the Teams page row menu
+    var TP = window.UnetiTagPicker;   // 0.195.0: shared with the Teams page row menu
     m.innerHTML = TP.pickerHtml(dongChonTag(item, danhSach()));
     var dang = false;
     async function doi(fields, giuKhoa) {
@@ -1471,10 +1471,10 @@
   // bung modal của nó (xem editAgent: chỉ khi CÓ host nó mới vẽ tại chỗ) - đúng thứ một động
   // tác "Sửa" cần, và cùng đường với nút Sửa quy trình ở cột phải.
   function suaMuc(item) {
-    if (!window.JavisStudio) return;
+    if (!window.UnetiStudio) return;
     var xong = { onSaved: async function () { await sauLuu(item, S.loai); } };
-    if (S.loai === "agent") window.JavisStudio.editAgent(item, xong);
-    else window.JavisStudio.editWorkflow(item, xong);
+    if (S.loai === "agent") window.UnetiStudio.editAgent(item, xong);
+    else window.UnetiStudio.editWorkflow(item, xong);
   }
   async function xoaMuc(item) {
     var hoi = S.loai === "agent" ? t("studio.del_ag", { ten: item.name })
@@ -1501,7 +1501,7 @@
   }
 
   // ---------- trả khung chat về bộ não chính khi rời trang ----------
-  // Khung chat là node MƯỢN của app: trang Cộng sự, trang Trò chuyện và màn Javis dùng CHUNG
+  // Khung chat là node MƯỢN của app: trang Cộng sự, trang Trò chuyện và màn UNETI AI dùng CHUNG
   // một khung. Rời trang mà không làm gì thì đoạn chat với trợ lý còn nằm nguyên ở hai chỗ kia
   // - và tệ hơn hiển thị: `savedSessionId` vẫn là phiên agent:<slug>, nên tin gõ tiếp ở trang
   // Trò chuyện BAY VÀO ĐÚNG PHIÊN CỦA TRỢ LÝ. Đó là hai chức năng chat khác nhau, chủ dự án
@@ -1512,23 +1512,23 @@
   // sẽ còn nằm lại - xoá trắng trước thì trường hợp xấu nhất cũng chỉ là một khung trống.
   function laPhienCongSu(id) { return !!(id && S.sessionCuaPhien[id]); }
   function traKhungChat() {
-    if (!window.JavisSessions) return;
-    var cur = window.JavisSessions.current();
-    // Phiên mở từ tab Lịch sử (sessions-ui gọi thẳng JavisSessions.open) không đi qua moPhien
+    if (!window.UnetiSessions) return;
+    var cur = window.UnetiSessions.current();
+    // Phiên mở từ tab Lịch sử (sessions-ui gọi thẳng UnetiSessions.open) không đi qua moPhien
     // nên không có trong S.sessionCuaPhien, mà nó VẪN là phiên cộng sự: rời trang mà không trả
     // khung chat là tin kế tiếp ở trang Trò chuyện rơi vào phiên trợ lý. Chỉ đúng một trường
     // hợp không đụng: khung chat vẫn đang ở đúng cuộc của bộ não chính lúc vào trang.
     if (!cur || (!laPhienCongSu(cur) && cur === _phienTruoc)) return;
-    window.JavisSessions.new();
+    window.UnetiSessions.new();
     if (_phienTruoc && _phienTruoc !== cur && !laPhienCongSu(_phienTruoc)) {
-      try { window.JavisSessions.open(_phienTruoc); } catch (e) {}
+      try { window.UnetiSessions.open(_phienTruoc); } catch (e) {}
     }
   }
   // Nhớ cuộc đang dở của bộ não chính NGAY LÚC DỰNG TRANG: lúc này khung chat còn là của
   // trang trước, chưa bị moPhien() đổi sang phiên trợ lý.
   function nhoPhienTruoc() {
     try {
-      var cur = window.JavisSessions && window.JavisSessions.current();
+      var cur = window.UnetiSessions && window.UnetiSessions.current();
       var v = docViTri();
       if (v && cur === v.sessionId) { _phienTruoc = v.mainSessionId || null; return; }
       if (cur && !laPhienCongSu(cur)) _phienTruoc = cur;
@@ -1552,11 +1552,11 @@
       // fetched the agent, the history list and its GitHub icons again and redrew the whole form on every click.
       if (!phaiDaVeCho(item)) vePhai(item);
       // New conversation: the old chat leaves the screen at once instead of after the server answers.
-      if (moiHan && window.JavisSessions && window.JavisSessions.blank) window.JavisSessions.blank();
+      if (moiHan && window.UnetiSessions && window.UnetiSessions.blank) window.UnetiSessions.blank();
       var b = encodeURIComponent(brain()), ch = kenh(item), id = sidChiDinh || null;
       if (!id && !moiHan && item.system) {
-        // Javis Core: open the brain's default chat, the one reports land in (the server makes it when missing).
-        var c = await api("/javis-core/session", { method: "POST", body: fd({ brain: brain() }) });
+        // UNETI AI Core: open the brain's default chat, the one reports land in (the server makes it when missing).
+        var c = await api("/uneti-ai-core/session", { method: "POST", body: fd({ brain: brain() }) });
         if (!still()) return false;
         id = c && c.id;
       }
@@ -1565,9 +1565,9 @@
         // 2026-11-05: open the remembered chat right away, in parallel with asking which chat is newest. Before, the
         // chat waited for this answer and then for its own messages: two round trips in a row on every click.
         nho = !item.system ? _phienGanNhat[khoaGanNhat(item)] : null;
-        if (nho && window.JavisSessions) {
+        if (nho && window.UnetiSessions) {
           S.sessionCuaPhien[nho] = item.slug;
-          moSom = window.JavisSessions.open(nho, still);
+          moSom = window.UnetiSessions.open(nho, still);
         }
         var r = await api("/sessions?brain=" + b + "&channel=" + encodeURIComponent(ch) + "&limit=1");
         if (!still()) return false;
@@ -1587,9 +1587,9 @@
       S.sessionCuaPhien[id] = item.slug;
       if (moSom && id === nho) await moSom;   // the remembered chat is still the newest: it is already open
       // A chat made just now is empty: open it without asking the server for its (zero) messages.
-      else if (window.JavisSessions) await window.JavisSessions.open(id, still, phienMoiTao ? { empty: true } : undefined);
+      else if (window.UnetiSessions) await window.UnetiSessions.open(id, still, phienMoiTao ? { empty: true } : undefined);
       if (!still()) return false;
-      if (!window.JavisSessions || window.JavisSessions.current() !== id) throw new Error(t("ws.err_session"));
+      if (!window.UnetiSessions || window.UnetiSessions.current() !== id) throw new Error(t("ws.err_session"));
       if (!item.system) _phienGanNhat[khoaGanNhat(item)] = id;
       chatReady(true);
       luuViTri(id);
@@ -1598,19 +1598,19 @@
       else ganCongHuong(item, id);
       return true;
     } catch (e) {
-      if (still()) { veLoi(t("ws.err_session")); if (window.JavisSessions) window.JavisSessions.new(); }
+      if (still()) { veLoi(t("ws.err_session")); if (window.UnetiSessions) window.UnetiSessions.new(); }
       return false;
     }
   }
   async function chayQuyTrinh() {
     var item = dangChon();
-    if (!ready || S.loai !== "workflow" || !item || !window.JavisSend) return;
+    if (!ready || S.loai !== "workflow" || !item || !window.UnetiSend) return;
     var td = tienDoHienTai(item);
     if (td.trang_thai === "dang" || td.cho_duyet) return;
     var input = document.getElementById("chatInput");
     // Cờ wfRun: bấm nút Chạy là ý định chạy đã nói rõ bằng một cú bấm, nên server
     // không xét lại xem câu trong ô nhập có phải đang nói về chính quy trình không.
-    window.JavisSend((input && input.value.trim()) || t("ws.run_default"), { wfRun: true });
+    window.UnetiSend((input && input.value.trim()) || t("ws.run_default"), { wfRun: true });
   }
   function veLoi(msg) { var el = S.el && S.el.querySelector("#wsIdentity"); if (el) {
     el.innerHTML += '<small class="ws-err">' + esc(msg) + '</small><button type="button" class="ws-btn" id="wsRetry">' + esc(t("ws.retry_session")) + '</button>';
@@ -1665,7 +1665,7 @@
     var nut = function (id, fn) { var b = host.querySelector(id); if (b) b.onclick = fn; };
     nut("#wsObAgent", function () { taoMoi("agent"); });
     nut("#wsObWf", function () { taoMoi("workflow"); });
-    nut("#wsObStore", function () { nhom("packs", function () { if (window.JavisPacks && window.JavisPacks.moKho) window.JavisPacks.moKho(S.loai, "workspace", t("page.workspace.label")); }); });
+    nut("#wsObStore", function () { nhom("packs", function () { if (window.UnetiPacks && window.UnetiPacks.moKho) window.UnetiPacks.moKho(S.loai, "workspace", t("page.workspace.label")); }); });
   }
 
   // ---------- ẩn/hiện cột bên phải, nhớ lựa chọn (0.142.0) ----------
@@ -1686,7 +1686,7 @@
     if (mq.addEventListener) mq.addEventListener("change", doi); else if (mq.addListener) mq.addListener(doi);
     _khoManGan = true;
   }
-  function nhoPhaiHien() { try { return localStorage.getItem("javis_ws_right") === "1"; } catch (e) { return false; } }
+  function nhoPhaiHien() { try { return localStorage.getItem("uneti_ws_right") === "1"; } catch (e) { return false; } }
   function phaiDangHien() {
     var page = S.el && S.el.querySelector("#wsPage");
     if (!page) return false;
@@ -1697,12 +1697,12 @@
     var page = S.el && S.el.querySelector("#wsPage");
     if (!page) return;
     page.classList.toggle("right-open", manRong() ? !hien : !!hien);
-    if (manRong() && !tamThoi) { try { localStorage.setItem("javis_ws_right", hien ? "1" : "0"); } catch (e) {} }
+    if (manRong() && !tamThoi) { try { localStorage.setItem("uneti_ws_right", hien ? "1" : "0"); } catch (e) {} }
   }
 
   // ---------- kéo đường biên để đổi bề rộng cột ----------
-  var BE_RONG = { left: { bien: "--ws-left-w", khoa: "javis_ws_left_w", min: 220, max: 560 },
-    right: { bien: "--ws-right-w", khoa: "javis_ws_right_w", min: 280, max: 640 } };
+  var BE_RONG = { left: { bien: "--ws-left-w", khoa: "uneti_ws_left_w", min: 220, max: 560 },
+    right: { bien: "--ws-right-w", khoa: "uneti_ws_right_w", min: 280, max: 640 } };
   var CHAT_TOI_THIEU = 360;   // khung chat giữa không bao giờ hẹp hơn mức này vì kéo hai cột bên
   // 0.191.0 (owner, 16/10/2026: "khi co nhỏ vào đến 1 cỡ thì nó chỉ còn các hình avatar thôi"): dragging the list edge
   // past NGUONG_MINI snaps the column to MINI_W, a strip of avatars only (class ws-mini on the page; hover shows the
@@ -1745,9 +1745,9 @@
     try { localStorage.setItem(BE_RONG[ben].khoa, String(w)); } catch (e) {}
   }
   // The name card of the avatar strip: the row's name, role or step count, and time, next to the avatar under the
-  // pointer. The card itself is shared with the Teams page (0.196.0: JavisColResize.miniTip in col-resize.js).
+  // pointer. The card itself is shared with the Teams page (0.196.0: UnetiColResize.miniTip in col-resize.js).
   function anTheMini() {
-    var CR = typeof window !== "undefined" ? window.JavisColResize : null;
+    var CR = typeof window !== "undefined" ? window.UnetiColResize : null;
     if (CR && CR.miniTip) CR.miniTip.hide();
   }
   function hienTheMini(b) {
@@ -1758,10 +1758,10 @@
     var wrap = b.closest(".ws-item-wrap"), gio = wrap && wrap.querySelector(".ws-item-time");
     var anh = b.querySelector(".ws-item-ic");
     var x = (S.agents || []).filter(function (a) { return a.slug === b.dataset.slug; })[0];
-    var tt = S.loai === "agent" && x && S.jc && window.JavisAgentJobs && window.JavisAgentJobs.statusText
-      ? window.JavisAgentJobs.statusText(S.jc[x.slug]) : "";
-    var st = tt ? window.JavisAgentJobs.statusOf(S.jc[x.slug]) : "";
-    window.JavisColResize.miniTip.show(b, { ava: anh ? anh.innerHTML : "", name: ten ? ten.textContent : "",
+    var tt = S.loai === "agent" && x && S.jc && window.UnetiAgentJobs && window.UnetiAgentJobs.statusText
+      ? window.UnetiAgentJobs.statusText(S.jc[x.slug]) : "";
+    var st = tt ? window.UnetiAgentJobs.statusOf(S.jc[x.slug]) : "";
+    window.UnetiColResize.miniTip.show(b, { ava: anh ? anh.innerHTML : "", name: ten ? ten.textContent : "",
       time: gio ? gio.textContent : "", sub: phu ? phu.textContent : "", stText: tt, st: st });
   }
   function noiKeoBien(page) {
@@ -1834,7 +1834,7 @@
     if (input) input.focus();
   }
 
-  // Javis Core may have saved a new name in the turn that just ended (`javis_core_name`): read it back so the list,
+  // UNETI AI Core may have saved a new name in the turn that just ended (`uneti_core_name`): read it back so the list,
   // the chat header and the card show it without a reload (owner, 04/11/2026).
   async function docLaiTenCore(ag) {
     var d = null;
@@ -1867,21 +1867,21 @@
     if (S.loai === "agent") {
       // 0.190.0 (owner, 16/10/2026: "tối giản nhất, người ta không cần hiểu gì về cài đặt cũng dùng được"): the column
       // opens on what every assistant app has (picture, name, role, instructions, documents, skills, model). The Auto
-      // block sits below and shows only while Auto is on (veAuto); lessons are handled in chat (javis_memory).
-      // 2026-11-05 (owner): Javis Core opens this same form, picture, name, role, instructions, documents, skills,
+      // block sits below and shows only while Auto is on (veAuto); lessons are handled in chat (uneti_memory).
+      // 2026-11-05 (owner): UNETI AI Core opens this same form, picture, name, role, instructions, documents, skills,
       // model. Being the system assistant only drops Export and Delete; its Auto stays on (veAuto).
       host.innerHTML = '<div class="ws-form" id="wsAgentForm"></div><div class="ws-auto-block" id="wsAuto"></div>' +
         (item.system ? "" : '<div class="ws-acts"><button type="button" class="ws-btn" id="wsExport">' + esc(t("studio.export")) + '</button>' +
         '<button type="button" class="ws-btn danger" id="wsDel">' + esc(t("common.delete")) + '</button></div>');
       // MƯỢN chính trình sửa agent của Studio (studio.js), không dựng bản thứ hai: chọn model,
       // chọn skill, nhóm... đã nằm ở đó, chép lại là hai bản trôi lệch nhau ngay lần sửa đầu.
-      if (window.JavisStudio && window.JavisStudio.editAgent) {
-        window.JavisStudio.editAgent(item, { host: host.querySelector("#wsAgentForm"),
+      if (window.UnetiStudio && window.UnetiStudio.editAgent) {
+        window.UnetiStudio.editAgent(item, { host: host.querySelector("#wsAgentForm"),
           onSaved: async function () { await sauLuu(item, "agent"); } });
       }
       veAuto(item);
       if (!item.system) {
-        host.querySelector("#wsExport").onclick = function () { window.JavisStudio && window.JavisStudio.exportItem("agent", item.slug); };
+        host.querySelector("#wsExport").onclick = function () { window.UnetiStudio && window.UnetiStudio.exportItem("agent", item.slug); };
         host.querySelector("#wsDel").onclick = async function () {
           if (!confirm(t("studio.del_ag", { ten: item.name }))) return;
           await api("/agents/delete", { method: "POST", body: fd({ slug: item.slug, brain: brain() }) });
@@ -1903,8 +1903,8 @@
         '<button type="button" class="ws-btn danger" id="wsDel">' + esc(t("common.delete")) + '</button></div>';
       host.querySelector("#wsRun").onclick = chayQuyTrinh;
       veBuoc(item, td);
-      host.querySelector("#wsEditWf").onclick = function () { var moi = dangChon() || item; window.JavisStudio && window.JavisStudio.editWorkflow(moi, { onSaved: async function () { await sauLuu(moi, "workflow"); } }); };
-      host.querySelector("#wsExport").onclick = function () { window.JavisStudio && window.JavisStudio.exportItem("workflow", item.slug); };
+      host.querySelector("#wsEditWf").onclick = function () { var moi = dangChon() || item; window.UnetiStudio && window.UnetiStudio.editWorkflow(moi, { onSaved: async function () { await sauLuu(moi, "workflow"); } }); };
+      host.querySelector("#wsExport").onclick = function () { window.UnetiStudio && window.UnetiStudio.exportItem("workflow", item.slug); };
       host.querySelector("#wsDel").onclick = async function () {
         if (!confirm(t("studio.del_wf", { ten: item.name }))) return;
         await api("/workflows/delete", { method: "POST", body: fd({ slug: item.slug, brain: brain() }) });
@@ -1921,27 +1921,27 @@
   function veAuto(item) {
     var box = S.el && S.el.querySelector("#wsAuto");
     if (!box || !item) return;
-    if (!window.JavisResonanceAgent || !(item.system || autoBat(S.rs, item.slug))) { box.innerHTML = ""; return; }
+    if (!window.UnetiResonanceAgent || !(item.system || autoBat(S.rs, item.slug))) { box.innerHTML = ""; return; }
     if (box.querySelector("#wsResonance")) return;
     box.innerHTML = '<div class="rsa-panel" id="wsResonance"></div><div class="rsa-panel pulse-panel" id="wsPulse"></div>';
     ganCongHuong(item);
   }
   function ganCongHuong(item, sid) {
     var host = S.el && S.el.querySelector("#wsResonance");
-    if (!host || !window.JavisResonanceAgent || !item) return;
-    window.JavisResonanceAgent.mount(host, { slug: item.slug,
-      sessionId: sid || (window.JavisSessions && window.JavisSessions.current && window.JavisSessions.current()) || "",
+    if (!host || !window.UnetiResonanceAgent || !item) return;
+    window.UnetiResonanceAgent.mount(host, { slug: item.slug,
+      sessionId: sid || (window.UnetiSessions && window.UnetiSessions.current && window.UnetiSessions.current()) || "",
       onNewSession: function () { var x = dangChon(); return x ? moPhien(x, true) : false; } });
     // T3: bảng Nhịp chủ động (agent-pulse.js) ngay dưới Cộng hưởng: mọi ngữ cảnh của trợ lý, nút chỉ báo xong sau 200.
     var ph = S.el && S.el.querySelector("#wsPulse");
     // 0.190.0: the compact view: one plain line for the daily limit and pending proposals only (no pace, no thresholds).
-    if (ph && window.JavisPulse) window.JavisPulse.mount(ph, { slug: item.slug, brain: brain(), compact: true });
+    if (ph && window.UnetiPulse) window.UnetiPulse.mount(ph, { slug: item.slug, brain: brain(), compact: true });
   }
   function tenAgent(slug) { var a = S.agents.find(function (x) { return x.slug === slug; }); return a ? a.name : (slug || ""); }
   // Tiến độ ĐANG XEM: lần chạy sống của phiên đang mở nếu có, không thì khung rỗng dựng từ
   // các bước khai trong file quy trình (để cột phải vẫn nói được quy trình này làm những gì).
   function tienDoHienTai(item) {
-    var sid = window.JavisSessions ? window.JavisSessions.current() : null;
+    var sid = window.UnetiSessions ? window.UnetiSessions.current() : null;
     if (sid && S.tienDo[sid]) return S.tienDo[sid];
     var buocs = cacBuoc(item);
     var td = tienDoMoi(buocs.length);
@@ -1972,9 +1972,9 @@
     var ap = host.querySelector("#wsApprove");
     if (ap) ap.onclick = function () {
       ap.disabled = true;
-      var sid = window.JavisSessions ? window.JavisSessions.current() : null;
-      if (!sid || !window.JavisWsSend) return;
-      window.JavisWsSend({ action: "wf_resume", session_id: sid, task_id: td.cho_duyet.task_id, node: td.cho_duyet.node, code: td.cho_duyet.code, brain: brain() });
+      var sid = window.UnetiSessions ? window.UnetiSessions.current() : null;
+      if (!sid || !window.UnetiWsSend) return;
+      window.UnetiWsSend({ action: "wf_resume", session_id: sid, task_id: td.cho_duyet.task_id, node: td.cho_duyet.node, code: td.cho_duyet.code, brain: brain() });
       td.cho_duyet = null; td.trang_thai = "dang"; veBuoc(item, td);
     };
     var run = S.el.querySelector("#wsRun");
@@ -2005,8 +2005,8 @@
     // đây ở chế độ lọc theo kênh: cùng ô tìm, cùng nhóm theo ngày, cùng ghim / đổi tên / xoá,
     // cùng nút "Xem thêm". Chủ dự án yêu cầu đúng trải nghiệm ấy chứ không phải một danh sách
     // rút gọn khác; và một bản thứ hai thì lệch dần khỏi bản gốc ngay từ lần sửa đầu tiên.
-    if (window.JavisChatSide && window.JavisChatSide.mount) {
-      window.JavisChatSide.mount(host.querySelector("#wsSess"), {
+    if (window.UnetiChatSide && window.UnetiChatSide.mount) {
+      window.UnetiChatSide.mount(host.querySelector("#wsSess"), {
         kenh: kenh(item), chiHoiThoai: true,
         onNew: function () { var x = dangChon(); if (x) moPhien(x, true); },
         trangTri: S.loai === "workflow" ? trangTriHang : null,
@@ -2027,7 +2027,7 @@
     };
   }
   // Hàng của phiên ĐANG MỞ do chính cột lịch sử tự tô (lớp .active, mỗi lần
-  // JavisChatSide.refresh chạy) - từ 0.59.20 tab này không còn danh sách nào của riêng nó nữa
+  // UnetiChatSide.refresh chạy) - từ 0.59.20 tab này không còn danh sách nào của riêng nó nữa
   // nên ở đây không phải tô gì cả.
   // Nạp SỔ lần chạy: session_id -> lần chạy. Không vẽ danh sách nào cả - dữ liệu này chỉ để
   // trang trí hàng hội thoại tương ứng (xem trangTriHang), nên nạp xong thì bảo cột lịch sử
@@ -2040,7 +2040,7 @@
     var so = {};
     (r.runs || []).forEach(function (x) { if (x.session_id) so[x.session_id] = x; });
     S.lanChay = so;
-    if (window.JavisChatSide && window.JavisChatSide.refresh) window.JavisChatSide.refresh();
+    if (window.UnetiChatSide && window.UnetiChatSide.refresh) window.UnetiChatSide.refresh();
   }
   // ---------- sự kiện quy trình từ WebSocket ----------
   // app.js chuyển MỌI khung wf_event vào đây, kể cả của phiên đang không mở: ghi theo
@@ -2048,11 +2048,11 @@
   function onWfEvent(frame) {
     var sid = frame.session_id, ev = frame.event || {}; if (!sid) return;
     var item = dangChon();
-    // Phiên mở từ cột LỊCH SỬ đi thẳng qua JavisSessions.open (module lịch sử lo), không qua
+    // Phiên mở từ cột LỊCH SỬ đi thẳng qua UnetiSessions.open (module lịch sử lo), không qua
     // moPhien nên chưa có tên trong sổ "phiên nào của cộng sự nào". Lần chạy đầu tiên ở đó mà
     // thiếu dòng này thì icon quay ở cột trái không bao giờ bật: dangChay() tra sổ không thấy.
     if (item && !S.sessionCuaPhien[sid] &&
-        window.JavisSessions && window.JavisSessions.current() === sid) {
+        window.UnetiSessions && window.UnetiSessions.current() === sid) {
       S.sessionCuaPhien[sid] = item.slug;
     }
     if (!S.tienDo[sid]) {
@@ -2064,7 +2064,7 @@
     // quy trình đọc từ S.tienDo, nên không vẽ lại thì bắt đầu chạy mà hàng vẫn đứng im, và
     // chạy xong rồi mà vẫn quay.
     if (S.loai === "workflow") veDanhSach();
-    var cur = window.JavisSessions ? window.JavisSessions.current() : null;
+    var cur = window.UnetiSessions ? window.UnetiSessions.current() : null;
     if (item && S.loai === "workflow" && cur === sid) {
       veBuoc(item, S.tienDo[sid]);
       // Xong / lỗi / chờ duyệt = lịch sử chạy vừa có dòng mới và mốc "chạy gần nhất" vừa đổi,
@@ -2095,7 +2095,7 @@
     apDung(S.tienDo[sid], { type: "stopped" });
     if (S.loai === "workflow") veDanhSach();
     var item = dangChon();
-    var cur = window.JavisSessions ? window.JavisSessions.current() : null;
+    var cur = window.UnetiSessions ? window.UnetiSessions.current() : null;
     if (item && S.loai === "workflow" && cur === sid) veBuoc(item, S.tienDo[sid]);
   }
 
@@ -2103,7 +2103,7 @@
   // `loai` chỉ rõ tạo TRỢ LÝ hay QUY TRÌNH: màn khởi đầu bày cả hai nút nên nút được bấm mới
   // là thứ quyết định, không phải tab đang đứng. Bỏ trống thì theo tab (nút Tạo mới cột trái).
   function taoMoi(loai) {
-    if (!window.JavisStudio) return;
+    if (!window.UnetiStudio) return;
     loai = loai === "agent" || loai === "workflow" ? loai : S.loai;
     var sau = async function (saved) {
       await taiDanhSach(); if (!active) return;
@@ -2117,8 +2117,8 @@
     };
     // Không truyền `host`: tạo mới vẫn mở modal của Studio (cột phải đang là form của mục
     // đang chọn, vẽ đè lên đó thì người dùng tưởng mình đang sửa mục cũ).
-    if (loai === "agent") window.JavisStudio.editAgent(null, { onSaved: sau });
-    else window.JavisStudio.editWorkflow(null, { onSaved: sau });
+    if (loai === "agent") window.UnetiStudio.editAgent(null, { onSaved: sau });
+    else window.UnetiStudio.editWorkflow(null, { onSaved: sau });
   }
 
   // Rời trang: trả ô nhập về lời mời chung. veGiua() đổi placeholder thành "Nhắn cho <trợ lý>",
@@ -2141,21 +2141,21 @@
     if (inp) inp.placeholder = t("bar.input_ph");
   }
 
-  window.JavisWorkspace = { gioNgan: gioNgan, render: render, roi: roi, openCommand: openCommand, openTab: openTab, onTurnDone: onTurnDone, canSend: function () { return !active || ready; }, dungKhiChuaCoTuDien: function () { return dungKhiChuaCoTuDien; }, onChatState: onChatState, chayQuyTrinh: chayQuyTrinh, onWfEvent: onWfEvent, sapXep: sapXep, loc: loc, tienDoMoi: tienDoMoi, apDung: apDung, phanTram: phanTram,
+  window.UnetiWorkspace = { gioNgan: gioNgan, render: render, roi: roi, openCommand: openCommand, openTab: openTab, onTurnDone: onTurnDone, canSend: function () { return !active || ready; }, dungKhiChuaCoTuDien: function () { return dungKhiChuaCoTuDien; }, onChatState: onChatState, chayQuyTrinh: chayQuyTrinh, onWfEvent: onWfEvent, sapXep: sapXep, loc: loc, tienDoMoi: tienDoMoi, apDung: apDung, phanTram: phanTram,
     dangChay: dangChay, tabPhai: chonTabPhai, gomNhom: gomNhom, nhomHtml: nhomHtml, chonNhom: chonNhom, state: function () { return S; },
     tagsCua: tagsCua, tagCap: tagCap, laKhoa: laKhoa, demTag: demTag, coTag: coTag, khoaTag: khoaTag,
     dongChonTag: dongChonTag, chipTagHtml: chipTagHtml, TAG_NONE: TAG_NONE, TAG_AUTO: TAG_AUTO, laLocGia: laLocGia, autoBat: autoBat,
     resonanceMap: resonanceMap, afterToggle: afterToggle, tinHtml: tinHtml, tatDen: tatDen };
-  // Sidebar lịch sử mở phiên trực tiếp qua JavisSessions.open, ngoài đường moPhien ở trên.
+  // Sidebar lịch sử mở phiên trực tiếp qua UnetiSessions.open, ngoài đường moPhien ở trên.
   // Ghi lại sau khi nó mở xong để lần dựng trang sau vẫn ở đúng cuộc đã chọn.
-  window.addEventListener("javis:sessions-changed", function () {
-    if (active && ready && window.JavisSessions) luuViTri(window.JavisSessions.current());
+  window.addEventListener("uneti:sessions-changed", function () {
+    if (active && ready && window.UnetiSessions) luuViTri(window.UnetiSessions.current());
   });
   // T0 nhóm chat team: trạng thái Cộng hưởng vừa đổi (tab này, tab khác qua gói WS resonance_agents, hay trang Cài
   // đặt): đọc lại trạng thái THẬT của host rồi vẽ lại danh sách. Không giữ trạng thái người dùng vừa bấm.
   // 0.454.0: the tag order changed: the list and its tag bar follow.
-  window.addEventListener("javis:order-changed", function () { if (active && ready) veDanhSach(); });
-  window.addEventListener("javis:resonance-agents-changed", function () {
+  window.addEventListener("uneti:order-changed", function () { if (active && ready) veDanhSach(); });
+  window.addEventListener("uneti:resonance-agents-changed", function () {
     if (!active) return;
     loadResonance().then(function (ok) { if (ok && active && S.loai === "agent") { veDanhSach(); veAuto(dangChon()); } });
     henDemViec();
@@ -2163,11 +2163,11 @@
   // Huy hiệu việc trên thẻ trợ lý theo cùng các sự kiện với tab Công việc (gộp nhịp 800ms).
   // Performance (2026-11-05): a plain chat switch (reason "open") adds no message and no job, so it does not recount.
   function laDoiPhien(e) { return !!(e && e.detail && e.detail.reason === "open"); }
-  ["javis:team-event", "javis:sessions-changed", "javis:agent-jobs-changed"].forEach(function (ev) {
+  ["uneti:team-event", "uneti:sessions-changed", "uneti:agent-jobs-changed"].forEach(function (ev) {
     window.addEventListener(ev, function (e) { if (!laDoiPhien(e)) henDemViec(); });
   });
   // 0.205.0: a message landed somewhere, or another tab read or muted a partner: read the unread counts again.
-  ["javis:sessions-changed", "javis:agent-read"].forEach(function (ev) {
+  ["uneti:sessions-changed", "uneti:agent-read"].forEach(function (ev) {
     window.addEventListener(ev, function (e) { if (!laDoiPhien(e)) henUnread(); });
   });
   if (typeof document !== "undefined" && document.addEventListener) document.addEventListener("visibilitychange", function () {

@@ -12,7 +12,7 @@ the server's, its memory is returned when it exits, and a stuck run can be kille
 small VPS two at once would starve the server itself.
 
 Cost the owner should know (also on the card): a 30 second clip takes roughly 5 to 30 seconds depending on the CPU,
-and the "small" model hears Vietnamese less well than Groq's large Whisper. `JAVIS_LOCAL_STT_MODEL` picks another size
+and the "small" model hears Vietnamese less well than Groq's large Whisper. `UNETI_LOCAL_STT_MODEL` picks another size
 (base, small, medium, large-v3-turbo) for a stronger or weaker machine.
 """
 from __future__ import annotations
@@ -35,7 +35,7 @@ LIB_DIR = ROOT / "lib"
 MODEL_DIR = ROOT / "models"
 TMP_DIR = ROOT / "tmp"
 WORKER = Path(__file__).resolve().parent / "offline_ear" / "worker.py"
-MODEL = (os.getenv("JAVIS_LOCAL_STT_MODEL") or "small").strip() or "small"
+MODEL = (os.getenv("UNETI_LOCAL_STT_MODEL") or "small").strip() or "small"
 TIMEOUT = 600.0          # one transcription; a long clip on a slow CPU, never forever
 INSTALL_TIMEOUT = 1800.0  # ~1GB over a slow VPS link
 SIZE_HINT = "~1 GB"
@@ -47,10 +47,10 @@ def describe() -> dict:
         "id": "local_ear",
         "ten": localefmt.chu("Bộ nghe offline (Whisper)", "Offline ear (Whisper)"),
         "mo_ta": localefmt.chu(
-            "Nghe tin thoại và lời nói trong video khách gửi ngay trên máy này, không cần API key nào. Javis chỉ dùng "
+            "Nghe tin thoại và lời nói trong video khách gửi ngay trên máy này, không cần API key nào. UNETI AI chỉ dùng "
             "khi không có key Groq, OpenAI hay Gemini, hoặc các key đó đang lỗi. Tải về khoảng 1 GB. Máy yếu nghe chậm "
             "hơn (một video 30 giây mất vài chục giây) và nghe tiếng Việt kém hơn Groq.",
-            "Hears voice messages and the speech in customers' videos on this machine, with no API key. Javis uses it "
+            "Hears voice messages and the speech in customers' videos on this machine, with no API key. UNETI AI uses it "
             "only when there is no Groq, OpenAI or Gemini key, or those keys fail. About 1 GB to download. A weak "
             "machine hears slowly (a 30 second video can take tens of seconds) and less accurately than Groq."),
         "dung_luong_uoc": SIZE_HINT,
@@ -95,8 +95,8 @@ def status(d: dict, job: dict) -> dict:
         tt, why = "chua_cai", localefmt.chu("Bản tải về chưa đủ (thiếu thư viện hoặc mô hình). Bấm cài lại.",
                                             "The download is incomplete (library or model missing). Install again.")
     else:
-        tt, why = "chua_cai", localefmt.chu("Chưa cài. Không có key nào thì Javis chưa nghe được tin thoại.",
-                                            "Not installed. Without a key Javis cannot hear voice messages yet.")
+        tt, why = "chua_cai", localefmt.chu("Chưa cài. Không có key nào thì UNETI AI chưa nghe được tin thoại.",
+                                            "Not installed. Without a key UNETI AI cannot hear voice messages yet.")
     d.update({"trang_thai": tt, "ly_do": why, "go_duoc": ROOT.exists() and not job.get("dang_chay"),
               "duong_dan": str(ROOT) if ROOT.exists() else "",
               "dung_luong": _doc_mb(_size(ROOT)) if ROOT.exists() else ""})
@@ -129,9 +129,9 @@ def remove() -> dict:
 
 def _threads() -> int:
     """0.444.4: leave one core to the server. Whisper's default takes every core, and on a 1-2 vCPU VPS a voice
-    message then starved uvicorn until /health failed. JAVIS_LOCAL_STT_THREADS overrides."""
+    message then starved uvicorn until /health failed. UNETI_LOCAL_STT_THREADS overrides."""
     try:
-        n = int(os.environ.get("JAVIS_LOCAL_STT_THREADS") or 0)
+        n = int(os.environ.get("UNETI_LOCAL_STT_THREADS") or 0)
     except ValueError:
         n = 0
     return n if n > 0 else max(1, (os.cpu_count() or 2) - 1)
@@ -149,12 +149,12 @@ def _last_json(out: str) -> dict:
 
 
 async def transcribe(data: bytes, file_name: str = "audio", lang: Optional[str] = None) -> dict:
-    """Same contract as `stt.groq_nghe`: {"ok", "text", "model"} or {"ok": False, "ly_do", "noi_voi_javis"}."""
+    """Same contract as `stt.groq_nghe`: {"ok", "text", "model"} or {"ok": False, "ly_do", "noi_voi_uneti"}."""
     import stt
     if not installed():
-        return {"ok": False, "ly_do": "thieu_key", "noi_voi_javis": stt.loi_thanh_dong("thieu_key")}
+        return {"ok": False, "ly_do": "thieu_key", "noi_voi_uneti": stt.loi_thanh_dong("thieu_key")}
     if not data:
-        return {"ok": False, "ly_do": "rong", "noi_voi_javis": stt.loi_thanh_dong("loi", "file rỗng")}
+        return {"ok": False, "ly_do": "rong", "noi_voi_uneti": stt.loi_thanh_dong("loi", "file rỗng")}
     TMP_DIR.mkdir(parents=True, exist_ok=True)
     ext = os.path.splitext(str(file_name or ""))[1][:8] or ".bin"
     src = TMP_DIR / (uuid.uuid4().hex + ext)
@@ -174,18 +174,18 @@ async def transcribe(data: bytes, file_name: str = "audio", lang: Optional[str] 
                 proc.kill()
                 await proc.wait()
                 return {"ok": False, "ly_do": "loi",
-                        "noi_voi_javis": stt.loi_thanh_dong("loi", "bộ nghe offline chạy quá lâu")}
+                        "noi_voi_uneti": stt.loi_thanh_dong("loi", "bộ nghe offline chạy quá lâu")}
         res = _last_json(out.decode("utf-8", "replace"))
         if not res.get("ok"):
             why = str(res.get("error") or err.decode("utf-8", "replace")[-200:] or f"mã {proc.returncode}")
             print(f"[stt local] {why}", file=sys.stderr)
-            return {"ok": False, "ly_do": "loi", "noi_voi_javis": stt.loi_thanh_dong("loi", why[:200])}
+            return {"ok": False, "ly_do": "loi", "noi_voi_uneti": stt.loi_thanh_dong("loi", why[:200])}
         text = stt.loc_ao_giac(str(res.get("text") or "").strip())
         if not text:
-            return {"ok": False, "ly_do": "khong_nghe_ro", "noi_voi_javis": stt.loi_thanh_dong("khong_nghe_ro")}
+            return {"ok": False, "ly_do": "khong_nghe_ro", "noi_voi_uneti": stt.loi_thanh_dong("khong_nghe_ro")}
         return {"ok": True, "text": text, "model": "whisper-" + MODEL + " (offline)"}
     except Exception as e:      # noqa: BLE001 - a broken ear must never cost the message
         print(f"[stt local] {type(e).__name__}: {e}", file=sys.stderr)
-        return {"ok": False, "ly_do": "loi", "noi_voi_javis": stt.loi_thanh_dong("loi", f"{type(e).__name__}")}
+        return {"ok": False, "ly_do": "loi", "noi_voi_uneti": stt.loi_thanh_dong("loi", f"{type(e).__name__}")}
     finally:
         src.unlink(missing_ok=True)

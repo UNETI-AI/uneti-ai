@@ -23,7 +23,7 @@ Token được mã hoá khi lưu và không bao giờ gửi về trình duyệt.
 Trong khung chat bấm **dấu cộng → Repo GitHub**, tích một hay nhiều repo, bấm **Gắn**. Chip tên repo hiện cạnh ô nhập.
 
 - UNETI AI tải repo về máy, **ngoài** thư mục brain (`<thư mục trạng thái>/repos/<brain>/<owner>/<repo>`), nên code không lẫn vào bản sao lưu brain hay ô tìm kiếm.
-- Mỗi cuộc trò chuyện làm trên **một nhánh và một thư mục riêng** (`javis/...`). Hai cuộc cùng sửa một repo không bao giờ đè việc của nhau.
+- Mỗi cuộc trò chuyện làm trên **một nhánh và một thư mục riêng** (`uneti/...`). Hai cuộc cùng sửa một repo không bao giờ đè việc của nhau.
 - Gắn repo không chạy script, không cài gì cho tới khi bước kiểm tra cần.
 
 ## 3. Sau mỗi lượt có sửa code
@@ -56,7 +56,7 @@ Giao nhiều việc một lúc ("xong cái này thì làm cái kia")? UNETI AI x
 
 ## 6. Bài học và số đo
 
-- Mỗi lần CI hay kiểm tra ở máy đỏ rồi được sửa, UNETI AI ghi một dòng bài học cho repo đó vào `Javis/learned/repos/` trong brain, và nạp lại ở lượt sau.
+- Mỗi lần CI hay kiểm tra ở máy đỏ rồi được sửa, UNETI AI ghi một dòng bài học cho repo đó vào `UNETI/learned/repos/` trong brain, và nạp lại ở lượt sau.
 - Nút **Số đo** trên thẻ GitHub cho biết, theo từng engine và model: tỉ lệ xanh ngay lần đẩy đầu, số vòng sửa trung bình, số lỗi review chéo bắt được. Chọn model bằng số thật.
 
 ## 7. Gỡ repo

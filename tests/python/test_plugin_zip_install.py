@@ -2,7 +2,7 @@
 
     python tests/run.py plugin_zip
 
-No pytest, no network, isolated JAVIS_STATE_DIR. What must hold:
+No pytest, no network, isolated UNETI_STATE_DIR. What must hold:
 
 1. The zip rules are the PACK rules (one shared extractor): traversal, symlink, ratio bomb and
    oversize are refused here too.
@@ -21,9 +21,9 @@ import sys
 import tempfile
 import zipfile
 
-os.environ["JAVIS_STATE_DIR"] = tempfile.mkdtemp(prefix="javis-pzip-")
-os.environ.pop("JAVIS_ENABLE_USER_PLUGINS", None)
-os.environ.pop("JAVIS_ENABLE_VAULT_PLUGINS", None)
+os.environ["UNETI_STATE_DIR"] = tempfile.mkdtemp(prefix="uneti-pzip-")
+os.environ.pop("UNETI_ENABLE_USER_PLUGINS", None)
+os.environ.pop("UNETI_ENABLE_VAULT_PLUGINS", None)
 
 import fastyaml  # noqa: E402
 import pack_install  # noqa: E402
@@ -181,13 +181,13 @@ check("pack zip reported as kind=pack", rk == {"ok": True, "kind": "pack"}, rk)
 import hashlib  # noqa: E402
 check("pack zip leaves no plugin staging", not (plugin_install.STAGING / hashlib.sha256(b.getvalue()).hexdigest()).exists())
 
-# ---------- 6. JAVIS_ENABLE_USER_PLUGINS=false is reported ----------
-os.environ["JAVIS_ENABLE_USER_PLUGINS"] = "false"
+# ---------- 6. UNETI_ENABLE_USER_PLUGINS=false is reported ----------
+os.environ["UNETI_ENABLE_USER_PLUGINS"] = "false"
 rg = plugin_install.inspect(make_zip(slug="gated-one"))
 check("inspect reports user plugins globally off", rg.get("ok") and rg.get("user_gate") is False, rg)
 ig = plugin_install.install(rg["staging_id"], rg["sha256"])
 check("install still ok, says gated", ig.get("ok") and ig.get("user_gate") is False, ig)
-os.environ.pop("JAVIS_ENABLE_USER_PLUGINS", None)
+os.environ.pop("UNETI_ENABLE_USER_PLUGINS", None)
 
 # ---------- 7. routes: real session only, pack zips go to the pack inspector ----------
 try:
@@ -197,7 +197,7 @@ try:
 
     refreshed = []
     app = FastAPI()
-    pz.register(app, pz.PluginZipDeps(co_phien=lambda req: req.cookies.get("javis_session") == "good",
+    pz.register(app, pz.PluginZipDeps(co_phien=lambda req: req.cookies.get("uneti_session") == "good",
                                       brain_root=lambda b: "", after_install=refreshed.append))
     c = TestClient(app)
     data = make_zip(slug="route-demo", tool="route_demo_tool")
@@ -205,7 +205,7 @@ try:
     check("route: inspect needs a session", r401.status_code == 401)
     r401b = c.post("/plugins/install", json={"staging_id": "x", "consent_sha256": "x"})
     check("route: install needs a session", r401b.status_code == 401)
-    c.cookies.set("javis_session", "good")
+    c.cookies.set("uneti_session", "good")
     ri = c.post("/plugins/inspect", files={"file": ("p.zip", data, "application/zip")}, data={"brain": "brain"}).json()
     check("route: inspect ok", ri.get("ok") and ri.get("slug") == "route-demo", ri)
     rn = c.post("/plugins/install", json={"staging_id": ri["staging_id"], "consent_sha256": ri["sha256"],

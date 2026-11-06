@@ -1,5 +1,5 @@
 """Threads (Meta) gateway, 0.448.0: replies under the owner's Threads posts land in the inbox and the bot can
-answer them publicly. Same shape as `messenger_bot`: Threads POSTs every new reply to a webhook, Javis never polls
+answer them publicly. Same shape as `messenger_bot`: Threads POSTs every new reply to a webhook, UNETI AI never polls
 (owner, 2026-11-04: "anh không muốn làm kiểu vài phút hỏi 1 lần").
 
 Two halves:
@@ -11,7 +11,7 @@ Two halves:
 What the platform allows, and so what this does:
   - Threads has NO private messages in its API. Only replies (comments) under the owner's posts are handled.
   - Every top-level reply under a post is its own conversation, keyed by that reply's id; a reply under a reply joins
-    its parent's conversation. Javis answers with a reply to that id (create a TEXT container with `reply_to_id`,
+    its parent's conversation. UNETI AI answers with a reply to that id (create a TEXT container with `reply_to_id`,
     then publish it). A reply holds 500 characters; longer answers are split.
   - The bot's own replies come back on the webhook and are skipped, so it never answers itself.
   - Moderation: a reply can be hidden (`/manage_reply`), not deleted (only the author can delete their reply).
@@ -37,7 +37,7 @@ import localefmt
 from bot_gateway import HangLuot, dong_vet, parse_chat_ids, ten_tool
 from whatsapp_bot import verify_signature  # noqa: F401  - same Meta signature scheme, re-exported
 
-GRAPH_HOST = os.getenv("JAVIS_THREADS_GRAPH", "https://graph.threads.net")
+GRAPH_HOST = os.getenv("UNETI_THREADS_GRAPH", "https://graph.threads.net")
 GRAPH = f"{GRAPH_HOST}/v1.0"
 MAX_REPLY = 490               # Threads takes 500 characters per post
 MAX_DEDUPE = 4000
@@ -116,7 +116,7 @@ def comment_note(post: str = "") -> str:
 def reply_event(value: dict, own_username: str = "", own_id: str = ""):
     """One `replies` notification value -> the reply it carries, or None.
 
-    Skips the account's own replies (every answer Javis sends comes back here). A top-level reply (its parent is the
+    Skips the account's own replies (every answer UNETI AI sends comes back here). A top-level reply (its parent is the
     root post) opens its own conversation; a reply under a reply joins its parent's."""
     v = value or {}
     rid = str(v.get("id") or "")
@@ -297,7 +297,7 @@ class ThreadsBot(HangLuot):
         return True, ""
 
     async def send_file(self, path, caption="", chat=None):
-        return False, localefmt.chu("Javis chỉ trả lời bình luận Threads bằng chữ", "Javis answers Threads replies with text only")
+        return False, localefmt.chu("UNETI AI chỉ trả lời bình luận Threads bằng chữ", "UNETI AI answers Threads replies with text only")
 
     async def _post_text(self, client, post_id) -> str:
         """The first words of the post a reply sits under, for the inbox title and for the bot. Cached."""

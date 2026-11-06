@@ -2,9 +2,9 @@
 
     python tests/run.py windows_898      (no network)
 
-Item 2: an npx MCP connector whose argument has a space (`--user-data-dir "C:\\My Javis\\x"`) died with
+Item 2: an npx MCP connector whose argument has a space (`--user-data-dir "C:\\My UNETI\\x"`) died with
 "'C:\\Program' is not recognized". npx is npx.cmd, run as `cmd.exe /c "C:\\Program Files\\nodejs\\npx.cmd" ...`,
-and cmd strips the first and last quote of that line. Javis now runs `node npx-cli.js` of the same Node
+and cmd strips the first and last quote of that line. UNETI AI now runs `node npx-cli.js` of the same Node
 install directly (as zalo_cli already did), so cmd.exe never parses the arguments.
 
 Item 3: models write Windows paths URL style, `/C:/Users/...`. Neither pathlib reads that as drive C, so a
@@ -19,9 +19,9 @@ import sys
 import tempfile
 from pathlib import Path
 
-SCRATCH = Path(tempfile.mkdtemp(prefix="javis-win898-"))
-for key, relative in {"JAVIS_STATE_DIR": "state", "BRAINS_DIR": "brains", "OBSIDIAN_VAULT_PATH": "vault",
-                      "BRAIN_PATH": "brain", "SOURCES_PATH": "sources", "JAVIS_SESSIONS_DB": "sessions.sqlite3"}.items():
+SCRATCH = Path(tempfile.mkdtemp(prefix="uneti-win898-"))
+for key, relative in {"UNETI_STATE_DIR": "state", "BRAINS_DIR": "brains", "OBSIDIAN_VAULT_PATH": "vault",
+                      "BRAIN_PATH": "brain", "SOURCES_PATH": "sources", "UNETI_SESSIONS_DB": "sessions.sqlite3"}.items():
     os.environ[key] = str(SCRATCH / relative)
 
 try:
@@ -53,7 +53,7 @@ NODEJS = SCRATCH / "Program Files" / "nodejs"
 touch(NODEJS / "npx.cmd", exe=True)
 touch(NODEJS / "node.exe", exe=True)
 touch(NODEJS / "node_modules" / "npm" / "bin" / "npx-cli.js")
-ARGS = ["-y", "@playwright/mcp@latest", "--user-data-dir", r"C:\My Javis\profile"]
+ARGS = ["-y", "@playwright/mcp@latest", "--user-data-dir", r"C:\My UNETI AI\profile"]
 
 direct = mcp_client.npx_node_argv(str(NODEJS / "npx.cmd"))
 check("npx.cmd maps to node.exe + npx-cli.js of the same install",

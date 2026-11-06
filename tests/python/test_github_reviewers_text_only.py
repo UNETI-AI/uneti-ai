@@ -11,7 +11,7 @@ from _paths import ROOT, SERVER  # noqa: F401
 import os
 import tempfile
 
-os.environ.setdefault("JAVIS_STATE_DIR", tempfile.mkdtemp(prefix="javis-ghrev-"))
+os.environ.setdefault("UNETI_STATE_DIR", tempfile.mkdtemp(prefix="uneti-ghrev-"))
 
 import aux_engine  # noqa: E402
 import main  # noqa: E402

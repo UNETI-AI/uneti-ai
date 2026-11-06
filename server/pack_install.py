@@ -106,7 +106,7 @@ def companion_packs(catalog: dict, connector_ids) -> list:
 
     0.73.0 moved the three Zalo plugins (send images, tag people, read group images) out of the app into
     the store pack `javis.zalo`, so people who never use Zalo no longer carry them. The Zalo connection
-    stays in the app (QR sign-in cannot be declared by a pack). Javis never installs a pack on its own, so
+    stays in the app (QR sign-in cannot be declared by a pack). UNETI AI never installs a pack on its own, so
     a machine that already used Zalo would silently lose those tools: this list lets the Connect page say
     so and open the pack's consent screen. `state` is installed | disabled | missing."""
     ledger = doc_so()
@@ -351,8 +351,8 @@ def soi(du_lieu: bytes, ten_tep: str = "") -> dict:
     py = sorted(str(p.relative_to(tam)).replace("\\", "/") for p in tam.rglob("*.py"))
 
     # Plugin trong gói: liệt kê để hiện lên màn hình xác nhận, và TỪ CHỐI nếu trùng tên một
-    # plugin đi kèm app. Chặn ở đây chứ không lúc nạp, vì một gói lặng lẽ thay `javis_task`
-    # hay `javis_schedule` dưới một màn hình chỉ nói "gói này chạy mã" là đúng kiểu bất ngờ
+    # plugin đi kèm app. Chặn ở đây chứ không lúc nạp, vì một gói lặng lẽ thay `uneti_task`
+    # hay `uneti_schedule` dưới một màn hình chỉ nói "gói này chạy mã" là đúng kiểu bất ngờ
     # không nên có - người dùng phải thấy lý do TRƯỚC khi có gì rơi xuống đĩa.
     plugin_slugs = []
     goc_pl = tam / "plugins"
@@ -368,9 +368,9 @@ def soi(du_lieu: bytes, ten_tep: str = "") -> dict:
     if trung:
         shutil.rmtree(boc, ignore_errors=True)
         return {"ok": False, "stage": "validate",
-                "error": localefmt.chu("gói mang plugin trùng tên plugin có sẵn của Javis: "
+                "error": localefmt.chu("gói mang plugin trùng tên plugin có sẵn của UNETI AI: "
                                        + ", ".join(trung) + ". Đổi tên trong gói rồi thử lại.",
-                                       "the pack carries a plugin with the same name as a built-in Javis plugin: "
+                                       "the pack carries a plugin with the same name as a built-in UNETI AI plugin: "
                                        + ", ".join(trung) + ". Rename it in the pack and try again.")}
     return {
         "ok": bool(ban["ok"]), "stage": "" if ban["ok"] else "validate",
@@ -515,7 +515,7 @@ def _ban_kho_chinh_thuc(pid: str, sha: str) -> bool:
     """The zip with this sha256 is the one the OFFICIAL store index lists for this pack id.
 
     The index is fetched over HTTPS from the default store URL (a custom `store_url` does not count), so a pack id and
-    hash found there were published by the Javis store, not chosen by whoever built the zip."""
+    hash found there were published by the UNETI AI store, not chosen by whoever built the zip."""
     try:
         import packs_store
         if packs_store.url_kho() != packs_store.STORE_MAC_DINH:
@@ -632,13 +632,13 @@ def dat_bat_tat(pid: str, bat: bool) -> dict:
 # ─────────────────────────── gỡ ───────────────────────────
 
 def quet_tuong_thich() -> list:
-    """Lúc khởi động: TẮT gói có dải `compat.app` không còn khớp phiên bản Javis hiện tại.
+    """Lúc khởi động: TẮT gói có dải `compat.app` không còn khớp phiên bản UNETI AI hiện tại.
 
     Vì sao cần dù trình cài đã kiểm: `update.sh` chạy `git pull` và `updater.py` chạy
     `git reset --hard`, không cái nào chạy lại trình cài. Không có lượt quét này thì dải
     `compat` chỉ có tác dụng đúng một lần, ở lần cài đầu tiên - tức là trang trí.
 
-    TẮT chứ không xoá, và ghi lý do: hạ cấp Javis rồi nâng lại là gói tự chạy tiếp."""
+    TẮT chứ không xoá, và ghi lý do: hạ cấp UNETI AI rồi nâng lại là gói tự chạy tiếp."""
     ra = []
     so = doc_so()
     doi = False

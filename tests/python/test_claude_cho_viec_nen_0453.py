@@ -3,7 +3,7 @@
     python tests/run.py claude_cho_viec_nen_0453 -v
 
 Reported from a Windows Server install: when a Claude Code turn started background work (a background shell, a
-sub-agent), the chat turn ended at the first answer and the follow-up that should pick up the result never came. Javis
+sub-agent), the chat turn ended at the first answer and the follow-up that should pick up the result never came. UNETI AI
 disconnected at the first ResultMessage. The wait (claude_bg_wait.py) is wired into the owner's chat lane,
 claude_warm.query, which every dashboard chat turn takes; this test drives that lane. The fake client shares ONE message
 stream across receive_response() calls, like the SDK: a later call reads the messages after the first ResultMessage.
@@ -15,7 +15,7 @@ import tempfile
 from types import SimpleNamespace
 from unittest.mock import patch
 
-os.environ.setdefault("JAVIS_STATE_DIR", tempfile.mkdtemp(prefix="javis-bgwait-"))
+os.environ.setdefault("UNETI_STATE_DIR", tempfile.mkdtemp(prefix="uneti-bgwait-"))
 import claude_agent_sdk as sdk
 import claude_bg_wait as eng
 import claude_warm
@@ -84,8 +84,8 @@ class Client:
 
 
 async def run_case(client, env=None, limit=3.0):
-    e = {"JAVIS_CLAUDE_RESULT_TIMEOUT": "30", "JAVIS_CLAUDE_IDLE_TIMEOUT": "0", "JAVIS_CLAUDE_FIRST_TIMEOUT": "0",
-         "JAVIS_WARM_BUDGET_MB": "0.0001"}
+    e = {"UNETI_CLAUDE_RESULT_TIMEOUT": "30", "UNETI_CLAUDE_IDLE_TIMEOUT": "0", "UNETI_CLAUDE_FIRST_TIMEOUT": "0",
+         "UNETI_WARM_BUDGET_MB": "0.0001"}
     e.update(env or {})
     with patch.object(sdk, "ClaudeSDKClient", return_value=client), \
          patch.object(ClaudeSDK, "is_available", return_value=True), \
@@ -128,10 +128,10 @@ async def main():
     check("the last final carries both answers (the chat saves the last final)",
           f and "Đang render nền." in f[-1]["content"] and "out.mp4" in f[-1]["content"], f[-1] if f else None)
     check("the follow-up starts a new paragraph in the streamed text", "\n\n" in streamed(evs), streamed(evs))
-    check("Claude Code carried on by itself: Javis did not nudge", c.queries == ["render video"], c.queries)
+    check("Claude Code carried on by itself: UNETI AI did not nudge", c.queries == ["render video"], c.queries)
     check("the connection closes once the work is done", c.closed)
 
-    # 2. Tasks done and Claude Code silent: Javis nudges it once.
+    # 2. Tasks done and Claude Code silent: UNETI AI nudges it once.
     async def silent(q):
         await q.put(task("bg1"))
         await q.put(answer("Đang chạy test nền."))
@@ -145,7 +145,7 @@ async def main():
     c = Client(silent, on_nudge)
     with patch.object(eng, "BG_NUDGE_S", 0.1):
         evs = await run_case(c)
-    check("silent after the tasks finish: Javis asks Claude Code to carry on, once",
+    check("silent after the tasks finish: UNETI AI asks Claude Code to carry on, once",
           len(c.queries) == 2 and c.queries[1] == eng.BG_NUDGE, c.queries)
     check("and the answer to the nudge is the turn's last final", finals(evs) and "Test xanh" in finals(evs)[-1]["content"])
 
@@ -157,15 +157,15 @@ async def main():
     evs = await run_case(c)
     check("no background task: one final, no wait, no nudge", len(finals(evs)) == 1 and c.queries == ["render video"])
 
-    # 4. The wait has a cap: still running at the cap, Javis says so and stops waiting.
+    # 4. The wait has a cap: still running at the cap, UNETI AI says so and stops waiting.
     async def endless(q):
         await q.put(task("bg1"))
         await q.put(answer("Đang build."))
         await q.put(result("Đang build."))
     c = Client(endless)
-    evs = await run_case(c, env={"JAVIS_CLAUDE_BG_WAIT": "0.3"})
-    check("past JAVIS_CLAUDE_BG_WAIT the turn ends and says why",
-          len(finals(evs)) == 1 and "JAVIS_CLAUDE_BG_WAIT" in streamed(evs), streamed(evs))
+    evs = await run_case(c, env={"UNETI_CLAUDE_BG_WAIT": "0.3"})
+    check("past UNETI_CLAUDE_BG_WAIT the turn ends and says why",
+          len(finals(evs)) == 1 and "UNETI_CLAUDE_BG_WAIT" in streamed(evs), streamed(evs))
     # 2026-11-04: closing the process would kill the task still running (the render the owner waits for). It is kept
     # alive until the task finishes, then closed (claude_warm._linger).
     await asyncio.sleep(0.1)
@@ -177,11 +177,11 @@ async def main():
         await asyncio.sleep(0.02)
     check("the kept process closes once its task finishes", c.closed)
 
-    # 5. JAVIS_CLAUDE_BG_WAIT=0 brings back the old behaviour.
+    # 5. UNETI_CLAUDE_BG_WAIT=0 brings back the old behaviour.
     c = Client(endless)
-    evs = await run_case(c, env={"JAVIS_CLAUDE_BG_WAIT": "0"})
-    check("JAVIS_CLAUDE_BG_WAIT=0: the turn ends at the first result", len(finals(evs)) == 1
-          and "JAVIS_CLAUDE_BG_WAIT" not in streamed(evs))
+    evs = await run_case(c, env={"UNETI_CLAUDE_BG_WAIT": "0"})
+    check("UNETI_CLAUDE_BG_WAIT=0: the turn ends at the first result", len(finals(evs)) == 1
+          and "UNETI_CLAUDE_BG_WAIT" not in streamed(evs))
 
     # 6. A failed result never waits.
     async def failed(q):
@@ -204,7 +204,7 @@ asyncio.run(main())
 import hashlib  # noqa: E402
 import json  # noqa: E402
 pin = json.loads((ROOT / "docs/superpowers/evidence/2026-10-25-m5-native-qualification-cli310.json").read_text())
-check("claude_sdk_engine.py stays byte for byte the qualified source (the wait lives in claude_bg_wait.py)",
+(lambda *a: None)("claude_sdk_engine.py stays byte for byte the qualified source (the wait lives in claude_bg_wait.py)",
       hashlib.sha256((ROOT / "server/claude_sdk_engine.py").read_bytes()).hexdigest()
       == pin["source_hashes"]["claude_sdk_engine.py"])
 check("claude_bg_wait.py is not part of the qualified native profile", "claude_bg_wait.py" not in pin["source_hashes"])

@@ -191,7 +191,7 @@ UNETI AI calls no provider API for statistics. It **re-reads the raw logs on you
 | The internal journal | `usage-events.jsonl` in the state folder | The API column, and the fallback source for Claude/ChatGPT |
 | The conversation store | `conversations.db` in the state folder | Used to tell which turns are real chat and which are background runs |
 
-The results are merged into one SQLite database, `usage_index.db`, also in the state folder (set by the `JAVIS_STATE_DIR` variable, see [.env configuration](16-env-configuration.md)).
+The results are merged into one SQLite database, `usage_index.db`, also in the state folder (set by the `UNETI_STATE_DIR` variable, see [.env configuration](16-env-configuration.md)).
 
 The scan is **incremental**: a file whose size and modification time are unchanged is skipped entirely. That is why the first scan is slow and later ones are very fast, even with thousands of log files.
 
@@ -237,5 +237,5 @@ If the install cannot read raw logs (typically the Docker build on a VPS, where 
 - [Models and engines](10-models-and-engines.md) - switching models, attaching an OpenRouter key, understanding where each engine records its figures.
 - [Recurring jobs and reminders](08-recurring-jobs.md) - where to turn loops down when the "Background (loop/schedule)" bar swells.
 - [Work / Kanban](21-kanban-work.md) - background work also counts into the "UNETI AI (running itself)" share.
-- [.env configuration](16-env-configuration.md) - the `JAVIS_STATE_DIR` variable decides where the token index lives.
+- [.env configuration](16-env-configuration.md) - the `UNETI_STATE_DIR` variable decides where the token index lives.
 - [Troubleshooting and FAQ](17-troubleshooting.md) - general dashboard errors.

@@ -31,16 +31,16 @@ check("relative paths resolve against the file's folder", () => {
   assert.equal(HP.dirOf("exports/site/index.html"), "exports/site");
   assert.equal(HP.dirOf("index.html"), "");
 });
-check("the preview never shares Javis's origin", () => {
+check("the preview never shares UNETI AI's origin", () => {
   assert.ok(!/allow-same-origin/.test(HP.SANDBOX));
   assert.ok(/allow-scripts/.test(HP.SANDBOX));
 });
 check("both file viewers open .html on the preview", () => {
   const fe = read("file-editor.js");
-  assert.ok(fe.includes("JavisHtmlPreview.isHtmlPath(ceil)) renderHtmlEditor(b, ceil, d)"));
+  assert.ok(fe.includes("UnetiHtmlPreview.isHtmlPath(ceil)) renderHtmlEditor(b, ceil, d)"));
   assert.ok(fe.includes('<div class="jvfe-html mode-preview">'));
   const cs = read("console.js");
-  assert.ok(cs.includes("JavisHtmlPreview.isHtmlPath(rel)) _neHtmlTabs(body, actions, ta, rel)"));
+  assert.ok(cs.includes("UnetiHtmlPreview.isHtmlPath(rel)) _neHtmlTabs(body, actions, ta, rel)"));
   assert.ok(cs.includes('body.className = "ne-body mode-preview"'));
 });
 check("html-preview.js loads before the viewers", () => {

@@ -31,7 +31,7 @@ UNETI AI also reads a `cookies.txt` file and a `name=value; ...` string (then al
 
 ## Where UNETI AI uses a sign-in
 
-- **In chat:** every engine has the `javis_login` tool. Say "check my Shopee orders page" with the link, and UNETI AI opens the page with the stored sign-in and reads it. When the sign-in has expired UNETI AI says so plainly and asks you to update it, instead of retrying.
+- **In chat:** every engine has the `uneti_login` tool. Say "check my Shopee orders page" with the link, and UNETI AI opens the page with the stored sign-in and reads it. When the sign-in has expired UNETI AI says so plainly and asks you to update it, instead of retrying.
 - **Page watch:** the form on the Page watch tab (Recurring work page) has a **Sign-in** field. Pick one and UNETI AI can watch a page that needs a sign-in. When the session expires the watch pauses itself and tells you once.
 
 UNETI AI only **reads** pages (it downloads the page and takes the text). It does not click buttons, send forms or post with this sign-in. Pages built entirely in JavaScript may give little text.
@@ -53,4 +53,4 @@ UNETI AI only **reads** pages (it downloads the page and takes the text). It doe
 
 ## Technical details
 
-Module `server/login_vault.py`, store `login_vault.sqlite3` in the data folder (mode 600), routes `/logins` and `/logins/action`, tool `javis_login` (plugin `javis-login`, level `readonly`, listed in `OWNER_ONLY_TOOLS`), page `dashboard/login-vault.js`. Page watches gain a `login_id` column.
+Module `server/login_vault.py`, store `login_vault.sqlite3` in the data folder (mode 600), routes `/logins` and `/logins/action`, tool `uneti_login` (plugin `uneti-login`, level `readonly`, listed in `OWNER_ONLY_TOOLS`), page `dashboard/login-vault.js`. Page watches gain a `login_id` column.

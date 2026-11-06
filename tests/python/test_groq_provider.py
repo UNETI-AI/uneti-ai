@@ -16,14 +16,14 @@ import json
 import os
 # 0.438.5: vòng tool mặc định gọi model dạng stream. File này thử logic vòng tool trên đường non-stream
 # (giả lập client.post / máy chủ trả JSON), đường đó vẫn là đường lui. Đường stream: test_api_stream_vong.py.
-os.environ["JAVIS_API_STREAM_TOOLS"] = "0"
+os.environ["UNETI_API_STREAM_TOOLS"] = "0"
 import tempfile
 import threading
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
 from _paths import ROOT, SERVER  # noqa: E402,F401  - nạp server/ vào sys.path
 
-os.environ.setdefault("JAVIS_STATE_DIR", tempfile.mkdtemp(prefix="javis-groq-test-"))
+os.environ.setdefault("UNETI_STATE_DIR", tempfile.mkdtemp(prefix="uneti-groq-test-"))
 
 import aux_engine  # noqa: E402
 import config as cfgmod  # noqa: E402
@@ -90,7 +90,7 @@ class _Fake(BaseHTTPRequestHandler):
             return
         msg = ({"role": "assistant", "content": None,
                 "tool_calls": [{"id": "c1", "type": "function",
-                                "function": {"name": "javis_connections", "arguments": "{}"}}]}
+                                "function": {"name": "uneti_connections", "arguments": "{}"}}]}
                if first else {"role": "assistant", "content": "Đã gọi tool xong"})
         out = {"choices": [{"message": msg, "finish_reason": "tool_calls" if first else "stop"}],
                "usage": {"prompt_tokens": 10, "completion_tokens": 5}}
@@ -106,7 +106,7 @@ _srv = HTTPServer(("127.0.0.1", 0), _Fake)
 threading.Thread(target=_srv.serve_forever, daemon=True).start()
 engine.GROQ_URL = f"http://127.0.0.1:{_srv.server_address[1]}/openai/v1/chat/completions"
 
-TOOLS = [{"fn": "javis_connections", "server": "javis", "name": "javis_connections",
+TOOLS = [{"fn": "uneti_connections", "server": "uneti", "name": "uneti_connections",
           "description": "liệt kê nguồn", "schema": {"type": "object", "properties": {}, "required": []}}]
 
 
@@ -114,7 +114,7 @@ async def _call(_args):
     return "Kết nối: POS, Lịch"
 
 
-ROUTE = {"javis_connections": {"call": _call}}
+ROUTE = {"uneti_connections": {"call": _call}}
 
 
 async def _run():
@@ -132,7 +132,7 @@ async def _run():
         kinds.append(ev["type"])
         if ev["type"] == "tool_call":
             called.append(ev.get("name"))
-    check("vòng tool MCP gọi được tool", called == ["javis_connections"])
+    check("vòng tool MCP gọi được tool", called == ["uneti_connections"])
     check("và trả về chữ sau khi có kết quả tool", "text" in kinds)
 
     # reasoning_effort gửi nhầm cho model thường là Groq trả 400 -> phải lọc theo model.

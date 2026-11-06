@@ -24,9 +24,9 @@ Mỗi brain của UNETI AI thực chất là một thư mục trên máy/VPS ch�
 |---|---|---|
 | Chạy cục bộ, không bắt đăng nhập (localhost) | **Ổ đĩa chứa brain** | Bạn duyệt và sửa được cả file ngoài brain, vì máy là của chính bạn |
 | Nghe public / bắt buộc đăng nhập (Docker, VPS) | Thư mục brain | Khoá cứng trong brain, không hở ổ đĩa ra web |
-| Đặt `JAVIS_FILES_ROOT=brain` (hoặc `vault`) | Thư mục brain | Khoá trong brain kể cả khi chạy cục bộ |
-| Đặt `JAVIS_FILES_ROOT=drive` (hoặc `root`) | Ổ đĩa chứa brain | Ép mở rộng tới ổ đĩa |
-| Đặt `JAVIS_FILES_ROOT=<đường dẫn>` | Đúng thư mục đó | Trần tuỳ ý, phải là thư mục có chứa brain |
+| Đặt `UNETI_FILES_ROOT=brain` (hoặc `vault`) | Thư mục brain | Khoá trong brain kể cả khi chạy cục bộ |
+| Đặt `UNETI_FILES_ROOT=drive` (hoặc `root`) | Ổ đĩa chứa brain | Ép mở rộng tới ổ đĩa |
+| Đặt `UNETI_FILES_ROOT=<đường dẫn>` | Đúng thư mục đó | Trần tuỳ ý, phải là thư mục có chứa brain |
 
 Vì thế trên máy cá nhân, bấm **↑ Lên** nhiều lần có thể đưa bạn ra ngoài brain tới tận gốc ổ đĩa. Nút **⌂ Brain** đưa bạn về nhà ngay lập tức. Khi đã đứng ở trần, nút **↑ Lên** tự ẩn đi. UNETI AI luôn chặn các đường dẫn cố vượt quá trần (kiểu `../../`), và brain luôn nằm trong trần.
 
@@ -38,7 +38,7 @@ Cách chỉnh biến môi trường xem [Cấu hình .env](16-cau-hinh-env.md).
 2. Trên rail điều hướng bên trái, mở nhóm **Bộ não** rồi bấm mục **Tệp tin**.
 3. Trang hiện ô tìm kiếm ở trên cùng, dưới đó là thanh công cụ, dưới nữa là danh sách file/thư mục. Lần đầu vào, UNETI AI hiển thị thư mục gốc của brain đang chọn.
 
-Nếu danh sách báo lỗi kiểu "Máy chủ UNETI AI chưa có chức năng Tệp tin", hãy khởi động lại server (chạy `stop-javis.bat` rồi `start-javis.vbs`) và tải lại trang. Xem thêm [Khắc phục sự cố & FAQ](17-khac-phuc-su-co.md).
+Nếu danh sách báo lỗi kiểu "Máy chủ UNETI AI chưa có chức năng Tệp tin", hãy khởi động lại server (chạy `stop-uneti.bat` rồi `start-uneti.vbs`) và tải lại trang. Xem thêm [Khắc phục sự cố & FAQ](17-khac-phuc-su-co.md).
 
 ## Chọn brain đang làm việc
 
@@ -302,13 +302,13 @@ Kết luận thực dụng: tài liệu bạn muốn giữ lâu dài thì chuy�
 
 ## Sự cố thường gặp
 
-**Danh sách báo "Máy chủ UNETI AI chưa có chức năng Tệp tin".** Server đang chạy bản cũ chưa có tính năng này. Khởi động lại server (`stop-javis.bat` rồi `start-javis.vbs`) và tải lại trang.
+**Danh sách báo "Máy chủ UNETI AI chưa có chức năng Tệp tin".** Server đang chạy bản cũ chưa có tính năng này. Khởi động lại server (`stop-uneti.bat` rồi `start-uneti.vbs`) và tải lại trang.
 
 **Báo "Phiên đăng nhập hết hạn" hoặc lỗi 401.** Tải lại trang và đăng nhập lại. Xem [Bảo mật & tài khoản](14-bao-mat-tai-khoan.md).
 
 **Bấm ↑ Lên mà không thấy nút đâu.** Bạn đã ở trần duyệt rồi, nút tự ẩn. Bấm **⌂ Brain** để về gốc brain.
 
-**Duyệt lạc ra ngoài brain, không biết đường về.** Bấm **⌂ Brain**. Đây đúng là hành vi thiết kế khi chạy cục bộ: trần duyệt là ổ đĩa chứ không phải thư mục brain. Muốn khoá cứng trong brain thì đặt `JAVIS_FILES_ROOT=brain` rồi khởi động lại server.
+**Duyệt lạc ra ngoài brain, không biết đường về.** Bấm **⌂ Brain**. Đây đúng là hành vi thiết kế khi chạy cục bộ: trần duyệt là ổ đĩa chứ không phải thư mục brain. Muốn khoá cứng trong brain thì đặt `UNETI_FILES_ROOT=brain` rồi khởi động lại server.
 
 **Tìm kiếm không ra file mà bạn biết chắc là có.** Ba nguyên nhân hay gặp: file nằm ngoài gốc brain (tìm kiếm chỉ quét trong brain); file nằm trong thư mục bị bỏ qua như `.git`, `node_modules`, `.trash`; hoặc bạn đang ở chip **Nội dung** mà file đó không phải dạng chữ hay nặng hơn 1MB. Thử đổi sang chip **Tên**.
 
@@ -339,5 +339,5 @@ Kết luận thực dụng: tài liệu bạn muốn giữ lâu dài thì chuy�
 - [Second Brain: bộ nhớ, Wiki, INGEST](13-second-brain-bo-nho-wiki.md) - cấu trúc bên trong một brain.
 - [Sao lưu brain lên GitHub](18-sao-luu-github.md) - giữ lịch sử thay đổi và cứu file lỡ xoá.
 - [Task & Dataview trong note](19-task-va-dataview.md) - viết task và bảng truy vấn trong file .md.
-- [Cấu hình .env](16-cau-hinh-env.md) - biến `JAVIS_FILES_ROOT` và các biến khác.
+- [Cấu hình .env](16-cau-hinh-env.md) - biến `UNETI_FILES_ROOT` và các biến khác.
 - [Khắc phục sự cố & FAQ](17-khac-phuc-su-co.md)

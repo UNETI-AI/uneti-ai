@@ -18,9 +18,9 @@ import os
 import tempfile
 from pathlib import Path
 
-os.environ["JAVIS_STATE_DIR"] = tempfile.mkdtemp(prefix="javis-fix-pp3-")
-os.environ.pop("JAVIS_RESONANCE_CALL_CEILING", None)
-TEMP = Path(tempfile.mkdtemp(prefix="javis-fix-pp3-w-"))
+os.environ["UNETI_STATE_DIR"] = tempfile.mkdtemp(prefix="uneti-fix-pp3-")
+os.environ.pop("UNETI_RESONANCE_CALL_CEILING", None)
+TEMP = Path(tempfile.mkdtemp(prefix="uneti-fix-pp3-w-"))
 
 import agent_ledger as AL  # noqa: E402
 import agent_pulse as AP  # noqa: E402

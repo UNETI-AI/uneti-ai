@@ -20,9 +20,9 @@ from unittest.mock import patch
 _SCRATCH_PARENT = Path(tempfile.gettempdir()).anchor if os.name == "nt" else tempfile.gettempdir()
 _SCRATCH_LIFETIME = tempfile.TemporaryDirectory(prefix="trial-dashboard-", dir=_SCRATCH_PARENT)
 SCRATCH = Path(_SCRATCH_LIFETIME.name)
-for key, child in {"JAVIS_STATE_DIR": "boot-state", "BRAINS_DIR": "boot-brains", "BRAIN_PATH": "boot-brain",
+for key, child in {"UNETI_STATE_DIR": "boot-state", "BRAINS_DIR": "boot-brains", "BRAIN_PATH": "boot-brain",
                    "OBSIDIAN_VAULT_PATH": "boot-vault", "SOURCES_PATH": "boot-sources",
-                   "JAVIS_SESSIONS_DB": "boot-sessions.db"}.items():
+                   "UNETI_SESSIONS_DB": "boot-sessions.db"}.items():
     os.environ[key] = str(SCRATCH / child)
 
 import main as H
@@ -89,8 +89,8 @@ class DashboardTests(unittest.TestCase):
         self.stack = contextlib.ExitStack()
         self.addCleanup(self.stack.close)
         self.stack.enter_context(patch.object(Path, "home", return_value=self.root))
-        self.stack.enter_context(patch.dict(os.environ, {"JAVIS_PORT": "7777",
-            "JAVIS_ENABLE_USER_PLUGINS": "", "JAVIS_ENABLE_VAULT_PLUGINS": "", "JAVIS_DISABLE_PACKS": "", "JAVIS_FILES_ROOT": "brain"}))
+        self.stack.enter_context(patch.dict(os.environ, {"UNETI_PORT": "7777",
+            "UNETI_ENABLE_USER_PLUGINS": "", "UNETI_ENABLE_VAULT_PLUGINS": "", "UNETI_DISABLE_PACKS": "", "UNETI_FILES_ROOT": "brain"}))
         os.environ.pop("CLAUDE_CONFIG_DIR", None)
         for obj, name, value in ((H, "CLAUDE_MD_PATH", self.app / "CLAUDE.md"), (H.cfgmod, "STATE_DIR", self.state),
             (H.cfgmod, "SETTINGS_PATH", self.state / "settings.json"), (H.coding_store, "STORE_PATH", self.state / "coding.json"),
@@ -267,10 +267,10 @@ class DashboardTests(unittest.TestCase):
             self.capture()
 
     def test_unknown_serving_ceiling_and_unwarmed_sync_are_not_complete(self):
-        os.environ["JAVIS_FILES_ROOT"] = "drive"
+        os.environ["UNETI_FILES_ROOT"] = "drive"
         with self.assertRaisesRegex(ValueError, "serving"):
             self.capture()
-        os.environ["JAVIS_FILES_ROOT"] = "brain"
+        os.environ["UNETI_FILES_ROOT"] = "brain"
         H.system_sync._SYNCED_ROOTS.clear()
         with self.assertRaisesRegex(ValueError, "sync"):
             self.capture()
@@ -481,13 +481,13 @@ class DashboardTests(unittest.TestCase):
 
     def test_runtime_port_telegram_and_catalog_priority_drift_reject_revalidation(self):
         first = self.capture()
-        with patch.dict(os.environ, {"JAVIS_PORT": "7788"}):
+        with patch.dict(os.environ, {"UNETI_PORT": "7788"}):
             with self.assertRaisesRegex(ValueError, "changed"):
                 self.capture(frozen=first)
         with patch.object(H, "_TG_BOT", object()):
             with self.assertRaisesRegex(ValueError, "changed"):
                 self.capture(frozen=first)
-        self.write(self.brain, "Javis/skill-usage.json", '{"custom":{"pinned":true,"use_count":1,"last_used_at":2}}')
+        self.write(self.brain, "UNETI/skill-usage.json", '{"custom":{"pinned":true,"use_count":1,"last_used_at":2}}')
         with self.assertRaisesRegex(ValueError, "changed"):
             self.capture(frozen=first)
 

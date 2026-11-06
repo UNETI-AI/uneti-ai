@@ -99,7 +99,7 @@ The stop button only stops **the session you are looking at**; other sessions ru
 From 0.206.0 you can keep typing and sending while UNETI AI works, like in Claude Code or Codex. As soon as there is text in the box, the send button comes back next to the stop button (tooltip "Send to the work in progress"); Enter works too on a computer. The running work is **not stopped**:
 
 - With Claude Code and the API-key brains, UNETI AI reads the new message at its **next step** (after the tool call in progress) and acts on it. A correction is applied at once; a new task is taken on as well, in parallel where possible, and both are answered.
-- From 0.213.0 Codex (ChatGPT plan) also reads the new message within the turn, like Enter in the Codex app itself: a message sent while Codex runs a command joins the next step, and one sent while Codex writes its final answer makes Codex do one more round in the same turn to cover it. To go back to the old way (the message waits for the next turn), set the environment variable `JAVIS_CODEX_STEER=0` and restart UNETI AI.
+- From 0.213.0 Codex (ChatGPT plan) also reads the new message within the turn, like Enter in the Codex app itself: a message sent while Codex runs a command joins the next step, and one sent while Codex writes its final answer makes Codex do one more round in the same turn to cover it. To go back to the old way (the message waits for the next turn), set the environment variable `UNETI_CODEX_STEER=0` and restart UNETI AI.
 - With Grok Build and Antigravity CLI (which run in one go and take no input mid-way), or when UNETI AI is already writing its final answer, your message **runs as the next turn** as soon as the current work ends. Nothing is lost.
 
 A small line under the message you sent says where it is: "UNETI AI will read this at its next step", "UNETI AI has read this", "UNETI AI will do this right after the current task" or "UNETI AI is working on this now". You can send several in a row; UNETI AI reads them in order. To drop the current work altogether, press stop as before.
@@ -247,7 +247,7 @@ The reverse direction works too: UNETI AI can put images and files from the brai
 
 - **Images**: UNETI AI writes `![description](attachments/image-name.png)` and the dashboard renders the real image in the chat bubble. Click the image to open that exact file in the **Files** page.
 - **Other files** (pdf, docx, xlsx...): UNETI AI writes a markdown link that opens the file in the Files page.
-- **Paths in backticks** such as `Javis/loops/morning-report.md` also become links that open the file.
+- **Paths in backticks** such as `UNETI/loops/morning-report.md` also become links that open the file.
 - **Wikilinks** `[[Note name]]` become Wikipedia-style navigation links: clicking one makes UNETI AI find that note in the vault and open it.
 - Images that **can no longer be loaded** (expired from the cache area, deleted by hand or renamed) render as a grey box reading **"Image expired"** instead of a broken icon. The brain's `attachments/` and `inbox/` folders are cache areas: they are cleaned after 30 days or when they hit the 300MB ceiling.
 
@@ -275,7 +275,7 @@ Mermaid diagrams need a rendering library fetched from the internet; offline, th
 
 UNETI AI generates images right inside the chat using **the ChatGPT plan you signed into** (OAuth), with no extra OpenAI API key. Just ask in words, for example "make me a photo of a fish sauce bottle on a wooden table, dark background, landscape".
 
-Under the hood, UNETI AI calls the `javis_generate_image` tool (from the bundled `image-chatgpt` plugin) with three parameters:
+Under the hood, UNETI AI calls the `uneti_generate_image` tool (from the bundled `image-chatgpt` plugin) with three parameters:
 
 | Parameter | Values | Default |
 |---|---|---|
@@ -298,7 +298,7 @@ Paste a video link into the chat and say what you want, for example "summarise t
 
 It accepts every link shape: `youtube.com/watch?v=...`, `youtu.be/...`, Shorts, live links, links carrying a playlist or a timestamp, and links buried in the middle of your sentence.
 
-Under the hood, UNETI AI calls the `javis_youtube_read` tool (bundled `youtube-read` plugin). This is a **read-only** action, so background work in read-only mode can summarise videos too, and it runs on **every engine**, including the six API engines that cannot open web pages themselves.
+Under the hood, UNETI AI calls the `uneti_youtube_read` tool (bundled `youtube-read` plugin). This is a **read-only** action, so background work in read-only mode can summarise videos too, and it runs on **every engine**, including the six API engines that cannot open web pages themselves.
 
 A few things to know:
 
@@ -306,7 +306,7 @@ A few things to know:
 - **Private, age-restricted or region-blocked videos** cannot be read either, and UNETI AI names which of those it hit.
 - **"YouTube suspects this server is a robot" is not a problem with your video.** The root cause is **IP reputation**: YouTube flags hosting-provider IP ranges, so the same video opens fine at home but gets challenged on a VPS. UNETI AI rotates through eight player types before falling back to yt-dlp, so most such cases pass on their own. Seeing that message means all nine routes were refused.
   - Trying again a few minutes later usually works, because YouTube throttles in waves.
-  - If it repeats, the server IP is heavily flagged. The definitive fix is to set the environment variable `JAVIS_YOUTUBE_PROXY` to a residential proxy and restart, see [.env configuration](16-env-configuration.md). Only YouTube traffic goes through it.
+  - If it repeats, the server IP is heavily flagged. The definitive fix is to set the environment variable `UNETI_YOUTUBE_PROXY` to a residential proxy and restart, see [.env configuration](16-env-configuration.md). Only YouTube traffic goes through it.
 - **To see exactly which route failed**, run this on the server:
   ```
   python server/youtube_read.py <video link>
@@ -511,7 +511,7 @@ Start a new chat that refers to an old one ("carry on with the fish sauce landin
 
 ## Voice notes
 
-Ask UNETI AI to "read it to me", "send a voice note", or say you would rather hear a report than read it, and UNETI AI calls the `javis_voice_note` tool: a short spoken message (up to 1000 characters) is saved as an mp3 in the brain's `attachments/voice/`. The chat shows a player next to the link, Telegram receives it as audio, and UNETI AI still writes the words as text below. The voice is a free Edge voice picked by the language of the text.
+Ask UNETI AI to "read it to me", "send a voice note", or say you would rather hear a report than read it, and UNETI AI calls the `uneti_voice_note` tool: a short spoken message (up to 1000 characters) is saved as an mp3 in the brain's `attachments/voice/`. The chat shows a player next to the link, Telegram receives it as audio, and UNETI AI still writes the words as text below. The voice is a free Edge voice picked by the language of the text.
 
 Reminders also have a **Read it aloud** box: at the set time, the reminder or the report arrives with a voice note. If UNETI AI is open on a computer or phone, the voice note plays at once like a call (press play when the browser blocks autoplay).
 

@@ -41,7 +41,7 @@ global.document = {
 global.window = {
   addEventListener() {},
   matchMedia: () => ({ matches: false }),
-  JavisDictate: {
+  UnetiDictate: {
     joinText: D.joinText, ear: () => "", isIOS: () => false,
     create(opts) {
       engine = { opts, started: 0, stopped: 0, cancelled: 0,

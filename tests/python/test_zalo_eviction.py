@@ -2,7 +2,7 @@
 
     python tests/run.py zalo_eviction      (no network; spawns a few sleeping dummy processes on Linux)
 
-Field report 22/10/2026 (bot Javis Vũ): after an update, the account's live socket was evicted right after every
+Field report 22/10/2026 (bot UNETI AI Vũ): after an update, the account's live socket was evicted right after every
 re-login, javis-zalo backed off up to five minutes, and the bot only heard messages in the seconds after each
 reconnect. Three hours of tags went unanswered while the bot card stayed green, and some replies showed in the bot
 history without ever reaching the customer. Checks:
@@ -21,7 +21,7 @@ import sys
 import tempfile
 import time
 
-os.environ["JAVIS_STATE_DIR"] = tempfile.mkdtemp(prefix="javis-evict-")
+os.environ["UNETI_STATE_DIR"] = tempfile.mkdtemp(prefix="uneti-evict-")
 try:
     sys.stdout.reconfigure(encoding="utf-8")
 except Exception:
@@ -109,7 +109,7 @@ async def _bell(*a, **k):
 
 
 zc.NOTIFY_OWNER = _bell
-CONN = {"id": "zl-1", "label": "Javis Vũ", "env": {"HOME": "/tmp/zl"}}
+CONN = {"id": "zl-1", "label": "UNETI AI Vũ", "env": {"HOME": "/tmp/zl"}}
 
 
 async def watch(lines):
@@ -127,7 +127,7 @@ check("one quick close is not a rival", not REAPED and not BELL and not zc.evict
 asyncio.run(watch([line(1, 1), line(2, 3)]))
 check("rapid closes: local rivals reaped, keeping our own group", REAPED == [("/tmp/zl", (4242,))], REAPED)
 check("rapid closes: the bot card shows eviction", zc.evicted_recently("zl-1"))
-check("rapid closes: the owner is told once", len(BELL) == 1 and "Javis Vũ" in str(BELL[0]), BELL)
+check("rapid closes: the owner is told once", len(BELL) == 1 and "UNETI AI Vũ" in str(BELL[0]), BELL)
 asyncio.run(watch([line(1, 1), line(2, 3)]))
 check("the same log line is handled once", len(REAPED) == 1 and len(BELL) == 1)
 asyncio.run(watch([line(3, 4)]))

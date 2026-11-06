@@ -1,6 +1,6 @@
 /* Timezone picker (0.443.0), shared by the first-run setup and the Settings page.
  *
- * The owner (2026-11-02): the timezone only showed up through the `datetime-vn` plugin, with no place to set it. Javis reads
+ * The owner (2026-11-02): the timezone only showed up through the `datetime-vn` plugin, with no place to set it. UNETI AI reads
  * `locale.tz` for "today", "yesterday", "tomorrow", reminders and report periods, so the owner picks it once, at setup, and can
  * change it in Settings.
  *
@@ -8,13 +8,13 @@
  * the admin account exists, so it cannot rely on an authenticated call. The server still checks every name it is handed
  * against its own tz database before saving, so a name the browser knows and the server does not is refused, not stored.
  *
- *   JavisTz.detect()               the browser's own timezone, current IANA spelling, e.g. "Asia/Ho_Chi_Minh" ("" when unknown)
- *   JavisTz.offsetLabel(name)      "UTC+07:00"
- *   JavisTz.options(selected)      <option> HTML: a short "suggested" group (selected, browser, a few common ones) then all
- *   JavisTz.nowIn(name)            "21:34" in that timezone, for a "time there now" confirmation line
+ *   UnetiTz.detect()               the browser's own timezone, current IANA spelling, e.g. "Asia/Ho_Chi_Minh" ("" when unknown)
+ *   UnetiTz.offsetLabel(name)      "UTC+07:00"
+ *   UnetiTz.options(selected)      <option> HTML: a short "suggested" group (selected, browser, a few common ones) then all
+ *   UnetiTz.nowIn(name)            "21:34" in that timezone, for a "time there now" confirmation line
  */
 (function () {
-  // Used only when the browser cannot list timezones (old Safari). Enough to cover the people Javis serves today.
+  // Used only when the browser cannot list timezones (old Safari). Enough to cover the people UNETI AI serves today.
   var FALLBACK = ["Asia/Ho_Chi_Minh", "Asia/Bangkok", "Asia/Jakarta", "Asia/Singapore", "Asia/Kuala_Lumpur", "Asia/Manila",
     "Asia/Shanghai", "Asia/Hong_Kong", "Asia/Taipei", "Asia/Seoul", "Asia/Tokyo", "Asia/Kolkata", "Asia/Dubai",
     "Australia/Sydney", "Europe/London", "Europe/Paris", "Europe/Berlin", "Europe/Moscow", "America/New_York",
@@ -23,7 +23,7 @@
     "America/New_York", "America/Los_Angeles", "UTC"];
 
   // Browsers list CLDR's canonical names, which are often the OLD IANA spellings ("Asia/Saigon", "Asia/Calcutta",
-  // "Europe/Kiev"), and report the device's own zone that way too. Javis stores the current IANA name (its default is
+  // "Europe/Kiev"), and report the device's own zone that way too. UNETI AI stores the current IANA name (its default is
   // "Asia/Ho_Chi_Minh"), so a Vietnamese owner would otherwise see "Saigon" next to a saved "Ho Chi Minh" as two choices.
   var CURRENT = { "Asia/Saigon": "Asia/Ho_Chi_Minh", "Asia/Calcutta": "Asia/Kolkata", "Asia/Katmandu": "Asia/Kathmandu",
     "Asia/Rangoon": "Asia/Yangon", "Europe/Kiev": "Europe/Kyiv", "America/Godthab": "America/Nuuk",
@@ -117,5 +117,5 @@
     } catch (e) { return ""; }
   }
 
-  window.JavisTz = { detect: detect, offsetLabel: offsetLabel, offsetMinutes: offsetMinutes, options: options, nowIn: nowIn };
+  window.UnetiTz = { detect: detect, offsetLabel: offsetLabel, offsetMinutes: offsetMinutes, options: options, nowIn: nowIn };
 })();

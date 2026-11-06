@@ -9,9 +9,9 @@ import sys
 import tempfile
 from pathlib import Path
 
-_TMP = tempfile.mkdtemp(prefix="javis-wfturn-")
-os.environ["JAVIS_STATE_DIR"] = _TMP
-os.environ["JAVIS_SESSIONS_DB"] = str(Path(_TMP) / "conv.db")
+_TMP = tempfile.mkdtemp(prefix="uneti-wfturn-")
+os.environ["UNETI_STATE_DIR"] = _TMP
+os.environ["UNETI_SESSIONS_DB"] = str(Path(_TMP) / "conv.db")
 
 import main  # noqa: E402
 import workflow_runs  # noqa: E402

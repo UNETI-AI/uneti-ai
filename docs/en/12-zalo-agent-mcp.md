@@ -164,7 +164,7 @@ Just ask in chat, for example "look at the receipt Lan just posted in the Sales 
   in on the Models page the images are still fetched, just without the description.
 
 The part where ChatGPT looks at images lives in the app (the bundled `image-chatgpt` plugin, tool
-`javis_describe_image`), so it can view any other image in the brain too, with or without the
+`uneti_describe_image`), so it can view any other image in the brain too, with or without the
 Zalo pack.
 
 ## Sending images and files
@@ -238,7 +238,7 @@ Four things worth knowing:
 - **You only need to say a name to tag.** "@minhquy" or "Minh Quý" both work, ignoring case and accents. UNETI AI looks up the real Zalo
   id among the people who already spoke in that group first, then in Zalo's member list. **If a name is ambiguous or not found, UNETI AI
   asks back with the candidates** instead of guessing, because a wrong tag cannot be undone. `@All` only when you ask for it explicitly.
-- **This reminder is not UNETI AI's own reminder** (`javis_schedule`): it shows up inside Zalo, so the whole group sees it. Times use UNETI AI's timezone.
+- **This reminder is not UNETI AI's own reminder** (`uneti_schedule`): it shows up inside Zalo, so the whole group sees it. Times use UNETI AI's timezone.
 - **If the group locks note or poll creation for members**, Zalo refuses and UNETI AI reports that reason as is. If a command times out,
   UNETI AI says it is **not sure whether it was created** and asks you to check the group before trying again, so you do not get two polls.
 - **With several Zalo accounts attached, UNETI AI asks** which one to use, same as for sending images.
@@ -282,8 +282,8 @@ account is set to Full power.
 ## Differences from the old Zalo integration
 
 The new flow dropped the `listen --webhook` sidecar, the `/hook/zalo` endpoint, the "Listen
-continuously" panel, the per-chat rules file and the two plugins `javis_zalo_rule` and
-`javis_zalo_send`. No listener process turns the MCP connector off and back on any more.
+continuously" panel, the per-chat rules file and the two plugins `uneti_zalo_rule` and
+`uneti_zalo_send`. No listener process turns the MCP connector off and back on any more.
 
 Because of that, UNETI AI does not forward Zalo messages to Telegram in the background. When you
 want to check messages, ask UNETI AI; MCP can use `zalo_get_messages` for buffered messages or

@@ -1,4 +1,4 @@
-/* brain-picker.js - the brain picker, drawn by Javis instead of the browser (0.431.0).
+/* brain-picker.js - the brain picker, drawn by UNETI AI instead of the browser (0.431.0).
 
    Owner, 2026-11-01, relaying a user with a phone screenshot: the brain list "shows one way on one device and another
    way on the next", and the order could not be changed. The list was a plain <select>, so every browser drew its own
@@ -38,7 +38,7 @@
   var api = { moveItem: moveItem, orderFromOptions: orderFromOptions };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   if (!root || typeof document === "undefined") return;
-  root.JavisBrainPicker = api;
+  root.UnetiBrainPicker = api;
 
   var sel = document.getElementById("graphSource");
   if (!sel) return;
@@ -108,7 +108,7 @@
     new MutationObserver(function () { drawButton(); if (open) drawList(); })
       .observe(sel, { childList: true, subtree: true, characterData: true, attributes: true });
   } catch (e) {}
-  root.addEventListener("javis:i18n", drawButton);
+  root.addEventListener("uneti:i18n", drawButton);
 
   // ---- the panel ----
   var open = false, reorder = false, query = "", work = null, saving = false;
@@ -302,7 +302,7 @@
         saving = false;
         if (!res.ok) throw new Error((res.d && res.d.error) || "");
         reorder = false; work = null;
-        var reload = root.JavisBrains && root.JavisBrains.reload;
+        var reload = root.UnetiBrains && root.UnetiBrains.reload;
         return Promise.resolve(reload ? reload() : null).then(function () { if (open) drawList(); });
       })
       .catch(function (e) {

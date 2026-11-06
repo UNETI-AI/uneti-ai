@@ -18,7 +18,7 @@ Chứng minh bằng model thật, trên đường host thật (server thật, kh
 4. Giết rồi dựng lại server: không lượt nào được gọi thêm, kể cả thử gọi.
 
 Không chứng minh:
-- Bộ não chat tự định tuyến tới `javis_goal`: mục tiêu được lập bằng `form_goal` với đề xuất đóng băng, xem mục "Lập mục tiêu"; điểm này đã có ở pilot A4.
+- Bộ não chat tự định tuyến tới `uneti_goal`: mục tiêu được lập bằng `form_goal` với đề xuất đóng băng, xem mục "Lập mục tiêu"; điểm này đã có ở pilot A4.
 - Hai vai là hai model độc lập: theo thiết kế, hai vai dùng chung engine việc nền.
 - Nhánh hai vòng sửa tới cùng, thử lại sau `unknown` hay sau lỗi engine: các nhánh đó cần thêm lượt hoặc hẹn một giờ, vượt trần pilot đề xuất. Chúng đã có test bằng engine giả.
 - Hiệu năng hay độ trễ trên VPS: pilot chạy trên máy local.
@@ -30,13 +30,13 @@ Không chứng minh:
 - Lời giao (dữ liệu mô phỏng): bản tóm tắt cuộc họp ở `Inbox/tom-tat-hop-a5.md`, có mục Kết luận và mục Việc tiếp theo (mỗi việc một dòng, có người phụ trách và hạn), kèm nội dung họp.
 - Đề xuất mục tiêu: hai tiêu chí `artifact_contract` trên file đích, phải có "Kết luận" và "Việc tiếp theo"; `achieve/delivery`.
 
-**Lập mục tiêu.** Không dùng lượt chat. Bộ chạy gọi `form_goal` với lời giao và đề xuất đóng băng, trong phiên của agent làm. Đây đúng là hàm mà tool `javis_goal` và route `/goal-requests` dùng, và không gọi model. `/goal-requests` không dùng được vì nó để bộ lập mục tiêu gọi một lượt model và tự đặt tiêu chí, nên tiêu chí không đóng băng được. Đây là gieo trạng thái bằng hàm host thật, không phải engine giả.
+**Lập mục tiêu.** Không dùng lượt chat. Bộ chạy gọi `form_goal` với lời giao và đề xuất đóng băng, trong phiên của agent làm. Đây đúng là hàm mà tool `uneti_goal` và route `/goal-requests` dùng, và không gọi model. `/goal-requests` không dùng được vì nó để bộ lập mục tiêu gọi một lượt model và tự đặt tiêu chí, nên tiêu chí không đóng băng được. Đây là gieo trạng thái bằng hàm host thật, không phải engine giả.
 
 **Các bước:**
 
 | Bước | Server | Việc | Lượt model |
 |---|---|---|---|
-| 0 | không | Kiểm nguồn: HEAD đúng SHA đã duyệt (`JAVIS_RESONANCE_A5_APPROVED_SHA`) và cả checkout sạch, gồm mã sản phẩm, chính bộ chạy và không file lạ (`preflight_source`). Cổng chi phí: trần pilot ≤ số đã duyệt, đủ cho nhánh ngắn nhất. Tạo sổ (từ chối nếu đã có). Cổng engine và xác thực: engine việc nền đúng cấu hình đã duyệt; `claude auth status` là gói thuê bao gốc; không có apiKeyHelper, env chọn nhà cung cấp hay settings do quản trị đặt | 0 |
+| 0 | không | Kiểm nguồn: HEAD đúng SHA đã duyệt (`UNETI_RESONANCE_A5_APPROVED_SHA`) và cả checkout sạch, gồm mã sản phẩm, chính bộ chạy và không file lạ (`preflight_source`). Cổng chi phí: trần pilot ≤ số đã duyệt, đủ cho nhánh ngắn nhất. Tạo sổ (từ chối nếu đã có). Cổng engine và xác thực: engine việc nền đúng cấu hình đã duyệt; `claude auth status` là gói thuê bao gốc; không có apiKeyHelper, env chọn nhà cung cấp hay settings do quản trị đặt | 0 |
 | A | nhịp tạm dừng, trần kho 0, trần sổ 0 | Bật hai trợ lý qua `/resonance/agents/toggle`. Chọn người review qua `/resonance/agents/reviewer`. Lập mục tiêu (`form_goal`). Cho phép phạm vi qua lệnh `approve_scope` của thẻ. Kiểm đội đã gắn (ghim mã reviewer, 8 lượt chia 4/4, hai vòng), phạm vi đã cấp, chưa có file đích | 0 |
 | B | nhịp chạy, trần kho = trần tổng pilot, trần sổ theo vai | Tiền điều kiện (hai trợ lý còn bật, đội còn ghim đúng mã, không kiểm nào hỏng), cổng token (còn ít nhất 30 phút). Quan sát tới khi mục tiêu kết thúc, sổ đóng, hay không còn lịch làm việc trong 5 phút, không có lượt đang chạy, mục tiêu không ở `running`, không lần thức nào giữ khoá mục tiêu, đúng ở hai lần quan sát liên tiếp; trần thời gian 30 phút | theo nhánh, tối đa 4 |
 | C | nhịp chạy, trần kho = số đã dùng, trần sổ 0 | Chờ khoảng 95 giây (hơn ba nhịp). Sổ không có lượt hay lần thử mới; hành động và hàng review không đổi. Tạm dừng mục tiêu nếu còn mở | 0 |
@@ -76,7 +76,7 @@ Các lớp chặn (không lớp nào thay lớp nào):
   - Mọi kết cục lỗi vẫn tính lượt, và sổ đóng ngay.
   - Bị chặn thì không chạm hàm dựng engine thật; host hoàn lượt theo đường not-run của A5. Sổ chỉ ghi một sự kiện `refused`.
   - Sổ đã có thì từ chối chạy; sổ hỏng thì không cấp lượt và không ghi đè.
-- **Trần kho** `JAVIS_RESONANCE_CALL_CEILING`, áp cho mọi tiến trình server.
+- **Trần kho** `UNETI_RESONANCE_CALL_CEILING`, áp cho mọi tiến trình server.
 - **Trần sản phẩm** của đội (8, 4/4, hai vòng).
 - **Hậu kiểm.** Sổ pilot phải khớp sổ vai của kho (`team_calls`) và `calls_used`; mỗi hàng review tính (`charged=1`) ứng với một lượt reviewer. Sổ thiếu, hỏng hay lệch là **chưa xác minh**, không bao giờ là 0.
 
@@ -126,7 +126,7 @@ Kho và log của mọi server đã dựng là mục bắt buộc. Không chép 
 
 ## Dry
 
-`JAVIS_RESONANCE_A5_PILOT=dry python tests/python/test_resonance_a5_pilot.py` chạy 24 ca, mỗi ca một tiến trình con với server thật, đi qua đúng đường điều phối, hàm kết luận và pha ghi hồ sơ của real. Một ca chỉ đạt khi mã thoát đúng hợp đồng của kết luận và báo cáo JSON bắt buộc có (trừ ca chặn ghi báo cáo) cùng kết luận, nhánh, trạng thái giữ sandbox với dòng `A5_PILOT`. Dry chặn đường tới engine thật ngay từ cấu hình và đường gọi, không chỉ đếm sau khi chạy:
+`UNETI_RESONANCE_A5_PILOT=dry python tests/python/test_resonance_a5_pilot.py` chạy 24 ca, mỗi ca một tiến trình con với server thật, đi qua đúng đường điều phối, hàm kết luận và pha ghi hồ sơ của real. Một ca chỉ đạt khi mã thoát đúng hợp đồng của kết luận và báo cáo JSON bắt buộc có (trừ ca chặn ghi báo cáo) cùng kết luận, nhánh, trạng thái giữ sandbox với dòng `A5_PILOT`. Dry chặn đường tới engine thật ngay từ cấu hình và đường gọi, không chỉ đếm sau khi chạy:
 - settings dùng provider không tồn tại (`pilot-dry`);
 - launcher thay hàm dựng engine việc nền bằng engine giả đọc kịch bản; hàm dựng "thật" là bẫy;
 - không có lượt chat nào.
@@ -160,7 +160,7 @@ Logic của sổ, kết cục lượt qua `_ask` thật, kết luận, bảo to�
 ## Chạy real (chỉ sau khi được duyệt)
 
 ```bash
-JAVIS_RESONANCE_A5_PILOT=real JAVIS_RESONANCE_PILOT_SETTINGS=<settings.json thật> JAVIS_RESONANCE_A5_OUT=<thư mục mới, ngoài checkout> JAVIS_RESONANCE_A5_APPROVED='{"aux": {"provider": "anthropic-cli", "model": "sonnet"}}' JAVIS_RESONANCE_A5_MAX_CALLS=4 JAVIS_RESONANCE_A5_INPUTS_SHA=<frozen_sha256> JAVIS_RESONANCE_A5_APPROVED_SHA=<SHA đã duyệt> python tests/python/test_resonance_a5_pilot.py
+UNETI_RESONANCE_A5_PILOT=real UNETI_RESONANCE_PILOT_SETTINGS=<settings.json thật> UNETI_RESONANCE_A5_OUT=<thư mục mới, ngoài checkout> UNETI_RESONANCE_A5_APPROVED='{"aux": {"provider": "anthropic-cli", "model": "sonnet"}}' UNETI_RESONANCE_A5_MAX_CALLS=4 UNETI_RESONANCE_A5_INPUTS_SHA=<frozen_sha256> UNETI_RESONANCE_A5_APPROVED_SHA=<SHA đã duyệt> python tests/python/test_resonance_a5_pilot.py
 ```
 
-Đúng một lần, trên một bản checkout sạch ở SHA đã duyệt. Bộ chạy tự kiểm (bước 0, trước mọi server) rằng HEAD đúng `JAVIS_RESONANCE_A5_APPROVED_SHA` và cả checkout sạch; sai hay không đọc được thì dừng, không lượt nào. Thư mục hồ sơ phải nằm ngoài checkout.
+Đúng một lần, trên một bản checkout sạch ở SHA đã duyệt. Bộ chạy tự kiểm (bước 0, trước mọi server) rằng HEAD đúng `UNETI_RESONANCE_A5_APPROVED_SHA` và cả checkout sạch; sai hay không đọc được thì dừng, không lượt nào. Thư mục hồ sơ phải nằm ngoài checkout.

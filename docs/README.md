@@ -45,7 +45,7 @@ Thanh điều hướng của dashboard gom **19 trang** thành **5 nhóm**: Bộ
 - [11 - Kênh Telegram](11-telegram.md) - hỏi UNETI AI qua điện thoại, gửi và nhận file.
 - [26 - Kênh Zalo Bot](26-kenh-zalo-bot.md) - hỏi UNETI AI trên Zalo bằng API chính thức, ghép nối bằng một cú bấm.
 - [12 - Zalo Agent MCP](12-zalo.md) - đăng nhập QR, đọc/tìm lịch sử và gửi tin qua MCP chuẩn.
-- [24 - UNETI AI CLI (terminal)](24-cli-terminal.md) - gõ `javis "..."` từ terminal, token API, ghép vào script.
+- [24 - UNETI AI CLI (terminal)](24-cli-terminal.md) - gõ `uneti "..."` từ terminal, token API, ghép vào script.
 
 ### Bộ não & dữ liệu
 - [13 - Second Brain: bộ nhớ, Wiki, INGEST](13-second-brain-bo-nho-wiki.md) - đa brain, bộ nhớ sống, tiêu hoá tri thức.

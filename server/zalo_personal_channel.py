@@ -3,7 +3,7 @@
 
 Ở Việt Nam khách nhắn qua Zalo cá nhân nhiều hơn mọi kênh khác, và không phải ai bán hàng cũng
 có Zalo OA. Nên tài khoản Zalo đã quét QR ở trang Kết nối phải là một KÊNH của Hộp thư, không
-phải một tool mà chỉ khi chủ hỏi Javis mới đọc.
+phải một tool mà chỉ khi chủ hỏi UNETI AI mới đọc.
 
 Cách làm: vòng lặp nền, mỗi `NHIP` giây gọi `zalo_get_messages` với cursor lần trước, chuẩn hoá
 từng tin về sự kiện chung rồi `conversations.ghi_su_kien`. Cursor lưu ở `sync_state` của kho,
@@ -13,9 +13,9 @@ Ba quyết định đáng ghi lại:
 
   1. **Chỉ ghi khi chủ BẬT cho từng tài khoản** (trang Hộp thư, mục Kênh). Vòng lặp này giữ
      tiến trình MCP sống liên tục (mỗi lần gọi là một lần chạm phiên), tức tài khoản Zalo đăng
-     nhập 24/7 qua API không chính thức. Đó là lựa chọn của chủ tài khoản, không phải của Javis.
+     nhập 24/7 qua API không chính thức. Đó là lựa chọn của chủ tài khoản, không phải của UNETI AI.
   2. **Không gọi `zalo_mark_read`.** Cursor của kho là cursor của kho; bộ đệm của MCP để nguyên
-     cho chủ hỏi Javis "có tin Zalo mới không" như trước. Tool này là tool ĐỌC, không đụng quyền.
+     cho chủ hỏi UNETI AI "có tin Zalo mới không" như trước. Tool này là tool ĐỌC, không đụng quyền.
   3. **Không đồng bộ lịch sử cũ.** Lần đầu bật chỉ lấy tin từ lúc bật trở đi (bộ đệm MCP vốn
      chỉ giữ tin từ khi tiến trình chạy), đúng luật của kho: lưu từ lúc kênh được nối.
 
@@ -375,9 +375,9 @@ def cau_bao_xin_vao(conn: dict, chat_title: str, names: List[str]) -> str:
     nhom = chat_title or localefmt.chu("một nhóm", "a group")
     tk = conn.get("label") or "Zalo"
     return localefmt.chu(
-        f"Zalo ({tk}): {ai} đang xin vào nhóm \"{nhom}\". Nhắn Javis \"duyệt\" hoặc \"từ chối\" để xử lý "
+        f"Zalo ({tk}): {ai} đang xin vào nhóm \"{nhom}\". Nhắn UNETI AI \"duyệt\" hoặc \"từ chối\" để xử lý "
         f"(tài khoản này phải là trưởng hoặc phó nhóm).",
-        f"Zalo ({tk}): {ai} asked to join the group \"{nhom}\". Tell Javis \"approve\" or \"reject\" to handle it "
+        f"Zalo ({tk}): {ai} asked to join the group \"{nhom}\". Tell UNETI AI \"approve\" or \"reject\" to handle it "
         f"(this account must be the group's owner or a deputy).")
 
 
@@ -501,7 +501,7 @@ def chuan_hoa_tin(conn: dict, msg: dict, ten: Dict[str, dict]) -> Optional[dict]
 # ============================================================
 # Nhập tin cũ (0.174.0)
 # ============================================================
-# Chủ repo hỏi 16/10/2026: đăng nhập Zalo vào Javis lần đầu thì Hộp thư trống trơn, dù điện thoại có cả trăm cuộc chat. javis-zalo
+# Chủ repo hỏi 16/10/2026: đăng nhập Zalo vào UNETI AI lần đầu thì Hộp thư trống trơn, dù điện thoại có cả trăm cuộc chat. javis-zalo
 # (từ 1.1.0) tự kéo tin cũ về mỗi lần kết nối, khoảng 2 tuần gần nhất theo cửa sổ phát lại của Zalo, rồi giữ trong kho lịch sử của
 # nó (`zalo_search_history`). Vòng đọc ở dưới không dùng kho đó: nó chỉ đọc bộ đệm tin MỚI (`zalo_get_messages`), đúng như quyết
 # định 3 ở đầu file. Nút "Nhập tin cũ" là lựa chọn riêng của chủ, không chạy tự động.
@@ -545,8 +545,8 @@ async def nhap_lich_su(conn_id: str, ngay: int = NHAP_NGAY) -> dict:
             except Exception as e:
                 if not tin:
                     return {"ok": False, "loi": localefmt.chu(
-                        f"javis-zalo không trả được tin cũ: {str(e)[:200]}. Bản javis-zalo cần từ 1.1.0 trở lên.",
-                        f"javis-zalo could not return old messages: {str(e)[:200]}. javis-zalo 1.1.0 or newer is needed.")}
+                        f"Zalo CLI không trả được tin cũ: {str(e)[:200]}. Cần Zalo CLI từ 1.1.0 trở lên.",
+                        f"The Zalo CLI could not return old messages: {str(e)[:200]}. Zalo CLI 1.1.0 or newer is needed.")}
                 break
             trang = (d.get("messages") if isinstance(d, dict) else None) or []
             tin.extend(m for m in trang if isinstance(m, dict))
@@ -797,12 +797,12 @@ async def doc_mot_lan(conn: dict) -> dict:
 # Lỗi chết của tiến trình javis-zalo (src/commands/mcp.js) mà người dùng tự xử được, dịch ra lời thường.
 _LOI_ZALO = (
     (re.compile(r"duplicate zalo web session", re.I),
-     "Zalo đã ngắt phiên của Javis vì tài khoản này vừa được mở ở nơi khác: Zalo Web trên trình duyệt "
-     "(chat.zalo.me) hoặc một máy Javis khác cũng đăng nhập tài khoản này. Mỗi tài khoản chỉ giữ được một "
-     "phiên như vậy. Đóng nơi kia đi; Javis tự nối lại sau khoảng 2 phút.",
-     "Zalo closed Javis's session because this account was just opened somewhere else: Zalo Web in a "
-     "browser (chat.zalo.me) or another Javis machine signed in to the same account. An account keeps only "
-     "one such session. Close the other one; Javis reconnects by itself in about 2 minutes."),
+     "Zalo đã ngắt phiên của UNETI AI vì tài khoản này vừa được mở ở nơi khác: Zalo Web trên trình duyệt "
+     "(chat.zalo.me) hoặc một máy UNETI AI khác cũng đăng nhập tài khoản này. Mỗi tài khoản chỉ giữ được một "
+     "phiên như vậy. Đóng nơi kia đi; UNETI AI tự nối lại sau khoảng 2 phút.",
+     "Zalo closed UNETI AI's session because this account was just opened somewhere else: Zalo Web in a "
+     "browser (chat.zalo.me) or another UNETI AI machine signed in to the same account. An account keeps only "
+     "one such session. Close the other one; UNETI AI reconnects by itself in about 2 minutes."),
     (re.compile(r"auto-login failed|re-login retry failed|re-login failed", re.I),
      "Phiên đăng nhập Zalo của tài khoản này đã hết hạn hoặc bị đăng xuất. Vào trang Kết nối, đăng nhập "
      "lại Zalo bằng mã QR.",
@@ -874,10 +874,10 @@ async def _vong() -> None:
 # Another session evicting ours (0.283.0)
 # ============================================================
 # Zalo keeps ONE live socket per account. When a second session of the same account is up (an `mcp start` an earlier
-# server lifetime left behind, Zalo Web of this nick in a browser, another Javis or Claude client), ours is evicted
+# server lifetime left behind, Zalo Web of this nick in a browser, another UNETI AI or Claude client), ours is evicted
 # right after every re-login and javis-zalo backs off up to five minutes. Reading still "works" (the buffer answers),
 # so the bot card stayed green while the bot heard only the few seconds after each reconnect (field report
-# 22/10/2026, Javis Vũ: three hours of tags in two groups unanswered). javis-zalo prints each close as
+# 22/10/2026, UNETI AI Vũ: three hours of tags in two groups unanswered). javis-zalo prints each close as
 # "Connection closed (code: N). Re-login in Ss... (reconnect #R, rapid #K)"; K counts closes that came before the
 # connection was stable, so K >= THRASH_RAPID means a rival.
 THRASH_RAPID = 3
@@ -930,17 +930,17 @@ def _soi_tranh_phien(conn: dict) -> None:
         tt["tranh_phien_bao"] = time.time()
         conversations.ghi_trang_thai(f"zalo_thrash_bell:{cid}", str(tt["tranh_phien_bao"]))
         tk = conn.get("label") or "Zalo"
-        don = (localefmt.chu(f" Javis đã tắt {len(killed)} bản Zalo cũ còn chạy trên máy này.",
-                             f" Javis stopped {len(killed)} old Zalo copy(ies) still running on this machine.")
+        don = (localefmt.chu(f" UNETI AI đã tắt {len(killed)} bản Zalo cũ còn chạy trên máy này.",
+                             f" UNETI AI stopped {len(killed)} old Zalo copy(ies) still running on this machine.")
                if killed else "")
         cau = localefmt.chu(
             f"Zalo ({tk}) đang bị một phiên khác của cùng nick giành kết nối: bot chỉ nghe được tin vài giây sau mỗi lần "
             f"nối lại, tin tag và tin nhắn riêng ở giữa bị lỡ.{don} Nếu vẫn tiếp diễn: đóng Zalo Web (chat.zalo.me) của "
-            "nick này trên mọi trình duyệt, tắt Javis hoặc Claude khác đang dùng cùng nick, rồi bấm Kiểm tra ở trang "
+            "nick này trên mọi trình duyệt, tắt UNETI AI hoặc Claude khác đang dùng cùng nick, rồi bấm Kiểm tra ở trang "
             "Kết nối.",
             f"Zalo ({tk}) is being evicted by another session of the same account: the bot only hears messages for a few "
             f"seconds after each reconnect, and tags and private messages in between are missed.{don} If it goes on: "
-            "close Zalo Web (chat.zalo.me) for this account in every browser, stop any other Javis or Claude client "
+            "close Zalo Web (chat.zalo.me) for this account in every browser, stop any other UNETI AI or Claude client "
             "using it, then click Check on the Connections page.")
         loop = asyncio.get_running_loop()
         t = loop.create_task(NOTIFY_OWNER("", cau, kind="system", label="Zalo", source="zalo"))
@@ -1170,8 +1170,8 @@ def anh_duoc_quote(conn_id: str, thread: str, md: dict) -> str:
     Field report 2026-10-14: in a group someone quoted a product photo and tagged the bot to look at it; the bot only
     got the text and said it could not see the photo, so the owner's workaround was "send the photo, then tag the bot
     within 3 minutes". The quote carries the photo's message id (`replyTo.msgId`, Zalo's global id, the same id the
-    photo was stored under when Javis read it), so the stored photo message gives the link. A link inside the quote
-    payload is the fallback, for a photo sent before Javis started reading this account."""
+    photo was stored under when UNETI AI read it), so the stored photo message gives the link. A link inside the quote
+    payload is the fallback, for a photo sent before UNETI AI started reading this account."""
     rt = (md or {}).get("replyTo")
     if not isinstance(rt, dict):
         return ""
@@ -1688,7 +1688,7 @@ def lay_bo_do(conn_id: str, thread: str, now: Optional[float] = None) -> dict:
 # this only when the bot's yield minutes were saved explicitly (`yield_explicit`): a direct tag is answered at once,
 # other messages are held until the window ends and then answered one turn per person, through the bot's group
 # rules (judge, "reply when"). Without the setting groups stay silent for the whole window, as before 0.172.0.
-# Hàng chờ chỉ nằm trong RAM: Javis khởi động lại thì mất, tệ nhất là một tin không được trả lời thay, không bao giờ
+# Hàng chờ chỉ nằm trong RAM: UNETI AI khởi động lại thì mất, tệ nhất là một tin không được trả lời thay, không bao giờ
 # là trả lời hai lần.
 CHO_CHU_TRA_LOI = 600   # giây chờ chủ trả lời tin khách tới lúc chủ đang nhắn tay; 0 = tắt (bỏ tin như trước 0.136.0)
 _CHO_CHU: Dict[tuple, dict] = {}    # (conn_id, thread) -> {"evs": [...], "dau": giờ tin khách đầu tiên chưa ai trả lời}
@@ -1749,7 +1749,7 @@ def gop_cho_chu(evs: List[dict], cho: int = 0, tay: float = 0) -> dict:
         cho_chu = f"chủ nick nhắn tay lần cuối lúc {gio_tay} rồi {phut} phút không nhắn thêm gì nên tới lượt bạn"
     else:
         cho_chu = f"chủ nick chưa trả lời sau {phut} phút nên tới lượt bạn"
-    ghi = (f"[Ghi chú của Javis, không phải lời khách: khách nhắn lúc {gio}, " + cho_chu
+    ghi = (f"[Ghi chú của UNETI AI, không phải lời khách: khách nhắn lúc {gio}, " + cho_chu
            + (f"; khách gửi kèm {', '.join(kem)}" if kem else "") + ".]")
     md = dict(ev.get("metadata") or {})
     md["sau_chu_im"] = True

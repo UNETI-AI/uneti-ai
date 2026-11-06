@@ -13,12 +13,12 @@ license: MIT (LICENSE.txt)
 - Hỏi về bảo mật, xem nhanh một đoạn code hay một lỗi cụ thể: chỉ dùng phần liên quan (guidance mode), không tạo file.
 - "Audit bảo mật repo này", "pen-test code", "rà soát toàn bộ, xuất báo cáo": chạy đủ 6 giai đoạn (full audit mode).
 
-## Ghi chú khi chạy trong Javis
+## Ghi chú khi chạy trong UNETI AI
 
 - Skill do Cloudflare viết (giấy phép MIT, xem `LICENSE.txt`), thân dưới đây giữ nguyên bản gốc, chỉ đổi dấu gạch dài thành gạch ngắn.
 - "Task tool" là cơ chế tác tử con: Claude Code, Codex, Grok Build có Task thật để chạy song song. Engine API không có Task, nên chạy tuần tự từng vai, vẫn giữ nguyên tắc người kiểm chứng KHÔNG phải người tìm ra lỗi (mở lượt mới, không mang ghi chú của hunter).
-- Thư mục báo cáo phải nằm NGOÀI repo đang audit. Trong Javis mặc định đặt ở `exports/security-audit/<repo>/run-<N>` của brain, trừ khi người dùng chỉ chỗ khác.
-- Hai file kiểm `validate-*.cjs` cần Node (image Docker của Javis đã có sẵn).
+- Thư mục báo cáo phải nằm NGOÀI repo đang audit. Trong UNETI AI mặc định đặt ở `exports/security-audit/<repo>/run-<N>` của brain, trừ khi người dùng chỉ chỗ khác.
+- Hai file kiểm `validate-*.cjs` cần Node (image Docker của UNETI AI đã có sẵn).
 - Chỉ audit mã nguồn người dùng sở hữu hoặc được phép kiểm. Không dò hệ thống đang chạy thật, không chạy code của repo ngoài sandbox.
 
 # Security Audit

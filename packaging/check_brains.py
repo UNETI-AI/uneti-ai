@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Check that the four subscription brains are installed, the way Javis itself sees them.
+"""Check that the four subscription brains are installed, the way UNETI AI itself sees them.
 
     <install dir>/.venv/bin/python packaging/check_brains.py      (Windows: .venv\\Scripts\\python.exe)
 
 Uses the server's own finders (PATH plus the vendor install folders it also searches), so a
-CLI that the installer put somewhere off PATH still counts when Javis would find it, and one
-Javis would miss fails here. The desktop-installers workflow runs it after a fresh install.
+CLI that the installer put somewhere off PATH still counts when UNETI AI would find it, and one
+UNETI AI would miss fails here. The desktop-installers workflow runs it after a fresh install.
 Exit code 1 lists what is missing.
 """
 import sys

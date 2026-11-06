@@ -14,7 +14,7 @@ Use it when the job is just keeping an eye on a page: a competitor's price, a ne
 
 ## Create it by asking in chat
 
-Tell UNETI AI something like "watch this page and tell me when the shirt drops below $20", with the link. UNETI AI uses the `javis_watch` tool and replies with the watch id. Every engine can do this.
+Tell UNETI AI something like "watch this page and tell me when the shirt drops below $20", with the link. UNETI AI uses the `uneti_watch` tool and replies with the watch id. Every engine can do this.
 
 ## Create it on the Recurring work page
 
@@ -53,7 +53,7 @@ Tick **Summarize changes with AI** and UNETI AI calls the background model **onc
 
 ## Where the data lives
 
-`web_watch.sqlite3` in the UNETI AI state folder (`JAVIS_STATE_DIR`), next to `kanban.sqlite3`.
+`web_watch.sqlite3` in the UNETI AI state folder (`UNETI_STATE_DIR`), next to `kanban.sqlite3`.
 
 ## Related
 

@@ -18,8 +18,8 @@ import sys
 import tempfile
 from pathlib import Path
 
-os.environ["JAVIS_STATE_DIR"] = tempfile.mkdtemp(prefix="javis-tualai-")
-os.environ["JAVIS_ALLOWED_HOSTS"] = "testserver"
+os.environ["UNETI_STATE_DIR"] = tempfile.mkdtemp(prefix="uneti-tualai-")
+os.environ["UNETI_ALLOWED_HOSTS"] = "testserver"
 try:
     sys.stdout.reconfigure(encoding="utf-8")
 except Exception:
@@ -77,7 +77,7 @@ def phien(tin, **cot):
     return s
 
 
-HOI = [("user", "[FILE ĐANG MỞ trong trình sửa của Javis: notes/a.md]\n\nviết lại đoạn mở bài"),
+HOI = [("user", "[FILE ĐANG MỞ trong trình sửa của UNETI AI: notes/a.md]\n\nviết lại đoạn mở bài"),
        ("assistant", "bản một"), ("user", "ok"), ("assistant", "xong"),
        ("user", "viết lại đoạn mở bài"), ("assistant", "bản hai"), ("user", "ok"), ("assistant", "xong hai")]
 

@@ -1,14 +1,14 @@
-"""Tiến trình nền do engine bỏ lại: Javis nhận theo dõi, xong thì tự báo và tự làm tiếp (0.64.66).
+"""Tiến trình nền do engine bỏ lại: UNETI AI nhận theo dõi, xong thì tự báo và tự làm tiếp (0.64.66).
 
 Vì sao có file này
 ==================
-Chủ repo báo 2026-09-27, kèm nguyên đoạn chat: nhờ Javis làm video, Javis trả lời "Đang render
+Chủ repo báo 2026-09-27, kèm nguyên đoạn chat: nhờ UNETI AI làm video, UNETI AI trả lời "Đang render
 nền, xong mình ghép tiếng và gửi video" rồi im. Video render xong lúc 14:57 mà phải tới 16:14,
-khi chủ hỏi "xong video chưa", Javis mới biết.
+khi chủ hỏi "xong video chưa", UNETI AI mới biết.
 
 Gốc rễ: engine có shell (Codex, Grok Build, Antigravity) tự bật lệnh dài chạy ngầm (`cmd &`,
-`nohup cmd &`) rồi kết thúc lượt. Javis chỉ biết tự báo về cho việc Kanban, loop và nhắc hẹn.
-Một tiến trình do engine tự bật thì Javis không hề biết nó tồn tại, nên không có gì đánh thức
+`nohup cmd &`) rồi kết thúc lượt. UNETI AI chỉ biết tự báo về cho việc Kanban, loop và nhắc hẹn.
+Một tiến trình do engine tự bật thì UNETI AI không hề biết nó tồn tại, nên không có gì đánh thức
 khung chat khi nó xong. Còn lời hứa "xong mình gửi" là lời của model, không có cơ chế nào đứng
 sau.
 
@@ -25,7 +25,7 @@ model, không cần model nhớ gọi tool nào: đây là sự thật đọc t�
      xong. Gọi `_KHI_XONG` do main đặt: báo về đúng khung chat + hòm thư + thông báo đẩy, và nếu
      cần thì mở một lượt nối tiếp trong cùng phiên để làm nốt (ghép tiếng, kiểm tra, gửi file).
 
-Lượt nối tiếp chạy khi: model đã dặn rõ bằng tool `javis_job` op=then, HOẶC câu trả lời của
+Lượt nối tiếp chạy khi: model đã dặn rõ bằng tool `uneti_job` op=then, HOẶC câu trả lời của
 lượt vừa rồi có hứa "xong em làm tiếp/gửi" (bộ bắt lời hứa của background_status). Nhờ vậy lời
 hứa của model thành sự thật, thay vì chỉ bị dán nhãn là hứa suông.
 
@@ -60,7 +60,7 @@ try:
     import config as _cfg
     _STATE_DIR = Path(_cfg.STATE_DIR)
 except Exception:          # chạy lẻ trong test
-    _STATE_DIR = Path(os.getenv("JAVIS_STATE_DIR", str(Path(__file__).parent)))
+    _STATE_DIR = Path(os.getenv("UNETI_STATE_DIR", str(Path(__file__).parent)))
 
 POSIX = os.name != "nt"
 
@@ -80,7 +80,7 @@ _KHOA = threading.Lock()
 
 _NHOM_THEO_TAG: Dict[str, List[int]] = {}      # tag lượt -> pid engine (= mã nhóm)
 _VIEC: Dict[str, dict] = {}                     # mã việc -> bản ghi
-_LOI_DAN: Dict[str, dict] = {}                  # chat_id -> {"text", "ts"} (javis_job op=then)
+_LOI_DAN: Dict[str, dict] = {}                  # chat_id -> {"text", "ts"} (uneti_job op=then)
 _KHI_XONG: Optional[Callable[[dict], Any]] = None
 _VONG: Optional[asyncio.Task] = None
 
@@ -93,7 +93,7 @@ def nhom_con_song(pgid: int) -> bool:
 
     Tiến trình đã chết mà chưa ai dọn (zombie, trạng thái Z) vẫn làm killpg(0) thành công. Máy
     thật có tiến trình số 1 dọn chúng (tini trong Docker, systemd, launchd), nhưng một container
-    chạy thẳng uvicorn làm PID 1 thì không: khi đó việc đã xong mà Javis tưởng còn chạy mãi. Nên
+    chạy thẳng uvicorn làm PID 1 thì không: khi đó việc đã xong mà UNETI AI tưởng còn chạy mãi. Nên
     có /proc thì hỏi thêm trạng thái từng thành viên, chỉ tính người còn sống thật.
     """
     if not POSIX or not pgid:
@@ -248,10 +248,10 @@ def ghi_nhom(tag: str, pid: int) -> None:
 # ---------------------------------------------------------------------------------------
 # The owner reported on 2026-11-04 that a long video render or edit started from the chat never
 # reported back, neither in the chat nor in the bell. The process group test above cannot see
-# Claude Code's work: Javis keeps its `claude` process warm between turns (it does not exit), the
+# Claude Code's work: UNETI AI keeps its `claude` process warm between turns (it does not exit), the
 # SDK starts it without a session of its own, and its Bash tool runs every command in a NEW
 # session. So `nohup ffmpeg ... &` left behind by Claude Code was never adopted, and
-# `javis_job op=then` silently dropped its instruction at the end of the turn.
+# `uneti_job op=then` silently dropped its instruction at the end of the turn.
 #
 # Instead the engine starts with ENV_MARK=<mark> in its environment. Every process it starts
 # inherits it (Claude Code filters only its own CLAUDE_CODE_* and BUN_* variables from its shell),
@@ -261,7 +261,7 @@ def ghi_nhom(tag: str, pid: int) -> None:
 # tool is still running in the background (a turn that ended with its background tasks running).
 # The engine itself, its MCP servers and anything else still owned by a live engine process are
 # not orphans and are left alone.
-ENV_MARK = "JAVIS_BG_MARK"
+ENV_MARK = "UNETI_BG_MARK"
 _MARKS_BY_TAG: Dict[str, List[str]] = {}
 _CLAUDE_SHELL = re.compile(r"shell-snapshots/snapshot-|pwd -P >\| \S*claude-[0-9a-f]+-cwd")
 _EVAL_INNER = re.compile(r"\beval '(.*?)'(?: < /dev/null)?(?: && pwd -P|$)", re.S)
@@ -373,7 +373,7 @@ def _marked(mark: str) -> List[dict]:
 
 
 def groups_left_by_mark(mark) -> List[int]:
-    """Process groups the engine marked `mark` left running (see ENV_MARK). Groups Javis already
+    """Process groups the engine marked `mark` left running (see ENV_MARK). Groups UNETI AI already
     tracks, the server's own group and groups holding an engine the server started are skipped."""
     m = _clean_mark(mark)
     if not POSIX or not m:
@@ -405,7 +405,7 @@ def groups_left_by_mark(mark) -> List[int]:
 
 
 def dat_loi_dan(chat_id: str, text: str) -> None:
-    """Model dặn "khi việc nền của lượt này xong thì làm tiếp X" (tool javis_job op=then)."""
+    """Model dặn "khi việc nền của lượt này xong thì làm tiếp X" (tool uneti_job op=then)."""
     cid = str(chat_id or "").strip()
     t = str(text or "").strip()
     if not cid or not t:
@@ -489,9 +489,9 @@ def nhan_nuoi_theo_tag(tag: str, brain_root: str, chat_id: str, *, hua: bool = F
 
 
 def theo_doi_nhom(pgid: int, mo_ta: str, cwd: str, brain_root: str, chat_id: str) -> str:
-    """Nhận theo dõi NGAY một nhóm tiến trình Javis tự bật (terminal của engine API, 0.256.0).
+    """Nhận theo dõi NGAY một nhóm tiến trình UNETI AI tự bật (terminal của engine API, 0.256.0).
 
-    Khác `nhan_nuoi_theo_tag`: không cần đợi hết lượt rồi dò nhóm còn sống, vì chính Javis bật
+    Khác `nhan_nuoi_theo_tag`: không cần đợi hết lượt rồi dò nhóm còn sống, vì chính UNETI AI bật
     tiến trình và biết chắc mã nhóm. Trả mã việc (rỗng nếu không theo dõi được).
     """
     if not POSIX or not pgid or not chat_id:

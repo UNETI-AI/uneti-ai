@@ -14,7 +14,7 @@ it is not edited. This wraps its module-level `map_message` the same way the cac
 - sub-agent stream events (parent_tool_use_id set) are left alone: their AssistantMessage text passes as before.
 
 Nothing changes when the binary sends no StreamEvent (old CLI, the bundled one): there is nothing to drop.
-`JAVIS_CLAUDE_STREAM_TEXT=0` turns it off.
+`UNETI_CLAUDE_STREAM_TEXT=0` turns it off.
 """
 from __future__ import annotations
 
@@ -28,7 +28,7 @@ _MAX_SESSIONS = 256
 
 
 def bat() -> bool:
-    return (os.environ.get("JAVIS_CLAUDE_STREAM_TEXT") or "1").strip().lower() not in ("0", "false", "off", "no")
+    return (os.environ.get("UNETI_CLAUDE_STREAM_TEXT") or "1").strip().lower() not in ("0", "false", "off", "no")
 
 
 def _state(sid: str) -> dict:

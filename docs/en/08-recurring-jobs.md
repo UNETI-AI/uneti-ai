@@ -12,8 +12,8 @@ Two kinds of job share one page:
 
 | Kind | Nature | Stored where |
 |---|---|---|
-| 🔁 **Loop** | Every N minutes it wakes, does one job and stops. It runs forever until you switch it off. | An `.md` file in the brain's `Javis/loops/` |
-| ⏰ **Reminder** | A specific moment ("in 30 minutes", "8:30"), or a cron schedule repeating at a fixed time ("7am every day"). | The brain's `Javis/reminders.json` |
+| 🔁 **Loop** | Every N minutes it wakes, does one job and stops. It runs forever until you switch it off. | An `.md` file in the brain's `UNETI/loops/` |
+| ⏰ **Reminder** | A specific moment ("in 30 minutes", "8:30"), or a cron schedule repeating at a fixed time ("7am every day"). | The brain's `UNETI/reminders.json` |
 
 The key difference: a loop counts the **gap** between runs, a reminder counts a **clock time**. "Scan orders every 2 hours" is a loop; "report revenue at 7am every day" is a reminder using cron.
 
@@ -21,7 +21,7 @@ You can create **many loops in parallel**, each in its own file. But they run **
 
 A loop **can read real data through MCP** (POS, ads, calendar, analytics...) to do its work. Whether it can write files or take real outside actions depends on the **permission level** you pick, see "The three permission levels" below.
 
-Loops can be edited directly by opening the `.md` file in Obsidian or the [File manager](05-file-manager.md) page. Run state (last run, iterations today, error streak) lives separately in `Javis/loop-state.json`, owned by the server, so you can edit the definition file without stepping on it.
+Loops can be edited directly by opening the `.md` file in Obsidian or the [File manager](05-file-manager.md) page. Run state (last run, iterations today, error streak) lives separately in `UNETI/loop-state.json`, owned by the server, so you can edit the definition file without stepping on it.
 
 ## Where to find it in UNETI AI
 
@@ -175,7 +175,7 @@ On a loop card:
 - **Enable** / **Disable**: flip the state. Enabling also clears an auto-pause.
 - **▶ Run now**: run one iteration immediately, without waiting for the cycle. The button reads "Running..." and the list reloads after about 2.5 seconds. Note: this button does **not** save an open form; it runs what is saved in the file. Running now also clears an auto-pause, because it is a deliberate action on your part.
 - **Edit**: reopen the form with this job's content.
-- **Delete**: asks to confirm, then removes `Javis/loops/<slug>.md` entirely.
+- **Delete**: asks to confirm, then removes `UNETI/loops/<slug>.md` entirely.
 - **Move to brain…**: a picker to move the job to another brain, keeping its file and run state. If the target brain already has a job with the same name, UNETI AI refuses and reports the error rather than overwriting. A running job cannot be moved; try again later.
 
 On a reminder card:
@@ -237,7 +237,7 @@ Who receives it:
 - Jobs created through chat carry the speaker's chat_id, so they report back to that person.
 - Jobs created on the dashboard do not know who you are, so they report to the **first Telegram ID** in the allow list.
 
-To stop one job reporting every iteration because it is too noisy, open `Javis/loops/<slug>.md` and set `notify: false` in the frontmatter.
+To stop one job reporting every iteration because it is too noisy, open `UNETI/loops/<slug>.md` and set `notify: false` in the frontmatter.
 
 Reminders go through Telegram too. Reminders created on the dashboard have no attached recipient, so they go to **every ID** in the allow list; reminders set in words through chat go to the person who set them.
 
@@ -254,7 +254,7 @@ UNETI AI loads the 200 most recent entries and paginates **10 per page**, with *
 
 Each entry starts with a heading such as `## [2026-07-20 14:35] doc-source · loop (custom/auto) - scheduled`, where `scheduled` means it ran on schedule and `manual` means you clicked **▶ Run now**. Below is the summary of what it did, a **Verification** line where present, and a warning line if that iteration is what auto-paused the job.
 
-The log also exists in the brain as real files: `Javis/loop-log/YYYY-MM-DD.md`, one per day. Open them through [File manager](05-file-manager.md) to look further back than 200 entries.
+The log also exists in the brain as real files: `UNETI/loop-log/YYYY-MM-DD.md`, one per day. Open them through [File manager](05-file-manager.md) to look further back than 200 entries.
 
 ## Scheduling in words through chat
 
@@ -266,7 +266,7 @@ You do not have to use this page. Tell UNETI AI directly in [Chat](02-chat-and-v
 - "Is anything still running?"
 - "Cancel the order scanning job."
 
-UNETI AI uses the `javis_schedule` tool (a bundled plugin) to pick the right store: interval schedules become files in `Javis/loops/`; fixed repeating times and one-shots go into the reminder store. The tool sets a proper slug and **blocks duplicate names**: if a job with that name exists, it reports an error and tells you to edit the old one rather than spawning a copy.
+UNETI AI uses the `uneti_schedule` tool (a bundled plugin) to pick the right store: interval schedules become files in `UNETI/loops/`; fixed repeating times and one-shots go into the reminder store. The tool sets a proper slug and **blocks duplicate names**: if a job with that name exists, it reports an error and tells you to edit the old one rather than spawning a copy.
 
 Two hard safety rails on this path, which no parameter can change:
 
@@ -284,7 +284,7 @@ Reminders run on the clock. A webhook runs on an **event**: a customer just fill
 
 Pick the permission level as for a reminder (Read only, Can write files, Full access), then **Save**.
 
-**The secret is shown only once**, right after saving, together with a `curl` command to test it. The calling system sends it in the `Authorization: Bearer <token>` header (or the `X-Javis-Token` header, or `?token=` at the end of the link when it cannot set headers). UNETI AI keeps only a hash, so if you lose it press **New token**; the old one stops working at once.
+**The secret is shown only once**, right after saving, together with a `curl` command to test it. The calling system sends it in the `Authorization: Bearer <token>` header (or the `X-Uneti-Token` header, or `?token=` at the end of the link when it cannot set headers). UNETI AI keeps only a hash, so if you lose it press **New token**; the old one stops working at once.
 
 **Where results go:** like a reminder, to the brain's UNETI AI Core chat, the inbox (bell) and your Telegram. A result that starts or ends with `[SILENT]` is not reported.
 
@@ -319,7 +319,7 @@ A cron schedule also shows its **next three runs** on the card. A run missed bec
 
 ## Advanced fields (editable only in the .md file)
 
-The dashboard form is deliberately compact. The following require opening `Javis/loops/<slug>.md` and editing the frontmatter (through [File manager](05-file-manager.md) or Obsidian). Once saved, the dashboard rereads it immediately, with no restart.
+The dashboard form is deliberately compact. The following require opening `UNETI/loops/<slug>.md` and editing the frontmatter (through [File manager](05-file-manager.md) or Obsidian). Once saved, the dashboard rereads it immediately, with no restart.
 
 | Field | Meaning |
 |---|---|
@@ -384,7 +384,7 @@ The **file body** (below the second `---`) is exactly the "Task description" you
 
 **The result says the Claude CLI is not installed.** The brain is not ready on the machine. See [Getting started & first-run setup](01-getting-started.md) and [Troubleshooting & FAQ](17-troubleshooting.md).
 
-**Running on ChatGPT reports `bwrap: Failed to make / slave: Permission denied`.** Codex (ChatGPT) wraps all of its file reads and writes in bubblewrap, and bubblewrap cannot start inside a Docker container, so the background job cannot read a single file. The Docker image since version 0.25.9 already disables that particular sandbox (`JAVIS_CODEX_SANDBOX=off`), so **updating to a newer build** is enough. If you build your own container, set that environment variable, or move background work to the Claude brain. Details in [.env configuration](16-env-configuration.md).
+**Running on ChatGPT reports `bwrap: Failed to make / slave: Permission denied`.** Codex (ChatGPT) wraps all of its file reads and writes in bubblewrap, and bubblewrap cannot start inside a Docker container, so the background job cannot read a single file. The Docker image since version 0.25.9 already disables that particular sandbox (`UNETI_CODEX_SANDBOX=off`), so **updating to a newer build** is enough. If you build your own container, set that environment variable, or move background work to the Claude brain. Details in [.env configuration](16-env-configuration.md).
 
 **A loop complains that there is no business data.** It can only read real numbers once you connect a source. Go to [Connections & business data](09-connections-and-business-data.md) to connect a POS, ads account or sales channel. With no source, the iteration stops and says so in one line.
 
@@ -405,4 +405,4 @@ The **file body** (below the second `---`) is exactly the "Task description" you
 - [Models & engines](10-models-and-engines.md) - picking a cheap model for background work.
 - [File manager](05-file-manager.md) - opening job definition files and log files.
 - [Chat & voice](02-chat-and-voice.md) - creating jobs and reminders in words.
-- [Plugins](20-plugins.md) - understanding `javis_schedule` and the other bundled tools.
+- [Plugins](20-plugins.md) - understanding `uneti_schedule` and the other bundled tools.

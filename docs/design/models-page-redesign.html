@@ -347,7 +347,7 @@ button { font: inherit; color: inherit; }
       </div>
       <div class="acts">
         <button class="act" data-setbg="agy"><i data-lucide="workflow"></i>Dùng cho việc nền</button>
-        <button class="act" data-toast="Antigravity chat được, tool của Javis hoạt động."><i data-lucide="refresh-cw"></i>Kiểm tra</button>
+        <button class="act" data-toast="Antigravity chat được, tool của UNETI AI hoạt động."><i data-lucide="refresh-cw"></i>Kiểm tra</button>
         <button class="act" data-sheet="agyacc" data-for="Antigravity"><i data-lucide="user-plus"></i>Thêm tài khoản</button>
         <button class="act danger" data-sheet="confirm" data-for="Antigravity"><i data-lucide="log-out"></i>Ngắt</button>
       </div>
@@ -452,10 +452,10 @@ button { font: inherit; color: inherit; }
         <span class="logo" data-logo="antigravity-color" style="opacity:.6"><span class="dot"></span></span>
         <div class="who">
           <div class="name">Antigravity <span class="kind">Gói Google</span></div>
-          <div class="status"><i data-lucide="unplug"></i>Đã ngắt khỏi Javis</div>
+          <div class="status"><i data-lucide="unplug"></i>Đã ngắt khỏi UNETI AI</div>
         </div>
       </div>
-      <div class="offnote"><i data-lucide="info"></i><span>Javis không dùng thẻ này nữa. Phiên Google trong máy vẫn còn, bấm Kết nối lại là dùng tiếp.</span></div>
+      <div class="offnote"><i data-lucide="info"></i><span>UNETI AI không dùng thẻ này nữa. Phiên Google trong máy vẫn còn, bấm Kết nối lại là dùng tiếp.</span></div>
       <div class="acts" style="border-top:0;padding-top:0">
         <button class="act pri" data-toast="Đã kết nối lại Antigravity."><i data-lucide="plug-zap"></i>Kết nối lại</button>
       </div>
@@ -652,7 +652,7 @@ window.t = function (k) { return ({"fast.claude": "Tính vào usage credits, gi�
     };
   }
   api.mount = mount;
-  window.JavisEffortSlider = api;
+  window.UnetiEffortSlider = api;
 })();
 
 </script>
@@ -700,13 +700,13 @@ function cardMenu(id) {
     ${c.main ? "" : mi("arrow-up", "Lên một bậc", "", "", 'data-toast="Đã đưa lên."')}
     ${c.last ? "" : mi("arrow-down", "Xuống một bậc", "", "", 'data-toast="Đã đưa xuống."')}
   </div><div class="grp">
-    ${c.keys ? mi("key-round", "Thêm key", "Hết lượt key này thì Javis dùng key kế", "", 'data-sheet="addkey" data-for="' + c.name + '"') : ""}
+    ${c.keys ? mi("key-round", "Thêm key", "Hết lượt key này thì UNETI AI dùng key kế", "", 'data-sheet="addkey" data-for="' + c.name + '"') : ""}
     ${c.adv ? mi("key-round", "Thêm key", "Key của nhà khác, mỗi key một địa chỉ", "", 'data-sheet="advadd" data-for="' + c.name + '"') : ""}
     ${c.plan ? mi("user-plus", "Thêm tài khoản", "Đăng nhập thêm một tài khoản cùng gói", "", 'data-sheet="addacc" data-for="' + c.name + '"') : ""}
-    ${c.agyPlan ? mi("user-plus", "Thêm tài khoản Google", "Hết lượt tài khoản này thì Javis dùng tài khoản kế", "", 'data-sheet="agyacc" data-for="' + c.name + '"') : ""}
+    ${c.agyPlan ? mi("user-plus", "Thêm tài khoản Google", "Hết lượt tài khoản này thì UNETI AI dùng tài khoản kế", "", 'data-sheet="agyacc" data-for="' + c.name + '"') : ""}
     ${mi("refresh-cw", "Kiểm tra lại", "Chạy thử một lượt thật", "", 'data-toast="' + c.name + ' dùng được."')}
   </div><div class="grp">
-    ${mi("log-out", "Ngắt kết nối", "Javis thôi dùng thẻ này", "danger", 'data-sheet="confirm" data-for="' + c.name + '"')}
+    ${mi("log-out", "Ngắt kết nối", "UNETI AI thôi dùng thẻ này", "danger", 'data-sheet="confirm" data-for="' + c.name + '"')}
   </div>`;
   open(head(c.name, c.sub, c.logo), b);
 }
@@ -718,13 +718,13 @@ const SHEETS = {
     ${["gpt-5.1", "gpt-5.1-codex-mini", "gpt-5", "o4-mini"].map(m => `<button class="mi" data-toast="Đã chọn ${m}."><span class="mic">${ico("cpu")}</span><span class="mt">${m}</span></button>`).join("")}`],
   effort: (who) => [head("Độ sâu suy nghĩ", who), `<div class="effbox" id="effBox"></div>`],
   key: (who) => [head(who, "OpenRouter"), `<div class="grp">
-    ${mi("pause", "Tạm tắt key này", "Javis bỏ qua key này cho tới khi bật lại", "", 'data-toast="Đã tắt key."')}
+    ${mi("pause", "Tạm tắt key này", "UNETI AI bỏ qua key này cho tới khi bật lại", "", 'data-toast="Đã tắt key."')}
     ${mi("pencil", "Đổi tên", "", "", 'data-toast="Đã đổi tên."')}
     ${mi("key-round", "Thay key mới", "Dán key mới, tên và thứ tự giữ nguyên", "", 'data-sheet="addkey" data-for="' + who + '"')}
     ${mi("arrow-up", "Lên một bậc", "", "", 'data-toast="Đã đưa lên."')}
     </div><div class="grp">${mi("trash-2", "Xoá key", "", "danger", 'data-sheet="confirm" data-for="' + who + '"')}</div>`],
   advkey: (who) => [head(who, "API key nâng cao"), `<div class="grp">
-    ${mi("pause", "Tạm tắt key này", "Javis bỏ qua key này cho tới khi bật lại", "", 'data-toast="Đã tắt key."')}
+    ${mi("pause", "Tạm tắt key này", "UNETI AI bỏ qua key này cho tới khi bật lại", "", 'data-toast="Đã tắt key."')}
     ${mi("pencil", "Sửa tên, địa chỉ hoặc key", "", "", 'data-sheet="advadd" data-for="' + who + '"')}
     ${mi("cpu", "Tên model của key này", "Khi nhà đó không tự liệt kê model", "", 'data-toast="Đã lưu tên model."')}
     ${mi("arrow-up", "Lên một bậc", "", "", 'data-toast="Đã đưa lên."')}
@@ -733,23 +733,23 @@ const SHEETS = {
     <input class="field" inputmode="url" placeholder="Địa chỉ API của nhà cung cấp (https://...)">
     <input class="field" type="password" placeholder="Dán API key">
     <input class="field" placeholder="Tên model (không bắt buộc)">
-    <div class="offnote" style="margin:0 0 12px">${ico("info")}<span>Dùng được key của các bên bán lại Claude, Kimi, MiniMax, DeepSeek và nhiều nhà khác. Javis thử kết nối trước khi lưu.</span></div>
+    <div class="offnote" style="margin:0 0 12px">${ico("info")}<span>Dùng được key của các bên bán lại Claude, Kimi, MiniMax, DeepSeek và nhiều nhà khác. UNETI AI thử kết nối trước khi lưu.</span></div>
     <div class="btns"><button class="btn" data-close>Huỷ</button><button class="btn pri" data-toast="Đã kết nối và lưu key.">${ico("check")}Kết nối</button></div>`],
   agyacc: (who) => [head("Thêm tài khoản Google", who), `<input class="field" placeholder="Tên gợi nhớ, ví dụ: Gmail công việc">
     <div class="grp" style="padding:0 0 10px">
-      ${mi("terminal", "1. Mở Terminal của Javis", "Lệnh đăng nhập riêng cho tài khoản này đã gõ sẵn", "", "")}
+      ${mi("terminal", "1. Mở Terminal của UNETI AI", "Lệnh đăng nhập riêng cho tài khoản này đã gõ sẵn", "", "")}
       ${mi("log-in", "2. Đăng nhập Google bằng tài khoản mới", "Mở link agy in ra, dán địa chỉ trả về vào Terminal", "", "")}
-      ${mi("circle-check", "3. Quay lại đây", "Javis tự nhận tài khoản mới", "", "")}
+      ${mi("circle-check", "3. Quay lại đây", "UNETI AI tự nhận tài khoản mới", "", "")}
     </div>
-    <div class="offnote" style="margin:0 0 12px">${ico("info")}<span>Hết lượt tài khoản này thì Javis tự chuyển sang tài khoản kế. Chạy được trên máy Linux và VPS; máy Mac và Windows giữ một đăng nhập Google cho cả máy.</span></div>
+    <div class="offnote" style="margin:0 0 12px">${ico("info")}<span>Hết lượt tài khoản này thì UNETI AI tự chuyển sang tài khoản kế. Chạy được trên máy Linux và VPS; máy Mac và Windows giữ một đăng nhập Google cho cả máy.</span></div>
     <div class="btns"><button class="btn" data-close>Huỷ</button><button class="btn pri" data-toast="Đã mở Terminal với lệnh đăng nhập.">${ico("terminal")}Mở Terminal</button></div>`],
   addkey: (who) => [head("Thêm key", who), `<input class="field" placeholder="Tên gợi nhớ (không bắt buộc)">
     <input class="field" type="password" placeholder="Dán API key">
     <div class="btns"><button class="btn" data-close>Huỷ</button><button class="btn pri" data-toast="Đã thêm key.">${ico("check")}Lưu</button></div>`],
   addacc: (who) => [head("Thêm tài khoản", who), `<input class="field" placeholder="Tên gợi nhớ, ví dụ: Tài khoản công ty">
-    <div class="offnote" style="margin:0 0 12px">${ico("info")}<span>Hết lượt tài khoản này thì Javis tự dùng tài khoản kế.</span></div>
+    <div class="offnote" style="margin:0 0 12px">${ico("info")}<span>Hết lượt tài khoản này thì UNETI AI tự dùng tài khoản kế.</span></div>
     <div class="btns"><button class="btn" data-close>Huỷ</button><button class="btn pri" data-toast="Đã mở link đăng nhập.">${ico("external-link")}Lấy link đăng nhập</button></div>`],
-  confirm: (who) => [head("Ngắt " + who + "?"), `<div class="confirm"><p>Javis thôi dùng ${who} cho tới khi bạn kết nối lại. Thẻ kế tiếp trong thứ tự sẽ thay chỗ.</p>
+  confirm: (who) => [head("Ngắt " + who + "?"), `<div class="confirm"><p>UNETI AI thôi dùng ${who} cho tới khi bạn kết nối lại. Thẻ kế tiếp trong thứ tự sẽ thay chỗ.</p>
     <div class="btns"><button class="btn" data-close>Giữ lại</button><button class="btn red" data-toast="Đã ngắt ${who}.">${ico("log-out")}Ngắt</button></div></div>`],
   connect: () => [head("Kết nối thêm", "8 nhà chưa kết nối"), [["claudecode-color", "Claude Code", "Gói Claude Pro hoặc Ultra"],
     ["grok", "Grok Build", "Gói SuperGrok hoặc X Premium+"], ["gemini-color", "Google Gemini", "API key"], ["groq", "Groq", "API key, trả lời rất nhanh"],
@@ -794,12 +794,12 @@ document.addEventListener("click", (e) => {
       // The app's own slider (dashboard/effort-slider.js), mounted as the composer mounts it.
       const chipEl = t.classList.contains("cp-eff") ? t : null;
       const sup = !chipEl || chipEl.dataset.fast === "1";
-      window.JavisEffortSlider.mount(document.getElementById("effBox"), { value: (chipEl && chipEl.dataset.v) || "medium",
+      window.UnetiEffortSlider.mount(document.getElementById("effBox"), { value: (chipEl && chipEl.dataset.v) || "medium",
         // Fast mode: the same bolt as the composer's slider, one setting for the whole app; greyed out on a model
         // without Fast mode (same rule as model-picker.js fastNote), e.g. Antigravity.
         fast: { supported: sup, on: window.FAST_ON, title: () => "Fast mode\n" + window.t(chipEl && chipEl.dataset.for === "ChatGPT" ? "fast.codex" : sup ? "fast.api" : "fast.none"),
           onToggle: (on) => { window.FAST_ON = on; document.querySelectorAll(".cp-eff[data-fast='1'] .cp-eff-fast").forEach(x => { x.hidden = !on; }); } },
-        onChange: (v) => { if (chipEl) { chipEl.dataset.v = v; chipEl.querySelector(".ev").textContent = window.t(window.JavisEffortSlider.LABEL_KEY[v]); } } });
+        onChange: (v) => { if (chipEl) { chipEl.dataset.v = v; chipEl.querySelector(".ev").textContent = window.t(window.UnetiEffortSlider.LABEL_KEY[v]); } } });
     }
     return;
   }

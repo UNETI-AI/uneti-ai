@@ -1,6 +1,6 @@
 """The owner's own tasks for the Tasks page, tab "Mine" (0.423.0). Spec: docs/dev/2026-10-nhiem-vu-spec.md 8.2.
 
-One JSON store per brain at <brain>/Javis/my-tasks.json:
+One JSON store per brain at <brain>/UNETI/my-tasks.json:
 
     {"tasks": [...], "projects": [...], "rev": n}
 
@@ -11,7 +11,7 @@ repeating task starts each occurrence with its subtasks open again (the ticked o
 `done_dates` entry so unticking the occurrence puts them back).
 
 A repeating task is ONE record; each finished occurrence is a key of `done_dates` ("YYYY-MM-DD" ->
-{"at": epoch, "by": "me" | "javis"}). The missed occurrence shown under Overdue, streaks and the like are
+{"at": epoch, "by": "me" | "uneti"}). The missed occurrence shown under Overdue, streaks and the like are
 computed from the schedule and `done_dates` (the page does it, see dashboard/tasks.js), never stored.
 
 Routes (all JSON bodies, `brain` like the other stores):
@@ -33,8 +33,8 @@ Routes (all JSON bodies, `brain` like the other stores):
 and a repeat `skip_dates` ({date: epoch}: times skipped on purpose, they count as handled but never as done). The store
 keeps `clean` = {days: {date: "c"|"i"|"x"|"e"}, over_clears: n}, see `judge_clean_days`.
 
-Habit coach (0.427.0): once a day the background model ("Javis Core") writes the habit lines the page and the
-reminders use, into <brain>/Javis/habit-coach.json, and learns which style of nudge was followed by the habit
+Habit coach (0.427.0): once a day the background model ("UNETI AI Core") writes the habit lines the page and the
+reminders use, into <brain>/UNETI/habit-coach.json, and learns which style of nudge was followed by the habit
 being done that day (see `coach_prompt`). No model, or a bad answer: the fixed lines stay.
 """
 from __future__ import annotations
@@ -189,8 +189,8 @@ def _apply(task: dict, p: dict) -> None:
                         for x in p["subs"][:MAX_SUBS] if isinstance(x, dict) and str(x.get("t") or "").strip()]
     if "habit" in p:
         task["habit"] = clean_habit(p.get("habit"))
-    if "from_javis" in p:
-        task["from_javis"] = bool(p.get("from_javis"))
+    if "from_uneti" in p:
+        task["from_uneti"] = bool(p.get("from_uneti"))
     if "prep" in p:
         task["prep"] = str(p.get("prep") or "")[:500]
     if "star" in p:
@@ -381,7 +381,7 @@ def usual_time(task: dict, tz=None) -> str:
 
 
 def nudge_time(task: dict, state: dict, tz=None) -> str:
-    """When today's reminder goes out: the set time, or for "Javis reminds" half an hour after the usual time
+    """When today's reminder goes out: the set time, or for "UNETI AI reminds" half an hour after the usual time
     (earlier while frozen, so there is room to thaw it)."""
     hb = task.get("habit") or {}
     if hb.get("remind") == "time":
@@ -612,7 +612,7 @@ class MyTasks:
 
     # ---- habit coach ----
     def _coach_path(self, brain: str) -> Path:
-        return Path(self.deps.brain_root(brain)) / "Javis" / COACH
+        return Path(self.deps.brain_root(brain)) / "UNETI" / COACH
 
     def load_coach(self, brain: str) -> dict:
         try:
@@ -681,7 +681,7 @@ class MyTasks:
 
     # ---- store ----
     def _path(self, brain: str) -> Path:
-        return Path(self.deps.brain_root(brain)) / "Javis" / STORE
+        return Path(self.deps.brain_root(brain)) / "UNETI" / STORE
 
     def load(self, brain: str) -> dict:
         p = self._path(brain)
@@ -755,7 +755,7 @@ class MyTasks:
         task = self._find(data, tid)
         if task is None:
             return _err("không thấy việc này", "task not found")
-        by = "javis" if by == "javis" else "me"
+        by = "uneti" if by == "uneti" else "me"
         if task.get("repeat"):
             d = _clean_date(date) or time.strftime("%Y-%m-%d")
             dd = task.setdefault("done_dates", {})
@@ -795,7 +795,7 @@ class MyTasks:
             return _err("không thấy việc này", "task not found")
         data["tasks"] = [t for t in data["tasks"] if t.get("id") != tid]
         if handoff:
-            # "Give to Javis" (0.428.0): the stats count how many tasks the owner handed over.
+            # "Give to UNETI AI" (0.428.0): the stats count how many tasks the owner handed over.
             log = data.setdefault("log", {})
             log["handoffs"] = (list(log.get("handoffs") or []) + [_now()])[-2000:]
         self.save(brain, data)
@@ -1092,7 +1092,7 @@ class MyTasks:
         return router
 
 
-# The running store, for the bundled plugin javis-mine (in-process, like tasks.current()).
+# The running store, for the bundled plugin uneti-mine (in-process, like tasks.current()).
 _FEATURE: Optional["MyTasks"] = None
 
 

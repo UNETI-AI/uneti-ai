@@ -11,9 +11,9 @@
  * Giao việc: yêu cầu, tiêu chí xong, nơi nhận kết quả (chat riêng hay một nhóm trợ lý đang ở), kiểu việc (thường hay
  * kiểm chứng), rồi một bước xác nhận trước khi tạo. `nonce` giữ nguyên qua các lần gửi lại để server trả đúng việc cũ.
  *
- * Đồng bộ trực tiếp: trong lúc tab đang gắn, nghe gói nhóm (`javis:team-event`), mục tiêu đổi
- * (`javis:resonance-agents-changed`), tin việc nền về (`javis:sessions-changed`) và việc vừa tạo, huỷ ở chính tab
- * (`javis:agent-jobs-changed`), tải lại sau 800ms gộp nhịp. Kanban chưa có gói WS riêng nên thêm một nhịp hỏi thưa lúc
+ * Đồng bộ trực tiếp: trong lúc tab đang gắn, nghe gói nhóm (`uneti:team-event`), mục tiêu đổi
+ * (`uneti:resonance-agents-changed`), tin việc nền về (`uneti:sessions-changed`) và việc vừa tạo, huỷ ở chính tab
+ * (`uneti:agent-jobs-changed`), tải lại sau 800ms gộp nhịp. Kanban chưa có gói WS riêng nên thêm một nhịp hỏi thưa lúc
  * trang đang hiện. `destroy` gỡ hết.
  *
  * Hàm vẽ là hàm THUẦN (test dưới node); `mount` gắn sự kiện và gọi API.
@@ -94,7 +94,7 @@
   function reasonText(r) {
     r = String(r || "");
     if (!/^[a-z][a-z0-9_]*$/.test(r)) return r;
-    var RS = typeof window !== "undefined" ? window.JavisResonance : null;
+    var RS = typeof window !== "undefined" ? window.UnetiResonance : null;
     var k = RS && RS.stateKey ? RS.stateKey({ status: "active", block_reason: r }) : "";
     if (k && k !== "resonance.st_working" && k !== "resonance.st_blocked" && k !== "resonance.st_running") return tw(k);
     return tw("ajobs.reason.code_generic");
@@ -236,7 +236,7 @@
 
   function assignHtml(ui, data) {
     ui = ui || {};
-    // 0.191.0: Javis Core takes no jobs of its own (no agent file, no team seat), so it gets no Assign button.
+    // 0.191.0: UNETI AI Core takes no jobs of its own (no agent file, no team seat), so it gets no Assign button.
     if (ui.noAssign) return "";
     if (!ui.assignOpen) {
       return '<button type="button" class="ws-btn primary aj-assign-open">' + ic("plus") + esc(tw("ajobs.assign")) + "</button>";
@@ -384,7 +384,7 @@
   }
 
   function changed() {
-    try { window.dispatchEvent(new CustomEvent("javis:agent-jobs-changed")); } catch (e) { /* node */ }
+    try { window.dispatchEvent(new CustomEvent("uneti:agent-jobs-changed")); } catch (e) { /* node */ }
   }
 
   // ───────────── gắn vào trang ─────────────
@@ -633,7 +633,7 @@
     }
     var mine = host._ajActive;
     // Đồng bộ trực tiếp: các sự kiện của app gộp nhịp rồi tải lại tại chỗ. Gỡ ở destroy.
-    var EVENTS = ["javis:team-event", "javis:resonance-agents-changed", "javis:sessions-changed", "javis:agent-jobs-changed"];
+    var EVENTS = ["uneti:team-event", "uneti:resonance-agents-changed", "uneti:sessions-changed", "uneti:agent-jobs-changed"];
     var hasWin = typeof window !== "undefined" && window.addEventListener;
     // Performance (2026-11-05): switching to another chat (reason "open") adds no job: no reload for it.
     var onEvent = function (e) { if (e && e.detail && e.detail.reason === "open") return; schedule(); };
@@ -666,6 +666,6 @@
   var api = { html: html, jobHtml: jobHtml, toolbarHtml: toolbarHtml, assignHtml: assignHtml,
     confirmHtml: confirmHtml, badgeHtml: badgeHtml, archiveHtml: archiveHtml, statusOf: statusOf, statusText: statusText, nextText: nextText, reasonText: reasonText, relTime: relTime, mount: mount, loadCounts: loadCounts,
     RELOAD_MS: RELOAD_MS, setStrings: function (o) { STR = o || {}; } };
-  if (typeof window !== "undefined") window.JavisAgentJobs = api;
+  if (typeof window !== "undefined") window.UnetiAgentJobs = api;
   if (typeof module !== "undefined" && module.exports) module.exports = api;
 })();

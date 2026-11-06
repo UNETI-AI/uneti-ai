@@ -2,9 +2,9 @@
 
     python tests/run.py ollama_local_dinh_tuyen     (KHÔNG mạng)
 
-Chủ repo báo kèm ảnh (02/09): chọn model local `qwen3:4b-instruct`, gõ "hello", Javis trả
+Chủ repo báo kèm ảnh (02/09): chọn model local `qwen3:4b-instruct`, gõ "hello", UNETI AI trả
 về "There's an issue with the selected model (qwen3:4b-instruct). It may not exist or you
-may not have access to it." Câu đó KHÔNG có trong mã nguồn Javis - nó do chính binary
+may not have access to it." Câu đó KHÔNG có trong mã nguồn UNETI AI - nó do chính binary
 `claude` in ra. Badge dưới câu trả lời ghi `cli · qwen3:4b-instruct`, tức lượt chat đã bị
 đưa cho Claude Code kèm tên model của Ollama.
 
@@ -88,7 +88,7 @@ SRC = (ROOT / "server" / "main.py").read_text(encoding="utf-8")
 # Đây chính là chữ "ghim hỏng" trong ảnh: /sessions/{id}/meta tính pin_ok bằng khoá, nên
 # Ollama máy nhà chạy ngon mà nhãn vẫn kêu hỏng. Hai nơi phải giải nghĩa khoá GIỐNG NHAU.
 check("CANARY: pin_ok dùng chung cách giải nghĩa khoá với đường định tuyến",
-      # 0.461.0: the check moved into `_pin_health`, shared by /sessions/{id}/meta and the Javis Core card.
+      # 0.461.0: the check moved into `_pin_health`, shared by /sessions/{id}/meta and the UNETI AI Core card.
       'ok = bool(d) and (d.get("kind") != "api" or bool(_provider_key(mcfg, d)))' in SRC
       and 'sess["pin_ok"], lim_until = _pin_health(' in SRC
       and 'key = mcfg.get(d["key_field"], "") if d and d.get("key_field") else ""' not in SRC)

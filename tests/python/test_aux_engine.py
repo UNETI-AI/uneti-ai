@@ -27,7 +27,7 @@ import os
 import sys
 import tempfile
 
-os.environ["JAVIS_STATE_DIR"] = tempfile.mkdtemp(prefix="javis-aux-")
+os.environ["UNETI_STATE_DIR"] = tempfile.mkdtemp(prefix="uneti-aux-")
 
 import aux_engine  # noqa: E402
 
@@ -46,8 +46,8 @@ class FakeClaude:
     def __init__(self):
         self.system_prompt = "SYS"
         self.cwd = "/vault"
-        self.javis_vault = "/vault"
-        self.javis_mode = "suggest"
+        self.uneti_vault = "/vault"
+        self.uneti_mode = "suggest"
         self.tag = "loop"
         self.model = None
         self.kind = "claude"
@@ -83,7 +83,7 @@ check("API: da doi engine", api is not c3)
 check("API: dung provider/model", api.provider == "openrouter" and api.model == "x/cheap")
 check("API: thua huong system_prompt", api.system_prompt == "SYS")
 check("API: thua huong vault", api.vault_root == "/vault")
-check("API: thua huong mode (quyet dinh an toan dau kia)", api.javis_mode == "suggest")
+check("API: thua huong mode (quyet dinh an toan dau kia)", api.uneti_mode == "suggest")
 
 # ---- swap: hỏng cấu hình thì KHÔNG được làm chết việc nền ----
 c4 = FakeClaude()
@@ -144,7 +144,7 @@ check("deps moi -> goi aux_swap kem mode/tag", getattr(c7, "swapped", None) == (
 # ---- Engine API gom text -> đúng một final ----
 async def _fake_stream():
     yield {"type": "meta", "model": "m"}
-    yield {"type": "tool_call", "name": "javis_read_file"}
+    yield {"type": "tool_call", "name": "uneti_read_file"}
     yield {"type": "text", "content": "phan 1 "}
     yield {"type": "text", "content": "phan 2"}
 

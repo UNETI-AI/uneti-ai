@@ -631,7 +631,7 @@ input.nv-subt:focus { box-shadow: 0 2px 0 var(--accent); }
    one left edge for title, meta and icons; icons flush right at the title's first line; bold only for what matters;
    each task a card; on the phone the card corner and the round tick are concentric (radius 10 + gap 6 = 16px). */
 
-/* the four tiles + Javis's line */
+/* the four tiles + UNETI AI's line */
 .nv-pu { margin: 6px 0 4px; }
 .nv-pus { margin: 4px 0 12px; }
 button.nv-hs-t { width: 100%; min-width: 0; font: inherit; color: var(--text); text-align: left; cursor: pointer; transition: transform .12s, border-color .15s, background .15s; }
@@ -849,7 +849,7 @@ button.nv-hs-t:active { transform: scale(.97); }
 .nv-toastx:hover { opacity: 1; background: color-mix(in srgb, var(--bg) 14%, transparent); }
 .nv-toastx .ic { width: 18px; height: 18px; }
 
-/* segmented choices (add form: Me / Javis, kind): icon and label spaced, centred */
+/* segmented choices (add form: Me / UNETI AI, kind): icon and label spaced, centred */
 .nv-seg button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
 .nv-seg button .ic { width: 18px; height: 18px; flex: none; }
 

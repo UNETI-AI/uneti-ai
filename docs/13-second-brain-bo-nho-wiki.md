@@ -17,7 +17,7 @@ Một Second Brain (gọi tắt là "brain" hay "vault") là một thư mục tr
 | Memory | `memory/` | Bộ nhớ sống: những gì UNETI AI nhớ về bạn và doanh nghiệp. |
 | Agents / Workflows | `agents/`, `workflows/` | Lớp vận hành (xem [Agents & Workflows](07-agents-va-workflows.md)). |
 | Skills | `skills/` | Bản chuẩn của kỹ năng, mỗi skill một thư mục `skills/<slug>/SKILL.md`. UNETI AI tự mirror sang `.claude/skills` cho Claude Code nạp native (xem [Skills](06-skills.md)). |
-| Tầng vận hành | `Javis/` | Thứ do chat sinh ra: việc lặp `Javis/loops/<slug>.md`, luật từng cuộc chat Zalo `Javis/zalo/<slug>.md`, nhắc hẹn `Javis/reminders.json`, và chỉ mục năng lực `Javis/index.md` (tự sinh từ file, đừng sửa tay). |
+| Tầng vận hành | `UNETI/` | Thứ do chat sinh ra: việc lặp `UNETI/loops/<slug>.md`, luật từng cuộc chat Zalo `UNETI/zalo/<slug>.md`, nhắc hẹn `UNETI/reminders.json`, và chỉ mục năng lực `UNETI/index.md` (tự sinh từ file, đừng sửa tay). |
 | Sổ bullet journal | `00 - Dashboard/`, `01 - Daily Log/`, `02 - Weekly Log/`... | Nơi ghi chép và task hằng ngày; khối Dataview kéo dữ liệu từ đây (xem [Task & Dataview trong note](19-task-va-dataview.md)). |
 | Vùng cache | `attachments/`, `inbox/` | Ảnh và file đính kèm; `inbox/telegram/` là nơi file gửi qua Telegram rơi xuống. **Hai thư mục này là cache, tự hết hạn** - đọc mục riêng bên dưới trước khi để tài liệu quý ở đây. |
 
@@ -103,7 +103,7 @@ Xoá brain **không phải là mất vĩnh viễn**. UNETI AI chuyển cả thư
 3. Hộp thoại hiện ra ghi rõ: "Não này sẽ được chuyển vào THÙNG RÁC (giữ 30 ngày rồi tự xoá hẳn), và việc xoá sẽ ĐỒNG BỘ sang mọi máy khác." Nó yêu cầu **gõ CHÍNH XÁC tên brain** để xác nhận.
 4. Gõ đúng thì brain được đưa vào thùng rác và UNETI AI quay về Brain Default, kèm thông báo "Đã xoá brain ... (đưa vào thùng rác 30 ngày, đồng bộ xoá sang các máy khác)". Gõ sai tên thì hiện "Tên không khớp - đã huỷ xoá".
 
-Thùng rác nằm ở thư mục `brain-trash` trong thư mục state của UNETI AI (`JAVIS_STATE_DIR`; bản chạy máy là thư mục `server/`, bản Docker là volume state). Mỗi lần xoá tạo một thư mục con dạng `Tên brain__20260729-153012`. Việc dọn thùng rác quá 30 ngày chạy kèm mỗi lượt đồng bộ brain lên GitHub.
+Thùng rác nằm ở thư mục `brain-trash` trong thư mục state của UNETI AI (`UNETI_STATE_DIR`; bản chạy máy là thư mục `server/`, bản Docker là volume state). Mỗi lần xoá tạo một thư mục con dạng `Tên brain__20260729-153012`. Việc dọn thùng rác quá 30 ngày chạy kèm mỗi lượt đồng bộ brain lên GitHub.
 
 Không thể xoá **Brain Default**, bấm 🗑 lúc đang chọn nó sẽ báo "Không thể xoá Brain mặc định (não khởi đầu)."
 
@@ -111,13 +111,13 @@ Với folder ngoài (📁), nút 🗑 làm việc khác hẳn: nó hỏi 'Bỏ f
 
 ### Chuẩn hoá cấu trúc một brain
 
-Nếu một brain có cấu trúc cũ (ví dụ ghi chú nằm trong `Javis/agents`, `Memory` viết hoa, skill nằm trong `.claude/skills`), bạn có thể gom về dạng phẳng đồng nhất:
+Nếu một brain có cấu trúc cũ (ví dụ ghi chú nằm trong `UNETI/agents`, `Memory` viết hoa, skill nằm trong `.claude/skills`), bạn có thể gom về dạng phẳng đồng nhất:
 
 1. Vào **Cài đặt** (nhóm **Hệ thống** trên rail).
 2. Mở nhóm **Giao diện & Brain**, kéo tới mục **Cấu trúc brain**.
-3. Bấm **Chuẩn hóa brain đang chọn**, rồi xác nhận hộp thoại: "Chuẩn hóa cấu trúc brain đang chọn? (Di chuyển Javis/agents→agents, Javis/workflows→workflows, Memory→memory. Có git backup.)"
+3. Bấm **Chuẩn hóa brain đang chọn**, rồi xác nhận hộp thoại: "Chuẩn hóa cấu trúc brain đang chọn? (Di chuyển UNETI/agents→agents, UNETI/workflows→workflows, Memory→memory. Có git backup.)"
 
-Thao tác này an toàn: chỉ di chuyển khi thư mục đích chưa tồn tại, không ghi đè. Nó gộp `Javis/agents` về `agents/`, `Javis/workflows` về `workflows/`, `Memory` về `memory/`, và dời skill cũ ở `.claude/skills` sang `skills/` (kể cả nhánh skill đang tắt, để skill bạn đã tắt không bị bật lại).
+Thao tác này an toàn: chỉ di chuyển khi thư mục đích chưa tồn tại, không ghi đè. Nó gộp `UNETI/agents` về `agents/`, `UNETI/workflows` về `workflows/`, `Memory` về `memory/`, và dời skill cũ ở `.claude/skills` sang `skills/` (kể cả nhánh skill đang tắt, để skill bạn đã tắt không bị bật lại).
 
 ## `attachments/` và `inbox/` là vùng cache, không phải kho lưu trữ
 
@@ -144,7 +144,7 @@ UNETI AI phân 4 loại ký ức: thông tin về bạn (`user`), cách bạn th
 
 ### Chỉ mục MEMORY.md có trần nạp vào ngữ cảnh
 
-Vì `MEMORY.md` được nạp vào **mọi** lượt chat, nó có trần khoảng **20.000 ký tự** (đổi bằng biến môi trường `JAVIS_MEMORY_INDEX_MAX`). Brain dày lên vượt trần thì UNETI AI hạ dần theo bậc, ưu tiên giữ đủ số ký ức:
+Vì `MEMORY.md` được nạp vào **mọi** lượt chat, nó có trần khoảng **20.000 ký tự** (đổi bằng biến môi trường `UNETI_MEMORY_INDEX_MAX`). Brain dày lên vượt trần thì UNETI AI hạ dần theo bậc, ưu tiên giữ đủ số ký ức:
 
 1. Rút mô tả mỗi dòng còn 100 ký tự, rồi 60 ký tự.
 2. Chỉ giữ tiêu đề và đường dẫn file, bỏ mô tả.
@@ -281,4 +281,4 @@ Kết quả không sửa gì cả, chỉ đổ xuống khối **Nhật ký học
 - [Agents & Workflows](07-agents-va-workflows.md) - lớp vận hành trong `agents/` và `workflows/`.
 - [Việc định kỳ & Nhắc hẹn](08-viec-dinh-ky.md) - giao việc lặp cho UNETI AI tiêu hoá nguồn theo lịch.
 - [Task & Dataview trong note](19-task-va-dataview.md) - bộ sổ bullet journal trong brain.
-- [Cấu hình .env](16-cau-hinh-env.md) - biến `BRAINS_DIR`, `JAVIS_STATE_DIR`, `JAVIS_MEMORY_INDEX_MAX`.
+- [Cấu hình .env](16-cau-hinh-env.md) - biến `BRAINS_DIR`, `UNETI_STATE_DIR`, `UNETI_MEMORY_INDEX_MAX`.

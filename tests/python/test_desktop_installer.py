@@ -5,7 +5,7 @@
 The .exe and .dmg are only built on Windows and macOS runners (desktop-installers.yml, which
 also does a real install on Windows). This Linux test guards the invariants whose breakage
 installs fine and fails later, where nobody looks:
-- the shortcut must open Javis WITHOUT restarting it (start-javis.vbs always kills first);
+- the shortcut must open UNETI AI WITHOUT restarting it (start-uneti.vbs always kills first);
 - the code must be a git clone in a folder the app and the uninstaller agree on, or the
   Update button stops working and the uninstaller loses track of the brain;
 - Windows script files must stay ASCII (PowerShell 5.1 and wscript read them as ANSI), and the
@@ -29,16 +29,16 @@ def check(name, cond, extra=""):
 
 
 PK = ROOT / "packaging"
-ISS = PK / "windows" / "javis-setup.iss"
+ISS = PK / "windows" / "uneti-setup.iss"
 BOOT_PS1 = PK / "windows" / "bootstrap.ps1"
-OPEN_VBS = ROOT / "open-javis.vbs"
+OPEN_VBS = ROOT / "open-uneti.vbs"
 LAUNCHER = PK / "macos" / "launcher.sh"
 BOOT_SH = PK / "macos" / "bootstrap.sh"
 BUILD_DMG = PK / "macos" / "build-dmg.sh"
 WF = ROOT / ".github" / "workflows" / "desktop-installers.yml"
 
 for f in (ISS, BOOT_PS1, OPEN_VBS, LAUNCHER, BOOT_SH, BUILD_DMG, WF,
-          PK / "assets" / "javis.ico", PK / "assets" / "javis.icns"):
+          PK / "assets" / "uneti.ico", PK / "assets" / "uneti.icns"):
     check(f"exists: {f.relative_to(ROOT)}", f.exists())
 
 iss_raw = ISS.read_bytes()
@@ -55,31 +55,31 @@ main_py = (ROOT / "server" / "main.py").read_text(encoding="utf-8")
 # ---- encodings ----
 for f in (BOOT_PS1, OPEN_VBS, ROOT / "install.ps1"):
     check(f"{f.name} is pure ASCII (read as ANSI on Windows)", f.read_bytes().isascii())
-check("javis-setup.iss starts with a UTF-8 BOM (Vietnamese messages)", iss_raw.startswith(b"\xef\xbb\xbf"))
+check("uneti-setup.iss starts with a UTF-8 BOM (Vietnamese messages)", iss_raw.startswith(b"\xef\xbb\xbf"))
 
 # ---- open without restarting ----
 server_up = vbs.split("Function ServerUp()", 1)[-1].split("End Function", 1)[0]
-check("CANARY: open-javis.vbs only calls start-javis.vbs (which kills the running server) when /health fails",
-      re.search(r'If ServerUp\(\) Then\s+OpenWindow\s+Else\s+sh\.Run "wscript\.exe //nologo """ & root & "\\start-javis\.vbs"" /open"',
+check("CANARY: open-uneti.vbs only calls start-uneti.vbs (which kills the running server) when /health fails",
+      re.search(r'If ServerUp\(\) Then\s+OpenWindow\s+Else\s+sh\.Run "wscript\.exe //nologo """ & root & "\\start-uneti\.vbs"" /open"',
                 vbs) is not None and "/health" in server_up and "http.Status = 200" in server_up)
-check("open-javis.vbs opens an app window (--app=) with a default-browser fallback",
+check("open-uneti.vbs opens an app window (--app=) with a default-browser fallback",
       "--app=" in vbs and "sh.Run url, 1, False" in vbs)
-check("open-javis.vbs honours JAVIS_PORT", "JAVIS_PORT" in vbs)
+check("open-uneti.vbs honours UNETI_PORT", "UNETI_PORT" in vbs)
 shortcut_lines = [ln for ln in iss.splitlines() if ln.startswith("Name: \"{auto") and "wscript.exe" in ln]
-check("every wscript shortcut in the installer runs open-javis.vbs, never start-javis.vbs",
-      len(shortcut_lines) == 2 and all("open-javis.vbs" in ln and "start-javis.vbs" not in ln for ln in shortcut_lines),
+check("every wscript shortcut in the installer runs open-uneti.vbs, never start-uneti.vbs",
+      len(shortcut_lines) == 2 and all("open-uneti.vbs" in ln and "start-uneti.vbs" not in ln for ln in shortcut_lines),
       shortcut_lines)
-check("the 'open now' checkbox also uses open-javis.vbs and only after a good bootstrap",
-      re.search(r'^Filename: "\{sys\}\\wscript\.exe";.*open-javis\.vbs.*postinstall.*Check: BootstrapOk', iss, re.M) is not None)
-check("CANARY: macOS launcher hands an installed Javis to bin/javis-start.sh (opens, never restarts)",
-      'exec "${JAVIS_HOME}/bin/javis-start.sh"' in launcher)
+check("the 'open now' checkbox also uses open-uneti.vbs and only after a good bootstrap",
+      re.search(r'^Filename: "\{sys\}\\wscript\.exe";.*open-uneti\.vbs.*postinstall.*Check: BootstrapOk', iss, re.M) is not None)
+check("CANARY: macOS launcher hands an installed UNETI AI to bin/uneti-start.sh (opens, never restarts)",
+      'exec "${UNETI_HOME}/bin/uneti-start.sh"' in launcher)
 
 # ---- one folder, agreed on everywhere ----
 check("installer CodeDir and bootstrap.ps1 default agree on %USERPROFILE%\\UNETI-AI",
       "ExpandConstant('{%USERPROFILE}') + '\\UNETI-AI'" in iss
       and '(Join-Path $env:USERPROFILE "UNETI-AI")' in boot)
 check("macOS launcher and bootstrap.sh agree on ~/UNETI-AI",
-      'JAVIS_HOME="${JAVIS_HOME:-$HOME/UNETI-AI}"' in launcher and 'JAVIS_HOME="${JAVIS_HOME:-$HOME/UNETI-AI}"' in boot_sh)
+      'UNETI_HOME="${UNETI_HOME:-$HOME/UNETI-AI}"' in launcher and 'UNETI_HOME="${UNETI_HOME:-$HOME/UNETI-AI}"' in boot_sh)
 check("Windows wizard does not ask for a folder (the clone path is fixed)", "DisableDirPage=yes" in iss)
 check("per-user install, no admin prompt from the wizard", "PrivilegesRequired=lowest" in iss)
 
@@ -90,7 +90,7 @@ for name, src in (("bootstrap.ps1", boot), ("bootstrap.sh", boot_sh)):
     check(f"{name} does not shallow-clone (--depth breaks the updater merge)",
           not any("git clone" in ln and "--depth" in ln for ln in src.splitlines()))
     check(f"{name} leaves an existing clone alone (it holds the brain)", ".git" in src and "giu nguyen" in src)
-    check(f"{name} refuses to clone over a non-empty folder", "khong phai ban Javis" in src)
+    check(f"{name} refuses to clone over a non-empty folder", "khong phai ban UNETI AI" in src)
 check("bootstrap.ps1 hands over to install.ps1 -NoStart and checks its exit code",
       '"-NoStart"' in boot and "$LASTEXITCODE -ne 0" in boot.split("install.ps1")[-1])
 check("bootstrap.sh runs install.sh", "bash ./install.sh" in boot_sh)
@@ -99,7 +99,7 @@ check("bootstrap.sh runs install.sh", "bash ./install.sh" in boot_sh)
 m = re.search(r'_AUTOSTART_NAME = "([^"]+)"', main_py)
 check("uninstaller removes the same Run entry the app writes",
       m is not None and f"CurrentVersion\\Run', '{m.group(1)}'" in iss, m and m.group(1))
-check("uninstaller stops Javis first", "stop-javis.ps1" in iss and "usUninstall" in iss)
+check("uninstaller stops UNETI AI first", "stop-uneti.ps1" in iss and "usUninstall" in iss)
 check("uninstaller keeps the brain folder and says where it is", "DataKept" in iss and "[UninstallDelete]" in iss
       and "UNETI-AI" not in iss.split("[UninstallDelete]")[1].split("[Code]")[0])
 
@@ -131,9 +131,9 @@ check("CI installs the CLIs on Windows (no -SkipCli) and checks all four brains"
 check("CI runs the macOS first-run path and checks all four brains",
       "packaging/macos/bootstrap.sh" in mac_job and "check_brains.py" in mac_job)
 check("macOS launcher has a fallback when Terminal automation is denied",
-      "if ! osascript" in launcher and "pbcopy" in launcher and "printf 'JAVIS_HOME=%q bash %q" in launcher)
+      "if ! osascript" in launcher and "pbcopy" in launcher and "printf 'UNETI_HOME=%q bash %q" in launcher)
 
-# ---- Javis logo in the installers, optional signing (0.439.1) ----
+# ---- UNETI AI logo in the installers, optional signing (0.439.1) ----
 import struct  # noqa: E402
 
 
@@ -155,8 +155,8 @@ for pct in (100, 125, 150, 175, 200, 225, 250):
               info == (*want, 24), info)
         check(f"installer lists {name}", f"..\\assets\\{name}" in iss)
 check("installer shows the pictures unstretched", "WizardImageStretch=no" in iss)
-check("signing is opt-in: SignTool only under #ifdef Sign", "#ifdef Sign\r\nSignTool=javis" in iss_raw.decode("utf-8-sig")
-      or "#ifdef Sign\nSignTool=javis" in iss)
+check("signing is opt-in: SignTool only under #ifdef Sign", "#ifdef Sign\r\nSignTool=uneti" in iss_raw.decode("utf-8-sig")
+      or "#ifdef Sign\nSignTool=uneti" in iss)
 check("the uninstaller is signed together with the setup", "SignedUninstaller=yes" in iss)
 check("CI signs only with the certificate secrets and checks the signature",
       "secrets.WINDOWS_CERT_PFX_BASE64" in wf and "/DSign" in wf and "Get-AuthenticodeSignature" in wf
@@ -164,31 +164,31 @@ check("CI signs only with the certificate secrets and checks the signature",
 check("CI never prints the certificate to the log (written to a file, removed after)",
       "WriteAllBytes($pfx" in wf and "Remove-Item $pfx" in wf)
 build_dmg = BUILD_DMG.read_text(encoding="utf-8")
-check(".dmg mounts with the Javis icon (.VolumeIcon.icns + custom-icon flag)",
+check(".dmg mounts with the UNETI AI icon (.VolumeIcon.icns + custom-icon flag)",
       ".VolumeIcon.icns" in build_dmg and "-a C" in build_dmg and "UDRW" in build_dmg)
 
 # ---- one-line installs, no SmartScreen / Gatekeeper block (0.439.1) ----
 REL = "https://github.com/uneti-ai/uneti-ai/releases/download/desktop/"
-GET_PS1 = PK / "windows" / "get-javis.ps1"
-GET_SH = PK / "macos" / "get-javis.sh"
+GET_PS1 = PK / "windows" / "get-uneti.ps1"
+GET_SH = PK / "macos" / "get-uneti.sh"
 gps = GET_PS1.read_text(encoding="utf-8")
 gsh = GET_SH.read_text(encoding="utf-8")
-check("get-javis.ps1 is pure ASCII (piped into Windows PowerShell 5.1)", GET_PS1.read_bytes().isascii())
-check("get-javis.ps1 runs inside & { } so `irm | iex` leaves no settings in the person's session",
+check("get-uneti.ps1 is pure ASCII (piped into Windows PowerShell 5.1)", GET_PS1.read_bytes().isascii())
+check("get-uneti.ps1 runs inside & { } so `irm | iex` leaves no settings in the person's session",
       gps.split("# ===", 2)[-1].lstrip().split("\n", 1)[-1].lstrip().startswith("& {"))
-check("get-javis.ps1 downloads the published setup and opens it",
+check("get-uneti.ps1 downloads the published setup and opens it",
       REL + "UNETI-AI-Setup.exe" in gps and "Start-Process -FilePath $out" in gps)
-check("get-javis.sh downloads the published .dmg", REL + "UNETI-AI-macOS.dmg" in gsh)
-check("get-javis.sh gives the installer the keyboard back (stdin is the curl pipe)", "< /dev/tty" in gsh)
-check("get-javis.sh only replaces the app bundle, never ~/UNETI-AI (the brain)",
+check("get-uneti.sh downloads the published .dmg", REL + "UNETI-AI-macOS.dmg" in gsh)
+check("get-uneti.sh gives the installer the keyboard back (stdin is the curl pipe)", "< /dev/tty" in gsh)
+check("get-uneti.sh only replaces the app bundle, never ~/UNETI-AI (the brain)",
       'rm -rf "${DEST}/UNETI AI.app"' in gsh and not any("rm -rf" in ln and "UNETI-AI" in ln and ".app" not in ln
                                                          for ln in gsh.splitlines()))
-check("get-javis.sh is executable", os.access(GET_SH, os.X_OK))
+check("get-uneti.sh is executable", os.access(GET_SH, os.X_OK))
 raw = "https://raw.githubusercontent.com/uneti-ai/uneti-ai/main/"
 for doc in ("QUICKSTART.md", "QUICKSTART.en.md"):
     d = (ROOT / doc).read_text(encoding="utf-8")
-    check(f"{doc} gives the Windows one-liner", f"irm {raw}packaging/windows/get-javis.ps1 | iex" in d)
-    check(f"{doc} gives the macOS one-liner", f"curl -fsSL {raw}packaging/macos/get-javis.sh | bash" in d)
+    check(f"{doc} gives the Windows one-liner", f"irm {raw}packaging/windows/get-uneti.ps1 | iex" in d)
+    check(f"{doc} gives the macOS one-liner", f"curl -fsSL {raw}packaging/macos/get-uneti.sh | bash" in d)
 
 # ---- the .app bundle actually assembles ----
 dist = ROOT / "dist" / "dmg-stage"
@@ -203,13 +203,13 @@ if shutil.which("bash") and os.name != "nt":
         check("Info.plist executable and icon exist",
               (app / "MacOS" / info["CFBundleExecutable"]).exists()
               and (app / "Resources" / (info["CFBundleIconFile"] + ".icns")).exists())
-        check("app executable is executable", os.access(app / "MacOS" / "javis", os.X_OK))
+        check("app executable is executable", os.access(app / "MacOS" / "uneti", os.X_OK))
     shutil.rmtree(ROOT / "dist", ignore_errors=True)
-for f in (LAUNCHER, BOOT_SH, BUILD_DMG, PK / "macos" / "get-javis.sh", ROOT / "install.sh", ROOT / "bin" / "javis-start.sh"):
+for f in (LAUNCHER, BOOT_SH, BUILD_DMG, PK / "macos" / "get-uneti.sh", ROOT / "install.sh", ROOT / "bin" / "uneti-start.sh"):
     r = subprocess.run(["bash", "-n", str(f)], capture_output=True, text=True)
     check(f"bash -n {f.relative_to(ROOT)}", r.returncode == 0, r.stderr)
 check("in-repo UNETI AI.app now has the icon its Info.plist names",
-      (ROOT / "UNETI AI.app" / "Contents" / "Resources" / "javis.icns").exists())
+      (ROOT / "UNETI AI.app" / "Contents" / "Resources" / "uneti.icns").exists())
 
 # ---- publishing and docs agree on the download links ----
 base = "https://github.com/uneti-ai/uneti-ai/releases/download/desktop/"

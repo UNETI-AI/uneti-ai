@@ -171,10 +171,10 @@ const rail = (consoleJs.match(/const RAIL_ITEMS = \[\s*([\s\S]*?)\]\.map/) || []
 check("thanh bên có mục teams ngay sau workspace", /"workspace", "teams"/.test(rail), rail);
 check("nhóm Năng lực chứa teams", /ids: \["workspace", "teams"/.test(consoleJs));
 check("icon và tiêu đề trang teams", /teams: "users"/.test(consoleJs) && consoleJs.includes('"teams"') && /id === "teams"/.test(consoleJs));
-// 0.417.0: teams.js nạp chậm qua nap-cham.js (khối javis-lazy), không còn là thẻ <script>.
+// 0.417.0: teams.js nạp chậm qua nap-cham.js (khối uneti-lazy), không còn là thẻ <script>.
 check("index.html nạp teams.js", coNap("teams.js", indexHtml));
-check("app.js chuyển gói team_message, team_state thành sự kiện trang", appJs.includes('"team_message"') && appJs.includes("javis:team-event"));
-// 0.173.0: nhóm đang mở bị xoá (công cụ javis_team hay tab khác): khung chat đóng về trống, báo bằng chữ, không giữ nhóm ma.
+check("app.js chuyển gói team_message, team_state thành sự kiện trang", appJs.includes('"team_message"') && appJs.includes("uneti:team-event"));
+// 0.173.0: nhóm đang mở bị xoá (công cụ uneti_team hay tab khác): khung chat đóng về trống, báo bằng chữ, không giữ nhóm ma.
 check("nhóm đang mở bị xoá: gói team_state deleted và GET nhóm 404 đều đóng khung qua closeGone",
       teamsJs.includes('d.type === "team_state" && d.deleted && d.team_id === S.activeId) closeGone(d.team_id)')
       && teamsJs.includes("if (r.code === 404) return closeGone(forTeam);")
@@ -267,7 +267,7 @@ check("CSS: sheet display:flex has its own [hidden] rule", /\.tm-sheet\[hidden\]
 // ───────────── T2 0.154.0: bảng dùng chung, chip agent, khung lọc theo việc ─────────────
 const JR = require(path.join(ROOT, "dashboard", "reactions.js"));
 check("teams.js không còn bảng emoji riêng: REACTIONS là bảng của reactions.js", TM.REACTIONS === JR.EMOJI
-      && !/var REACTIONS = \[/.test(teamsJs) && teamsJs.includes("window.JavisReactions"));
+      && !/var REACTIONS = \[/.test(teamsJs) && teamsJs.includes("window.UnetiReactions"));
 const withS = Object.assign({}, am, { reaction: { value: "like", reasons: [], axis: "should_silent", comment: "",
   status: "pending_review", status_reason: "Chờ <lượt> xem xét" } });
 mh = TM.messageHtml(withS, { members: members });
@@ -296,8 +296,8 @@ check("0.176 sending a reply puts the quote on top and calls the assistant repli
 check("0.176 list preview drops the quote", TM.previewText({ last: { text: "> Lan: cũ\n\nmới", author_kind: "owner" } }) ===
       vi["teams.you"] + ": mới");
 check("0.176 assistant text goes through the main chat markdown renderer in the browser",
-      /window\.mdToHtml/.test(teamsJs) && teamsJs.includes('tm-text msg-javis tm-mdwrap"><div class="bubble">')
-      && /\.tm-mdwrap\.msg-javis \.bubble \{ background: none; border: none; padding: 0;/.test(css));
+      /window\.mdToHtml/.test(teamsJs) && teamsJs.includes('tm-text msg-uneti tm-mdwrap"><div class="bubble">')
+      && /\.tm-mdwrap\.msg-uneti \.bubble \{ background: none; border: none; padding: 0;/.test(css));
 check("0.176 assistant avatar opens its settings", TM.messageHtml(am, { members: members })
   .includes('class="tm-face-btn" data-agent-edit="lan"') && /St\.editAgent\(\{ slug: slug \}/.test(teamsJs));
 h = TM.teamListHtml([team], "tm_1", 0, "tm_1");
@@ -516,7 +516,7 @@ check("T5 console.js: trang Nhóm dùng cview-flush, body.on-teams; rời trang 
       /id === "teams"[\s\S]{0,700}el\.classList\.add\("cview-flush"\);\s*document\.body\.classList\.add\("on-teams"\);/.test(consoleJs)
       && /_pageLeave = \(\) => \{\s*el\.classList\.remove\("cview-flush"\);\s*document\.body\.classList\.remove\("on-teams"\);/.test(consoleJs));
 check("T5 điện thoại: ẩn linh vật trên trang Nhóm; 0.176 bỏ đầu trang chung ở MỌI cỡ màn",
-      /@media \(max-width: 760px\) \{[\s\S]*body\.on-teams #javisPet \{ display: none; \}/.test(css)
+      /@media \(max-width: 760px\) \{[\s\S]*body\.on-teams #unetiPet \{ display: none; \}/.test(css)
       && /^body\.on-teams \.cview-head \{ display: none; \}/m.test(css));
 check("T5 khung soạn một hàng: nút +, ô chữ, mic, nút gửi; ô chữ không còn chiếm trọn hàng",
       /class="tm-plus" aria-haspopup="menu"/.test(teamsJs) && /textarea class="tm-input" rows="1"/.test(teamsJs)
@@ -578,7 +578,7 @@ check("review T5: bỏ khoá chữ không còn dùng", dead.every(function (k) {
       dead.filter(function (k) { return k in vi || k in en; }).join(","));
 
 // ───────────── Ảnh đại diện đúng ảnh trợ lý, ảnh nhóm ghép, ghim nhóm ─────────────
-global.window = { JavisAvatar: { html: function (a, size) {
+global.window = { UnetiAvatar: { html: function (a, size) {
   return '<i class="fake-ava" data-slug="' + a.slug + '" data-shape="' + ((a.avatar || {}).shape || "") + '" data-size="' + size + '"></i>';
 } } };
 const fz = function (n) {
@@ -657,11 +657,11 @@ check("4f6268bd #2 pinTeam của trang dùng pinTeamWith với setNote (vùng th
 // của bộ não chính (gõ ở đó sẽ ghi tin không tác giả vào phiên nhóm).
 const notiJs = fs.readFileSync(path.join(ROOT, "dashboard", "notifications.js"), "utf8");
 check("hộp thư nhận ra thư của nhóm (kênh team:) và mở nhóm đó ở trang Nhóm, trước nhánh mở khung chat chính",
-      /\/\^team:\(\.\+\)\$\/\.exec/.test(notiJs) && /window\.JavisTeams\.open\(nhom\)/.test(notiJs)
-      && notiJs.indexOf("JavisTeams.open(") < notiJs.indexOf("window.JavisSessions.open(item.session_id)"));
-check("JavisTeams.open: đang ở trang Nhóm thì mở ngay; chưa thì ghi nhớ, sang trang Nhóm, mở sau khi tải danh sách",
+      /\/\^team:\(\.\+\)\$\/\.exec/.test(notiJs) && /window\.UnetiTeams\.open\(nhom\)/.test(notiJs)
+      && notiJs.indexOf("UnetiTeams.open(") < notiJs.indexOf("window.UnetiSessions.open(item.session_id)"));
+check("UnetiTeams.open: đang ở trang Nhóm thì mở ngay; chưa thì ghi nhớ, sang trang Nhóm, mở sau khi tải danh sách",
       typeof TM.open === "function" && /function open\(teamId, taskId\) \{[\s\S]{0,600}pendingOpen = /.test(teamsJs)
-      && /JavisNav\.go\("teams"\)/.test(teamsJs) && /if \(pendingOpen\) \{[\s\S]{0,200}openTeam\(/.test(teamsJs));
+      && /UnetiNav\.go\("teams"\)/.test(teamsJs) && /if \(pendingOpen\) \{[\s\S]{0,200}openTeam\(/.test(teamsJs));
 check("console.js không còn nhãn số giữ chỗ 0.111.0", !consoleJs.includes("0.111.0"));
 
 // Ghim ngay trên danh sách: máy tính rê chuột hiện nút ghim, chuột phải hay nhấn giữ (điện thoại) mở menu Ghim / Bỏ ghim

@@ -48,21 +48,21 @@ HAT_GIONG = {
                "## 📥 No due date\n\n" + _TASKS[3]),
     },
     "memory": {
-        "vi": ("# Bộ nhớ Javis - Index\n\n"
-               "> Chỉ mục bộ nhớ dài hạn của Javis. Mỗi dòng = 1 ký ức, trỏ tới file trong `facts/`.\n"
-               "> Nội dung file này được nạp vào đầu mỗi câu hỏi để Javis nhớ ngữ cảnh.\n\n"
-               "_(Chưa có ký ức nào. Javis sẽ học dần sau mỗi hội thoại.)_\n"),
-        "en": ("# Javis Memory - Index\n\n"
-               "> Index of Javis's long-term memory. One line = one memory, pointing to a file in `facts/`.\n"
-               "> This file is loaded at the start of every question so Javis remembers the context.\n\n"
-               "_(No memories yet. Javis learns a little after every conversation.)_\n"),
+        "vi": ("# Bộ nhớ UNETI AI - Index\n\n"
+               "> Chỉ mục bộ nhớ dài hạn của UNETI AI. Mỗi dòng = 1 ký ức, trỏ tới file trong `facts/`.\n"
+               "> Nội dung file này được nạp vào đầu mỗi câu hỏi để UNETI AI nhớ ngữ cảnh.\n\n"
+               "_(Chưa có ký ức nào. UNETI AI sẽ học dần sau mỗi hội thoại.)_\n"),
+        "en": ("# UNETI AI Memory - Index\n\n"
+               "> Index of UNETI AI's long-term memory. One line = one memory, pointing to a file in `facts/`.\n"
+               "> This file is loaded at the start of every question so UNETI AI remembers the context.\n\n"
+               "_(No memories yet. UNETI AI learns a little after every conversation.)_\n"),
     },
-    "javis_readme": {
-        "vi": ("# Javis\n\nLớp điều phối của Javis OS trong vault này.\n\n"
+    "uneti_readme": {
+        "vi": ("# UNETI AI\n\nLớp điều phối của UNETI AI trong vault này.\n\n"
                "- `agents/` - các Agent (vai trò + skills + bộ nhớ riêng)\n"
                "- `workflows/` - quy trình nhiều agent (status active/off)\n"
                "- Skills dùng chung ở `skills/` (tự mirror sang `.claude/skills` cho Claude Code native)\n"),
-        "en": ("# Javis\n\nThe Javis OS orchestration layer of this vault.\n\n"
+        "en": ("# UNETI AI\n\nThe UNETI AI orchestration layer of this vault.\n\n"
                "- `agents/` - Agents (role + skills + their own memory)\n"
                "- `workflows/` - multi-agent workflows (status active/off)\n"
                "- Shared skills live in `skills/` (mirrored to `.claude/skills` for native Claude Code)\n"),
@@ -70,10 +70,10 @@ HAT_GIONG = {
     "wiki_index": {
         "vi": ("# Wiki Index\n\n"
                "Catalog nội dung wiki (cập nhật mỗi lần INGEST). Đọc file này trước khi trả lời câu hỏi.\n\n"
-               "_(Chưa có trang wiki nào. Thả source vào `sources/` rồi bảo Javis \"tiêu hoá giúp tôi\" để bắt đầu tích luỹ tri thức.)_\n"),
+               "_(Chưa có trang wiki nào. Thả source vào `sources/` rồi bảo UNETI AI \"tiêu hoá giúp tôi\" để bắt đầu tích luỹ tri thức.)_\n"),
         "en": ("# Wiki Index\n\n"
                "Catalogue of the wiki's content (updated on every INGEST). Read this file before answering a question.\n\n"
-               "_(No wiki pages yet. Drop a source into `sources/` and ask Javis to \"digest it\" to start building up knowledge.)_\n"),
+               "_(No wiki pages yet. Drop a source into `sources/` and ask UNETI AI to \"digest it\" to start building up knowledge.)_\n"),
     },
     "wiki_log": {
         "vi": ("# Wiki Log\n\n"
@@ -142,7 +142,7 @@ def _vi_tri(root: Path) -> dict:
     return {
         "dashboard": _thu_muc_con(root, r"^(\d+\s*[-_.]\s*)?dashboard$", "00 - Dashboard") / "Dashboard.md",
         "memory": root / "memory" / "MEMORY.md",
-        "javis_readme": root / "Javis" / "README.md",
+        "uneti_readme": root / "UNETI" / "README.md",
         "wiki_index": wiki / "index.md",
         "wiki_log": wiki / "log.md",
         "open_questions": wiki / "_open-questions.md",

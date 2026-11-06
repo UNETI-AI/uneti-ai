@@ -1,6 +1,6 @@
 """Facebook Messenger gateway over the official Messenger Platform (Meta), 0.134.0.
 
-Same shape as `whatsapp_bot` because the platform works the same way: Javis cannot pull
+Same shape as `whatsapp_bot` because the platform works the same way: UNETI AI cannot pull
 messages, Meta POSTs every inbound message to a webhook. Two halves:
 
   - `MessengerBot`: the transport, same contract as `TelegramBot` (start/stop/status/send_text/
@@ -27,7 +27,7 @@ Rules of the platform that shape the code:
 
 Page comments (0.434.0), handled the way Pancake shows them: every top-level comment under a Page
 post is its own conversation in the inbox, every reply under it joins that conversation, and
-whatever Javis sends there goes out as a reply under that top-level comment. The conversation id
+whatever UNETI AI sends there goes out as a reply under that top-level comment. The conversation id
 is `cmt:<top-level comment id>`, so a reply needs no stored state and still works after a
 restart. They arrive as `feed` changes on the same webhook. Each account picks a mode in its
 meta (`comments`): "off", "inbox" (shown in the inbox, the owner answers; the default) or
@@ -62,7 +62,7 @@ import stt
 from bot_gateway import HangLuot, dong_vet, parse_chat_ids, ten_tool
 from whatsapp_bot import verify_signature  # noqa: F401  - same Meta signature scheme, re-exported
 
-GRAPH_VERSION = os.getenv("JAVIS_MESSENGER_GRAPH_VERSION", os.getenv("JAVIS_WHATSAPP_GRAPH_VERSION", "v23.0"))
+GRAPH_VERSION = os.getenv("UNETI_MESSENGER_GRAPH_VERSION", os.getenv("UNETI_WHATSAPP_GRAPH_VERSION", "v23.0"))
 GRAPH = f"https://graph.facebook.com/{GRAPH_VERSION}"
 
 MAX_MSG = 1900               # Messenger allows 2000; keep a margin for multi-byte counting
@@ -166,7 +166,7 @@ def raw_chat_id(chat) -> str:
 def ig_comment_event(value: dict, ig_id: str):
     """One Instagram `comments` change -> the new comment it carries, or None (0.447.0).
 
-    The account's own comments (every reply Javis sends) are skipped. A reply under a comment joins the
+    The account's own comments (every reply UNETI AI sends) are skipped. A reply under a comment joins the
     top-level comment's thread (`parent_id`)."""
     v = value or {}
     cid = str(v.get("id") or "")
@@ -187,7 +187,7 @@ def comment_event(value: dict, page_id: str):
     """One `feed` change -> the new comment it carries, or None.
 
     Only new comments count (`item` comment, `verb` add); edits, removals, reactions and posts are
-    skipped, and so are the Page's own comments, which include every reply Javis sends. A reply
+    skipped, and so are the Page's own comments, which include every reply UNETI AI sends. A reply
     under a reply still belongs to the top-level comment: `parent_id` is the post id for a
     top-level comment and the parent comment id otherwise."""
     v = value or {}
@@ -564,9 +564,9 @@ class MessengerBot(HangLuot):
             try:
                 kq = await self.stt_fn(data, f"messenger_{int(time.time())}.mp4")
             except Exception as e:
-                kq = {"ok": False, "noi_voi_javis": stt.loi_thanh_dong("loi", f"{type(e).__name__}: {e}")}
+                kq = {"ok": False, "noi_voi_uneti": stt.loi_thanh_dong("loi", f"{type(e).__name__}: {e}")}
             if not (kq or {}).get("ok"):
-                return (kq or {}).get("noi_voi_javis") or stt.loi_thanh_dong("loi")
+                return (kq or {}).get("noi_voi_uneti") or stt.loi_thanh_dong("loi")
             return stt.khoi_thoai(kq.get("text"), "Messenger")
         ddir = self.download_dir(chat) if callable(self.download_dir) else self.download_dir
         d = Path(ddir) if ddir else Path("messenger-inbox")
@@ -633,7 +633,7 @@ class MessengerBot(HangLuot):
             meta["instagram"] = True
         if self.chat_ids and chat not in self.chat_ids:
             await self._send(client, chat, localefmt.chu(
-                "Bạn không có quyền dùng bot Javis này.", "You are not allowed to use this Javis bot."))
+                "Bạn không có quyền dùng bot UNETI AI này.", "You are not allowed to use this UNETI AI bot."))
             return
         text = await self._event_text(client, ev, chat)
         if not text:
@@ -788,9 +788,9 @@ class MessengerBot(HangLuot):
         # Subscribing needs pages_manage_metadata, which many Page tokens lack. A Page subscribed by
         # hand in the Meta app still delivers, so a failed subscribe is a warning, not a dead bot.
         self.loi_danh_tinh = "" if sub.get("ok") else localefmt.chu(
-            "Javis chưa tự gắn được Page vào webhook (" + sub.get("error", "") + "). Nếu Page đã được gắn tay "
+            "UNETI AI chưa tự gắn được Page vào webhook (" + sub.get("error", "") + "). Nếu Page đã được gắn tay "
             "trong app Meta (Messenger, Webhooks, Add Subscriptions) thì bot vẫn nghe; chưa thì gắn tay ở đó.",
-            "Javis could not subscribe the Page to the webhook (" + sub.get("error", "") + "). If the Page was "
+            "UNETI AI could not subscribe the Page to the webhook (" + sub.get("error", "") + "). If the Page was "
             "subscribed by hand in the Meta app (Messenger, Webhooks, Add Subscriptions) the bot still hears; "
             "otherwise subscribe it there.")
         self.bot_username = info.get("username", "")
@@ -911,7 +911,7 @@ async def subscribe_page(client, page_id, token) -> dict:
 
 async def unsubscribe_page(client, page_id, token) -> dict:
     """Stop the Page calling this app's webhook (0.446.0, Disconnect). Best effort: a token that no longer
-    works cannot unsubscribe, and the Page is removed from Javis either way."""
+    works cannot unsubscribe, and the Page is removed from UNETI AI either way."""
     try:
         r = await client.delete(f"{GRAPH}/{page_id}/subscribed_apps", params={"access_token": token})
         d = r.json() or {}

@@ -16,7 +16,7 @@ import tempfile
 import time
 from pathlib import Path
 
-os.environ["JAVIS_STATE_DIR"] = tempfile.mkdtemp(prefix="javis-zvid-")
+os.environ["UNETI_STATE_DIR"] = tempfile.mkdtemp(prefix="uneti-zvid-")
 try:
     sys.stdout.reconfigure(encoding="utf-8")
 except Exception:
@@ -75,7 +75,7 @@ check("a video alone -> a 'video' turn", g["message_type"] == "video" and g["met
 # ============================================================
 # 3. video_vision on a real clip (ffmpeg makes it; the download is local)
 # ============================================================
-tmp = Path(tempfile.mkdtemp(prefix="javis-zvid-clip-"))
+tmp = Path(tempfile.mkdtemp(prefix="uneti-zvid-clip-"))
 clip = tmp / "clip.mp4"
 HAS_FFMPEG = vv.available()
 if HAS_FFMPEG:
@@ -144,7 +144,7 @@ text, paths = asyncio.run(cr.anh_cho_bot("Xem giúp em", {"chat_id": "t1", "vide
 check("CANARY: a video that cannot be fetched -> no images and an honest note", not paths and "KHÔNG xem được" in text
       and "Đừng nói như đã xem" in text and text.endswith("Xem giúp em"), text)
 check("the reason is kept for the bot log", "video" in str(CFG.get("_anh_loi") or ""), CFG)
-check("no ffmpeg -> honest note too", "ffmpeg" in vv.note({"frames": [], "why": "máy chủ Javis chưa cài ffmpeg"}))
+check("no ffmpeg -> honest note too", "ffmpeg" in vv.note({"frames": [], "why": "máy chủ UNETI AI chưa cài ffmpeg"}))
 
 # ============================================================
 # 4. The live bot answers a private video, and shows it again with the next text

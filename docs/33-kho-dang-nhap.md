@@ -31,7 +31,7 @@ Nút **Kiểm tra** mở **trang kiểm tra** bằng đăng nhập đó. Mặc �
 
 ## UNETI AI dùng đăng nhập ở đâu
 
-- **Trong chat:** mọi engine có tool `javis_login`. Nói "xem giúp anh trang đơn hàng Shopee" kèm link, UNETI AI mở trang bằng đăng nhập đã cất và đọc nội dung. Đăng nhập hết hạn thì UNETI AI nói thẳng và nhờ bạn cập nhật, không thử lại mãi.
+- **Trong chat:** mọi engine có tool `uneti_login`. Nói "xem giúp anh trang đơn hàng Shopee" kèm link, UNETI AI mở trang bằng đăng nhập đã cất và đọc nội dung. Đăng nhập hết hạn thì UNETI AI nói thẳng và nhờ bạn cập nhật, không thử lại mãi.
 - **Theo dõi trang:** form ở tab Theo dõi trang (trang Việc định kỳ) có ô **Đăng nhập**. Chọn một đăng nhập là UNETI AI canh được trang cần đăng nhập. Phiên hết hạn thì mục theo dõi tự tạm dừng và báo bạn một lần.
 
 UNETI AI chỉ **đọc** trang (tải trang về và lấy chữ). Nó không bấm nút, không gửi form, không đăng bài bằng đăng nhập này. Trang dựng hoàn toàn bằng JavaScript có thể ra ít chữ.
@@ -53,4 +53,4 @@ UNETI AI chỉ **đọc** trang (tải trang về và lấy chữ). Nó không b
 
 ## Chi tiết kỹ thuật
 
-Module `server/login_vault.py`, kho `login_vault.sqlite3` trong thư mục dữ liệu (quyền 600), route `/logins` và `/logins/action`, tool `javis_login` (plugin `javis-login`, mức `readonly`, nằm trong `OWNER_ONLY_TOOLS`), trang `dashboard/login-vault.js`. Mục theo dõi trang có thêm cột `login_id`.
+Module `server/login_vault.py`, kho `login_vault.sqlite3` trong thư mục dữ liệu (quyền 600), route `/logins` và `/logins/action`, tool `uneti_login` (plugin `uneti-login`, mức `readonly`, nằm trong `OWNER_ONLY_TOOLS`), trang `dashboard/login-vault.js`. Mục theo dõi trang có thêm cột `login_id`.

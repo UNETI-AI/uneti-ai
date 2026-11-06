@@ -4,7 +4,7 @@
 
 No network, no real brain, no real STATE_DIR.
 
-The report: install "Linh Hồn Javis Vũ" from the Store, rename it (or delete it) on the Partners page.
+The report: install "Linh Hồn UNETI AI Vũ" from the Store, rename it (or delete it) on the Partners page.
 After a delete the Store still said "Installed". After Uninstall + Install the agent never showed up
 again. Two causes, both guarded here end to end through the real installer:
 
@@ -23,7 +23,7 @@ import tempfile
 import zipfile
 from pathlib import Path
 
-os.environ["JAVIS_STATE_DIR"] = tempfile.mkdtemp(prefix="javis-kho-cai-lai-")
+os.environ["UNETI_STATE_DIR"] = tempfile.mkdtemp(prefix="uneti-kho-cai-lai-")
 
 import pack_install  # noqa: E402
 import pack_vault  # noqa: E402
@@ -76,7 +76,7 @@ def store_says_installed() -> bool:
     return bool(hang) and not packs_route._gone_from_brain(PID, hang, CATALOG)
 
 
-brain = Path(tempfile.mkdtemp(prefix="javis-kho-brain-"))
+brain = Path(tempfile.mkdtemp(prefix="uneti-kho-brain-"))
 agents = brain / "agents"
 
 r = install(brain)

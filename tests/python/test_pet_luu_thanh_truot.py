@@ -11,10 +11,10 @@ import os
 import tempfile
 from pathlib import Path
 
-state = tempfile.mkdtemp(prefix="javis-pet-test-")
-os.environ["JAVIS_STATE_DIR"] = state
+state = tempfile.mkdtemp(prefix="uneti-pet-test-")
+os.environ["UNETI_STATE_DIR"] = state
 os.environ["BRAINS_DIR"] = str(Path(state) / "brains")
-os.environ["JAVIS_SESSIONS_DB"] = str(Path(state) / "sessions.db")
+os.environ["UNETI_SESSIONS_DB"] = str(Path(state) / "sessions.db")
 
 import main
 import config as cfgmod

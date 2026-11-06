@@ -2,17 +2,17 @@
 
 ***Tiếng Việt** · [English](en/24-cli.md)*
 
-Cài một gói nhỏ lên máy tính rồi gõ `javis "doanh thu tuần này thế nào"` ngay trong terminal, không cần mở trình duyệt. Câu trả lời vẫn đến từ chính UNETI AI của bạn: cùng brain, cùng bộ nhớ, cùng MCP đã đấu, cùng lịch sử hội thoại.
+Cài một gói nhỏ lên máy tính rồi gõ `uneti "doanh thu tuần này thế nào"` ngay trong terminal, không cần mở trình duyệt. Câu trả lời vẫn đến từ chính UNETI AI của bạn: cùng brain, cùng bộ nhớ, cùng MCP đã đấu, cùng lịch sử hội thoại.
 
 > **Đọc dòng này trước:** UNETI AI CLI **không chứa UNETI AI bên trong**. Nó là cái ống nói - đầu kia phải có một máy chủ UNETI AI đang chạy, trên chính máy này hoặc trên VPS. Không có máy chủ thì CLI không làm gì được, và nó sẽ nói thẳng như vậy chứ không báo lỗi mạng mơ hồ.
 
 ## Tính năng này là gì
 
 - **Kênh thứ ba**, bên cạnh dashboard web và Telegram. Cùng một UNETI AI, chỉ khác chỗ đứng.
-- Hỏi một câu rồi thoát (`javis "..."`), hoặc mở phiên hỏi đáp liên tục (`javis chat`).
+- Hỏi một câu rồi thoát (`uneti "..."`), hoặc mở phiên hỏi đáp liên tục (`uneti chat`).
 - Nối được nhiều UNETI AI: một hồ sơ cho máy nhà, một cho VPS, đổi bằng `--profile`.
 - Giao việc Kanban, duyệt brain, xem loop, xem trạng thái máy chủ - đều từ terminal.
-- **Ghép được vào script**: câu trả lời ra stdout, mọi thứ khác ra stderr. Nên `javis "tóm tắt tuần này" > bao-cao.md` cho ra đúng nội dung, không dính dòng trạng thái.
+- **Ghép được vào script**: câu trả lời ra stdout, mọi thứ khác ra stderr. Nên `uneti "tóm tắt tuần này" > bao-cao.md` cho ra đúng nội dung, không dính dòng trạng thái.
 - UNETI AI biết mình đang nói qua terminal nên trả lời khác: không bảng markdown, không nhúng ảnh, đường dẫn file in tuyệt đối để bạn copy chạy được luôn.
 
 ## Cài đặt
@@ -20,7 +20,7 @@ Cài một gói nhỏ lên máy tính rồi gõ `javis "doanh thu tuần này th
 Cần Python 3.9 trở lên. Gói chỉ kéo theo **một** thư viện (`httpx`), cài trên máy chưa từng có UNETI AI vẫn được.
 
 ```bash
-pip install javis-cli
+pip install uneti-cli
 ```
 
 Cài từ mã nguồn (khi bạn đã clone repo UNETI AI):
@@ -29,7 +29,7 @@ Cài từ mã nguồn (khi bạn đã clone repo UNETI AI):
 pip install ./cli
 ```
 
-Xong thì có lệnh `javis`. Kiểm tra: `javis --help`.
+Xong thì có lệnh `uneti`. Kiểm tra: `uneti --help`.
 
 ## Bước 1: tạo token trong dashboard
 
@@ -39,7 +39,7 @@ Máy chủ UNETI AI không nhận lệnh từ bên ngoài nếu chưa có token.
 2. Đặt tên dễ nhớ, ví dụ "laptop của anh" - sau này thu hồi thì biết đang thu hồi cái nào.
 3. Chọn phạm vi:
    - **Chỉ chat** - vào được `/chat`, `/version`, `/health`, `/sessions`. Đủ để hỏi đáp và xem lịch sử. Chọn cái này nếu chỉ định hỏi han.
-   - **Toàn quyền** - như đang đăng nhập bằng trình duyệt. Cần cho `javis task add`, `javis brain`, `javis loops`.
+   - **Toàn quyền** - như đang đăng nhập bằng trình duyệt. Cần cho `uneti task add`, `uneti brain`, `uneti loops`.
 4. Bấm **Tạo token**. Chuỗi hiện ra **chỉ hiện đúng một lần**: máy chủ băm nó khi lưu, không có đường nào xem lại. Copy ngay.
 
 Mất token thì không xem lại được, chỉ tạo cái mới rồi thu hồi cái cũ. Đó là cố ý.
@@ -47,26 +47,26 @@ Mất token thì không xem lại được, chỉ tạo cái mới rồi thu h�
 ## Bước 2: nối CLI vào UNETI AI của bạn
 
 ```bash
-javis login https://javis-cua-ban.com
+uneti login https://uneti-cua-ban.com
 ```
 
 Nó sẽ hỏi token, bạn dán vào. Hoặc đưa thẳng:
 
 ```bash
-javis login https://javis-cua-ban.com --token jvs_xxxxx
+uneti login https://uneti-cua-ban.com --token jvs_xxxxx
 ```
 
 CLI **thử kết nối thật** trước khi lưu, nên nếu địa chỉ sai hoặc token sai thì bạn biết ngay tại đây chứ không phải lúc hỏi câu đầu tiên.
 
-Cấu hình lưu ở `~/.javis/config.json`, quyền `600` (chỉ chủ máy đọc được). File này chứa token nên đừng đưa vào repo hay backup công khai.
+Cấu hình lưu ở `~/.uneti/config.json`, quyền `600` (chỉ chủ máy đọc được). File này chứa token nên đừng đưa vào repo hay backup công khai.
 
 ### Nhiều UNETI AI cùng lúc
 
 ```bash
-javis login http://localhost:7777 --name nha
-javis login https://javis.congty.com --name congty --brain brain-cty
-javis --profile congty "tuần này bên công ty thế nào"
-javis profiles          # xem các hồ sơ đã lưu, dấu * là mặc định
+uneti login http://localhost:7777 --name nha
+uneti login https://uneti.congty.com --name congty --brain brain-cty
+uneti --profile congty "tuần này bên công ty thế nào"
+uneti profiles          # xem các hồ sơ đã lưu, dấu * là mặc định
 ```
 
 ### Đặt bằng biến môi trường (cho CI, Docker, server)
@@ -75,18 +75,18 @@ Ba biến này đè lên file cấu hình, tiện khi không muốn ghi token xu
 
 | Biến | Nghĩa |
 |---|---|
-| `JAVIS_URL` | địa chỉ máy chủ UNETI AI |
-| `JAVIS_TOKEN` | token API |
-| `JAVIS_BRAIN` | brain dùng mặc định |
-| `JAVIS_PROFILE` | tên hồ sơ dùng mặc định |
+| `UNETI_URL` | địa chỉ máy chủ UNETI AI |
+| `UNETI_TOKEN` | token API |
+| `UNETI_BRAIN` | brain dùng mặc định |
+| `UNETI_PROFILE` | tên hồ sơ dùng mặc định |
 
 ## Dùng hằng ngày
 
 ### Hỏi một câu
 
 ```bash
-javis "doanh thu tuần này thế nào"
-javis "tóm tắt các ghi chú tuần rồi"
+uneti "doanh thu tuần này thế nào"
+uneti "tóm tắt các ghi chú tuần rồi"
 ```
 
 Không cần lệnh con nào cả - gõ thẳng câu hỏi là chạy. Đang ngồi trước terminal thì bạn thấy dòng tiến độ chạy ở bên (UNETI AI đang gọi MCP nào, đọc file nào), rồi câu trả lời hiện ra.
@@ -94,7 +94,7 @@ Không cần lệnh con nào cả - gõ thẳng câu hỏi là chạy. Đang ng�
 ### Phiên hỏi đáp liên tục
 
 ```bash
-javis chat
+uneti chat
 ```
 
 Gõ câu, Enter, đọc trả lời, gõ tiếp. Cả phiên dùng chung một mã hội thoại nên UNETI AI nhớ mạch: hỏi "còn tháng trước?" là nó hiểu đang nói về cái vừa nãy. `Ctrl+D` hoặc `/thoat` để ra.
@@ -102,7 +102,7 @@ Gõ câu, Enter, đọc trả lời, gõ tiếp. Cả phiên dùng chung một m
 Muốn nối lại đúng mạch cũ ở lần chạy sau thì tự đặt mã phiên:
 
 ```bash
-javis chat --session ban-hang-thang-8
+uneti chat --session ban-hang-thang-8
 ```
 
 ### Ghép vào script
@@ -110,8 +110,8 @@ javis chat --session ban-hang-thang-8
 Đây là lý do đáng giá nhất của CLI. Câu trả lời ra stdout, tiến độ ra stderr, nên chuyển hướng là ra file sạch:
 
 ```bash
-javis "viết tóm tắt doanh số tuần này" > bao-cao-tuan.md
-javis -q "tình hình hôm nay" | mail -s "UNETI AI" sep@congty.com
+uneti "viết tóm tắt doanh số tuần này" > bao-cao-tuan.md
+uneti -q "tình hình hôm nay" | mail -s "UNETI AI" sep@congty.com
 ```
 
 Cờ `-q` tắt luôn dòng tiến độ. Thất bại thì CLI thoát khác 0 và **không in gì ra stdout**, nên `&&` trong script hành xử đúng.
@@ -119,7 +119,7 @@ Cờ `-q` tắt luôn dòng tiến độ. Thất bại thì CLI thoát khác 0 v
 ### Xem trạng thái
 
 ```bash
-javis status
+uneti status
 ```
 
 Cho biết phiên bản UNETI AI, có bản mới không, đang chạy bộ não nào, mức tiết kiệm token đang đặt ở đâu, và 24 giờ qua tiết kiệm được bao nhiêu phần trăm.
@@ -129,30 +129,30 @@ Cho biết phiên bản UNETI AI, có bản mới không, đang chạy bộ não
 Những lệnh này cần token **toàn quyền**.
 
 ```bash
-javis task add "soạn bài đăng về sản phẩm mới"     # giao một việc Kanban
-javis task add "chạy báo cáo tháng" --mode auto     # suggest (mặc định) | auto | full
-javis tasks                                          # xem các việc và cột đang đứng
+uneti task add "soạn bài đăng về sản phẩm mới"     # giao một việc Kanban
+uneti task add "chạy báo cáo tháng" --mode auto     # suggest (mặc định) | auto | full
+uneti tasks                                          # xem các việc và cột đang đứng
 
-javis brain ls                                       # liệt kê thư mục gốc brain
-javis brain ls "05 - Data Cache"
-javis brain cat "Memory/MEMORY.md"
+uneti brain ls                                       # liệt kê thư mục gốc brain
+uneti brain ls "05 - Data Cache"
+uneti brain cat "Memory/MEMORY.md"
 
-javis loops                                          # loop nào đang bật, mức quyền gì
+uneti loops                                          # loop nào đang bật, mức quyền gì
 ```
 
-Việc giao xong chạy nền trên máy chủ. Kết quả tự về đúng nơi bạn giao việc, xem tiến độ ở trang **Việc** trên dashboard hoặc gõ lại `javis tasks`.
+Việc giao xong chạy nền trên máy chủ. Kết quả tự về đúng nơi bạn giao việc, xem tiến độ ở trang **Việc** trên dashboard hoặc gõ lại `uneti tasks`.
 
 ### Bật UNETI AI trên chính máy này
 
 Nếu máy bạn đã cài UNETI AI (clone repo về):
 
 ```bash
-javis up
+uneti up
 ```
 
-Nó tìm bản cài (qua biến `JAVIS_HOME`, thư mục hiện tại, hoặc `~/javis-os`), bật lên rồi lưu sẵn hồ sơ `local` để lần sau `javis "..."` là chạy. UNETI AI đang chạy sẵn rồi thì nó nhận ra và không bật thêm cái thứ hai.
+Nó tìm bản cài (qua biến `UNETI_HOME`, thư mục hiện tại, hoặc `~/uneti-ai`), bật lên rồi lưu sẵn hồ sơ `local` để lần sau `uneti "..."` là chạy. UNETI AI đang chạy sẵn rồi thì nó nhận ra và không bật thêm cái thứ hai.
 
-Không tìm thấy bản cài thì nó nói thẳng: **`javis up` không chứa server bên trong**, và chỉ ba cách xử lý (đặt `JAVIS_HOME`, chạy từ trong thư mục UNETI AI, hoặc `javis login` tới một UNETI AI ở nơi khác).
+Không tìm thấy bản cài thì nó nói thẳng: **`uneti up` không chứa server bên trong**, và chỉ ba cách xử lý (đặt `UNETI_HOME`, chạy từ trong thư mục UNETI AI, hoặc `uneti login` tới một UNETI AI ở nơi khác).
 
 ## Quản lý token
 
@@ -169,15 +169,15 @@ Vài điều đáng biết về cách UNETI AI giữ token:
 
 ## Khi có trục trặc
 
-**"Chưa nối tới UNETI AI nào"** - chạy `javis login <địa-chỉ>` trước.
+**"Chưa nối tới UNETI AI nào"** - chạy `uneti login <địa-chỉ>` trước.
 
-**Báo 401 hoặc "token không hợp lệ"** - token sai, hoặc đã bị thu hồi. Tạo cái mới ở Tài khoản > Token API rồi `javis login` lại.
+**Báo 401 hoặc "token không hợp lệ"** - token sai, hoặc đã bị thu hồi. Tạo cái mới ở Tài khoản > Token API rồi `uneti login` lại.
 
-**Báo 403 khi gõ `javis task add` hay `javis brain ls`** - token của bạn là loại **chỉ chat**. Tạo một token **toàn quyền** cho những lệnh này.
+**Báo 403 khi gõ `uneti task add` hay `uneti brain ls`** - token của bạn là loại **chỉ chat**. Tạo một token **toàn quyền** cho những lệnh này.
 
 **Bị chặn tạm thời** - sai token quá nhiều lần liên tiếp. Chờ 15 phút, hoặc khởi động lại máy chủ UNETI AI.
 
-**Không kết nối được** - kiểm tra máy chủ UNETI AI còn chạy không (`javis status`, hoặc mở dashboard trong trình duyệt). Nếu UNETI AI nằm trên VPS, kiểm tra cổng và tên miền.
+**Không kết nối được** - kiểm tra máy chủ UNETI AI còn chạy không (`uneti status`, hoặc mở dashboard trong trình duyệt). Nếu UNETI AI nằm trên VPS, kiểm tra cổng và tên miền.
 
 **Chữ tiếng Việt hiện sai trên Windows** - chạy `chcp 65001` trong terminal trước, hoặc dùng Windows Terminal thay cho cmd.exe cũ.
 
@@ -198,4 +198,4 @@ Chi tiết thiết kế ở [spec CLI](dev/2026-08-cli-spec.md).
 - [02 - Trò chuyện & giọng nói](02-tro-chuyen-va-giong-noi.md) - kênh web.
 - [11 - Kênh Telegram](11-telegram.md) - kênh điện thoại.
 - [14 - Bảo mật & tài khoản](14-bao-mat-tai-khoan.md) - mật khẩu, đăng nhập, mã hoá khoá bí mật.
-- [21 - Việc (Kanban)](21-viec-kanban.md) - việc `javis task add` giao vào chạy ở đâu.
+- [21 - Việc (Kanban)](21-viec-kanban.md) - việc `uneti task add` giao vào chạy ở đâu.

@@ -8,7 +8,7 @@ No network.
      login; the static mount keeps a prefix WITH its slash.
  15. A "chat" scope API token reaches /chat and what lies under it, never /chatbots.
  16. WhatsApp: a second customer file with the same name no longer overwrites the first.
- 17. javis_web_fetch and page watching connect to the exact address the private-network check vetted (DNS
+ 17. uneti_web_fetch and page watching connect to the exact address the private-network check vetted (DNS
      rebinding), with the real host in the Host header and the TLS name.
 """
 import asyncio
@@ -16,7 +16,7 @@ import os
 import sys
 import tempfile
 
-os.environ["JAVIS_STATE_DIR"] = tempfile.mkdtemp(prefix="javis-audit-low-")
+os.environ["UNETI_STATE_DIR"] = tempfile.mkdtemp(prefix="uneti-audit-low-")
 
 from _paths import ROOT, SERVER  # noqa: E402,F401
 from pathlib import Path  # noqa: E402

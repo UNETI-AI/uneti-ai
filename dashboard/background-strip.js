@@ -119,12 +119,12 @@
   function el() { return document.getElementById("bgStrip"); }
 
   function sid() {
-    try { return (window.JavisSessions && window.JavisSessions.current()) || ""; }
+    try { return (window.UnetiSessions && window.UnetiSessions.current()) || ""; }
     catch (e) { return ""; }
   }
 
   function brain() {
-    try { return (window.JavisSessions && window.JavisSessions.brain()) || "brain"; }
+    try { return (window.UnetiSessions && window.UnetiSessions.brain()) || "brain"; }
     catch (e) { return "brain"; }
   }
 
@@ -177,10 +177,10 @@
     var e = el();
     if (!e) return;
     // Voice V1: orb ghi hậu tố "N việc nền" từ đúng con số này (không có thì 0).
-    try { if (window.JavisOrb) window.JavisOrb.setBackground((d && d.running_count) || 0); } catch (err) {}
-    // Voice V3: số việc nền do BỘ NÃO GIỌNG giao cho chính cuộc nói chuyện này. Javis dùng số
+    try { if (window.UnetiOrb) window.UnetiOrb.setBackground((d && d.running_count) || 0); } catch (err) {}
+    // Voice V3: số việc nền do BỘ NÃO GIỌNG giao cho chính cuộc nói chuyện này. UNETI AI dùng số
     // này để tự hỏi thăm ("em vẫn đang xem") thay vì bắt người dùng hỏi mới biết.
-    try { if (window.JavisOrb && window.JavisOrb.setVoiceJobs) window.JavisOrb.setVoiceJobs((d && d.voice_count) || 0); } catch (err) {}
+    try { if (window.UnetiOrb && window.UnetiOrb.setVoiceJobs) window.UnetiOrb.setVoiceJobs((d && d.voice_count) || 0); } catch (err) {}
     var q = quyetDinh(d);
     if (!q.hien) { hide(); return; }
 
@@ -278,7 +278,7 @@
 
   // Đổi hội thoại thì dải cũ không còn đúng nữa: xoá ngay rồi hỏi lại, đừng để chip của phiên
   // trước nằm lại vài giây trên phiên mới.
-  window.JavisBackground = {
+  window.UnetiBackground = {
     refresh: refresh,
     reset: function () { hide(); refresh(); },
     start: start,

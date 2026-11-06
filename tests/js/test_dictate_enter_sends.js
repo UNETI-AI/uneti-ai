@@ -36,7 +36,7 @@ const cdSrc = read("dashboard/composer-dictate.js");
 check("main chat: the keydown listener uses enterSendsFrom, not only the text box",
   /enterSendsFrom\(e\.target, \{ input: "chatInput", cancel: "dictCancel", stop: "dictStop" \}, card\)/.test(cdSrc)
   && !/sends && e\.target === \$\("chatInput"\)/.test(cdSrc));
-check("main chat: Enter still follows the phone rule (JavisActs.enterSends)", /JavisActs\.enterSends\(e, false\)/.test(cdSrc));
+check("main chat: Enter still follows the phone rule (UnetiActs.enterSends)", /UnetiActs\.enterSends\(e, false\)/.test(cdSrc));
 
 // ───────────── customer inbox ─────────────
 const conv = read("dashboard/conversations.js");

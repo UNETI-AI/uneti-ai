@@ -5,6 +5,11 @@
 tests/python/test_machine_translations.py
 tests/python/test_tai_lieu_song_ngu.py
 
+# Cách sửa từ nghe nhầm dựa trên việc tên cũ đọc gần giống "David", "Gia vít". Tên UNETI AI không đọc giống các từ đó.
+tests/python/test_nghe_sua.py
+tests/python/test_voice_ten_uneti.py
+tests/python/test_voice_transcript_integrity.py
+
 # Quy tắc văn phong của bản gốc: câu dưới 100 ký tự, và viết "A.I." có dấu chấm. Tên UNETI AI dài hơn và chứa chữ AI.
 tests/python/test_info_tip_rule.py
 tests/js/test_hoi_thoai_bo_loc.js
