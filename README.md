@@ -6,6 +6,8 @@ Phần mềm **chưa kèm AI**. Sau khi cài, mỗi người tự kết nối t�
 
 ## Cài đặt
 
+Hướng dẫn từng bước nằm ở [trang tải về](https://uneti-ai.github.io/uneti-ai/tai-ve.html).
+
 - Windows 10/11: [UNETI-AI-Setup.exe](https://github.com/uneti-ai/uneti-ai/releases/download/desktop/UNETI-AI-Setup.exe)
 - macOS 11 trở lên: [UNETI-AI-macOS.dmg](https://github.com/uneti-ai/uneti-ai/releases/download/desktop/UNETI-AI-macOS.dmg)
 
