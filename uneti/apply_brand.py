@@ -103,6 +103,9 @@ SOFT_PATCHES = (
     ("tests/python/test_image_gen.py", 'b"javisos.com" in _byte_go', f'b"{SITE_HOST}" in _byte_go'),
     ("tests/js/test_linh_vat.js", 'rail-brand-text">JAVIS <i>OS<\\/i><\\/span>', f'rail-brand-text">{NAME}<\\/span>'),
     ("tests/js/test_tab_model_local.js", "/Javis chưa dùng/", f"/{NAME} chưa dùng/"),
+    ("tests/python/test_anh_codex_ve_brain.py", 'b"javisos" in (attach', f'b"{SITE_HOST}" in (attach'),
+    # Shown to the owner in chat, and test_team_core_dispatch reads it with the new name.
+    ("server/team_dispatch.py", "(Javis không tự duyệt thay)", f"({NAME} không tự duyệt thay)"),
     # This README keeps upstream's support section, so only the sentence the test reads is renamed.
     ("docs/i18n/vi/README.md", "năng lực nằm ở Javis, không nằm ở model", f"năng lực nằm ở {NAME}, không nằm ở model"),
     # Our README is Vietnamese; the same three facts are still checked against docs/i18n/vi/README.md.

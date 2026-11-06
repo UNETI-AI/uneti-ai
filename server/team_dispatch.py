@@ -173,7 +173,7 @@ def phase(task: dict, acc: Optional[dict], team: Optional[dict] = None) -> tuple
                 "Nghiệm thu KHÔNG đạt, việc dừng: {r}", "Acceptance FAILED, the job stopped: {r}", r=reason or "-"), True, False
         if kind in _OWNER_BLOCKS or "approval" in kind:
             return "needs_owner", localefmt.chu(
-                "Đang chờ chủ quyết trên thẻ việc ở trang Nhóm (Javis không tự duyệt thay): {r}",
+                "Đang chờ chủ quyết trên thẻ việc ở trang Nhóm (UNETI AI không tự duyệt thay): {r}",
                 "Waiting for the owner on the job card in Teams (Javis never approves for you): {r}", r=reason or kind), True, False
         return "blocked", localefmt.chu("Việc bị chặn ({k}): {r}", "The job is blocked ({k}): {r}", k=kind or "-",
                                         r=reason or "-"), True, False
