@@ -28,12 +28,13 @@ Nếu lượt chạy báo lỗi "Không thấy đoạn cần sửa", nghĩa là 
 
 ## Đóng góp kinh phí
 
-Chỉ mở sau khi Nhà trường thống nhất tài khoản tiếp nhận và cách quản lý khoản đóng góp.
+Trang đóng góp nằm ở `uneti/site/index.html`, đang nhận qua tài khoản MB 221268686868 của HOI SINH VIEN UNETI.
 
-1. Sửa `uneti/site/donate.json`: đổi `open` thành `true`, điền ngân hàng, số tài khoản, chủ tài khoản. Nếu có mã QR, đặt ảnh vào `uneti/site/` rồi ghi tên tệp vào `qr_image`.
-2. Sau mỗi khoản thu hoặc chi, thêm một dòng vào `uneti/site/so-thu-chi.csv`, ví dụ `2027-01-15,thu,500000,Ủng hộ qua chuyển khoản`. Cột loại ghi `thu` hoặc `chi`, số tiền không có dấu chấm hay dấu phẩy.
+Khi đổi tài khoản nhận:
 
-Không ghi tên hay thông tin cá nhân của người đóng góp vào sổ nếu họ chưa đồng ý, vì sổ này công khai.
+1. Thay ảnh `uneti/site/qr-ung-ho.png` bằng mã QR mới, giữ nguyên tên tệp.
+2. Sửa tên người nhận, số tài khoản và ngân hàng trong `uneti/site/index.html`.
+3. Dùng điện thoại quét thử mã trên trang thật và kiểm tra đúng tên người nhận, nhưng chưa chuyển tiền.
 
 ## Không dùng chung với bản cá nhân
 

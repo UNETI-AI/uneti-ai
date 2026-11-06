@@ -25,7 +25,7 @@ Thông báo hiện ở biểu tượng chuông trong phần mềm. Quản trị 
 
 ## Đóng góp kinh phí
 
-Đóng góp là tự nguyện và không ảnh hưởng đến quyền sử dụng. Thông tin và sổ thu chi công khai nằm ở [trang đóng góp](https://uneti-ai.github.io/uneti-ai/).
+Đóng góp là tự nguyện và không ảnh hưởng đến quyền sử dụng. Kinh phí đóng góp sẽ được sử dụng trong việc từ thiện, xã hội hóa, phát triển UNETI AI. Xem cách đóng góp bằng mã QR tại [trang đóng góp](https://uneti-ai.github.io/uneti-ai/).
 
 Tác giả Javis OS cũng nhận ủng hộ riêng, xem mục Support trong [kho mã gốc](https://github.com/blogminhquy/javis-os).
 
