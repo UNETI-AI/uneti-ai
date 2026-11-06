@@ -1,4 +1,4 @@
-/* chat-render.js - bo render chat "chan that nhu Claude" cho Javis OS.
+/* chat-render.js - bo render chat "chan that nhu Claude" cho UNETI AI.
    Thay bo markdownToHtml regex cu trong app.js: markdown day du (heading h1-h6,
    danh sach co thu tu + long + checkbox, blockquote, duong ke ngang, in nghieng,
    gach ngang, link, anh), code block co nhan ngon ngu + to mau cu phap, render an

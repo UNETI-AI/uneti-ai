@@ -9,11 +9,11 @@
 
 노트북이나 작은 VPS에서 실행합니다. 음성으로 대화합니다. Claude, ChatGPT, Grok, Gemini 등 12개 제공자 중 무엇이든 연결하고, 바꿔도 모든 도구는 그대로 유지되며, 잠자는 동안에도 백그라운드에서 일하게 할 수 있습니다.
 
-[![GitHub stars](https://img.shields.io/github/stars/blogminhquy/javis-os?style=flat&logo=github&label=stars)](https://github.com/blogminhquy/javis-os/stargazers)
+[![GitHub stars](https://img.shields.io/github/stars/uneti-ai/uneti-ai?style=flat&logo=github&label=stars)](https://github.com/uneti-ai/uneti-ai/stargazers)
 [![License: MIT](https://img.shields.io/badge/license-MIT-22c55e)](../../../LICENSE)
-[![Last commit](https://img.shields.io/github/last-commit/blogminhquy/javis-os?color=f97316)](https://github.com/blogminhquy/javis-os/commits/main)
+[![Last commit](https://img.shields.io/github/last-commit/uneti-ai/uneti-ai?color=f97316)](https://github.com/uneti-ai/uneti-ai/commits/main)
 [![Python 3.12](https://img.shields.io/badge/python-3.12-3776ab?logo=python&logoColor=white)](../../../requirements.txt)
-[![Docker](https://img.shields.io/badge/docker-ghcr.io-2496ed?logo=docker&logoColor=white)](https://github.com/blogminhquy/javis-os/pkgs/container/javis-os)
+[![Docker](https://img.shields.io/badge/docker-ghcr.io-2496ed?logo=docker&logoColor=white)](https://github.com/uneti-ai/uneti-ai/pkgs/container/javis-os)
 [![MCP](https://img.shields.io/badge/tools-Model%20Context%20Protocol-8b5cf6)](https://modelcontextprotocol.io)
 
 <!-- flags:start -->
@@ -54,9 +54,9 @@
 
 | 환경 | 명령 하나로 전부 설치 |
 |---|---|
-| **Linux / macOS** | `git clone https://github.com/blogminhquy/javis-os.git javis && cd javis && chmod +x install.sh && ./install.sh` |
-| **Windows** | `git clone https://github.com/blogminhquy/javis-os.git javis; cd javis; powershell -ExecutionPolicy Bypass -File install.ps1` |
-| **Docker** | `curl -fsSLO https://raw.githubusercontent.com/blogminhquy/javis-os/main/docker-compose.yml && docker compose up -d` |
+| **Linux / macOS** | `git clone https://github.com/uneti-ai/uneti-ai.git javis && cd javis && chmod +x install.sh && ./install.sh` |
+| **Windows** | `git clone https://github.com/uneti-ai/uneti-ai.git javis; cd javis; powershell -ExecutionPolicy Bypass -File install.ps1` |
+| **Docker** | `curl -fsSLO https://raw.githubusercontent.com/uneti-ai/uneti-ai/main/docker-compose.yml && docker compose up -d` |
 
 그런 다음 **http://localhost:7777** 을 엽니다. 설치 프로그램이 Python, 구독형 CLI 브레인 네 가지(`claude`, `codex`, `agy`, `grok`), `.env` 를 준비한 뒤 서버를 시작합니다. 각 브레인 로그인은 **대시보드의 Models 페이지에서** 하므로 더 이상 명령을 입력할 필요가 없습니다.
 
@@ -149,7 +149,7 @@ Javis에서 모델은 교체할 수 있는 부품입니다. 쌓아 온 모든 �
 모든 브레인은 연결된 MCP 서버를 호출하고, Brain을 읽고 쓰고, Skill을 실행하고, Kanban 작업을 대기열에 넣고, Agent, Workflow, Loop, 리마인더를 만들 수 있습니다. CLI 엔진은 여기에 더해 **셸 명령 실행**, **웹 가져오기와 검색**, **병렬 서브 에이전트 생성** 도 할 수 있습니다.
 
 > [!WARNING]
-> **구독 요금제로 백그라운드 작업을 돌리기 전에 참고하세요.** Anthropic은 Claude Pro/Max를 Claude Code의 **일반적인 개인 사용** 으로 한정합니다. 지속적인 백그라운드 실행(Loop, 리마인더, Kanban 작업, 챗봇), VPS에서의 실행, 여러 사람이 한 계정을 함께 쓰는 경우는 모두 이 범위를 벗어나므로 **계정이 잠길** 위험이 있습니다. 다만 지금까지 Javis에서 확인된 사례는 없습니다. 혹시 겪으신다면 [Issues](https://github.com/blogminhquy/javis-os/issues/new/choose)로 개발자에게 알려 주세요. Javis는 로그인 토큰을 절대 읽지 않고 실제 `claude` 바이너리를 실행하지만, 그렇다고 24시간 백그라운드 사용이 정당해지는 것은 아닙니다. 안전하게 쓰려면 Models 페이지에서 Claude Code를 **API 키** 로 실행하도록 설정하거나, **백그라운드 작업용 모델** 을 다른 제공자로 지정하세요. xAI 요금제에도 같은 주의가 적용됩니다. `server/claude_auth.py` 를 참고하세요.
+> **구독 요금제로 백그라운드 작업을 돌리기 전에 참고하세요.** Anthropic은 Claude Pro/Max를 Claude Code의 **일반적인 개인 사용** 으로 한정합니다. 지속적인 백그라운드 실행(Loop, 리마인더, Kanban 작업, 챗봇), VPS에서의 실행, 여러 사람이 한 계정을 함께 쓰는 경우는 모두 이 범위를 벗어나므로 **계정이 잠길** 위험이 있습니다. 다만 지금까지 Javis에서 확인된 사례는 없습니다. 혹시 겪으신다면 [Issues](https://github.com/uneti-ai/uneti-ai/issues/new/choose)로 개발자에게 알려 주세요. Javis는 로그인 토큰을 절대 읽지 않고 실제 `claude` 바이너리를 실행하지만, 그렇다고 24시간 백그라운드 사용이 정당해지는 것은 아닙니다. 안전하게 쓰려면 Models 페이지에서 Claude Code를 **API 키** 로 실행하도록 설정하거나, **백그라운드 작업용 모델** 을 다른 제공자로 지정하세요. xAI 요금제에도 같은 주의가 적용됩니다. `server/claude_auth.py` 를 참고하세요.
 
 ---
 
@@ -252,7 +252,7 @@ flowchart LR
 Hostinger VPS → **Docker Manager → Compose → URL** → Hostinger용 파일을 붙여 넣고 **Deploy** 를 누릅니다.
 
 ```
-https://raw.githubusercontent.com/blogminhquy/javis-os/main/docker-compose.hostinger.yml
+https://raw.githubusercontent.com/uneti-ai/uneti-ai/main/docker-compose.hostinger.yml
 ```
 
 **Environment** 상자에는 세 가지 항목만 있으면 됩니다: `DOMAIN_NAME`, `JAVIS_ADMIN_USER`, `JAVIS_ADMIN_PASSWORD`. 선택 항목으로 `JAVIS_AUTO_UPDATE` 가 있습니다(`true` 로 설정하면 Javis가 매일 스스로 업데이트합니다).
@@ -280,7 +280,7 @@ Hostinger의 Traefik이 HTTPS 인증서를 발급하도록 `DOMAIN_NAME` 을 설
 ```bash
 # Docker required (don't have it?  curl -fsSL https://get.docker.com | sh)
 mkdir javis && cd javis
-curl -fsSLO https://raw.githubusercontent.com/blogminhquy/javis-os/main/docker-compose.yml
+curl -fsSLO https://raw.githubusercontent.com/uneti-ai/uneti-ai/main/docker-compose.yml
 
 docker compose run --rm javis claude auth login --claudeai   # sign in to Claude once (optional)
 docker compose up -d                                          # pull the image and run
@@ -296,7 +296,7 @@ docker compose up -d                                          # pull the image a
 <summary><b>방법 3: Docker 없이 Linux 또는 macOS</b></summary>
 
 ```bash
-git clone https://github.com/blogminhquy/javis-os.git javis && cd javis
+git clone https://github.com/uneti-ai/uneti-ai.git javis && cd javis
 chmod +x install.sh && ./install.sh
 ```
 
@@ -310,7 +310,7 @@ chmod +x install.sh && ./install.sh
 <summary><b>방법 4: Windows (개인 컴퓨터)</b></summary>
 
 ```powershell
-git clone https://github.com/blogminhquy/javis-os.git javis; cd javis
+git clone https://github.com/uneti-ai/uneti-ai.git javis; cd javis
 powershell -ExecutionPolicy Bypass -File install.ps1
 ```
 
@@ -473,13 +473,13 @@ javis-os/
 | [ARCHITECTURE.md](../../../ARCHITECTURE.md) | 구성 요소가 맞물리는 방식과 서버 모듈 지도 |
 | [docs/dev/GLOSSARY.md](../../../docs/dev/GLOSSARY.md) | 코드베이스가 베트남어로 작성되어 있어서, `nhac_hen`(리마인더) 같은 이름을 풀어 줍니다 |
 | [docs/dev/adding-a-language.md](../../../docs/dev/adding-a-language.md) | Javis를 내 언어로 번역하는 단계별 안내 |
-| [이슈 템플릿](https://github.com/blogminhquy/javis-os/issues/new/choose) | 버그 보고, 기능 요청, 번역 제안 |
+| [이슈 템플릿](https://github.com/uneti-ai/uneti-ai/issues/new/choose) | 버그 보고, 기능 요청, 번역 제안 |
 
 [행동 강령](../../../CODE_OF_CONDUCT.md) 을 지켜 주시고, 보안 문제는 [SECURITY.md](../../../SECURITY.md) 에 설명된 대로 비공개로 알려 주세요.
 
 Javis가 유용하다면 저장소에 ⭐ 를 눌러 주세요. 다른 사람들이 찾는 데 도움이 됩니다.
 
-[![Star History Chart](https://api.star-history.com/svg?repos=blogminhquy/javis-os&type=Date)](https://star-history.com/#blogminhquy/javis-os&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=uneti-ai/uneti-ai&type=Date)](https://star-history.com/#uneti-ai/uneti-ai&Date)
 
 ---
 

@@ -1,14 +1,14 @@
 #!/bin/bash
 # ============================================================
-# JAVIS OS - first install on a Mac (JAVIS OS.app opens Terminal on this file).
+# UNETI AI - first install on a Mac (UNETI AI.app opens Terminal on this file).
 #
-#   bash bootstrap.sh            # installs into ~/JavisOS (JAVIS_HOME to change it)
+#   bash bootstrap.sh            # installs into ~/UNETI-AI (JAVIS_HOME to change it)
 #
 # Checks and installs what the Mac lacks, WITHOUT Homebrew (most Macs do not have it):
 #   1. Git: Apple's Command Line Tools. macOS shows its own "Install" dialog for them.
 #   2. Python >= 3.10: macOS only ships 3.9, so if none is found, uv (astral.sh) downloads a
 #      standalone Python 3.12 into the home folder. No admin rights, nothing system wide.
-#   3. Clones Javis into ~/JavisOS. A clone, not a copy, because the Update button in the app
+#   3. Clones Javis into ~/UNETI-AI. A clone, not a copy, because the Update button in the app
 #      updates with git (server/updater.py).
 #   4. install.sh does the rest: Node (nodejs.org build when there is no brew), the four CLI
 #      brains, the venv, .env, the admin account, the login auto-start, then opens Javis.
@@ -16,8 +16,8 @@
 # ============================================================
 set -u
 
-JAVIS_HOME="${JAVIS_HOME:-$HOME/JavisOS}"
-REPO="${JAVIS_REPO:-https://github.com/blogminhquy/javis-os.git}"
+JAVIS_HOME="${JAVIS_HOME:-$HOME/UNETI-AI}"
+REPO="${JAVIS_REPO:-https://github.com/uneti-ai/uneti-ai.git}"
 BRANCH="${JAVIS_BRANCH:-main}"
 
 CYAN='\033[0;36m'; GREEN='\033[0;32m'; YELLOW='\033[0;33m'; RED='\033[0;31m'; NC='\033[0m'
@@ -27,8 +27,8 @@ warn() { echo -e "    ${YELLOW}[!]${NC} $*"; }
 fail() {
   echo -e "    ${RED}[LOI]${NC} $*"
   echo ""
-  echo "Cai dat chua xong. Sua xong thi mo lai JAVIS OS, cac buoc da xong se duoc bo qua."
-  echo "Setup did not finish. Fix the line above, then open JAVIS OS again."
+  echo "Cai dat chua xong. Sua xong thi mo lai UNETI AI, cac buoc da xong se duoc bo qua."
+  echo "Setup did not finish. Fix the line above, then open UNETI AI again."
   exit 1
 }
 
@@ -36,7 +36,7 @@ export PATH="$HOME/.local/bin:$HOME/.javis/node/bin:/opt/homebrew/bin:/usr/local
 
 echo ""
 echo " =========================================="
-echo "  JAVIS OS - kiem tra va cai nhung gi may con thieu"
+echo "  UNETI AI - kiem tra va cai nhung gi may con thieu"
 echo "  Thu muc cai: $JAVIS_HOME"
 echo " =========================================="
 
@@ -52,7 +52,7 @@ if ! xcode-select -p >/dev/null 2>&1 || ! git --version >/dev/null 2>&1; then
     sleep 5
   done
 fi
-git --version >/dev/null 2>&1 || fail "Chua co Git. Chay: xcode-select --install, cai xong roi mo lai JAVIS OS."
+git --version >/dev/null 2>&1 || fail "Chua co Git. Chay: xcode-select --install, cai xong roi mo lai UNETI AI."
 ok "$(git --version)"
 
 # ---------------------------------------------------------------- [B] python
@@ -79,7 +79,7 @@ if ! have_py; then
     fi
   fi
 fi
-have_py || fail "Chua cai duoc Python 3.12. Tai o https://www.python.org/downloads/macos/ roi mo lai JAVIS OS."
+have_py || fail "Chua cai duoc Python 3.12. Tai o https://www.python.org/downloads/macos/ roi mo lai UNETI AI."
 for c in python3.12 python3.11 python3.13 python3.10 python3; do
   if command -v "$c" >/dev/null 2>&1 && py_ok "$c"; then ok "$("$c" --version) ($(command -v "$c"))"; break; fi
 done
@@ -90,7 +90,7 @@ if [ -d "$JAVIS_HOME/.git" ]; then
   ok "Da co ban Javis o $JAVIS_HOME, giu nguyen (cap nhat bang nut Cap nhat trong app)"
 else
   if [ -e "$JAVIS_HOME" ] && [ -n "$(ls -A "$JAVIS_HOME" 2>/dev/null)" ]; then
-    fail "Thu muc $JAVIS_HOME da co file nhung khong phai ban Javis tai bang git. Doi ten no roi mo lai JAVIS OS."
+    fail "Thu muc $JAVIS_HOME da co file nhung khong phai ban Javis tai bang git. Doi ten no roi mo lai UNETI AI."
   fi
   # blob:none keeps every commit (the updater merges and rolls back on them) and downloads
   # file contents only when needed.
@@ -104,5 +104,5 @@ cd "$JAVIS_HOME" || fail "Khong vao duoc $JAVIS_HOME"
 bash ./install.sh || fail "install.sh bao loi, doc cac dong phia tren."
 
 echo ""
-ok "Xong. Lan sau mo Javis bang JAVIS OS trong Launchpad hoac thu muc Applications."
-echo "    Done. Next time, open JAVIS OS from Launchpad or Applications. You can close this window."
+ok "Xong. Lan sau mo Javis bang UNETI AI trong Launchpad hoac thu muc Applications."
+echo "    Done. Next time, open UNETI AI from Launchpad or Applications. You can close this window."

@@ -59,7 +59,7 @@ Javis OS **không phải** một chatbot. Nó là một **AI agentic tự host**
 <img src="../../../docs/assets/diagrams/swappable-brain.svg" width="100%" alt="Hình động: lõi Javis ở giữa, bộ đồ nghề (MCP Hub, Skills, Second Brain, Tasks, Schedules, Plugins) bao quanh, 12 bộ não lần lượt lắp vào mà mọi công cụ vẫn sáng nguyên">
 </p>
 
-> **Lưu ý khi cho gói subscription chạy việc nền.** Anthropic chỉ tính gói Claude Pro/Ultra cho việc dùng **cá nhân, thông thường** của Claude Code. Chạy nền liên tục (loop, nhắc hẹn, việc Kanban, chatbot), chạy trên VPS, hoặc nhiều người dùng chung một tài khoản đều nằm ngoài phạm vi đó nên có nguy cơ **bị khoá tài khoản**, dù tới nay Javis chưa ghi nhận trường hợp nào. Nếu bạn gặp, hãy báo cho nhà phát triển qua [Issues](https://github.com/blogminhquy/javis-os/issues/new/choose). Javis không tự đọc token đăng nhập của bạn (đường đó đã gỡ ở 0.26.17) - nó chạy qua đúng binary `claude`, nhưng như vậy vẫn không làm việc chạy nền 24/7 trở thành hợp lệ. Muốn yên tâm: ở trang **Models**, đặt Claude Code chạy bằng **API key**, hoặc trỏ **model việc nền** sang một provider khác. Xem `server/claude_auth.py`.
+> **Lưu ý khi cho gói subscription chạy việc nền.** Anthropic chỉ tính gói Claude Pro/Ultra cho việc dùng **cá nhân, thông thường** của Claude Code. Chạy nền liên tục (loop, nhắc hẹn, việc Kanban, chatbot), chạy trên VPS, hoặc nhiều người dùng chung một tài khoản đều nằm ngoài phạm vi đó nên có nguy cơ **bị khoá tài khoản**, dù tới nay Javis chưa ghi nhận trường hợp nào. Nếu bạn gặp, hãy báo cho nhà phát triển qua [Issues](https://github.com/uneti-ai/uneti-ai/issues/new/choose). Javis không tự đọc token đăng nhập của bạn (đường đó đã gỡ ở 0.26.17) - nó chạy qua đúng binary `claude`, nhưng như vậy vẫn không làm việc chạy nền 24/7 trở thành hợp lệ. Muốn yên tâm: ở trang **Models**, đặt Claude Code chạy bằng **API key**, hoặc trỏ **model việc nền** sang một provider khác. Xem `server/claude_auth.py`.
 
 > Triết lý: **năng lực nằm ở Javis, không nằm ở model.** Mọi bộ não đều được cấp cùng bộ đồ nghề qua trung tâm kết nối (MCP Hub) chung - MCP đã đấu, tool đọc/ghi brain, skill, việc Kanban, agent/workflow/loop/nhắc hẹn. Khác biệt duy nhất: hai engine CLI chạy thêm được **lệnh máy**. Đổi từ Claude sang Gemini không làm Javis mất chức năng nào ngoài chuyện đó.
 
@@ -155,7 +155,7 @@ Nhờ vậy:
 
 > ⚠️ **Quan trọng về bảo mật:** Javis chạy bộ não AI với **toàn quyền** trên máy. Khi chạy public (Docker/VPS/Hostinger), Javis **tự bắt buộc đăng nhập** - mở app ra là màn tạo tài khoản / đăng nhập, không ai điều khiển được khi chưa có mật khẩu.
 
-> 💻 **Cài trên máy tính Windows hoặc Mac của bạn?** Tải bộ cài về rồi mở như mọi ứng dụng: [JavisOS-Setup.exe](https://github.com/blogminhquy/javis-os/releases/download/desktop/JavisOS-Setup.exe) (Windows 10/11) hoặc [JavisOS-macOS.dmg](https://github.com/blogminhquy/javis-os/releases/download/desktop/JavisOS-macOS.dmg) (macOS 11+). Bộ cài tự kiểm tra máy thiếu gì (Git, Python, Node, các bộ não AI), tự cài, rồi để lại biểu tượng JAVIS OS để bấm. Các bước: [QUICKSTART.md](../../../QUICKSTART.md).
+> 💻 **Cài trên máy tính Windows hoặc Mac của bạn?** Tải bộ cài về rồi mở như mọi ứng dụng: [UNETI-AI-Setup.exe](https://github.com/uneti-ai/uneti-ai/releases/download/desktop/UNETI-AI-Setup.exe) (Windows 10/11) hoặc [UNETI-AI-macOS.dmg](https://github.com/uneti-ai/uneti-ai/releases/download/desktop/UNETI-AI-macOS.dmg) (macOS 11+). Bộ cài tự kiểm tra máy thiếu gì (Git, Python, Node, các bộ não AI), tự cài, rồi để lại biểu tượng UNETI AI để bấm. Các bước: [QUICKSTART.md](../../../QUICKSTART.md).
 
 ### Cách 1 - Hostinger Docker Manager (tên miền + HTTPS) ⚡
 
@@ -163,7 +163,7 @@ Nhờ vậy:
 
 VPS Hostinger → **Docker Manager → Compose → URL** → dán **file Hostinger** rồi **Deploy**:
 ```
-https://raw.githubusercontent.com/blogminhquy/javis-os/main/docker-compose.hostinger.yml
+https://raw.githubusercontent.com/uneti-ai/uneti-ai/main/docker-compose.hostinger.yml
 ```
 Ô **Environment** của mẫu mới chỉ còn 3 trường cần thiết: `DOMAIN_NAME`,
 `JAVIS_ADMIN_USER`, `JAVIS_ADMIN_PASSWORD`, cộng một trường tuỳ chọn
@@ -195,7 +195,7 @@ Deploy → đợi 1-3 phút Traefik cấp SSL → mở `https://<DOMAIN_NAME>`. 
 ```bash
 # Cần Docker (chưa có?  curl -fsSL https://get.docker.com | sh)
 mkdir javis && cd javis
-curl -fsSLO https://raw.githubusercontent.com/blogminhquy/javis-os/main/docker-compose.yml
+curl -fsSLO https://raw.githubusercontent.com/uneti-ai/uneti-ai/main/docker-compose.yml
 
 docker compose run --rm javis claude auth login --claudeai   # đăng nhập Claude 1 lần
 docker compose up -d                                          # pull image + chạy
@@ -205,19 +205,19 @@ Mở `http://<ip-vps>:7777` → màn tạo tài khoản admin: đặt tên đăn
 ### Cách 3 - Cài trực tiếp lên Linux/macOS (không Docker)
 
 ```bash
-git clone https://github.com/blogminhquy/javis-os.git javis && cd javis
+git clone https://github.com/uneti-ai/uneti-ai.git javis && cd javis
 chmod +x install.sh && ./install.sh
 ```
 Script tự cài Python + Node + hai engine CLI (Claude Code, Codex), tạo venv, đăng ký dịch vụ systemd tự chạy khi boot, in ra địa chỉ. Báo Claude chưa đăng nhập thì chạy 1 lần: `claude auth login --claudeai`.
 
-> 🍎 **macOS - mở như một app:** sau khi cài xong, double-click `JAVIS OS.app` (hoặc `Start JAVIS OS.command`) để chạy server + mở dashboard; từ 0.306.0 `./install.sh` cho Javis tự chạy khi đăng nhập máy và tự mở dashboard (tắt: `./bin/javis-autostart.sh uninstall`). Chi tiết: [bin/README.md](../../../bin/README.md).
+> 🍎 **macOS - mở như một app:** sau khi cài xong, double-click `UNETI AI.app` (hoặc `Start UNETI AI.command`) để chạy server + mở dashboard; từ 0.306.0 `./install.sh` cho Javis tự chạy khi đăng nhập máy và tự mở dashboard (tắt: `./bin/javis-autostart.sh uninstall`). Chi tiết: [bin/README.md](../../../bin/README.md).
 
 ### Cách 4 - Windows (máy cá nhân)
 
 **Một lệnh, cài hết:**
 
 ```powershell
-git clone https://github.com/blogminhquy/javis-os.git javis; cd javis
+git clone https://github.com/uneti-ai/uneti-ai.git javis; cd javis
 powershell -ExecutionPolicy Bypass -File install.ps1
 ```
 
@@ -234,7 +234,7 @@ Mở dashboard:                          http://localhost:7777
 
 > ⚠️ **Cài thêm một CLI sau khi Javis đang chạy thì phải khởi động lại Javis** (`stop-javis.bat` rồi `start-javis.vbs`). Tiến trình đang chạy giữ PATH của lúc nó bật, nên CLI vừa cài nó không thấy - trang Models sẽ vẫn báo "CLI chưa cài" cho một CLI đã nằm sẵn trên ổ đĩa.
 
-> 🪟 **Windows - mở như một app:** sau khi `setup.bat` chạy xong lần đầu, từ đó về sau chỉ cần double-click **`JAVIS OS.bat`** - server tự chạy nền (không cửa sổ đen) rồi dashboard tự mở thành **cửa sổ riêng** không thanh địa chỉ, có ô riêng trên taskbar. Từ 0.306.0 bộ cài cho Javis tự chạy khi đăng nhập máy và tự mở dashboard (tắt: `javis-autostart.bat uninstall` hoặc nút trong Cài đặt).
+> 🪟 **Windows - mở như một app:** sau khi `setup.bat` chạy xong lần đầu, từ đó về sau chỉ cần double-click **`UNETI AI.bat`** - server tự chạy nền (không cửa sổ đen) rồi dashboard tự mở thành **cửa sổ riêng** không thanh địa chỉ, có ô riêng trên taskbar. Từ 0.306.0 bộ cài cho Javis tự chạy khi đăng nhập máy và tự mở dashboard (tắt: `javis-autostart.bat uninstall` hoặc nút trong Cài đặt).
 
 ### Nhiều bản Javis trên cùng một VPS (mỗi bản một link riêng)
 
@@ -466,6 +466,6 @@ Không tiện donate cũng không sao - dùng Javis, góp ý, hay gửi một Pu
 
 <div align="center">
 
-Made with ☕ by **[Minh Quý](https://minhquy.vn)** · Repo: `github.com/blogminhquy/javis-os`
+Made with ☕ by **[Minh Quý](https://minhquy.vn)** · Repo: `github.com/uneti-ai/uneti-ai`
 
 </div>

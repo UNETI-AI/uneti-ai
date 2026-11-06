@@ -50,7 +50,7 @@
     { id: "tasks", label: "page.tasks.label", fb: "Tasks", page: true, sub: "page.tasks.sub" },
     { id: "webhooks", label: "page.webhooks.label", fb: "Webhooks", page: true, sub: "page.webhooks.sub" },
     { id: "mcp", label: "page.mcp.label", fb: "Connections", page: true, sub: "page.mcp.sub" },
-    { id: "packs", label: "page.packs.label", fb: "Javis Store", page: true, sub: "page.packs.sub" },
+    { id: "packs", label: "page.packs.label", fb: "UNETI AI Store", page: true, sub: "page.packs.sub" },
     { id: "channels", label: "page.channels.label", fb: "Admin channels", page: true, sub: "page.channels.sub" },
     { id: "logins", label: "page.logins.label", fb: "Cookies", page: true, sub: "page.logins.sub" },
     { id: "models", label: "page.models.label", fb: "Models", page: true, sub: "page.models.sub" },

@@ -80,7 +80,7 @@ ASK_JAVIS_TOOL = {
 }
 
 SYSTEM_PROMPT = (
-    "Bạn là Javis, trợ lý cá nhân, đang nói chuyện trực tiếp bằng giọng. "
+    "Bạn là UNETI AI, trợ lý cá nhân, đang nói chuyện trực tiếp bằng giọng. "
     "Nói ngắn, tự nhiên. Không bịa dữ liệu: cần dữ liệu "
     "thật hay hành động thì gọi tool ask_javis "
     "rồi thuật lại kết quả. Đang được ngắt lời thì dừng ngay và nghe. "
@@ -123,7 +123,7 @@ def turn_preset(value) -> str:
 
 # GPT-Live không có tool: nó ỦY NHIỆM. Prompt hội thoại ngắn, nói rõ khi nào giao việc.
 GPT_LIVE_PROMPT = (
-    "Bạn là Javis, trợ lý cá nhân, đang nói chuyện bằng giọng. Nói ngắn và "
+    "Bạn là UNETI AI, trợ lý cá nhân, đang nói chuyện bằng giọng. Nói ngắn và "
     "tự nhiên. Chuyện phiếm, hỏi đáp thường thì trả lời ngay. Câu nào cần dữ liệu thật (số liệu "
     "kinh doanh, lịch, email, file, ghi chú, ký ức), cần làm việc, nhắc hẹn, mở trang hay app, hay "
     "bất cứ hành động nào ra ngoài thì GIAO cho bộ não chính (delegate), nói một câu ngắn như 'để "
@@ -879,7 +879,7 @@ class GPTLive(LiveProvider):
 # ChatGPT Live (docs/dev/2026-10-voice-call-spec.md mục 3.3): model nói chuyện của OpenAI lo chuyện
 # trò, việc cần dữ liệu thì GIAO cho bộ não Javis. Xưng hô theo người dùng, không ép cố định.
 CHATGPT_LIVE_PROMPT = (
-    "Bạn là Javis, trợ lý cá nhân, đang nói chuyện với người dùng qua cuộc gọi bằng giọng nói. "
+    "Bạn là UNETI AI, trợ lý cá nhân, đang nói chuyện với người dùng qua cuộc gọi bằng giọng nói. "
     "Nói tự nhiên như người qua điện thoại, ngắn 1 đến 2 câu. Xưng hô đúng theo cách người dùng đang "
     "xưng với bạn (phần bộ nhớ bên dưới cho biết nếu có), không tự đổi. Chuyện trò, hỏi thăm, giải "
     "thích kiến thức chung thì trả lời thẳng. Mọi câu cần dữ liệu thật hay hành động (doanh thu, đơn "

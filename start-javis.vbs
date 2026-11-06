@@ -21,7 +21,7 @@ sh.Run "cmd /c cd /d """ & root & """ && .venv\Scripts\python.exe server\main.py
 
 ' 0.306.0: /open = cho server len roi MO dashboard (luc dang nhap may, luc cai xong). Chu repo 24/10/2026:
 ' "cai javis tren win hoac mac thi cai khoi dong cung trinh duyet". Khong co /open (nut Cap nhat, start-javis.bat)
-' thi van chay ngam nhu cu, khong bat cua so nao. Mo dang cua so app giong JAVIS OS.bat; chu trong file nay chi
+' thi van chay ngam nhu cu, khong bat cua so nao. Mo dang cua so app giong UNETI AI.bat; chu trong file nay chi
 ' dung ASCII vi wscript doc file theo ANSI codepage.
 If WScript.Arguments.Count > 0 Then
   If LCase(WScript.Arguments(0)) = "/open" Then MoDashboard

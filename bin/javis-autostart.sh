@@ -1,10 +1,10 @@
 #!/bin/bash
 # ============================================================
-# JAVIS OS - macOS auto-start (LaunchAgent) installer
+# UNETI AI - macOS auto-start (LaunchAgent) installer
 #   ./bin/javis-autostart.sh install     # start at login (default)
 #   ./bin/javis-autostart.sh uninstall    # remove
 #
-# Generates ~/Library/LaunchAgents/vn.minhquy.javis-os.plist with paths
+# Generates ~/Library/LaunchAgents/vn.edu.uneti.uneti-ai.plist with paths
 # computed for THIS machine (nothing hardcoded in the repo).
 # ============================================================
 set -u
@@ -29,7 +29,7 @@ if [ "${ACTION}" = "uninstall" ]; then
   launchctl unload "${PLIST}" 2>/dev/null || true
   launchctl unload "${OPEN_PLIST}" 2>/dev/null || true
   rm -f "${PLIST}" "${OPEN_PLIST}"
-  echo "JAVIS OS auto-start removed."
+  echo "UNETI AI auto-start removed."
   exit 0
 fi
 
@@ -73,7 +73,7 @@ PLISTEOF
 
 launchctl unload "${PLIST}" 2>/dev/null || true
 launchctl load "${PLIST}"
-echo "JAVIS OS auto-start installed -> http://127.0.0.1:${PORT}"
+echo "UNETI AI auto-start installed -> http://127.0.0.1:${PORT}"
 
 launchctl unload "${OPEN_PLIST}" 2>/dev/null || true
 if [ "${JAVIS_AUTOSTART_OPEN:-1}" = "0" ]; then

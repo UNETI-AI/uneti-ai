@@ -1,0 +1,60 @@
+name: Đăng tin Nhà trường
+
+on:
+  issues:
+    types: [opened, labeled]
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: uneti-announce
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: >-
+      (github.event.action == 'opened' && contains(github.event.issue.labels.*.name, 'thong-bao')) ||
+      (github.event.action == 'labeled' && github.event.label.name == 'go-tin')
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      NUMBER: ${{ github.event.issue.number }}
+    steps:
+      - name: Chỉ người có quyền ghi vào kho mã mới được đăng hoặc gỡ tin
+        id: quyen
+        env:
+          ACTOR: ${{ github.actor }}
+        run: |
+          quyen="$(gh api "repos/$GITHUB_REPOSITORY/collaborators/$ACTOR/permission" --jq .permission || echo none)"
+          case "$quyen" in
+            admin|maintain|write) echo "ok=true" >> "$GITHUB_OUTPUT" ;;
+            *) echo "ok=false" >> "$GITHUB_OUTPUT"; echo "Bỏ qua: $ACTOR không có quyền ghi." ;;
+          esac
+
+      - uses: actions/checkout@v4
+        if: steps.quyen.outputs.ok == 'true'
+
+      - name: Cập nhật danh sách tin
+        id: tin
+        if: steps.quyen.outputs.ok == 'true'
+        run: python3 uneti/add_announcement.py "$GITHUB_EVENT_PATH"
+
+      - name: Đưa lên nhánh chính
+        if: steps.tin.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add ANNOUNCEMENTS.json
+          git commit -m "Tin Nhà trường #$NUMBER"
+          git push
+
+      - name: Báo kết quả trên trang tin
+        if: steps.quyen.outputs.ok == 'true'
+        env:
+          MESSAGE: ${{ steps.tin.outputs.message }}
+          CHANGED: ${{ steps.tin.outputs.changed }}
+        run: |
+          gh issue comment "$NUMBER" --repo "$GITHUB_REPOSITORY" --body "$MESSAGE"
+          if [ "$CHANGED" = "true" ]; then gh issue close "$NUMBER" --repo "$GITHUB_REPOSITORY"; fi

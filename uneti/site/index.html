@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ủng hộ UNETI AI</title>
+<style>
+  body { font-family: system-ui, "Segoe UI", Arial, sans-serif; margin: 0; color: #1c2230; background: #f5f7fb; line-height: 1.55; }
+  main { max-width: 680px; margin: 0 auto; padding: 32px 20px 56px; }
+  h1 { color: #2e51a8; margin: 0 0 8px; }
+  h2 { margin: 32px 0 8px; font-size: 1.15rem; }
+  .khung { background: #fff; border: 1px solid #dde3ef; border-radius: 10px; padding: 18px 20px; }
+  .khung img { max-width: 240px; display: block; margin-bottom: 12px; }
+  dl { display: grid; grid-template-columns: max-content 1fr; gap: 4px 14px; margin: 0; }
+  dt { color: #5a6478; }
+  dd { margin: 0; font-weight: 600; overflow-wrap: anywhere; }
+  table { width: 100%; border-collapse: collapse; background: #fff; }
+  th, td { padding: 8px 10px; border-bottom: 1px solid #e4e8f1; text-align: left; }
+  td.so { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  th.so { text-align: right; }
+  .phu { color: #5a6478; font-size: .92rem; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Ủng hộ UNETI AI</h1>
+  <p>UNETI AI là phần mềm mã nguồn mở, miễn phí. Đóng góp là <strong>tự nguyện</strong> và không ảnh hưởng đến quyền sử dụng của bất kỳ ai.</p>
+
+  <h2>Cách đóng góp</h2>
+  <div class="khung" id="cachDongGop">Đang tải…</div>
+
+  <h2>Sổ thu chi công khai</h2>
+  <div id="so">Đang tải…</div>
+
+  <h2>Ghi công</h2>
+  <p class="phu">UNETI AI được phát triển tiếp từ <a href="https://github.com/blogminhquy/javis-os">Javis OS</a> của tác giả Nguyễn Minh Quý, giấy phép MIT. <a href="https://github.com/uneti-ai/uneti-ai">Xem mã nguồn UNETI AI</a>.</p>
+</main>
+<script>
+function tao(ten, chu) {
+  var el = document.createElement(ten);
+  if (chu !== undefined) el.textContent = chu;
+  return el;
+}
+
+function hienCachDongGop(d) {
+  var o = document.getElementById("cachDongGop");
+  o.textContent = "";
+  if (!d.open) {
+    o.textContent = "Chưa mở nhận đóng góp. Thông tin sẽ được đăng tại đây sau khi có tài khoản tiếp nhận chính thức.";
+    return;
+  }
+  if (d.qr_image) {
+    var anh = tao("img");
+    anh.src = d.qr_image;
+    anh.alt = "Mã QR chuyển khoản";
+    o.appendChild(anh);
+  }
+  var ds = tao("dl");
+  [["Ngân hàng", d.bank], ["Số tài khoản", d.account_number], ["Chủ tài khoản", d.account_name], ["Nội dung", d.transfer_note]]
+    .forEach(function (dong) {
+      ds.appendChild(tao("dt", dong[0]));
+      ds.appendChild(tao("dd", dong[1]));
+    });
+  o.appendChild(ds);
+}
+
+function docCsv(chu) {
+  return chu.trim().split(/\r?\n/).slice(1).filter(Boolean).map(function (dong) {
+    var o = dong.split(",");
+    return { ngay: o[0], loai: o[1], so_tien: Number(o[2]) || 0, noi_dung: o.slice(3).join(",") };
+  });
+}
+
+function hienSo(dong) {
+  var o = document.getElementById("so");
+  o.textContent = "";
+  if (!dong.length) {
+    o.textContent = "Chưa có khoản thu chi nào.";
+    return;
+  }
+  var bang = tao("table");
+  var dau = tao("tr");
+  ["Ngày", "Loại", "Nội dung"].forEach(function (c) { dau.appendChild(tao("th", c)); });
+  var cotTien = tao("th", "Số tiền (đồng)");
+  cotTien.className = "so";
+  dau.appendChild(cotTien);
+  bang.appendChild(dau);
+  var thu = 0, chi = 0;
+  dong.forEach(function (d) {
+    if (d.loai === "chi") chi += d.so_tien; else thu += d.so_tien;
+    var h = tao("tr");
+    h.appendChild(tao("td", d.ngay));
+    h.appendChild(tao("td", d.loai === "chi" ? "Chi" : "Thu"));
+    h.appendChild(tao("td", d.noi_dung));
+    var tien = tao("td", d.so_tien.toLocaleString("vi-VN"));
+    tien.className = "so";
+    h.appendChild(tien);
+    bang.appendChild(h);
+  });
+  o.appendChild(bang);
+  var tong = tao("p", "Tổng thu " + thu.toLocaleString("vi-VN") + " đồng, tổng chi " + chi.toLocaleString("vi-VN")
+    + " đồng, còn lại " + (thu - chi).toLocaleString("vi-VN") + " đồng.");
+  o.appendChild(tong);
+}
+
+fetch("donate.json", { cache: "no-store" }).then(function (r) { return r.json(); }).then(hienCachDongGop).catch(function () {
+  document.getElementById("cachDongGop").textContent = "Chưa tải được thông tin, bạn thử tải lại trang.";
+});
+fetch("so-thu-chi.csv", { cache: "no-store" }).then(function (r) { return r.text(); }).then(function (c) { hienSo(docCsv(c)); }).catch(function () {
+  document.getElementById("so").textContent = "Chưa tải được sổ thu chi, bạn thử tải lại trang.";
+});
+</script>
+</body>
+</html>

@@ -144,7 +144,7 @@
   // Trang CÓ THẬT nhưng KHÔNG hiện trên thanh bên. Bỏ hẳn khỏi `RAIL_ITEMS` thì không dùng
   // được, vì đó mới là nguồn icon và nhãn; nên chỗ ẩn nằm ở đây.
   //
-  // Rỗng từ 0.55.37. Trước đó Javis Store bị ẩn với lý do "nó không phải một chức năng ngang
+  // Rỗng từ 0.55.37. Trước đó UNETI AI Store bị ẩn với lý do "nó không phải một chức năng ngang
   // hàng với Trợ lý hay Kỹ năng, đường vào đúng là cái tab trên chính trang bạn đang đứng".
   // Lập luận đó đúng khi kho chỉ có vài gói và ai cũng tới nó từ một trang năng lực. Nó sai
   // ngay khi kho thành chỗ chứa PHẦN LỚN kết nối của Javis (0.55.36 dọn 16 khuôn ra kho):
@@ -699,7 +699,7 @@
     // hệt như "tab hỏng" chứ không giống "ai đó cướp handler".
     row.innerHTML = ds.map((x, i) =>
         `<button class="tab-kho${x.chon ? " on" : ""}" data-tab-cb="${i}">${esc(x.nhan)}</button>`).join("")
-      + `<button class="tab-kho" data-mo-kho="${kind}">${ic("package")} Javis Store</button>`;
+      + `<button class="tab-kho" data-mo-kho="${kind}">${ic("package")} UNETI AI Store</button>`;
     row.querySelectorAll("[data-tab-cb]").forEach(b => b.onclick = () => {
       const f = ds[Number(b.dataset.tabCb)];
       if (f && f.bam) f.bam();
@@ -1099,7 +1099,7 @@
     const myGen = _renderGen;
     el.innerHTML = `<div class="cl-wrap">
       <section class="upd-card" aria-label="${window.t("cs.upd_aria")}">
-        <div class="upd-title"><span class="upd-name">Javis OS</span><span class="gcard-tag" id="updVerTag">…</span></div>
+        <div class="upd-title"><span class="upd-name">UNETI AI</span><span class="gcard-tag" id="updVerTag">…</span></div>
         <div class="gcard-meta" id="updVerMeta">${window.t("cs.upd_checking")}</div>
         <div class="upd-changes" id="updVerChangelog"></div>
         <div class="js-actions">
@@ -1115,7 +1115,7 @@
     </div>`;
     // Thẻ "Ủng hộ Javis" (star-nudge.js): ai muốn tặng sao lúc nào cũng tìm được ở đây.
     const _snGo = el.querySelector(".sn-ho .sn-go");
-    if (_snGo) _snGo.onclick = () => window.JavisStar.open();
+    if (_snGo) _snGo.onclick = () => window.open("https://uneti-ai.github.io/uneti-ai/", "_blank", "noopener");
     // Nút "Kiểm tra lại" PHẢI làm mới cả danh sách bên dưới, không chỉ khung trên.
     wireUpdateManager(el, napTimeline);
     await napTimeline();
@@ -1160,7 +1160,7 @@
     if (maLyDo === "watchtower_off") {
       // Short reason stays visible; the how-to folds into the (i) block (0.214.0).
       return window.t("cs.upd_wt_a") + " <b>" + window.t("cs.upd_wt_b") + "</b>" + infoBtn() + infoBody(window.t("cs.upd_wt_c")
-        + "<br><code>curl -fsSLO https://raw.githubusercontent.com/blogminhquy/javis-os/main/docker-compose.yml</code>"
+        + "<br><code>curl -fsSLO https://raw.githubusercontent.com/uneti-ai/uneti-ai/main/docker-compose.yml</code>"
         + "<br><code>docker compose up -d --pull always</code><br>"
         + window.t("cs.upd_wt_d")
         + "<br><code>docker compose --profile update up -d</code><br>"
@@ -1296,7 +1296,7 @@
           if (rollback && root.dataset.updateMode === "docker") {
             const prev = root.dataset.previousVersion || "";
             rollback.style.display = "";
-            rollback.innerHTML = "<b>" + window.t("cs.upd_rb_docker") + "</b><br><code>docker compose pull && docker compose up -d</code>" + (prev ? `<br>${window.t("cs.upd_pin_a")} <code>ghcr.io/blogminhquy/javis-os:${esc(prev)}</code> ${window.t("cs.upd_pin_b")}` : "");
+            rollback.innerHTML = "<b>" + window.t("cs.upd_rb_docker") + "</b><br><code>docker compose pull && docker compose up -d</code>" + (prev ? `<br>${window.t("cs.upd_pin_a")} <code>ghcr.io/uneti-ai/uneti-ai:${esc(prev)}</code> ${window.t("cs.upd_pin_b")}` : "");
           }
           update.disabled = false;
         }
@@ -2356,7 +2356,7 @@
 
       <div class="si-log" id="lnBackupBox">
         <h3 style="font-size:15px;color:var(--text)">⇅ ${esc(window.t("cs.bk_head"))}${infoBtn()}</h3>
-        ${infoBody(`<p style="margin:0 0 8px">${esc(window.t("cs.bk_p_a"))} <b>${esc(window.t("cs.bk_p_b"))}</b> ${esc(window.t("cs.bk_p_c"))} <b>${esc(window.t("cs.bk_p_d"))}</b>${esc(window.t("cs.bk_p_e"))} <code>.conflict-*</code> ${esc(window.t("cs.bk_p_f"))} <a href="https://github.com/blogminhquy/javis-os/blob/main/docs/18-sao-luu-github.md" target="_blank" style="color:var(--link-ink)">docs/18-sao-luu-github.md</a>.</p>
+        ${infoBody(`<p style="margin:0 0 8px">${esc(window.t("cs.bk_p_a"))} <b>${esc(window.t("cs.bk_p_b"))}</b> ${esc(window.t("cs.bk_p_c"))} <b>${esc(window.t("cs.bk_p_d"))}</b>${esc(window.t("cs.bk_p_e"))} <code>.conflict-*</code> ${esc(window.t("cs.bk_p_f"))} <a href="https://github.com/uneti-ai/uneti-ai/blob/main/docs/18-sao-luu-github.md" target="_blank" style="color:var(--link-ink)">docs/18-sao-luu-github.md</a>.</p>
         <ol style="line-height:1.7;margin:0;padding-left:20px">
           <li>${esc(window.t("cs.bk_li1_a"))} <b>Private</b> ${esc(window.t("cs.bk_li1_b"))} <code>javis-brain-backup</code>.</li>
           <li>${esc(window.t("cs.bk_li2_a"))} <b>Fine-grained tokens</b> ${esc(window.t("cs.bk_li2_b"))} <b>Contents: Read and write</b> ${esc(window.t("cs.bk_li2_c"))} <code>github_pat_...</code>).</li>
@@ -2594,7 +2594,7 @@
     const m = s.model || {};
     // Đọc từ model.main + model.providers (nguồn thật của trang Models), KHÔNG từ m.engine -
     // trường cũ đó chỉ biết "cli" với "openrouter" nên máy đang chạy Gemini/OpenAI vẫn bị
-    // ghi là "Claude CLI". Mọi provider đều có MCP Javis, khác nhau ở chỗ chạy được lệnh máy.
+    // ghi là "Claude CLI". Mọi provider đều có MCP UNETI AI, khác nhau ở chỗ chạy được lệnh máy.
     const _mainP = (m.providers || []).find(p => p.id === (m.main || {}).provider) || {};
     const eng = (_mainP.label || (m.main || {}).provider || "-")
       + (_mainP.kind === "api" ? " " + window.t("cs.ov_eng_api") : _mainP.kind ? " " + window.t("cs.ov_eng_cli") : "");
@@ -2606,7 +2606,7 @@
       <div class="cview-section">
         <h3>${esc(window.t("cs.ov_version"))}</h3>
         <div class="gcard" style="max-width:640px">
-          <div class="gcard-top"><span class="gcard-name">Javis OS</span><span class="gcard-tag" id="ovVerTag">…</span></div>
+          <div class="gcard-top"><span class="gcard-name">UNETI AI</span><span class="gcard-tag" id="ovVerTag">…</span></div>
           <div class="gcard-meta" id="ovVerMeta">${esc(window.t("cs.ov_checking"))}</div>
           <div id="ovVerChangelog" style="display:none;margin:8px 0;padding:8px 10px;border-left:3px solid var(--accent,var(--accent));background:rgba(120,140,160,.08);border-radius:6px;font-size:13px;line-height:1.6"></div>
           <div class="js-actions">
@@ -2623,7 +2623,7 @@
         <div class="cgrid">
           <div class="gcard"><div class="gcard-top"><span class="gcard-name">Engine</span></div><div class="gcard-meta">${esc(eng)}</div></div>
           <div class="gcard"><div class="gcard-top"><span class="gcard-name">Model</span></div><div class="gcard-meta">${esc(curModel)}</div></div>
-          <div class="gcard"><div class="gcard-top"><span class="gcard-name">Workspace</span></div><div class="gcard-meta">${esc(s.workspace_name || "Javis OS")}</div></div>
+          <div class="gcard"><div class="gcard-top"><span class="gcard-name">Workspace</span></div><div class="gcard-meta">${esc(s.workspace_name || "UNETI AI")}</div></div>
           <div class="gcard"><div class="gcard-top"><span class="gcard-name">Telegram</span></div><div class="gcard-meta">${tg.enabled ? "● " + esc(window.t("settings.tag_on")) : "○ " + esc(window.t("settings.tag_off"))}${tg.chat_id ? " · " + esc(tg.chat_id) : ""}</div></div>
         </div>
       </div>
@@ -2806,7 +2806,7 @@
             rb.style.display = "";
             rb.innerHTML = "<b>" + esc(window.t("cs.ov_rb_head")) + "</b><br>" + esc(window.t("cs.ov_rb_pin"))
               + "<br><code>docker compose pull && docker compose up -d</code>"
-              + (prev ? "<br>" + esc(window.t("cs.ov_rb_img")) + " <code>ghcr.io/blogminhquy/javis-os:" + esc(prev) + "</code> " + esc(window.t("cs.upd_pin_b")) : "");
+              + (prev ? "<br>" + esc(window.t("cs.ov_rb_img")) + " <code>ghcr.io/uneti-ai/uneti-ai:" + esc(prev) + "</code> " + esc(window.t("cs.upd_pin_b")) : "");
           }
           verUpd.disabled = false;
         }
@@ -3713,7 +3713,7 @@
         // clones, LiteLLM, vLLM...). The key may be blank for a server that needs none; the model list comes from the
         // seller, and the model box opens only for a seller that lists none.
         return `${cardOpen(p, ord)}
-          ${provHead(p, on, "MCP Javis", (on ? t("models.st_connected") : t("models.st_not_connected")) + " · " + p.models.length + " model", true, ord)}
+          ${provHead(p, on, "MCP UNETI AI", (on ? t("models.st_connected") : t("models.st_not_connected")) + " · " + p.models.length + " model", true, ord)}
           ${infoBody(esc(t("models.oc_note")))}
           <div class="prov-action" style="flex-wrap:wrap">
             <input class="js-input" id="ocLabel" spellcheck="false" style="flex:1 1 100%" placeholder="${esc(t("models.adv_label_ph"))}">
@@ -3731,7 +3731,7 @@
         // the card also takes the model names the seller gave (comma separated).
         const typed = (m.anthropic_compat_models || []).join(", ");
         return `${cardOpen(p, ord)}
-          ${provHead(p, on, "MCP Javis", (on ? t("models.st_connected") : t("models.st_not_connected")) + " · " + p.models.length + " model", true, ord)}
+          ${provHead(p, on, "MCP UNETI AI", (on ? t("models.st_connected") : t("models.st_not_connected")) + " · " + p.models.length + " model", true, ord)}
           ${infoBody(esc(t("models.ac_note")))}
           <div class="prov-action" style="flex-wrap:wrap">
             <input class="js-input" id="acLabel" spellcheck="false" style="flex:1 1 100%" placeholder="${esc(t("models.adv_label_ph"))}">
@@ -3746,7 +3746,7 @@
         </div>`;
       }
       return `${cardOpen(p, ord)}
-        ${provHead(p, on, p.kind === "cli" ? "MCP/skill" : "MCP Javis", (on ? t("models.st_connected") : t("models.st_not_connected")) + " · " + p.models.length + " model", false, ord)}
+        ${provHead(p, on, p.kind === "cli" ? "MCP/skill" : "MCP UNETI AI", (on ? t("models.st_connected") : t("models.st_not_connected")) + " · " + p.models.length + " model", false, ord)}
         ${ord && multiKey.indexOf(p.id) >= 0 ? acctList(p) : p.needs_key
           ? `<div class="prov-action"><input class="js-input" id="pk-${p.id}" type="password" placeholder="${on ? esc(t("models.key_change_ph", { duoi: masked })) : esc(t("models.key_ph"))}"><button class="gcard-btn" data-pk="${p.id}">${on ? esc(t("models.key_change")) : esc(t("models.connect"))}</button>${on && !ord ? `<button class="gcard-btn ghost" data-disc="${p.id}">${esc(t("models.disconnect"))}</button>` : ""}</div>`
           : `<div class="prov-note">${esc(t("models.no_key_note"))}</div>`}
@@ -6058,7 +6058,7 @@
     // Hai nguyên nhân, hai lối thoát khác hẳn nhau - trộn làm một là đẩy người dùng đi sai
     // đường ở đúng lúc họ đang hoảng:
     //   `co_trong_kho`  người dùng vừa tự gỡ dịch vụ đó → cài lại ở khu "Đã gỡ" ngay dưới.
-    //   không có        dịch vụ đã DỌN RA Javis Store (0.55.36 dọn 16 cái) → cài lại từ kho.
+    //   không có        dịch vụ đã DỌN RA UNETI AI Store (0.55.36 dọn 16 cái) → cài lại từ kho.
     //
     // Câu cũ ở nhánh thứ hai xui người dùng nâng cấp app hoặc bỏ kết nối đi. Từ 0.55.36 nó
     // vừa sai vừa nguy hiểm: nâng cấp không mọc lại dịch vụ nữa, còn bỏ kết nối là vứt luôn
@@ -6130,7 +6130,7 @@
       + 'padding:14px 16px;margin-top:14px;display:flex;flex-wrap:wrap;align-items:center;gap:12px">'
       + '<span style="flex:1;min-width:240px">' + esc(window.t("cs.cn_more_services")) + '</span>'
       + '<button class="mp-btn" id="mcpDiSanCo">' + esc(window.t("cs.cn_tab_sanco")) + '</button>'
-      + '<button class="mp-btn primary" id="mcpDiKho">Javis Store</button></div>'
+      + '<button class="mp-btn primary" id="mcpDiKho">UNETI AI Store</button></div>'
       + '<details class="cview-section amb-details" id="ambWrap"><summary><h3 style="display:inline">◆ ' + esc(window.t("cs.cn_amb_head")) + ' <span style="opacity:.5">' + esc(window.t("cs.cn_amb_hint")) + '</span></h3></summary>'
       + '<div class="gcard-meta" style="max-width:740px;margin-top:10px">' + esc(window.t("cs.cn_amb_desc_a")) + ' <code>codex mcp</code>' + esc(window.t("cs.cn_amb_desc_b")) + '</div>'
       + '<div class="prov-list" id="mcpAmbient" style="margin-top:12px"><div class="mp-empty">' + esc(window.t("cs.cn_amb_click")) + '</div></div>'
@@ -6635,7 +6635,7 @@
   // Hướng dẫn mở đúng bản theo ngôn ngữ giao diện: tiếng Việt ở docs/, mọi thứ tiếng khác ở docs/en/.
   const DOC_GUIDE = { slack: "29-slack-whatsapp.md", whatsapp: "29-slack-whatsapp.md",
                       discord: "30-discord-lark.md", lark: "30-discord-lark.md" };
-  const docGuideUrl = (k) => "https://github.com/blogminhquy/javis-os/blob/main/docs/"
+  const docGuideUrl = (k) => "https://github.com/uneti-ai/uneti-ai/blob/main/docs/"
     + ((window.JavisI18n && window.JavisI18n.lang() === "vi") ? "" : "en/") + DOC_GUIDE[k];
   const ACH_TAB_KEY = "javis.adminChannelTab";
   // Khoá viết rõ từng cái (không ghép chuỗi) để bộ soát i18n thấy được khoá nào đang dùng.
@@ -6962,7 +6962,7 @@
         <h3>Workspace</h3>
         <div class="gcard" style="max-width:560px">
           <label class="js-lbl">${esc(window.t("cs.ac_ws_name"))}</label>
-          <input class="js-input" id="acWs" value="${esc(s.workspace_name || "Javis OS")}">
+          <input class="js-input" id="acWs" value="${esc(s.workspace_name || "UNETI AI")}">
           <button class="gcard-btn" id="acWsSave">${esc(window.t("common.save"))}</button>
           <div class="gcard-meta" id="acWsStatus"></div>
         </div>
@@ -7006,8 +7006,8 @@
           <div id="tkNew"></div>
           <div id="tkList" class="tk-list"></div>
           <div class="tk-docs">
-            <a href="https://github.com/blogminhquy/javis-os/blob/main/docs/24-cli-terminal.md" target="_blank" rel="noopener">${esc(window.t("cs.ac_doc_cli"))} ↗</a>
-            <a href="https://github.com/blogminhquy/javis-os/blob/main/docs/14-bao-mat-tai-khoan.md" target="_blank" rel="noopener">${esc(window.t("cs.ac_doc_sec"))} ↗</a>
+            <a href="https://github.com/uneti-ai/uneti-ai/blob/main/docs/24-cli-terminal.md" target="_blank" rel="noopener">${esc(window.t("cs.ac_doc_cli"))} ↗</a>
+            <a href="https://github.com/uneti-ai/uneti-ai/blob/main/docs/14-bao-mat-tai-khoan.md" target="_blank" rel="noopener">${esc(window.t("cs.ac_doc_sec"))} ↗</a>
           </div>
         </div>
       </div>`;
@@ -7035,7 +7035,7 @@
             <button class="gcard-btn ghost" id="tkHide">${esc(window.t("cs.ac_tk_hide"))}</button>
           </div>
           <div class="gcard-meta">${esc(window.t("cs.ac_tk_paste"))} <code>javis login ${esc(location.origin)} --token &lt;token&gt;</code></div>
-          <div class="gcard-meta">${esc(window.t("cs.ac_tk_nocli"))} <code>pip install javis-cli</code> · <a class="tk-doclink" href="https://github.com/blogminhquy/javis-os/blob/main/docs/24-cli-terminal.md" target="_blank" rel="noopener">${esc(window.t("cs.ac_tk_seedoc"))} ↗</a></div>
+          <div class="gcard-meta">${esc(window.t("cs.ac_tk_nocli"))} <code>pip install javis-cli</code> · <a class="tk-doclink" href="https://github.com/uneti-ai/uneti-ai/blob/main/docs/24-cli-terminal.md" target="_blank" rel="noopener">${esc(window.t("cs.ac_tk_seedoc"))} ↗</a></div>
         </div>`;
       document.getElementById("tkCopy").onclick = () => {
         const c = document.getElementById("tkCopy");
@@ -7050,7 +7050,7 @@
       wsStatus.textContent = window.t("settings.saving");
       const r = await saveSetting("general", { workspace_name: document.getElementById("acWs").value.trim() });
       wsStatus.innerHTML = r.ok ? OK_ICON + " " + esc(window.t("cs.ac_saved")) : WARN_ICON + " " + esc(window.t("cs.ac_err_dot"));
-      const wn = document.getElementById("workspaceName"); if (wn) wn.textContent = document.getElementById("acWs").value.trim() || "Javis OS";
+      const wn = document.getElementById("workspaceName"); if (wn) wn.textContent = document.getElementById("acWs").value.trim() || "UNETI AI";
     };
     const acStatus = document.getElementById("acStatus");
     // HAI đường, đừng gộp: /auth/setup là đường CÔNG KHAI cho lần đầu tạo admin và nó TỪ CHỐI
@@ -8117,7 +8117,7 @@
           <div class="settings-status-grid">
             <div><span>Engine</span><b>${esc(engine)}</b></div>
             <div><span>Model</span><b>${esc(currentModel)}</b></div>
-            <div><span>Workspace</span><b>${esc(s.workspace_name || "Javis OS")}</b></div>
+            <div><span>Workspace</span><b>${esc(s.workspace_name || "UNETI AI")}</b></div>
             <div><span>Telegram</span><b>${esc(telegram.enabled ? t("settings.on") : t("settings.off"))}</b></div>
           </div>
           <div class="settings-links">

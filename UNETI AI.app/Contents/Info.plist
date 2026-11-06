@@ -3,11 +3,11 @@
 <plist version="1.0">
 <dict>
     <key>CFBundleName</key>
-    <string>JAVIS OS</string>
+    <string>UNETI AI</string>
     <key>CFBundleDisplayName</key>
-    <string>JAVIS OS</string>
+    <string>UNETI AI</string>
     <key>CFBundleIdentifier</key>
-    <string>vn.minhquy.javis-os</string>
+    <string>vn.edu.uneti.uneti-ai</string>
     <key>CFBundleVersion</key>
     <string>1.0</string>
     <key>CFBundleShortVersionString</key>

@@ -9,11 +9,11 @@
 
 इसे अपने laptop या किसी छोटे VPS पर चलाइए। इससे आवाज़ में बात कीजिए। Claude, ChatGPT, Grok, Gemini या 12 providers में से किसी को भी जोड़िए, provider बदलने पर भी हर tool वैसा ही बना रहता है, और जब आप सो रहे हों तब इसे background में काम करने दीजिए।
 
-[![GitHub stars](https://img.shields.io/github/stars/blogminhquy/javis-os?style=flat&logo=github&label=stars)](https://github.com/blogminhquy/javis-os/stargazers)
+[![GitHub stars](https://img.shields.io/github/stars/uneti-ai/uneti-ai?style=flat&logo=github&label=stars)](https://github.com/uneti-ai/uneti-ai/stargazers)
 [![License: MIT](https://img.shields.io/badge/license-MIT-22c55e)](../../../LICENSE)
-[![Last commit](https://img.shields.io/github/last-commit/blogminhquy/javis-os?color=f97316)](https://github.com/blogminhquy/javis-os/commits/main)
+[![Last commit](https://img.shields.io/github/last-commit/uneti-ai/uneti-ai?color=f97316)](https://github.com/uneti-ai/uneti-ai/commits/main)
 [![Python 3.12](https://img.shields.io/badge/python-3.12-3776ab?logo=python&logoColor=white)](../../../requirements.txt)
-[![Docker](https://img.shields.io/badge/docker-ghcr.io-2496ed?logo=docker&logoColor=white)](https://github.com/blogminhquy/javis-os/pkgs/container/javis-os)
+[![Docker](https://img.shields.io/badge/docker-ghcr.io-2496ed?logo=docker&logoColor=white)](https://github.com/uneti-ai/uneti-ai/pkgs/container/javis-os)
 [![MCP](https://img.shields.io/badge/tools-Model%20Context%20Protocol-8b5cf6)](https://modelcontextprotocol.io)
 
 <!-- flags:start -->
@@ -54,9 +54,9 @@
 
 | मशीन | एक ही command सब कुछ इंस्टॉल कर देती है |
 |---|---|
-| **Linux / macOS** | `git clone https://github.com/blogminhquy/javis-os.git javis && cd javis && chmod +x install.sh && ./install.sh` |
-| **Windows** | `git clone https://github.com/blogminhquy/javis-os.git javis; cd javis; powershell -ExecutionPolicy Bypass -File install.ps1` |
-| **Docker** | `curl -fsSLO https://raw.githubusercontent.com/blogminhquy/javis-os/main/docker-compose.yml && docker compose up -d` |
+| **Linux / macOS** | `git clone https://github.com/uneti-ai/uneti-ai.git javis && cd javis && chmod +x install.sh && ./install.sh` |
+| **Windows** | `git clone https://github.com/uneti-ai/uneti-ai.git javis; cd javis; powershell -ExecutionPolicy Bypass -File install.ps1` |
+| **Docker** | `curl -fsSLO https://raw.githubusercontent.com/uneti-ai/uneti-ai/main/docker-compose.yml && docker compose up -d` |
 
 फिर **http://localhost:7777** खोलिए। Installer Python, चारों subscription CLI ब्रेन (`claude`, `codex`, `agy`, `grok`) और एक `.env` सेट करता है, फिर server शुरू कर देता है। हर ब्रेन में sign in आप **dashboard के Models page पर** करते हैं, अब commands टाइप करने की ज़रूरत नहीं।
 
@@ -149,7 +149,7 @@ Javis में model एक ऐसा पुर्ज़ा है जिसे
 हर ब्रेन आपके जुड़े हुए MCP servers को call कर सकता है, Brain को पढ़ और लिख सकता है, skills चला सकता है, Kanban में काम queue कर सकता है, और agents, workflows, loops और reminders बना सकता है। CLI engines इसके अलावा **shell commands** चलाते हैं, **web से fetch और search** करते हैं, और **parallel sub-agents** शुरू करते हैं।
 
 > [!WARNING]
-> **किसी subscription से background काम करवाने से पहले एक बात।** Anthropic, Claude Pro/Max को Claude Code के **सामान्य निजी इस्तेमाल** तक सीमित रखता है। लगातार background execution (loops, reminders, Kanban jobs, chatbots), VPS पर चलाना, या कई लोगों का एक ही account शेयर करना, ये सब उस दायरे से बाहर हैं, इसलिए account **block होने का जोखिम** है, हालाँकि अब तक Javis के पास ऐसा कोई मामला दर्ज नहीं है। अगर आपके साथ ऐसा हो, तो कृपया [Issues](https://github.com/blogminhquy/javis-os/issues/new/choose) में developer को बताइए। Javis आपका login token कभी नहीं पढ़ता: यह असली `claude` binary चलाता है, लेकिन इससे चौबीसों घंटे का background इस्तेमाल जायज़ नहीं हो जाता। सुरक्षित रहने के लिए Models page पर Claude Code को **API key** पर चलाइए, या **background-work model** को किसी दूसरे provider पर सेट कीजिए। यही सावधानी xAI plan पर भी लागू होती है। देखें `server/claude_auth.py`।
+> **किसी subscription से background काम करवाने से पहले एक बात।** Anthropic, Claude Pro/Max को Claude Code के **सामान्य निजी इस्तेमाल** तक सीमित रखता है। लगातार background execution (loops, reminders, Kanban jobs, chatbots), VPS पर चलाना, या कई लोगों का एक ही account शेयर करना, ये सब उस दायरे से बाहर हैं, इसलिए account **block होने का जोखिम** है, हालाँकि अब तक Javis के पास ऐसा कोई मामला दर्ज नहीं है। अगर आपके साथ ऐसा हो, तो कृपया [Issues](https://github.com/uneti-ai/uneti-ai/issues/new/choose) में developer को बताइए। Javis आपका login token कभी नहीं पढ़ता: यह असली `claude` binary चलाता है, लेकिन इससे चौबीसों घंटे का background इस्तेमाल जायज़ नहीं हो जाता। सुरक्षित रहने के लिए Models page पर Claude Code को **API key** पर चलाइए, या **background-work model** को किसी दूसरे provider पर सेट कीजिए। यही सावधानी xAI plan पर भी लागू होती है। देखें `server/claude_auth.py`।
 
 ---
 
@@ -252,7 +252,7 @@ flowchart LR
 Hostinger VPS → **Docker Manager → Compose → URL** → Hostinger वाली file paste कीजिए और **Deploy** दबाइए:
 
 ```
-https://raw.githubusercontent.com/blogminhquy/javis-os/main/docker-compose.hostinger.yml
+https://raw.githubusercontent.com/uneti-ai/uneti-ai/main/docker-compose.hostinger.yml
 ```
 
 **Environment** box में सिर्फ़ तीन fields चाहिए: `DOMAIN_NAME`, `JAVIS_ADMIN_USER`, `JAVIS_ADMIN_PASSWORD`, साथ में एक वैकल्पिक `JAVIS_AUTO_UPDATE` (इसे `true` करने पर Javis हर दिन खुद को update करता है)।
@@ -280,7 +280,7 @@ Certificate के लिए 1-3 मिनट इंतज़ार कीजि
 ```bash
 # Docker required (don't have it?  curl -fsSL https://get.docker.com | sh)
 mkdir javis && cd javis
-curl -fsSLO https://raw.githubusercontent.com/blogminhquy/javis-os/main/docker-compose.yml
+curl -fsSLO https://raw.githubusercontent.com/uneti-ai/uneti-ai/main/docker-compose.yml
 
 docker compose run --rm javis claude auth login --claudeai   # sign in to Claude once (optional)
 docker compose up -d                                          # pull the image and run
@@ -296,7 +296,7 @@ docker compose up -d                                          # pull the image a
 <summary><b>विकल्प 3: Linux या macOS, बिना Docker</b></summary>
 
 ```bash
-git clone https://github.com/blogminhquy/javis-os.git javis && cd javis
+git clone https://github.com/uneti-ai/uneti-ai.git javis && cd javis
 chmod +x install.sh && ./install.sh
 ```
 
@@ -310,7 +310,7 @@ Script Python, Node और CLI ब्रेन इंस्टॉल करत�
 <summary><b>विकल्प 4: Windows (निजी मशीन)</b></summary>
 
 ```powershell
-git clone https://github.com/blogminhquy/javis-os.git javis; cd javis
+git clone https://github.com/uneti-ai/uneti-ai.git javis; cd javis
 powershell -ExecutionPolicy Bypass -File install.ps1
 ```
 
@@ -473,13 +473,13 @@ Bug reports, ideas, अनुवाद और pull requests, सबका स्
 | [ARCHITECTURE.md](../../../ARCHITECTURE.md) | सारे हिस्से आपस में कैसे जुड़ते हैं, और server modules का नक्शा |
 | [docs/dev/GLOSSARY.md](../../../docs/dev/GLOSSARY.md) | Code base वियतनामी में लिखा गया था: यह `nhac_hen` (reminder) जैसे नामों का मतलब समझाता है |
 | [docs/dev/adding-a-language.md](../../../docs/dev/adding-a-language.md) | Javis को अपनी भाषा में अनुवाद करना, कदम-दर-कदम |
-| [Issue templates](https://github.com/blogminhquy/javis-os/issues/new/choose) | Bug report, feature request, अनुवाद की पेशकश |
+| [Issue templates](https://github.com/uneti-ai/uneti-ai/issues/new/choose) | Bug report, feature request, अनुवाद की पेशकश |
 
 कृपया [Code of Conduct](../../../CODE_OF_CONDUCT.md) का पालन कीजिए, और security समस्याओं की रिपोर्ट [SECURITY.md](../../../SECURITY.md) में बताए तरीके से निजी रूप से कीजिए।
 
 अगर Javis आपके काम आता है, तो repo पर एक ⭐ दूसरे लोगों को इसे ढूँढने में मदद करता है।
 
-[![Star History Chart](https://api.star-history.com/svg?repos=blogminhquy/javis-os&type=Date)](https://star-history.com/#blogminhquy/javis-os&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=uneti-ai/uneti-ai&type=Date)](https://star-history.com/#uneti-ai/uneti-ai&Date)
 
 ---
 

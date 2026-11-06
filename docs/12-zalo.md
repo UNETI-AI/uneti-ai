@@ -2,8 +2,8 @@
 
 ***Tiếng Việt** · [English](en/12-zalo-agent-mcp.md)*
 
-> **Javis có BA chỗ dính tới Zalo, đừng lẫn.** Trang này nói về chỗ thứ nhất: đăng nhập
-> **chính tài khoản Zalo của bạn** để Javis thao tác thay bạn. Hai chỗ kia dùng API chính
+> **UNETI AI có BA chỗ dính tới Zalo, đừng lẫn.** Trang này nói về chỗ thứ nhất: đăng nhập
+> **chính tài khoản Zalo của bạn** để UNETI AI thao tác thay bạn. Hai chỗ kia dùng API chính
 > thức, an toàn, nhưng chỉ thấy được thứ người ta nhắn thẳng cho bot.
 >
 > | | Zalo Agent MCP (trang này) | [Kênh Zalo Bot](26-kenh-zalo-bot.md) | [Chatbot](25-chatbot.md) |
@@ -13,12 +13,12 @@
 > | Rủi ro khoá tài khoản | Có | Không | Không |
 > | Đọc được hội thoại cũ | Có | Chỉ tin gửi cho bot | Chỉ tin gửi cho bot |
 > | Nhắn cho người chưa quen bot | Được | Không | Không |
-> | Dùng để | Javis làm việc thay bạn | **Bạn** nhắn cho Javis | **Khách** nhắn cho Javis |
+> | Dùng để | UNETI AI làm việc thay bạn | **Bạn** nhắn cho UNETI AI | **Khách** nhắn cho UNETI AI |
 >
 > Dùng cả ba cùng lúc cũng được, chúng không đụng nhau.
 
-Javis kết nối Zalo cá nhân bằng MCP của
-[`javis-zalo`](https://github.com/blogminhquy/javis-zalo), bản CLI Zalo riêng của Javis. Chỉ có
+UNETI AI kết nối Zalo cá nhân bằng MCP của
+[`javis-zalo`](https://github.com/blogminhquy/javis-zalo), bản CLI Zalo riêng của UNETI AI. Chỉ có
 một tiến trình MCP: đăng nhập QR, đọc hoặc tìm hội thoại và gửi tin qua các tool của nó.
 
 > `javis-zalo` dùng API Zalo không chính thức qua `zca-js`. Zalo không hỗ trợ cách
@@ -27,13 +27,13 @@ một tiến trình MCP: đăng nhập QR, đọc hoặc tìm hội thoại và 
 
 ## Cần chuẩn bị
 
-- Node.js 20 trở lên trên máy hoặc VPS chạy Javis, và máy tải được từ GitHub (lần đầu).
+- Node.js 20 trở lên trên máy hoặc VPS chạy UNETI AI, và máy tải được từ GitHub (lần đầu).
 - Điện thoại đã đăng nhập tài khoản Zalo cần kết nối.
-- Javis đã được khởi động và bạn đăng nhập được dashboard.
+- UNETI AI đã được khởi động và bạn đăng nhập được dashboard.
 
-Javis ghim `javis-zalo` theo tag phát hành (hiện là `v1.2.0`) và cài thẳng từ tarball của tag
+UNETI AI ghim `javis-zalo` theo tag phát hành (hiện là `v1.2.0`) và cài thẳng từ tarball của tag
 đó trên GitHub, không cần tài khoản npm hay Git. Chỉ thư viện `zca-js` bên dưới đi theo bản chính
-thức trên npm. Từ 0.83.0 Javis thay `zalo-agent-cli` 1.6.2 của tác giả ngoài bằng bản riêng này;
+thức trên npm. Từ 0.83.0 UNETI AI thay `zalo-agent-cli` 1.6.2 của tác giả ngoài bằng bản riêng này;
 kết nối đã đăng nhập từ trước tự chuyển sang mà không phải quét QR lại.
 
 ## Kết nối bằng QR
@@ -47,13 +47,13 @@ kết nối đã đăng nhập từ trước tự chuyển sang mà không phả
 
 Nút **Hướng dẫn trên GitHub** trong thẻ Zalo luôn mở trang tài liệu này:
 
-<https://github.com/blogminhquy/javis-os/blob/main/docs/12-zalo.md>
+<https://github.com/uneti-ai/uneti-ai/blob/main/docs/12-zalo.md>
 
 ## Nhập tin cũ vào Hộp thư (từ 0.174.0)
 
-Mới đăng nhập Zalo vào Javis thì Hộp thư chỉ có tin từ lúc bật **Ghi hội thoại** trở đi. Muốn có cả tin cũ, bấm **Nhập tin cũ** trên thẻ tài khoản Zalo ở trang Chatbot, thẻ Bot, mục Kênh chưa có bot. Zalo đã gắn bot thì bấm vào ô Zalo trên thẻ bot đó.
+Mới đăng nhập Zalo vào UNETI AI thì Hộp thư chỉ có tin từ lúc bật **Ghi hội thoại** trở đi. Muốn có cả tin cũ, bấm **Nhập tin cũ** trên thẻ tài khoản Zalo ở trang Chatbot, thẻ Bot, mục Kênh chưa có bot. Zalo đã gắn bot thì bấm vào ô Zalo trên thẻ bot đó.
 
-- Javis lấy các tin javis-zalo tự kéo về mỗi lần kết nối: khoảng **2 tuần** gần nhất, vì Zalo không cho lấy xa hơn. Tối đa 5.000 tin mỗi lần.
+- UNETI AI lấy các tin javis-zalo tự kéo về mỗi lần kết nối: khoảng **2 tuần** gần nhất, vì Zalo không cho lấy xa hơn. Tối đa 5.000 tin mỗi lần.
 - Chỉ nhập vào cuộc chat **chưa có tin nào** trong Hộp thư. Cuộc chat đã có tin thì bỏ qua, vì tin cũ chen vào sau sẽ hiện sai thứ tự.
 - Bot **không trả lời** các tin này, chúng **không tính là chưa đọc**, và nhóm vẫn chỉ giữ 1.000 tin gần nhất như thường lệ.
 - Vừa quét QR xong thì đợi vài phút cho Zalo tải xong tin cũ rồi hãy bấm. Bấm lại nhiều lần không bị nhân đôi.
@@ -85,57 +85,57 @@ nối (khoảng hai tuần gần nhất); tin cũ hơn thì không API nào lấ
 
 Ba tool đọc tin chỉ đọc kho do chính javis-zalo gom: tin tới lúc đang kết nối, cộng phần Zalo gửi
 lại mỗi lần vừa kết nối. Không có cách hỏi lại Zalo lịch sử chat riêng sau đó. Nên tin tới đúng lúc
-mất kết nối (Javis khởi động lại hay cập nhật, mạng rớt, một phiên Zalo Web khác đang giữ kết nối)
+mất kết nối (UNETI AI khởi động lại hay cập nhật, mạng rớt, một phiên Zalo Web khác đang giữ kết nối)
 chỉ thấy được nếu phần gửi lại mang nó về.
 
 - Kho lịch sử giờ **lưu ra đĩa** (30 ngày) trong thư mục phiên của tài khoản, nên khởi động lại
   không còn xoá sạch.
 - Mỗi kết quả đọc có thêm `sync`. `sync.complete: false` nghĩa là trong khoảng đó có lúc mất kết
   nối mà phần gửi lại chưa phủ hết (`sync.gaps` ghi từ lúc nào đến lúc nào): có thể đang thiếu tin,
-  **không phải** là khách chưa trả lời. Javis khi đó giữ bước đang chờ (duyệt, phát hành) và báo chủ.
+  **không phải** là khách chưa trả lời. UNETI AI khi đó giữ bước đang chờ (duyệt, phát hành) và báo chủ.
 - Tin tới lúc mất kết nối mà phần gửi lại mang về được đưa vào luồng tin mới, đánh dấu
   `recovered: true`, nên Hộp thư cũng có.
 
 ## Duyệt người xin vào nhóm
 
-Từ Javis 0.84.7 (javis-zalo 1.2.0), với nhóm bật "duyệt thành viên":
+Từ UNETI AI 0.84.7 (javis-zalo 1.2.0), với nhóm bật "duyệt thành viên":
 
-- **Javis báo bạn khi có người xin vào**, qua chuông hòm thư và Telegram của bạn: một tin cho mỗi nhóm, có tên người
+- **UNETI AI báo bạn khi có người xin vào**, qua chuông hòm thư và Telegram của bạn: một tin cho mỗi nhóm, có tên người
   xin và tên nhóm.
-- **Bạn ra lệnh, Javis làm.** Hỏi "ai đang xin vào nhóm Zoom | Javis OS?" thì Javis liệt kê; bảo "duyệt hết" hay
-  "duyệt Lan, từ chối Minh" thì Javis làm và nói lại kết quả từng người.
+- **Bạn ra lệnh, UNETI AI làm.** Hỏi "ai đang xin vào nhóm Zoom | UNETI AI?" thì UNETI AI liệt kê; bảo "duyệt hết" hay
+  "duyệt Lan, từ chối Minh" thì UNETI AI làm và nói lại kết quả từng người.
 - **Bot chuyên trách không bao giờ tự duyệt.** Sự kiện xin vào nhóm không tới bot.
 - Tài khoản Zalo đã quét QR phải là **trưởng hoặc phó nhóm**, không thì Zalo từ chối. Duyệt là thao tác nguy hiểm
   (đổi thành viên nhóm), nên kết nối Zalo phải ở mức Toàn quyền.
 
 ## Người mới vào nhóm
 
-Từ Javis 0.84.2 (javis-zalo 1.1.0), Javis biết ai vừa vào nhóm và vào **lúc nào**, kể cả người
+Từ UNETI AI 0.84.2 (javis-zalo 1.1.0), UNETI AI biết ai vừa vào nhóm và vào **lúc nào**, kể cả người
 được thêm vào bởi chính tài khoản của bạn:
 
-- **Hỏi lại được.** "Tuần này ai mới vào nhóm Zoom | Javis OS?" thì bộ não gọi
+- **Hỏi lại được.** "Tuần này ai mới vào nhóm Zoom | UNETI AI?" thì bộ não gọi
   `zalo_get_group_joins` và trả tên kèm giờ vào. Nhật ký nằm ở
   `~/.zalo-agent-cli/group-joins.jsonl` trong thư mục phiên của kết nối, giữ 5000 lượt gần nhất,
   còn nguyên sau khi khởi động lại.
 - **Bot chuyên trách nhận được sự kiện.** Ở nhóm đã cho phép bot, mỗi người mới vào là một sự
   kiện gửi tới Agent của bot, bất kể chế độ "trả lời khi nào". Agent làm theo chỉ dẫn của nó (ví dụ
-  chào và hỏi thăm), và câu nó gửi tự tag đúng người mới. Javis **không có lời chào mặc định**:
+  chào và hỏi thăm), và câu nó gửi tự tag đúng người mới. UNETI AI **không có lời chào mặc định**:
   chỉ dẫn của Agent không nói gì về người mới thì bot im. Nhiều người vào cùng lúc mà bot đã hết
   hạn mức thì bot cũng im chứ không nói "nhắn hơi nhanh".
 - **Giới hạn.** Zalo chỉ báo sự kiện này lúc đang kết nối, và danh sách thành viên không có ngày
-  vào nhóm. Người vào trước khi có tính năng này, hoặc trong lúc máy chạy Javis tắt, thì không có
+  vào nhóm. Người vào trước khi có tính năng này, hoặc trong lúc máy chạy UNETI AI tắt, thì không có
   trong nhật ký.
 
-## Gói Zalo mở rộng (Javis Store)
+## Gói Zalo mở rộng (UNETI AI Store)
 
 Ba nhóm tool dưới đây (đọc ảnh, gửi ảnh và file, tag người cùng ghi chú, nhắc hẹn, poll) bù đúng
-chỗ MCP chuẩn còn thiếu. Từ 0.73.0 chúng nằm trong gói **`javis.zalo`** trên Javis Store thay vì
+chỗ MCP chuẩn còn thiếu. Từ 0.73.0 chúng nằm trong gói **`javis.zalo`** trên UNETI AI Store thay vì
 đi sẵn trong app, để ai không dùng Zalo thì không phải mang theo:
 
-- **Quét QR Zalo xong là Javis mời cài gói**, qua đúng màn hình đồng ý của kho: liệt kê từng tệp
+- **Quét QR Zalo xong là UNETI AI mời cài gói**, qua đúng màn hình đồng ý của kho: liệt kê từng tệp
   mã, công tắc "chạy ngay" bật sẵn vì bạn vừa tự đấu Zalo. Bấm Cài là có đủ tool.
 - **Máy đã đấu Zalo từ trước** thì trang Kết nối hiện dải nhắc kèm nút **Cài gói đi kèm**.
-  Javis không bao giờ tự cài gói có mã mà không hỏi.
+  UNETI AI không bao giờ tự cài gói có mã mà không hỏi.
 - Kết nối Zalo, Hộp thư và chatbot Zalo vẫn ở trong app, chạy bình thường dù chưa cài gói. Thiếu
   gói thì chỉ thiếu các tool mở rộng.
 
@@ -151,7 +151,7 @@ bằng trình xem ảnh của máy chủ chứ không đưa cho bộ não. Nên 
 
 Nói trong chat như bình thường, ví dụ “xem ảnh hoá đơn chị Lan vừa gửi trong nhóm Kinh doanh”.
 
-- **Ảnh lấy thẳng từ Zalo**, không phụ thuộc bộ đệm 2 giờ của MCP: Javis hỏi Zalo các tin gần
+- **Ảnh lấy thẳng từ Zalo**, không phụ thuộc bộ đệm 2 giờ của MCP: UNETI AI hỏi Zalo các tin gần
   nhất của nhóm (mặc định 30, tối đa 100) và lấy tối đa 8 ảnh mới nhất. Chat riêng thì chỉ lấy
   được ảnh còn trong bộ đệm MCP.
 - **Ảnh lưu vào `attachments/zalo/<id nhóm>/`** của brain, nên hiện được ngay trong khung chat.
@@ -165,7 +165,7 @@ nên xem được cả mọi ảnh khác trong brain, có cài gói Zalo hay kh�
 
 ## Gửi ảnh và file
 
-`zalo_send_message` ở trên **chỉ gửi được chữ**. Muốn gửi ảnh (ví dụ ảnh Javis vừa tạo) hay
+`zalo_send_message` ở trên **chỉ gửi được chữ**. Muốn gửi ảnh (ví dụ ảnh UNETI AI vừa tạo) hay
 file (báo cáo PDF, bảng tính) thì dùng tool `zalo_send_image` trong gói `javis.zalo`. Nó dùng
 đúng tài khoản Zalo bạn đã quét QR.
 
@@ -179,33 +179,33 @@ tháng 7 cho anh Nam qua Zalo”.
 Ba điều nên biết:
 
 - **Chỉ gửi được file nằm trong bộ não đang dùng.** Đây là rào an toàn cố ý: nếu không, một
-  câu chat khéo léo có thể khiến Javis gửi file bất kỳ trên máy chủ ra ngoài, mà tin nhắn Zalo
+  câu chat khéo léo có thể khiến UNETI AI gửi file bất kỳ trên máy chủ ra ngoài, mà tin nhắn Zalo
   thì không thu hồi được.
 - **Một lượt gửi cùng một loại**, hoặc toàn ảnh hoặc toàn file, tối đa 10 file. Trộn lẫn thì
-  Zalo hiển thị sai kiểu nên Javis sẽ báo lại thay vì tự đoán.
-- **Đấu nhiều tài khoản Zalo thì Javis hỏi lại** nên gửi bằng tài khoản nào. Gửi nhầm tài
+  Zalo hiển thị sai kiểu nên UNETI AI sẽ báo lại thay vì tự đoán.
+- **Đấu nhiều tài khoản Zalo thì UNETI AI hỏi lại** nên gửi bằng tài khoản nào. Gửi nhầm tài
   khoản là gửi dưới danh tính người khác, nên đây là chỗ không được đoán.
 
-Cần Node.js 20+ trên máy chạy Javis, giống như phần kết nối Zalo.
+Cần Node.js 20+ trên máy chạy UNETI AI, giống như phần kết nối Zalo.
 
 ### Vì sao file đi đường khác ảnh (từ 0.139.0)
 
 Ảnh tải lên Zalo là có link ngay. File (Excel, PDF, Word, zip, video, cả ảnh `.bmp`) thì khác:
 Zalo nhận xong mới báo "đã tải lên" qua **kết nối thời gian thực** của tài khoản. Trước 0.139.0
-Javis gửi file bằng một lệnh chạy một lần, không mở kết nối đó, nên lệnh chờ mãi rồi bị cắt ở
+UNETI AI gửi file bằng một lệnh chạy một lần, không mở kết nối đó, nên lệnh chờ mãi rồi bị cắt ở
 120 giây, file không tới (14/10/2026 gửi bảng Excel 11 KB cho nhân sự treo hai lần, phải đổi
 sang ảnh). Mở thêm kết nối riêng cũng không được: Zalo chỉ giữ một kết nối Web mỗi tài khoản và
 sẽ đá kết nối đang trực Hộp thư.
 
 Từ 0.139.0 file đi qua tool `zalo_send_file` của chính tiến trình MCP đang giữ kết nối:
 
-- Javis chép file vào hộp gửi của phiên Zalo (`.zalo-agent-cli/outbox/` trong thư mục phiên), gọi
+- UNETI AI chép file vào hộp gửi của phiên Zalo (`.zalo-agent-cli/outbox/` trong thư mục phiên), gọi
   tool, xong thì xoá bản chép. Tool chỉ nhận file trong hộp gửi đó, nên model gọi thẳng tool cũng
   không gửi được file nào khác trên máy chủ.
 - **Zalo không xác nhận trong 60 giây thì báo lỗi rõ và KHÔNG gửi gì**, kể cả khi xác nhận tới
   muộn sau đó. Gửi lại là an toàn. Kết nối thời gian thực đang rớt thì báo ngay, không chờ.
 - Ảnh (jpg, png, webp, gif) vẫn đi đường cũ.
-- Kết nối Zalo còn chạy bản `javis-zalo` cũ (chưa có tool này) thì Javis báo cập nhật Javis rồi
+- Kết nối Zalo còn chạy bản `javis-zalo` cũ (chưa có tool này) thì UNETI AI báo cập nhật UNETI AI rồi
   tắt-bật lại kết nối Zalo, không phải quét QR lại.
 
 Lệnh dòng lệnh `javis-zalo msg send-file` gửi file khi không có kết nối thời gian thực thì báo lỗi
@@ -225,17 +225,17 @@ Zalo, vì kết nối mới sẽ đá MCP ra.
 | `zalo_create_reminder` | Nhắc hẹn hiện trong Zalo, chọn giờ và lặp (hằng ngày, tuần, tháng) | Nguy hiểm (mức Toàn quyền) |
 | `zalo_create_poll` | Poll cho nhóm: chọn nhiều đáp án, ẩn danh, hạn đóng | Nguy hiểm (mức Toàn quyền) |
 
-Nói trong chat như bình thường, ví dụ “nhắn nhóm Kinh doanh tag @minhquy họp lúc 9h nhé” hoặc “tạo poll trưa nay ăn gì trong nhóm Lớp Javis”.
+Nói trong chat như bình thường, ví dụ “nhắn nhóm Kinh doanh tag @minhquy họp lúc 9h nhé” hoặc “tạo poll trưa nay ăn gì trong nhóm Lớp UNETI AI”.
 
 Bốn điều nên biết:
 
-- **Tag chỉ cần nói tên.** “@minhquy” hay “Minh Quý” đều được, không phân biệt hoa thường hay dấu. Javis tìm ID Zalo thật trong
-  những người đã nhắn ở nhóm đó trước, rồi tới danh sách thành viên của Zalo. **Trùng tên hoặc không thấy thì Javis hỏi lại kèm
+- **Tag chỉ cần nói tên.** “@minhquy” hay “Minh Quý” đều được, không phân biệt hoa thường hay dấu. UNETI AI tìm ID Zalo thật trong
+  những người đã nhắn ở nhóm đó trước, rồi tới danh sách thành viên của Zalo. **Trùng tên hoặc không thấy thì UNETI AI hỏi lại kèm
   danh sách ứng viên**, không đoán, vì tag nhầm người thì không rút lại được. Tag cả nhóm (`@All`) chỉ khi bạn yêu cầu rõ.
-- **Nhắc hẹn này khác nhắc hẹn riêng của Javis** (`javis_schedule`): nó hiện trong Zalo nên cả nhóm cùng thấy. Giờ tính theo múi giờ của Javis.
-- **Nhóm khoá quyền tạo ghi chú hoặc poll của thành viên** thì Zalo từ chối và Javis báo thẳng lý do đó. Nếu lệnh quá giờ, Javis nói
+- **Nhắc hẹn này khác nhắc hẹn riêng của UNETI AI** (`javis_schedule`): nó hiện trong Zalo nên cả nhóm cùng thấy. Giờ tính theo múi giờ của UNETI AI.
+- **Nhóm khoá quyền tạo ghi chú hoặc poll của thành viên** thì Zalo từ chối và UNETI AI báo thẳng lý do đó. Nếu lệnh quá giờ, UNETI AI nói
   **không rõ đã tạo chưa** và dặn xem lại nhóm trước khi thử tiếp, để khỏi ra hai poll.
-- **Đấu nhiều tài khoản Zalo thì Javis hỏi lại** nên dùng tài khoản nào, giống phần gửi ảnh.
+- **Đấu nhiều tài khoản Zalo thì UNETI AI hỏi lại** nên dùng tài khoản nào, giống phần gửi ảnh.
 
 Bot chuyên trách đứng trong nhóm Zalo thì **tự tag người nó đang trả lời**, không cần công cụ nào ở trên, xem [Chatbot](25-chatbot.md).
 
@@ -258,8 +258,8 @@ Có thể nói tự nhiên:
 - “Gửi nhóm Kinh doanh: 9 giờ sáng mai họp nhé.”
 
 Khi gửi tin, nên nêu rõ tên hoặc `threadId`, nội dung và đó là cá nhân hay nhóm. Nếu kết
-quả tìm kiếm có nhiều cuộc chat trùng tên, Javis phải hỏi lại thay vì tự đoán.
-Nếu chỉ có một kết quả khớp chính xác, Javis gửi ngay bằng `zalo_send_message`; không cần
+quả tìm kiếm có nhiều cuộc chat trùng tên, UNETI AI phải hỏi lại thay vì tự đoán.
+Nếu chỉ có một kết quả khớp chính xác, UNETI AI gửi ngay bằng `zalo_send_message`; không cần
 bật listener, không cần người nhận nhắn trước và không phụ thuộc danh sách theo dõi.
 
 ## Phân quyền
@@ -279,8 +279,8 @@ Luồng mới đã bỏ sidecar `listen --webhook`, endpoint `/hook/zalo`, panel
 tục”, file luật theo từng cuộc chat và hai plugin `javis_zalo_rule`/`javis_zalo_send`.
 Không còn việc một tiến trình listener tự tắt rồi bật lại connector MCP.
 
-Do đó Javis không tự chuyển tiếp tin Zalo sang Telegram ở nền. Khi cần kiểm tra tin, hãy
-hỏi Javis; MCP có thể dùng `zalo_get_messages` cho tin đang đệm hoặc
+Do đó UNETI AI không tự chuyển tiếp tin Zalo sang Telegram ở nền. Khi cần kiểm tra tin, hãy
+hỏi UNETI AI; MCP có thể dùng `zalo_get_messages` cho tin đang đệm hoặc
 `zalo_get_history` cho lịch sử.
 
 ## Xử lý lỗi
@@ -293,10 +293,10 @@ hỏi Javis; MCP có thể dùng `zalo_get_messages` cho tin đang đệm hoặc
 - **Tool gửi bị chặn**: mở menu chip tài khoản và chuyển quyền sang **Toàn quyền**.
 - **Báo phiên đang được dùng nơi khác**: đóng Zalo Web hoặc tiến trình
   `javis-zalo` (hay `zalo-agent-cli` cũ) khác đang dùng cùng tài khoản, rồi thử lại.
-- **Bot im sau khi Javis khởi động lại**: trước 0.114.0, nếu Javis tắt không êm (crash, bị
+- **Bot im sau khi UNETI AI khởi động lại**: trước 0.114.0, nếu UNETI AI tắt không êm (crash, bị
   dừng cứng khi cập nhật) thì tiến trình `javis-zalo` cũ còn sống. Server mới mở thêm một phiên,
   và cùng một tài khoản có hai phiên nghe. Zalo chỉ đẩy tin về một phiên nên bot đọc phiên kia
-  và không thấy gì. Từ 0.114.0 Javis ghi lại mọi tiến trình MCP nó mở và tự dọn tiến trình sót
+  và không thấy gì. Từ 0.114.0 UNETI AI ghi lại mọi tiến trình MCP nó mở và tự dọn tiến trình sót
   của lần chạy trước. Bản cũ hơn thì khởi động lại cả máy chủ (hoặc container) là sạch.
 - **Muốn đăng nhập lại từ đầu**: xoá connection trên dashboard, sau đó kết nối và quét QR
   lại. Thư mục phiên của connection khác không bị ảnh hưởng.
@@ -305,4 +305,4 @@ hỏi Javis; MCP có thể dùng `zalo_get_messages` cho tin đang đệm hoặc
 
 - [Repository `javis-zalo`](https://github.com/blogminhquy/javis-zalo)
 - [zca-js](https://github.com/RFS-ADRENO/zca-js), thư viện nói chuyện với Zalo bên dưới
-- [Kết nối và phân quyền MCP trong Javis](09-mcp-va-so-lieu.md)
+- [Kết nối và phân quyền MCP trong UNETI AI](09-mcp-va-so-lieu.md)

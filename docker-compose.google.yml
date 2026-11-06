@@ -10,7 +10,7 @@
 # Cổng chỉ mở cho CHÍNH MÁY này (127.0.0.1), không ra mạng LAN hay Internet.
 #
 # CÁCH DÙNG (một lần, trong thư mục chứa docker-compose.yml):
-#   curl -fsSLO https://raw.githubusercontent.com/blogminhquy/javis-os/main/docker-compose.google.yml
+#   curl -fsSLO https://raw.githubusercontent.com/uneti-ai/uneti-ai/main/docker-compose.google.yml
 #   docker compose -f docker-compose.yml -f docker-compose.google.yml up -d
 #
 # Cập nhật về sau: update.sh tự giữ file này khi container đang mở cổng 8000. Tự chạy lệnh thì

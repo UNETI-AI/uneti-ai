@@ -67,7 +67,7 @@ check("hai plugin Zalo cũ đã được gỡ",
       and not (ROOT / "system/plugins/zalo-send/plugin.py").exists()
       and not (ROOT / "system/plugins/zalo-send/plugin.yaml").exists())
 
-guide_url = "https://github.com/blogminhquy/javis-os/blob/main/docs/12-zalo.md"
+guide_url = "https://github.com/uneti-ai/uneti-ai/blob/main/docs/12-zalo.md"
 check("catalog trỏ nút hướng dẫn đến doc GitHub", zalo["auth"]["guide_url"] == guide_url)
 check("doc nêu đủ mười một tool và link repo javis-zalo",
       all(name in doc for name in expected_read | {"zalo_mark_read", "zalo_send_message", "zalo_review_join_requests"})

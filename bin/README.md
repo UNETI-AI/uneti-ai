@@ -1,6 +1,6 @@
-# JAVIS OS - macOS launchers
+# UNETI AI - macOS launchers
 
-Portable helpers to run JAVIS OS natively on macOS (no Docker), so you can
+Portable helpers to run UNETI AI natively on macOS (no Docker), so you can
 start it like a normal app.
 
 ## Prereqs (once)
@@ -14,10 +14,10 @@ start it like a normal app.
 
 ## Run
 
-- **`JAVIS OS.app`** (repo root) - double-click in Finder to start the server and
+- **`UNETI AI.app`** (repo root) - double-click in Finder to start the server and
   open `http://127.0.0.1:7777`. Keep the `.app` inside the repo folder (it finds
   the repo relative to its own location).
-- **`Start JAVIS OS.command`** / **`Stop JAVIS OS.command`** - double-clickable
+- **`Start UNETI AI.command`** / **`Stop UNETI AI.command`** - double-clickable
   Finder alternatives.
 - **`bin/javis-start.sh`** / **`bin/javis-stop.sh`** - the underlying scripts.
 - **`bin/javis-autostart.sh [install|uninstall]`** - run the server at login via a

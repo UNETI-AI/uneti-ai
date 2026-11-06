@@ -11,8 +11,8 @@
 
 Javis を普通のアプリのようにインストールできます。ファイルを 1 つダウンロードして開けば、毎日クリックする JAVIS OS アイコンができます。インストーラーはパソコンに足りないもの（Git、Python、Node、AI ブレイン）を確認し、足りない分だけをインストールします。
 
-- **Windows 10/11:** [JavisOS-Setup.exe](https://github.com/blogminhquy/javis-os/releases/download/desktop/JavisOS-Setup.exe) をダウンロードし、ダブルクリックして最後まで Next を押します。黒いウィンドウに進行状況が表示されます（数分）。完了するとデスクトップとスタートメニューに JAVIS OS アイコンができます。
-- **macOS 11 以降:** [JavisOS-macOS.dmg](https://github.com/blogminhquy/javis-os/releases/download/desktop/JavisOS-macOS.dmg) をダウンロードして開き、**JAVIS OS** を **Applications** にドラッグしてから Launchpad で開きます。初回はターミナルが開いてインストールします（Javis の管理者アカウントの設定と、Mac のパスワードを一度求められることがあります）。
+- **Windows 10/11:** [JavisOS-Setup.exe](https://github.com/uneti-ai/uneti-ai/releases/download/desktop/JavisOS-Setup.exe) をダウンロードし、ダブルクリックして最後まで Next を押します。黒いウィンドウに進行状況が表示されます（数分）。完了するとデスクトップとスタートメニューに JAVIS OS アイコンができます。
+- **macOS 11 以降:** [JavisOS-macOS.dmg](https://github.com/uneti-ai/uneti-ai/releases/download/desktop/JavisOS-macOS.dmg) をダウンロードして開き、**JAVIS OS** を **Applications** にドラッグしてから Launchpad で開きます。初回はターミナルが開いてインストールします（Javis の管理者アカウントの設定と、Mac のパスワードを一度求められることがあります）。
 
 アイコンをクリックすると Javis は専用ウィンドウ（アドレスバーなし）で開き、パソコンの起動時に自動で動き、アプリ内の **Update** ボタンも通常どおり使えます。データはユーザーフォルダ内の `JavisOS` フォルダにあり、アプリをアンインストールしてもこのフォルダは残ります。
 
@@ -27,7 +27,7 @@ Javis を普通のアプリのようにインストールできます。ファ�
 1. hPanel → VPS → **Docker Manager** → **Compose** → **Compose from URL**。
 2. 次の URL を貼り付けます。
    ```
-   https://raw.githubusercontent.com/blogminhquy/javis-os/main/docker-compose.hostinger.yml
+   https://raw.githubusercontent.com/uneti-ai/uneti-ai/main/docker-compose.hostinger.yml
    ```
 3. （任意。HTTPS + ドメインを使う場合）**Environment** 欄に次を設定します。
    ```

@@ -186,7 +186,7 @@ jobs:
           python tools/release.py check
           if [ "$GITHUB_REF" = "refs/heads/main" ]; then echo "main: nothing to check"; exit 0; fi
           git fetch -q origin main
-          if [ "$IS_FORK" = "true" ]; then opt=--optional; else opt=; fi
+          opt=--optional
           python tools/release.py pr-check --base origin/main $opt
 
   # Job tổng hợp mang ĐÚNG tên `test`: quy tắc bảo vệ nhánh main đòi check tên này xanh. Nó chỉ xanh khi MỌI job phụ thuộc

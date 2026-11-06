@@ -1,40 +1,40 @@
-# Javis OS - Quick start
+# UNETI AI - Quick start
 
 *[English](QUICKSTART.en.md) · **Tiếng Việt** · [简体中文](docs/i18n/zh/QUICKSTART.md) · [Español](docs/i18n/es/QUICKSTART.md) · [日本語](docs/i18n/ja/QUICKSTART.md) · [हिन्दी](docs/i18n/hi/QUICKSTART.md) · [Português](docs/i18n/pt-BR/QUICKSTART.md) · [한국어](docs/i18n/ko/QUICKSTART.md) · [Русский](docs/i18n/ru/QUICKSTART.md) · [Deutsch](docs/i18n/de/QUICKSTART.md) · [Français](docs/i18n/fr/QUICKSTART.md) · [Bahasa Indonesia](docs/i18n/id/QUICKSTART.md)*
 
-Chạy Javis OS trong vài phút. Chi tiết từng phần: [docs/](docs/README.md).
+Chạy UNETI AI trong vài phút. Chi tiết từng phần: [docs/](docs/README.md).
 
 ## Máy tính cá nhân (Windows, macOS) - tải bộ cài
 
-Cài Javis như một ứng dụng bình thường: tải một file, bấm mở, xong thì có biểu tượng JAVIS OS để bấm vào mỗi ngày. Bộ cài tự kiểm tra máy còn thiếu gì (Git, Python, Node, các bộ não AI) và tự cài phần thiếu.
+Cài UNETI AI như một ứng dụng bình thường: tải một file, bấm mở, xong thì có biểu tượng UNETI AI để bấm vào mỗi ngày. Bộ cài tự kiểm tra máy còn thiếu gì (Git, Python, Node, các bộ não AI) và tự cài phần thiếu.
 
-- **Windows 10/11:** tải [JavisOS-Setup.exe](https://github.com/blogminhquy/javis-os/releases/download/desktop/JavisOS-Setup.exe), bấm đúp, bấm Next tới hết. Một cửa sổ đen hiện tiến trình cài (vài phút). Xong thì có biểu tượng JAVIS OS trên Desktop và Start menu.
-- **macOS 11 trở lên:** tải [JavisOS-macOS.dmg](https://github.com/blogminhquy/javis-os/releases/download/desktop/JavisOS-macOS.dmg), mở ra, kéo **JAVIS OS** vào **Applications**, rồi mở từ Launchpad. Lần đầu Terminal mở ra để cài (có thể hỏi đặt tài khoản quản trị Javis và mật khẩu máy Mac một lần).
+- **Windows 10/11:** tải [UNETI-AI-Setup.exe](https://github.com/uneti-ai/uneti-ai/releases/download/desktop/UNETI-AI-Setup.exe), bấm đúp, bấm Next tới hết. Một cửa sổ đen hiện tiến trình cài (vài phút). Xong thì có biểu tượng UNETI AI trên Desktop và Start menu.
+- **macOS 11 trở lên:** tải [UNETI-AI-macOS.dmg](https://github.com/uneti-ai/uneti-ai/releases/download/desktop/UNETI-AI-macOS.dmg), mở ra, kéo **UNETI AI** vào **Applications**, rồi mở từ Launchpad. Lần đầu Terminal mở ra để cài (có thể hỏi đặt tài khoản quản trị UNETI AI và mật khẩu máy Mac một lần).
 
-Bấm vào biểu tượng là Javis mở thành cửa sổ riêng (không thanh địa chỉ), Javis tự chạy cùng máy, nút **Cập nhật** trong app dùng được như thường. Dữ liệu nằm ở thư mục `JavisOS` trong thư mục người dùng; gỡ app không xoá thư mục này.
+Bấm vào biểu tượng là UNETI AI mở thành cửa sổ riêng (không thanh địa chỉ), UNETI AI tự chạy cùng máy, nút **Cập nhật** trong app dùng được như thường. Dữ liệu nằm ở thư mục `UNETI-AI` trong thư mục người dùng; gỡ app không xoá thư mục này.
 
-**Cách cài không bị màn hình cảnh báo (khuyên dùng).** Hai bộ cài chưa ký số, nên tải bằng trình duyệt thì lần đầu máy sẽ chặn lại. Dán một dòng lệnh dưới đây thì không bị chặn, vẫn ra đúng bộ cài có logo Javis:
+**Cách cài không bị màn hình cảnh báo (khuyên dùng).** Hai bộ cài chưa ký số, nên tải bằng trình duyệt thì lần đầu máy sẽ chặn lại. Dán một dòng lệnh dưới đây thì không bị chặn, vẫn ra đúng bộ cài có logo UNETI AI:
 - **Windows:** bấm Start, gõ `PowerShell`, mở lên, dán dòng này rồi Enter:
   ```
-  irm https://raw.githubusercontent.com/blogminhquy/javis-os/main/packaging/windows/get-javis.ps1 | iex
+  irm https://raw.githubusercontent.com/uneti-ai/uneti-ai/main/packaging/windows/get-javis.ps1 | iex
   ```
 - **macOS:** mở **Terminal** (Launchpad, gõ Terminal), dán dòng này rồi Enter:
   ```
-  curl -fsSL https://raw.githubusercontent.com/blogminhquy/javis-os/main/packaging/macos/get-javis.sh | bash
+  curl -fsSL https://raw.githubusercontent.com/uneti-ai/uneti-ai/main/packaging/macos/get-javis.sh | bash
   ```
 
 Nếu đã tải file bằng trình duyệt và bị chặn:
 - Windows hiện "Windows protected your PC": bấm **More info** rồi **Run anyway**.
-- macOS báo không mở được: vào **System Settings → Privacy & Security**, kéo xuống bấm **Open Anyway**, rồi mở lại JAVIS OS.
+- macOS báo không mở được: vào **System Settings → Privacy & Security**, kéo xuống bấm **Open Anyway**, rồi mở lại UNETI AI.
 
 ## Cách 1 - Hostinger VPS (Docker Manager, 1-click)
 
-> 🛒 **Chưa có VPS?** [Đăng ký VPS Hostinger tại đây](https://www.hostinger.com?REFERRALCODE=UTRBLOGMIDSN). VPS có sẵn Docker Manager nên cài Javis đúng một cú bấm. Thuê xong quay lại làm các bước dưới.
+> 🛒 **Chưa có VPS?** [Đăng ký VPS Hostinger tại đây](https://www.hostinger.com?REFERRALCODE=UTRBLOGMIDSN). VPS có sẵn Docker Manager nên cài UNETI AI đúng một cú bấm. Thuê xong quay lại làm các bước dưới.
 
 1. hPanel → VPS → **Docker Manager** → **Compose** → **Compose from URL**.
 2. Dán URL:
    ```
-   https://raw.githubusercontent.com/blogminhquy/javis-os/main/docker-compose.hostinger.yml
+   https://raw.githubusercontent.com/uneti-ai/uneti-ai/main/docker-compose.hostinger.yml
    ```
 3. (Tùy chọn, để có HTTPS + tên miền) ở ô **Environment** đặt:
    ```
@@ -44,7 +44,7 @@ Nếu đã tải file bằng trình duyệt và bị chặn:
 4. **Deploy**. Đợi 1-3 phút. Mở app bằng nút **Open** (hoặc `https://<DOMAIN_NAME>`).
 5. Lần đầu: màn hình sẽ hỏi tạo tài khoản admin. Sau đó đăng nhập Claude Code trong terminal container 1 lần: `claude auth login --claudeai`.
 
-VPS cài **Ubuntu 26** hay hệ điều hành trắng, không có Traefik của Hostinger: vẫn dán đúng link trên, bỏ trống `DOMAIN_NAME` cũng được: bấm **Open** là Javis tự chuyển sang `https://javis.srvXXXX.hstgr.cloud` hoặc `https://srvXXXX.hstgr.cloud` (từ 0.302.0). **Cài đặt → Tên miền** cho biết link đã chạy chưa. Container `javis-gateway` đi kèm tự cấp HTTPS cho `DOMAIN_NAME` khi cổng 80/443 trống (từ 0.300.0); nhớ mở cổng 80, 443 ở tường lửa.
+VPS cài **Ubuntu 26** hay hệ điều hành trắng, không có Traefik của Hostinger: vẫn dán đúng link trên, bỏ trống `DOMAIN_NAME` cũng được: bấm **Open** là UNETI AI tự chuyển sang `https://javis.srvXXXX.hstgr.cloud` hoặc `https://srvXXXX.hstgr.cloud` (từ 0.302.0). **Cài đặt → Tên miền** cho biết link đã chạy chưa. Container `javis-gateway` đi kèm tự cấp HTTPS cho `DOMAIN_NAME` khi cổng 80/443 trống (từ 0.300.0); nhớ mở cổng 80, 443 ở tường lửa.
 
 Cập nhật bản mới: bấm **⬆ Cập nhật ngay** trong app (trang Cập nhật), hoặc **Redeploy** trong Docker Manager (image `:latest`, `pull_policy: always`). Dữ liệu brain giữ nguyên trong volume.
 

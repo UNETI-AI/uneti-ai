@@ -241,7 +241,7 @@
     var bk = m.querySelector('[data-f="back"]');
     if (bk) bk.onclick = back;
   }
-  // The connect dialog (0.430.0): "Sign in with GitHub" first (the device flow of the Javis OS GitHub App, no token to
+  // The connect dialog (0.430.0): "Sign in with GitHub" first (the device flow of the UNETI AI GitHub App, no token to
   // make or copy), a pasted token below it for whoever prefers that, and the brain-backup token when there is one.
   function openForm(st) {
     var M = window.JavisConnModal;
@@ -461,7 +461,7 @@
   }
   // Status read when the panel opened: tells the repo list whether "add repos on GitHub" applies.
   var ghStatus = null;
-  // Signed in with the Javis OS app, a repo shows in the chat list only once the app may see it. The shortcut opens the
+  // Signed in with the UNETI AI app, a repo shows in the chat list only once the app may see it. The shortcut opens the
   // app's page on GitHub to tick more repos (owner, 01/11/2026); a pasted token already sees every repo, so it does not
   // get one.
   function addReposUrl() {

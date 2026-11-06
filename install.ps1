@@ -1,5 +1,5 @@
 # ============================================================
-# JAVIS OS - CAI MOT LAN TREN WINDOWS
+# UNETI AI - CAI MOT LAN TREN WINDOWS
 #
 #   powershell -ExecutionPolicy Bypass -File install.ps1
 #
@@ -62,7 +62,7 @@ function Have($cmd) { return [bool](Get-Command $cmd -ErrorAction SilentlyContin
 
 Line ""
 Line " =========================================="
-Line "  JAVIS OS - cai dat tren Windows"
+Line "  UNETI AI - cai dat tren Windows"
 Line " =========================================="
 
 # ---------------------------------------------------------------- [1] Python
@@ -229,8 +229,14 @@ Step 5 "Giai phong port 7777"
 $conns = Get-NetTCPConnection -LocalPort 7777 -State Listen -ErrorAction SilentlyContinue
 if ($conns) {
   foreach ($c in $conns) {
-    try { Stop-Process -Id $c.OwningProcess -Force -ErrorAction Stop; Ok "Da tat tien trinh cu PID $($c.OwningProcess)" }
-    catch { Warn "Khong tat duoc PID $($c.OwningProcess) - dong tay roi chay lai." }
+    $p = Get-Process -Id $c.OwningProcess -ErrorAction SilentlyContinue
+    if ($p -and $p.ProcessName -match '^pythonw?$') {
+      try { Stop-Process -Id $c.OwningProcess -Force -ErrorAction Stop; Ok "Da tat tien trinh cu PID $($c.OwningProcess)" }
+      catch { Warn "Khong tat duoc PID $($c.OwningProcess) - dong tay roi chay lai." }
+    } else {
+      Warn "Cong 7777 dang duoc chuong trinh khac su dung (PID $($c.OwningProcess)). Cai dat khong tu tat chuong trinh do - dong no roi chay lai."
+      exit 1
+    }
   }
 } else {
   Ok "Port 7777 dang trong"

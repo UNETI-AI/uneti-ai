@@ -1,23 +1,23 @@
-# Cài đặt Javis OS trên server / VPS
+# Cài đặt UNETI AI trên server / VPS
 
 ***Tiếng Việt** · [English](DEPLOY.en.md)*
 
-Javis OS là một AI agent cá nhân + Second Brain. "Bộ não" của nó là **Claude Code CLI**
+UNETI AI là một AI agent cá nhân + Second Brain. "Bộ não" của nó là **Claude Code CLI**
 (đăng nhập một lần, không cần API key). Có 3 cách chạy - chọn 1.
 
-> ⚠️ **An toàn:** Javis chạy Claude với toàn quyền trên máy. Khi chạy public (Docker/VPS/Hostinger),
-> Javis **tự bật bắt buộc đăng nhập** - mở app ra là màn **tạo tài khoản admin / đăng nhập**, không
+> ⚠️ **An toàn:** UNETI AI chạy Claude với toàn quyền trên máy. Khi chạy public (Docker/VPS/Hostinger),
+> UNETI AI **tự bật bắt buộc đăng nhập** - mở app ra là màn **tạo tài khoản admin / đăng nhập**, không
 > ai điều khiển được khi chưa đặt mật khẩu. (Chạy nội bộ muốn tắt: `JAVIS_REQUIRE_LOGIN=0`.)
 
 ---
 
 ## Cách 1 - Hostinger Docker Manager (1-click, nhanh nhất) ⚡
 
-> 🛒 **Chưa có VPS?** [Đăng ký VPS Hostinger tại đây](https://www.hostinger.com?REFERRALCODE=UTRBLOGMIDSN). VPS có sẵn Docker Manager nên cài Javis đúng một cú bấm. Thuê xong quay lại làm các bước dưới.
+> 🛒 **Chưa có VPS?** [Đăng ký VPS Hostinger tại đây](https://www.hostinger.com?REFERRALCODE=UTRBLOGMIDSN). VPS có sẵn Docker Manager nên cài UNETI AI đúng một cú bấm. Thuê xong quay lại làm các bước dưới.
 
 VPS Hostinger → **Docker Manager → Compose → URL** → dán link rồi **Deploy**:
 ```
-https://raw.githubusercontent.com/blogminhquy/javis-os/main/docker-compose.yml
+https://raw.githubusercontent.com/uneti-ai/uneti-ai/main/docker-compose.yml
 ```
 Hostinger pull image + chạy. Mở app bằng `http://<ip-vps>:7777` (IP xem ở hPanel → VPS) → ra
 màn **tạo tài khoản admin**.
@@ -50,7 +50,7 @@ màn **tạo tài khoản admin**.
 Cần Docker. Chưa có? `curl -fsSL https://get.docker.com | sh`
 ```bash
 mkdir javis && cd javis
-curl -fsSLO https://raw.githubusercontent.com/blogminhquy/javis-os/main/docker-compose.yml
+curl -fsSLO https://raw.githubusercontent.com/uneti-ai/uneti-ai/main/docker-compose.yml
 
 docker compose run --rm javis claude auth login --claudeai   # ĐĂNG NHẬP CLAUDE 1 LẦN (link + code)
 docker compose up -d                                          # pull image GHCR + chạy
@@ -61,7 +61,7 @@ Muốn build từ source thay vì pull: `curl -O .../docker-compose.build.yml` r
 
 Lệnh hằng ngày:
 ```bash
-docker compose logs -f     # xem Javis đang làm gì
+docker compose logs -f     # xem UNETI AI đang làm gì
 docker compose restart     # khởi động lại
 docker compose down        # tắt
 docker compose build --pull && docker compose up -d   # cập nhật
@@ -93,7 +93,7 @@ link riêng chạy HTTPS mà không cần mua tên miền. **Lưu ý (đã kiể
 1. Xem **hostname VPS** ở hPanel → VPS (vd `srv1782015.hstgr.cloud`).
 2. Docker Manager → Compose → URL:
    ```
-   https://raw.githubusercontent.com/blogminhquy/javis-os/main/docker-compose.hostinger.yml
+   https://raw.githubusercontent.com/uneti-ai/uneti-ai/main/docker-compose.hostinger.yml
    ```
 3. Ô **Environment** của mẫu mới chỉ còn 3 trường có ý nghĩa:
    - `DOMAIN_NAME`: đặt `javis.<hostname-vps>.hstgr.cloud`
@@ -101,7 +101,7 @@ link riêng chạy HTTPS mà không cần mua tên miền. **Lưu ý (đã kiể
    - `JAVIS_ADMIN_USER`: tên đăng nhập, mặc định `admin`.
    - `JAVIS_ADMIN_PASSWORD`: mật khẩu mạnh anh tự đặt; để trống thì phải tự tạo tài khoản trên
      màn chạy lần đầu ngay sau khi deploy (ai mở link trước sẽ tạo được admin).
-   - `JAVIS_AUTO_UPDATE` (tuỳ chọn): đặt `true` thì Javis TỰ cập nhật mỗi ngày. Bỏ trống thì
+   - `JAVIS_AUTO_UPDATE` (tuỳ chọn): đặt `true` thì UNETI AI TỰ cập nhật mỗi ngày. Bỏ trống thì
      vẫn cập nhật được bằng nút **⬆ Cập nhật ngay** trong app - từ 0.55.56 stack Hostinger đã
      kèm sẵn Watchtower nên nút đó có ngay từ lần cài đầu.
 
@@ -113,10 +113,10 @@ link riêng chạy HTTPS mà không cần mua tên miền. **Lưu ý (đã kiể
 > được. Gateway đọc tên VPS (`srvXXXX.hstgr.cloud`) và tự cấp HTTPS cho cả `javis.srvXXXX.hstgr.cloud` lẫn chính
 > `srvXXXX.hstgr.cloud` (từ 0.304.0; tên nào trỏ về máy thì tên đó có chứng chỉ). **Cài đặt → Tên miền** cho biết
 > link đã chạy chưa, hay còn đang chờ chứng chỉ. Bấm **Open** ra `http://<ip>:7777`, trang tự chuyển sang link
-> HTTPS đó ngay khi nó chạy và đúng là Javis này. Thêm `?stay=1` vào link IP nếu muốn ở lại. Ứng dụng cài từ Catalog
+> HTTPS đó ngay khi nó chạy và đúng là UNETI AI này. Thêm `?stay=1` vào link IP nếu muốn ở lại. Ứng dụng cài từ Catalog
 > của Hostinger (vd `omniroute-xxxx.srv....hstgr.cloud`) được Hostinger báo sẵn tên VPS lúc cài; cài bằng
 > "Compose from URL" thì không, nên nút Open không tự ghi được link đó. Trên mẫu Ubuntu 24 có Traefik thì vẫn
-> phải đặt `DOMAIN_NAME` một lần: mở Javis bằng IP → **Cài đặt → Tên miền** có sẵn dòng để sao chép.
+> phải đặt `DOMAIN_NAME` một lần: mở UNETI AI bằng IP → **Cài đặt → Tên miền** có sẵn dòng để sao chép.
 >
 > **VPS Hostinger cài Ubuntu 26 (hoặc hệ điều hành trắng, không có Traefik) - từ 0.300.0:** vẫn dán ĐÚNG link trên,
 > không phải đổi gì. Compose có thêm container `javis-gateway` (Caddy): thấy cổng 80/443 trống là nó tự xin và tự gia
@@ -130,7 +130,7 @@ link riêng chạy HTTPS mà không cần mua tên miền. **Lưu ý (đã kiể
 
 > Thiếu `DOMAIN_NAME` thì vẫn deploy được (chạy tạm ở `:7777`, chưa có HTTPS), và từ 0.302.0 nút **Open** mở
 > `http://<ip-vps>:7777` chứ không ra `localhost` nữa (nút Open đi theo tên miền trong nhãn Traefik, bản cũ ghi
-> `localhost` ở đó). Không biết hostname VPS? Mở Javis bằng IP → **Cài đặt → Tên miền**: Javis tự dò và hiện sẵn
+> `localhost` ở đó). Không biết hostname VPS? Mở UNETI AI bằng IP → **Cài đặt → Tên miền**: UNETI AI tự dò và hiện sẵn
 > dòng `DOMAIN_NAME=javis.srvXXXX.hstgr.cloud` kèm nút sao chép. Không thấy ô Environment? Bấm **Manage → sửa .yaml**,
 > đổi hai dòng nhãn thành `- traefik.enable=true` và
 > `- traefik.http.routers.javis.rule=Host(\`javis.srv1782015.hstgr.cloud\`)`.
@@ -159,9 +159,9 @@ Không cần đặt `DOMAIN` lúc chạy nữa - bật Caddy một lần rồi k
 
 ---
 
-## 🏢 Chạy NHIỀU bản Javis trên cùng một VPS (mỗi bản một link riêng)
+## 🏢 Chạy NHIỀU bản UNETI AI trên cùng một VPS (mỗi bản một link riêng)
 
-Một VPS chạy được bao nhiêu bản Javis cũng được - mỗi bản một tên miền phụ, một kho dữ liệu
+Một VPS chạy được bao nhiêu bản UNETI AI cũng được - mỗi bản một tên miền phụ, một kho dữ liệu
 riêng, không bản nào thấy brain hay tài khoản của bản nào.
 
 **Ba thứ phải KHÁC NHAU giữa các bản.** Trùng cái nào là hỏng đúng cái đó:
@@ -193,7 +193,7 @@ máy**:
 
 ```bash
 docker network create javis-web
-curl -fsSLO https://raw.githubusercontent.com/blogminhquy/javis-os/main/docker-compose.proxy.yml
+curl -fsSLO https://raw.githubusercontent.com/uneti-ai/uneti-ai/main/docker-compose.proxy.yml
 docker compose -f docker-compose.proxy.yml -p javis-proxy up -d
 ```
 
@@ -201,8 +201,8 @@ Rồi mỗi bản một **thư mục riêng**:
 
 ```bash
 mkdir -p ~/javis-shop && cd ~/javis-shop
-curl -fsSLO https://raw.githubusercontent.com/blogminhquy/javis-os/main/docker-compose.yml
-curl -fsSLO https://raw.githubusercontent.com/blogminhquy/javis-os/main/docker-compose.multi.yml
+curl -fsSLO https://raw.githubusercontent.com/uneti-ai/uneti-ai/main/docker-compose.yml
+curl -fsSLO https://raw.githubusercontent.com/uneti-ai/uneti-ai/main/docker-compose.multi.yml
 cat > .env <<'EOF'
 JAVIS_NAME=javis-shop
 JAVIS_HOST_PORT=7777
@@ -257,11 +257,11 @@ volume `claude-auth` - làm được nhưng tự chịu trách nhiệm, vì hai 
 
 ### 🌐 Truy cập từ xa (Hostinger / VPS bất kỳ) - Cloudflare Tunnel
 
-Mở giao diện Javis từ máy khác mà KHÔNG cần mở port / không cần tên miền:
+Mở giao diện UNETI AI từ máy khác mà KHÔNG cần mở port / không cần tên miền:
 
-1. **Đặt mật khẩu TRƯỚC (bắt buộc):** mở Javis (qua SSH tunnel ở bước 5) → Dashboard → **Tài khoản** → đặt mật khẩu admin. Javis chạy Claude toàn quyền trên máy → TUYỆT ĐỐI không phơi ra Internet khi chưa có mật khẩu. (Server cũng in cảnh báo nếu chạy public mà chưa đặt.)
+1. **Đặt mật khẩu TRƯỚC (bắt buộc):** mở UNETI AI (qua SSH tunnel ở bước 5) → Dashboard → **Tài khoản** → đặt mật khẩu admin. UNETI AI chạy Claude toàn quyền trên máy → TUYỆT ĐỐI không phơi ra Internet khi chưa có mật khẩu. (Server cũng in cảnh báo nếu chạy public mà chưa đặt.)
 2. Bật tunnel: `docker compose --profile tunnel up -d`
-3. Lấy URL: `docker compose logs tunnel | grep trycloudflare` → mở `https://<ngẫu-nhiên>.trycloudflare.com` trên trình duyệt bất kỳ, đăng nhập mật khẩu. Giờ xem & thao tác Javis từ xa.
+3. Lấy URL: `docker compose logs tunnel | grep trycloudflare` → mở `https://<ngẫu-nhiên>.trycloudflare.com` trên trình duyệt bất kỳ, đăng nhập mật khẩu. Giờ xem & thao tác UNETI AI từ xa.
 
 **URL cố định (tên miền riêng, kiểu `*.hstgr.cloud`):** tạo *named tunnel* ở Cloudflare Zero Trust (miễn phí) → lấy token → `TUNNEL_TOKEN=...` vào `.env` → đổi dòng `command` của service `tunnel` sang bản `run --token` (comment sẵn trong `docker-compose.yml`), trỏ tới `http://javis:7777`. Quick tunnel đổi URL mỗi lần restart; named tunnel cho URL ổn định.
 
@@ -270,7 +270,7 @@ Mở giao diện Javis từ máy khác mà KHÔNG cần mở port / không cần
 ## Cách 2 - Cài trực tiếp lên Linux/macOS (không Docker)
 
 ```bash
-git clone https://github.com/blogminhquy/javis-os.git javis && cd javis
+git clone https://github.com/uneti-ai/uneti-ai.git javis && cd javis
 chmod +x install.sh && ./install.sh
 ```
 
@@ -296,7 +296,7 @@ Dừng bằng `stop-javis.bat`. Mở http://localhost:7777
 |---|---|---|
 | `JAVIS_HOST` | Địa chỉ nghe. `127.0.0.1` = chỉ máy này; `0.0.0.0` = mọi nơi (Docker tự đặt) | `127.0.0.1` |
 | `JAVIS_PORT` | Cổng | `7777` |
-| `JAVIS_STATE_DIR` | Nơi Javis ghi state (settings, sessions, loop config) | `server/` (Docker: `/data/state`) |
+| `JAVIS_STATE_DIR` | Nơi UNETI AI ghi state (settings, sessions, loop config) | `server/` (Docker: `/data/state`) |
 | `OBSIDIAN_VAULT_PATH` | Vault Second Brain chính | `vault/` trong repo (Docker: `/data/vault`) |
 | `BRAIN_PATH` | Thư mục brain | `brain/` trong repo (Docker: `/data/brain`) |
 | `CLAUDE_CWD` | Thư mục dự phòng của Claude CLI (chat chạy trong thư mục brain) | repo root |
@@ -305,7 +305,7 @@ Dừng bằng `stop-javis.bat`. Mở http://localhost:7777
 
 ## 🔄 Cập nhật khi có code mới
 
-> **Nhanh nhất - bấm ngay trong app:** mở **Cập nhật** (rail trái) → khung **Javis OS** hiện
+> **Nhanh nhất - bấm ngay trong app:** mở **Cập nhật** (rail trái) → khung **UNETI AI** hiện
 > phiên bản đang chạy + tự kiểm tra bản mới trên GitHub. Có bản mới → bấm **⬆ Cập nhật ngay**,
 > app tự kéo bản mới + khởi động lại (~20-40s), khỏi vào terminal.
 > - **Docker/VPS:** nút này chạy nhờ service **watchtower**, và từ 0.55.56 nó **đi kèm sẵn**
@@ -313,11 +313,11 @@ Dừng bằng `stop-javis.bat`. Mở http://localhost:7777
 >   Máy nào còn thiếu nút là đang chạy bằng file compose cũ (trước đó Watchtower nằm trong
 >   `profiles: ["update"]` nên `docker compose up -d` không bật nó). Lấy bản mới rồi dựng lại:
 >   ```bash
->   curl -fsSLO https://raw.githubusercontent.com/blogminhquy/javis-os/main/docker-compose.yml
+>   curl -fsSLO https://raw.githubusercontent.com/uneti-ai/uneti-ai/main/docker-compose.yml
 >   docker compose up -d --pull always
 >   ```
 >   Chưa muốn đổi file compose thì bật riêng cũng được: `docker compose --profile update up -d`.
->   Chỉ Watchtower được cấp quyền Docker (socket); app Javis KHÔNG → an toàn. Không có nó cũng
+>   Chỉ Watchtower được cấp quyền Docker (socket); app UNETI AI KHÔNG → an toàn. Không có nó cũng
 >   được, khung sẽ chỉ *báo có bản mới* + chỉ cách cập nhật tay.
 > - **Có nút mà bấm không chạy, container `javis-watchtower` cứ Restarting:** stack dựng bằng
 >   compose trước 0.65.20 dùng image `containrrr/watchtower` (đã ngừng phát triển), log báo
@@ -326,7 +326,7 @@ Dừng bằng `stop-javis.bat`. Mở http://localhost:7777
 >   mới dùng bản fork `ghcr.io/nicholas-fedor/watchtower:1` tự thương lượng phiên bản với Docker.
 > - **Bấm cập nhật mà vẫn đứng ở bản cũ, `image:` trong file compose là một tên lạ** (ví dụ
 >   `javis-cwi:pc-0.206.0`, không có `ghcr.io/...`): đây là image tự đóng gói, thường gặp khi nhờ
->   AI chuyển Javis từ máy tính lên VPS bằng `docker save` rồi `docker load`. Image đó không nằm trên
+>   AI chuyển UNETI AI từ máy tính lên VPS bằng `docker save` rồi `docker load`. Image đó không nằm trên
 >   kho nào nên kéo lại hay Redeploy vẫn ra đúng bản cũ (từ 0.267.0 trang Cập nhật nói thẳng điều này).
 >   Đổi sang image chính thức MỘT LẦN, dữ liệu giữ nguyên vì nó nằm trong các thư mục gắn vào:
 >   ```bash
@@ -334,11 +334,11 @@ Dừng bằng `stop-javis.bat`. Mở http://localhost:7777
 >   cp compose.yml compose.yml.bak     # tên file có thể là docker-compose.yml
 >   docker compose config | grep -A1 "target:"   # đường dẫn bên trong phải là /data, /brains,
 >                                                 # /home/javis/.claude, /home/javis/.codex
->   sed -i 's#^\(\s*image:\s*\).*#\1ghcr.io/blogminhquy/javis-os:latest#' compose.yml
+>   sed -i 's#^\(\s*image:\s*\).*#\1ghcr.io/uneti-ai/uneti-ai:latest#' compose.yml
 >   docker compose up -d --pull always
 >   ```
 >   Dòng `sed` đổi MỌI dòng `image:` trong file, nên chỉ dùng khi file có đúng một service; có nhiều
->   service thì mở file sửa tay đúng dòng của Javis. Muốn có nút cập nhật trong app thì thêm service
+>   service thì mở file sửa tay đúng dòng của UNETI AI. Muốn có nút cập nhật trong app thì thêm service
 >   `watchtower` y như trong [`docker-compose.yml`](docker-compose.yml). Lỗi quyền ghi sau khi đổi: thư
 >   mục gắn vào phải thuộc user 10001 của container, chạy `sudo chown -R 10001:10001 brains data claude-auth codex-auth`.
 > - **Muốn TỰ cập nhật, khỏi bấm nút:** đặt `JAVIS_AUTO_UPDATE=true` trong `.env` (Hostinger: ô
@@ -372,7 +372,7 @@ Trên máy Windows của bạn, đẩy code lên GitHub: `git add -A && git comm
 
 ## Đăng nhập Claude là bước duy nhất bắt buộc
 
-"Bộ não" của Javis là Claude Code CLI. Token đăng nhập nằm trong `~/.claude`
+"Bộ não" của UNETI AI là Claude Code CLI. Token đăng nhập nằm trong `~/.claude`
 (Docker: volume `claude-auth`). Đăng nhập 1 lần → tồn tại qua mọi restart/update.
 Nếu đã đăng nhập trên máy khác, có thể copy thư mục `~/.claude` sang.
 

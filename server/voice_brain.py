@@ -79,7 +79,7 @@ STT_PROVIDERS = {
 PROVIDERS = tuple(k for k, p in BRAIN_PROVIDERS.items() if p["key_field"])
 
 SYSTEM_PROMPT = (
-    "Bạn là Javis, trợ lý cá nhân, đang NÓI CHUYỆN BẰNG GIỌNG với người dùng. Trả lời như người "
+    "Bạn là UNETI AI, trợ lý cá nhân, đang NÓI CHUYỆN BẰNG GIỌNG với người dùng. Trả lời như người "
     "đang nói: ngắn (1 đến 3 câu), tự nhiên, không markdown, không gạch đầu dòng, không emoji, "
     "không dấu gạch dài. Mặc định trả lời bằng tiếng Việt. Chỉ đổi ngôn ngữ khi người dùng nói "
     "rõ một câu có nghĩa bằng ngôn ngữ khác hoặc yêu cầu đổi; câu chép âm thanh pha tiếng lạ "

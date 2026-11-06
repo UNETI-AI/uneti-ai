@@ -3,7 +3,7 @@ chcp 65001 >nul
 title Javis OS
 echo.
 echo  ==========================================
-echo   JAVIS OS
+echo   UNETI AI
 echo  ==========================================
 echo   Muon cai MOT LUOT ca 4 bo nao CLI
 echo   (claude, codex, agy, grok) thi chay:

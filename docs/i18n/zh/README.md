@@ -9,11 +9,11 @@
 
 在你的笔记本或一台小型 VPS 上运行。用语音和它对话。接入 Claude、ChatGPT、Grok、Gemini 或 12 家提供商中的任意一家，切换模型时所有工具都保留，还能在你睡觉时于后台继续工作。
 
-[![GitHub stars](https://img.shields.io/github/stars/blogminhquy/javis-os?style=flat&logo=github&label=stars)](https://github.com/blogminhquy/javis-os/stargazers)
+[![GitHub stars](https://img.shields.io/github/stars/uneti-ai/uneti-ai?style=flat&logo=github&label=stars)](https://github.com/uneti-ai/uneti-ai/stargazers)
 [![License: MIT](https://img.shields.io/badge/license-MIT-22c55e)](../../../LICENSE)
-[![Last commit](https://img.shields.io/github/last-commit/blogminhquy/javis-os?color=f97316)](https://github.com/blogminhquy/javis-os/commits/main)
+[![Last commit](https://img.shields.io/github/last-commit/uneti-ai/uneti-ai?color=f97316)](https://github.com/uneti-ai/uneti-ai/commits/main)
 [![Python 3.12](https://img.shields.io/badge/python-3.12-3776ab?logo=python&logoColor=white)](../../../requirements.txt)
-[![Docker](https://img.shields.io/badge/docker-ghcr.io-2496ed?logo=docker&logoColor=white)](https://github.com/blogminhquy/javis-os/pkgs/container/javis-os)
+[![Docker](https://img.shields.io/badge/docker-ghcr.io-2496ed?logo=docker&logoColor=white)](https://github.com/uneti-ai/uneti-ai/pkgs/container/javis-os)
 [![MCP](https://img.shields.io/badge/tools-Model%20Context%20Protocol-8b5cf6)](https://modelcontextprotocol.io)
 
 <!-- flags:start -->
@@ -54,9 +54,9 @@
 
 | 机器 | 一条命令装好一切 |
 |---|---|
-| **Linux / macOS** | `git clone https://github.com/blogminhquy/javis-os.git javis && cd javis && chmod +x install.sh && ./install.sh` |
-| **Windows** | `git clone https://github.com/blogminhquy/javis-os.git javis; cd javis; powershell -ExecutionPolicy Bypass -File install.ps1` |
-| **Docker** | `curl -fsSLO https://raw.githubusercontent.com/blogminhquy/javis-os/main/docker-compose.yml && docker compose up -d` |
+| **Linux / macOS** | `git clone https://github.com/uneti-ai/uneti-ai.git javis && cd javis && chmod +x install.sh && ./install.sh` |
+| **Windows** | `git clone https://github.com/uneti-ai/uneti-ai.git javis; cd javis; powershell -ExecutionPolicy Bypass -File install.ps1` |
+| **Docker** | `curl -fsSLO https://raw.githubusercontent.com/uneti-ai/uneti-ai/main/docker-compose.yml && docker compose up -d` |
 
 然后打开 **http://localhost:7777**。安装程序会配置好 Python、四个订阅制 CLI 大脑（`claude`、`codex`、`agy`、`grok`）以及 `.env`，随后启动服务器。每个大脑都在**仪表盘的 Models（模型）页面**上登录，无需再敲命令。
 
@@ -149,7 +149,7 @@ Javis OS **不是**聊天机器人。它是一个运行在你自己的机器或 
 每个大脑都可以调用你已连接的 MCP 服务器、读写 Brain、运行 Skill、排入 Kanban 任务，以及创建 Agent、Workflow、Loop 和提醒。CLI 引擎还额外能运行 **shell 命令**、**抓取和搜索网页**，以及**启动并行的子 Agent**。
 
 > [!WARNING]
-> **让订阅账号运行后台任务之前的提示。** Anthropic 将 Claude Pro/Max 限定为 Claude Code 的**普通个人使用**。持续的后台执行（Loop、提醒、Kanban 任务、聊天机器人）、在 VPS 上运行，或多人共用一个账号，都超出了这个范围，因此存在账号**被锁定**的风险，不过到目前为止 Javis 尚未收到任何此类案例。如果你遇到了，请通过 [Issues](https://github.com/blogminhquy/javis-os/issues/new/choose) 告诉开发者。Javis 从不读取你的登录令牌：它运行的是真正的 `claude` 程序，但这并不能让全天候的后台使用变得合规。稳妥起见，请在 Models 页面把 Claude Code 设置为使用 **API key** 运行，或把**后台任务模型**指向其他提供商。同样的注意事项也适用于 xAI 订阅。参见 `server/claude_auth.py`。
+> **让订阅账号运行后台任务之前的提示。** Anthropic 将 Claude Pro/Max 限定为 Claude Code 的**普通个人使用**。持续的后台执行（Loop、提醒、Kanban 任务、聊天机器人）、在 VPS 上运行，或多人共用一个账号，都超出了这个范围，因此存在账号**被锁定**的风险，不过到目前为止 Javis 尚未收到任何此类案例。如果你遇到了，请通过 [Issues](https://github.com/uneti-ai/uneti-ai/issues/new/choose) 告诉开发者。Javis 从不读取你的登录令牌：它运行的是真正的 `claude` 程序，但这并不能让全天候的后台使用变得合规。稳妥起见，请在 Models 页面把 Claude Code 设置为使用 **API key** 运行，或把**后台任务模型**指向其他提供商。同样的注意事项也适用于 xAI 订阅。参见 `server/claude_auth.py`。
 
 ---
 
@@ -252,7 +252,7 @@ flowchart LR
 Hostinger VPS → **Docker Manager → Compose → URL** → 粘贴 Hostinger 专用文件，然后点击 **Deploy**：
 
 ```
-https://raw.githubusercontent.com/blogminhquy/javis-os/main/docker-compose.hostinger.yml
+https://raw.githubusercontent.com/uneti-ai/uneti-ai/main/docker-compose.hostinger.yml
 ```
 
 **Environment** 框只需要填三个字段：`DOMAIN_NAME`、`JAVIS_ADMIN_USER`、`JAVIS_ADMIN_PASSWORD`，另外还有一个可选的 `JAVIS_AUTO_UPDATE`（设为 `true` 后 Javis 每天自动更新）。
@@ -280,7 +280,7 @@ https://raw.githubusercontent.com/blogminhquy/javis-os/main/docker-compose.hosti
 ```bash
 # Docker required (don't have it?  curl -fsSL https://get.docker.com | sh)
 mkdir javis && cd javis
-curl -fsSLO https://raw.githubusercontent.com/blogminhquy/javis-os/main/docker-compose.yml
+curl -fsSLO https://raw.githubusercontent.com/uneti-ai/uneti-ai/main/docker-compose.yml
 
 docker compose run --rm javis claude auth login --claudeai   # sign in to Claude once (optional)
 docker compose up -d                                          # pull the image and run
@@ -296,7 +296,7 @@ docker compose up -d                                          # pull the image a
 <summary><b>方式三：Linux 或 macOS，不使用 Docker</b></summary>
 
 ```bash
-git clone https://github.com/blogminhquy/javis-os.git javis && cd javis
+git clone https://github.com/uneti-ai/uneti-ai.git javis && cd javis
 chmod +x install.sh && ./install.sh
 ```
 
@@ -310,7 +310,7 @@ chmod +x install.sh && ./install.sh
 <summary><b>方式四：Windows（个人电脑）</b></summary>
 
 ```powershell
-git clone https://github.com/blogminhquy/javis-os.git javis; cd javis
+git clone https://github.com/uneti-ai/uneti-ai.git javis; cd javis
 powershell -ExecutionPolicy Bypass -File install.ps1
 ```
 
@@ -473,13 +473,13 @@ javis-os/
 | [ARCHITECTURE.md](../../../ARCHITECTURE.md) | 各部分如何协同工作，以及服务器模块地图 |
 | [docs/dev/GLOSSARY.md](../../../docs/dev/GLOSSARY.md) | 代码库是用越南语编写的：这里解释诸如 `nhac_hen`（提醒）之类的名称 |
 | [docs/dev/adding-a-language.md](../../../docs/dev/adding-a-language.md) | 一步步把 Javis 翻译成你的语言 |
-| [Issue 模板](https://github.com/blogminhquy/javis-os/issues/new/choose) | Bug 报告、功能请求、翻译意向 |
+| [Issue 模板](https://github.com/uneti-ai/uneti-ai/issues/new/choose) | Bug 报告、功能请求、翻译意向 |
 
 请遵守[行为准则](../../../CODE_OF_CONDUCT.md)，并按照 [SECURITY.md](../../../SECURITY.md) 中的说明私下报告安全问题。
 
 如果 Javis 对你有用，在仓库上点一个 ⭐ 能帮助更多人发现它。
 
-[![Star History Chart](https://api.star-history.com/svg?repos=blogminhquy/javis-os&type=Date)](https://star-history.com/#blogminhquy/javis-os&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=uneti-ai/uneti-ai&type=Date)](https://star-history.com/#uneti-ai/uneti-ai&Date)
 
 ---
 

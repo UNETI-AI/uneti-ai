@@ -9,11 +9,11 @@
 
 Lass ihn auf deinem Laptop oder einem kleinen VPS laufen. Sprich mit ihm per Stimme. Schließ Claude, ChatGPT, Grok, Gemini oder einen von 12 Anbietern an, behalte beim Wechsel jedes Tool und lass ihn im Hintergrund arbeiten, während du schläfst.
 
-[![GitHub stars](https://img.shields.io/github/stars/blogminhquy/javis-os?style=flat&logo=github&label=stars)](https://github.com/blogminhquy/javis-os/stargazers)
+[![GitHub stars](https://img.shields.io/github/stars/uneti-ai/uneti-ai?style=flat&logo=github&label=stars)](https://github.com/uneti-ai/uneti-ai/stargazers)
 [![License: MIT](https://img.shields.io/badge/license-MIT-22c55e)](../../../LICENSE)
-[![Last commit](https://img.shields.io/github/last-commit/blogminhquy/javis-os?color=f97316)](https://github.com/blogminhquy/javis-os/commits/main)
+[![Last commit](https://img.shields.io/github/last-commit/uneti-ai/uneti-ai?color=f97316)](https://github.com/uneti-ai/uneti-ai/commits/main)
 [![Python 3.12](https://img.shields.io/badge/python-3.12-3776ab?logo=python&logoColor=white)](../../../requirements.txt)
-[![Docker](https://img.shields.io/badge/docker-ghcr.io-2496ed?logo=docker&logoColor=white)](https://github.com/blogminhquy/javis-os/pkgs/container/javis-os)
+[![Docker](https://img.shields.io/badge/docker-ghcr.io-2496ed?logo=docker&logoColor=white)](https://github.com/uneti-ai/uneti-ai/pkgs/container/javis-os)
 [![MCP](https://img.shields.io/badge/tools-Model%20Context%20Protocol-8b5cf6)](https://modelcontextprotocol.io)
 
 <!-- flags:start -->
@@ -54,9 +54,9 @@ Lass ihn auf deinem Laptop oder einem kleinen VPS laufen. Sprich mit ihm per Sti
 
 | Rechner | Ein Befehl installiert alles |
 |---|---|
-| **Linux / macOS** | `git clone https://github.com/blogminhquy/javis-os.git javis && cd javis && chmod +x install.sh && ./install.sh` |
-| **Windows** | `git clone https://github.com/blogminhquy/javis-os.git javis; cd javis; powershell -ExecutionPolicy Bypass -File install.ps1` |
-| **Docker** | `curl -fsSLO https://raw.githubusercontent.com/blogminhquy/javis-os/main/docker-compose.yml && docker compose up -d` |
+| **Linux / macOS** | `git clone https://github.com/uneti-ai/uneti-ai.git javis && cd javis && chmod +x install.sh && ./install.sh` |
+| **Windows** | `git clone https://github.com/uneti-ai/uneti-ai.git javis; cd javis; powershell -ExecutionPolicy Bypass -File install.ps1` |
+| **Docker** | `curl -fsSLO https://raw.githubusercontent.com/uneti-ai/uneti-ai/main/docker-compose.yml && docker compose up -d` |
 
 Öffne danach **http://localhost:7777**. Der Installer richtet Python, die vier Abo-CLI-Gehirne (`claude`, `codex`, `agy`, `grok`) und eine `.env` ein und startet dann den Server. Bei jedem Gehirn meldest du dich **auf der Seite Models im Dashboard** an, ganz ohne weitere Befehle.
 
@@ -149,7 +149,7 @@ Wähle das Gehirn auf der Seite **Models** und wechsle es, wann immer du willst.
 Jedes Gehirn kann deine verbundenen MCP-Server aufrufen, das Brain lesen und schreiben, Skills ausführen, Kanban-Arbeit einreihen und Agents, Workflows, Loops und Erinnerungen anlegen. Die CLI-Engines können zusätzlich **Shell-Befehle ausführen**, **das Web abrufen und durchsuchen** und **parallele Sub-Agents starten**.
 
 > [!WARNING]
-> **Ein Hinweis, bevor du ein Abo Hintergrundarbeit erledigen lässt.** Anthropic beschränkt Claude Pro/Max auf die **gewöhnliche persönliche Nutzung** von Claude Code. Dauerhafte Ausführung im Hintergrund (Loops, Erinnerungen, Kanban-Jobs, Chatbots), der Betrieb auf einem VPS oder mehrere Personen, die sich ein Konto teilen, fallen nicht darunter, daher besteht ein Risiko, dass das Konto **gesperrt wird**, auch wenn Javis bisher keinen Fall kennt. Falls es dir passiert, melde es bitte dem Entwickler über [Issues](https://github.com/blogminhquy/javis-os/issues/new/choose). Javis liest nie dein Login-Token: Es führt das echte `claude`-Binary aus, aber das macht eine Hintergrundnutzung rund um die Uhr nicht zulässig. Stell Claude Code sicherheitshalber auf der Seite Models auf einen **API-Schlüssel** um oder richte das **Modell für Hintergrundarbeit** auf einen anderen Anbieter. Dieselbe Vorsicht gilt für das xAI-Abo. Siehe `server/claude_auth.py`.
+> **Ein Hinweis, bevor du ein Abo Hintergrundarbeit erledigen lässt.** Anthropic beschränkt Claude Pro/Max auf die **gewöhnliche persönliche Nutzung** von Claude Code. Dauerhafte Ausführung im Hintergrund (Loops, Erinnerungen, Kanban-Jobs, Chatbots), der Betrieb auf einem VPS oder mehrere Personen, die sich ein Konto teilen, fallen nicht darunter, daher besteht ein Risiko, dass das Konto **gesperrt wird**, auch wenn Javis bisher keinen Fall kennt. Falls es dir passiert, melde es bitte dem Entwickler über [Issues](https://github.com/uneti-ai/uneti-ai/issues/new/choose). Javis liest nie dein Login-Token: Es führt das echte `claude`-Binary aus, aber das macht eine Hintergrundnutzung rund um die Uhr nicht zulässig. Stell Claude Code sicherheitshalber auf der Seite Models auf einen **API-Schlüssel** um oder richte das **Modell für Hintergrundarbeit** auf einen anderen Anbieter. Dieselbe Vorsicht gilt für das xAI-Abo. Siehe `server/claude_auth.py`.
 
 ---
 
@@ -252,7 +252,7 @@ flowchart LR
 Hostinger VPS → **Docker Manager → Compose → URL** → füge die Hostinger-Datei ein und klicke auf **Deploy**:
 
 ```
-https://raw.githubusercontent.com/blogminhquy/javis-os/main/docker-compose.hostinger.yml
+https://raw.githubusercontent.com/uneti-ai/uneti-ai/main/docker-compose.hostinger.yml
 ```
 
 Das Feld **Environment** braucht nur drei Einträge: `DOMAIN_NAME`, `JAVIS_ADMIN_USER`, `JAVIS_ADMIN_PASSWORD`, dazu optional `JAVIS_AUTO_UPDATE` (auf `true` gesetzt, aktualisiert sich Javis täglich selbst).
@@ -280,7 +280,7 @@ Details und Fehlerbehebung: [DEPLOY.en.md](../../../DEPLOY.en.md).
 ```bash
 # Docker required (don't have it?  curl -fsSL https://get.docker.com | sh)
 mkdir javis && cd javis
-curl -fsSLO https://raw.githubusercontent.com/blogminhquy/javis-os/main/docker-compose.yml
+curl -fsSLO https://raw.githubusercontent.com/uneti-ai/uneti-ai/main/docker-compose.yml
 
 docker compose run --rm javis claude auth login --claudeai   # sign in to Claude once (optional)
 docker compose up -d                                          # pull the image and run
@@ -296,7 +296,7 @@ Fernzugriff ohne Domain: `docker compose --profile tunnel up -d`, dann gibt `doc
 <summary><b>Option 3: Linux oder macOS, ohne Docker</b></summary>
 
 ```bash
-git clone https://github.com/blogminhquy/javis-os.git javis && cd javis
+git clone https://github.com/uneti-ai/uneti-ai.git javis && cd javis
 chmod +x install.sh && ./install.sh
 ```
 
@@ -310,7 +310,7 @@ Das Skript installiert Python, Node und die CLI-Gehirne, legt ein venv an, regis
 <summary><b>Option 4: Windows (persönlicher Rechner)</b></summary>
 
 ```powershell
-git clone https://github.com/blogminhquy/javis-os.git javis; cd javis
+git clone https://github.com/uneti-ai/uneti-ai.git javis; cd javis
 powershell -ExecutionPolicy Bypass -File install.ps1
 ```
 
@@ -473,13 +473,13 @@ Fehlerberichte, Ideen, Übersetzungen und Pull Requests sind willkommen, auf Eng
 | [ARCHITECTURE.md](../../../ARCHITECTURE.md) | Wie die Teile zusammenspielen, und eine Übersicht der Server-Module |
 | [docs/dev/GLOSSARY.md](../../../docs/dev/GLOSSARY.md) | Die Codebasis wurde auf Vietnamesisch geschrieben: Hier werden Namen wie `nhac_hen` (Erinnerung) entschlüsselt |
 | [docs/dev/adding-a-language.md](../../../docs/dev/adding-a-language.md) | Javis Schritt für Schritt in deine Sprache übersetzen |
-| [Issue-Vorlagen](https://github.com/blogminhquy/javis-os/issues/new/choose) | Fehlerbericht, Feature-Wunsch, Übersetzungsangebot |
+| [Issue-Vorlagen](https://github.com/uneti-ai/uneti-ai/issues/new/choose) | Fehlerbericht, Feature-Wunsch, Übersetzungsangebot |
 
 Bitte halte dich an den [Code of Conduct](../../../CODE_OF_CONDUCT.md) und melde Sicherheitsprobleme vertraulich, wie in [SECURITY.md](../../../SECURITY.md) beschrieben.
 
 Wenn Javis dir nützt, hilft ein ⭐ für das Repo anderen, es zu finden.
 
-[![Star History Chart](https://api.star-history.com/svg?repos=blogminhquy/javis-os&type=Date)](https://star-history.com/#blogminhquy/javis-os&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=uneti-ai/uneti-ai&type=Date)](https://star-history.com/#uneti-ai/uneti-ai&Date)
 
 ---
 

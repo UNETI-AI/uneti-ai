@@ -540,7 +540,7 @@ def coach_prompt(habits: list, stats: dict, vi: bool) -> str:
         f"last14={h['last14']}" for h in habits)
     rates = "\n".join(f"- {s}: sent {v['sent']}, done after {v['done']}" for s, v in stats.items())
     lang = "Vietnamese, addressing the user as \"bạn\" and yourself as \"mình\"" if vi else "English"
-    return f"""You are Javis, a small star mascot coaching the user's daily habits. Write today's short lines in {lang}.
+    return f"""You are UNETI AI, a small star mascot coaching the user's daily habits. Write today's short lines in {lang}.
 
 Habits today:
 {rows}

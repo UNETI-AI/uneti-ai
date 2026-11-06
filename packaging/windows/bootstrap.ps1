@@ -1,10 +1,10 @@
 # ============================================================
-# JAVIS OS - what JavisOS-Setup.exe runs after it copies its own few files.
+# UNETI AI - what UNETI-AI-Setup.exe runs after it copies its own few files.
 #
 #   powershell -ExecutionPolicy Bypass -File bootstrap.ps1 [-Dir <folder>] [-LogFile <path>]
 #
 # Steps: make sure Git exists (winget, else the official Git for Windows installer), clone
-# Javis into %USERPROFILE%\JavisOS (or reuse the clone already there), then hand over to
+# Javis into %USERPROFILE%\UNETI-AI (or reuse the clone already there), then hand over to
 # install.ps1 -NoStart, which checks and installs Python, Node, the four CLI brains, the venv,
 # .env and the login auto-start. The setup wizard opens the app itself on its last page.
 #
@@ -13,15 +13,15 @@
 # A plain copy would install fine and then never update. A clone also means the .exe never
 # goes stale: whoever runs it gets the newest release.
 #
-# Why %USERPROFILE%\JavisOS and not Program Files: the brain (notes, memory, settings) lives
+# Why %USERPROFILE%\UNETI-AI and not Program Files: the brain (notes, memory, settings) lives
 # inside that folder, so it has to be writable without admin rights, easy to find, and it must
 # survive an uninstall.
 #
 # ASCII only: Windows PowerShell 5.1 reads a file without BOM in the ANSI codepage.
 # ============================================================
 param(
-  [string]$Dir = (Join-Path $env:USERPROFILE "JavisOS"),
-  [string]$Repo = "https://github.com/blogminhquy/javis-os.git",
+  [string]$Dir = (Join-Path $env:USERPROFILE "UNETI-AI"),
+  [string]$Repo = "https://github.com/uneti-ai/uneti-ai.git",
   [string]$Branch = "main",
   [string]$LogFile = "",
   [switch]$SkipCli,   # passed on to install.ps1 (CI smoke test: no third-party CLI installers)
@@ -30,7 +30,7 @@ param(
 
 $ErrorActionPreference = "Continue"
 try { [Console]::OutputEncoding = [System.Text.Encoding]::UTF8 } catch { }
-try { $Host.UI.RawUI.WindowTitle = "JAVIS OS - cai dat" } catch { }
+try { $Host.UI.RawUI.WindowTitle = "UNETI AI - cai dat" } catch { }
 if ($LogFile) { try { Start-Transcript -Path $LogFile -Force | Out-Null } catch { } }
 
 function Line($t) { Write-Host $t }
@@ -56,11 +56,11 @@ function Finish($code) {
     Line ""
     Err "Cai dat chua xong. Doc cac dong mau do o tren de biet thieu gi."
     if ($LogFile) { Line "    Nhat ky: $LogFile" }
-    Line "    Sua xong thi chay lai JavisOS-Setup.exe, cac buoc da xong se duoc bo qua."
+    Line "    Sua xong thi chay lai UNETI-AI-Setup.exe, cac buoc da xong se duoc bo qua."
     if (-not $NoPause) { Read-Host "Nhan Enter de dong cua so nay" | Out-Null }
   } else {
     Line ""
-    Ok "Xong. Lan sau mo Javis bang bieu tuong JAVIS OS tren Desktop hoac Start menu."
+    Ok "Xong. Lan sau mo Javis bang bieu tuong UNETI AI tren Desktop hoac Start menu."
     if (-not $NoPause) { Start-Sleep -Seconds 3 }
   }
   exit $code
@@ -68,7 +68,7 @@ function Finish($code) {
 
 Line ""
 Line " =========================================="
-Line "  JAVIS OS - kiem tra va cai nhung gi may con thieu"
+Line "  UNETI AI - kiem tra va cai nhung gi may con thieu"
 Line "  Thu muc cai: $Dir"
 Line " =========================================="
 
@@ -101,7 +101,7 @@ if (-not (Have "git")) {
   }
 }
 if (-not (Have "git")) {
-  Err "Chua co Git. Cai Git o https://git-scm.com/download/win roi chay lai JavisOS-Setup.exe."
+  Err "Chua co Git. Cai Git o https://git-scm.com/download/win roi chay lai UNETI-AI-Setup.exe."
   Finish 1
 }
 Ok ((git --version) 2>&1)
@@ -115,7 +115,7 @@ if (Test-Path (Join-Path $Dir ".git")) {
 } else {
   if ((Test-Path $Dir) -and (Get-ChildItem -Force $Dir | Select-Object -First 1)) {
     Err "Thu muc $Dir da co file nhung khong phai ban Javis tai bang git."
-    Line "    Doi ten hoac chuyen thu muc do di cho khac, roi chay lai JavisOS-Setup.exe."
+    Line "    Doi ten hoac chuyen thu muc do di cho khac, roi chay lai UNETI-AI-Setup.exe."
     Finish 1
   }
   # blob:none = every commit, file contents fetched only when needed. The updater merges and

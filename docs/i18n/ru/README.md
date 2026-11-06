@@ -9,11 +9,11 @@
 
 Запускайте его на ноутбуке или небольшом VPS. Говорите с ним голосом. Подключите Claude, ChatGPT, Grok, Gemini или любого из 12 провайдеров, сохраняйте все инструменты при смене модели и позвольте ему работать в фоне, пока вы спите.
 
-[![GitHub stars](https://img.shields.io/github/stars/blogminhquy/javis-os?style=flat&logo=github&label=stars)](https://github.com/blogminhquy/javis-os/stargazers)
+[![GitHub stars](https://img.shields.io/github/stars/uneti-ai/uneti-ai?style=flat&logo=github&label=stars)](https://github.com/uneti-ai/uneti-ai/stargazers)
 [![License: MIT](https://img.shields.io/badge/license-MIT-22c55e)](../../../LICENSE)
-[![Last commit](https://img.shields.io/github/last-commit/blogminhquy/javis-os?color=f97316)](https://github.com/blogminhquy/javis-os/commits/main)
+[![Last commit](https://img.shields.io/github/last-commit/uneti-ai/uneti-ai?color=f97316)](https://github.com/uneti-ai/uneti-ai/commits/main)
 [![Python 3.12](https://img.shields.io/badge/python-3.12-3776ab?logo=python&logoColor=white)](../../../requirements.txt)
-[![Docker](https://img.shields.io/badge/docker-ghcr.io-2496ed?logo=docker&logoColor=white)](https://github.com/blogminhquy/javis-os/pkgs/container/javis-os)
+[![Docker](https://img.shields.io/badge/docker-ghcr.io-2496ed?logo=docker&logoColor=white)](https://github.com/uneti-ai/uneti-ai/pkgs/container/javis-os)
 [![MCP](https://img.shields.io/badge/tools-Model%20Context%20Protocol-8b5cf6)](https://modelcontextprotocol.io)
 
 <!-- flags:start -->
@@ -54,9 +54,9 @@
 
 | Машина | Одна команда ставит всё |
 |---|---|
-| **Linux / macOS** | `git clone https://github.com/blogminhquy/javis-os.git javis && cd javis && chmod +x install.sh && ./install.sh` |
-| **Windows** | `git clone https://github.com/blogminhquy/javis-os.git javis; cd javis; powershell -ExecutionPolicy Bypass -File install.ps1` |
-| **Docker** | `curl -fsSLO https://raw.githubusercontent.com/blogminhquy/javis-os/main/docker-compose.yml && docker compose up -d` |
+| **Linux / macOS** | `git clone https://github.com/uneti-ai/uneti-ai.git javis && cd javis && chmod +x install.sh && ./install.sh` |
+| **Windows** | `git clone https://github.com/uneti-ai/uneti-ai.git javis; cd javis; powershell -ExecutionPolicy Bypass -File install.ps1` |
+| **Docker** | `curl -fsSLO https://raw.githubusercontent.com/uneti-ai/uneti-ai/main/docker-compose.yml && docker compose up -d` |
 
 Затем откройте **http://localhost:7777**. Установщик ставит Python, четыре CLI-мозга по подписке (`claude`, `codex`, `agy`, `grok`) и файл `.env`, после чего запускает сервер. Вход в каждый мозг выполняется **на странице Models в панели**, никаких команд вводить больше не нужно.
 
@@ -149,7 +149,7 @@ Javis OS **не** чат-бот. Это **самостоятельно разм�
 Любой мозг может вызывать подключённые вами MCP-серверы, читать и писать в Brain, запускать skills, ставить работу в Kanban и создавать агентов (agents), workflows, loops и напоминания. CLI-движки дополнительно выполняют **команды shell**, **загружают страницы и ищут в интернете** и **запускают параллельных субагентов**.
 
 > [!WARNING]
-> **Небольшое замечание, прежде чем доверять подписке фоновую работу.** Anthropic ограничивает Claude Pro/Max **обычным личным использованием** Claude Code. Непрерывное фоновое выполнение (loops, напоминания, задачи Kanban, чат-боты), запуск на VPS или совместное использование одного аккаунта несколькими людьми выходят за эти рамки, поэтому есть риск, что аккаунт **заблокируют**, хотя Javis пока не знает ни одного такого случая. Если это случится с вами, сообщите разработчику через [Issues](https://github.com/blogminhquy/javis-os/issues/new/choose). Javis никогда не читает ваш токен входа: он запускает настоящий бинарник `claude`, но это не делает круглосуточную фоновую работу допустимой. Для надёжности переключите Claude Code на **API-ключ** на странице Models или направьте **модель для фоновой работы** на другого провайдера. Та же осторожность относится и к плану xAI. См. `server/claude_auth.py`.
+> **Небольшое замечание, прежде чем доверять подписке фоновую работу.** Anthropic ограничивает Claude Pro/Max **обычным личным использованием** Claude Code. Непрерывное фоновое выполнение (loops, напоминания, задачи Kanban, чат-боты), запуск на VPS или совместное использование одного аккаунта несколькими людьми выходят за эти рамки, поэтому есть риск, что аккаунт **заблокируют**, хотя Javis пока не знает ни одного такого случая. Если это случится с вами, сообщите разработчику через [Issues](https://github.com/uneti-ai/uneti-ai/issues/new/choose). Javis никогда не читает ваш токен входа: он запускает настоящий бинарник `claude`, но это не делает круглосуточную фоновую работу допустимой. Для надёжности переключите Claude Code на **API-ключ** на странице Models или направьте **модель для фоновой работы** на другого провайдера. Та же осторожность относится и к плану xAI. См. `server/claude_auth.py`.
 
 ---
 
@@ -252,7 +252,7 @@ flowchart LR
 Hostinger VPS → **Docker Manager → Compose → URL** → вставьте файл для Hostinger и нажмите **Deploy**:
 
 ```
-https://raw.githubusercontent.com/blogminhquy/javis-os/main/docker-compose.hostinger.yml
+https://raw.githubusercontent.com/uneti-ai/uneti-ai/main/docker-compose.hostinger.yml
 ```
 
 В поле **Environment** нужны всего три значения: `DOMAIN_NAME`, `JAVIS_ADMIN_USER`, `JAVIS_ADMIN_PASSWORD`, плюс необязательный `JAVIS_AUTO_UPDATE` (поставьте `true`, и Javis будет обновляться сам раз в день).
@@ -280,7 +280,7 @@ https://raw.githubusercontent.com/blogminhquy/javis-os/main/docker-compose.hosti
 ```bash
 # Docker required (don't have it?  curl -fsSL https://get.docker.com | sh)
 mkdir javis && cd javis
-curl -fsSLO https://raw.githubusercontent.com/blogminhquy/javis-os/main/docker-compose.yml
+curl -fsSLO https://raw.githubusercontent.com/uneti-ai/uneti-ai/main/docker-compose.yml
 
 docker compose run --rm javis claude auth login --claudeai   # sign in to Claude once (optional)
 docker compose up -d                                          # pull the image and run
@@ -296,7 +296,7 @@ docker compose up -d                                          # pull the image a
 <summary><b>Вариант 3: Linux или macOS без Docker</b></summary>
 
 ```bash
-git clone https://github.com/blogminhquy/javis-os.git javis && cd javis
+git clone https://github.com/uneti-ai/uneti-ai.git javis && cd javis
 chmod +x install.sh && ./install.sh
 ```
 
@@ -310,7 +310,7 @@ chmod +x install.sh && ./install.sh
 <summary><b>Вариант 4: Windows (личный компьютер)</b></summary>
 
 ```powershell
-git clone https://github.com/blogminhquy/javis-os.git javis; cd javis
+git clone https://github.com/uneti-ai/uneti-ai.git javis; cd javis
 powershell -ExecutionPolicy Bypass -File install.ps1
 ```
 
@@ -473,13 +473,13 @@ javis-os/
 | [ARCHITECTURE.md](../../../ARCHITECTURE.md) | Как связаны части системы, и карта серверных модулей |
 | [docs/dev/GLOSSARY.md](../../../docs/dev/GLOSSARY.md) | Код написан с вьетнамскими именами: здесь расшифрованы названия вроде `nhac_hen` (напоминание) |
 | [docs/dev/adding-a-language.md](../../../docs/dev/adding-a-language.md) | Пошаговый перевод Javis на ваш язык |
-| [Шаблоны issue](https://github.com/blogminhquy/javis-os/issues/new/choose) | Сообщение об ошибке, запрос функции, предложение перевода |
+| [Шаблоны issue](https://github.com/uneti-ai/uneti-ai/issues/new/choose) | Сообщение об ошибке, запрос функции, предложение перевода |
 
 Пожалуйста, соблюдайте [Кодекс поведения](../../../CODE_OF_CONDUCT.md) и сообщайте о проблемах безопасности приватно, как описано в [SECURITY.md](../../../SECURITY.md).
 
 Если Javis вам полезен, ⭐ репозиторию поможет другим людям его найти.
 
-[![Star History Chart](https://api.star-history.com/svg?repos=blogminhquy/javis-os&type=Date)](https://star-history.com/#blogminhquy/javis-os&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=uneti-ai/uneti-ai&type=Date)](https://star-history.com/#uneti-ai/uneti-ai&Date)
 
 ---
 

@@ -1334,7 +1334,7 @@
           + tw("store.back_to", { trang: esc(veTrang.nhan) }) + '</button>'
         : "")
       // No heading and no intro here (owner, 2026-10-28): the page header right above already says
-      // "Javis Store" and what it holds, and the cards explain themselves. Where installs land on
+      // "UNETI AI Store" and what it holds, and the cards explain themselves. Where installs land on
       // disk moved into the (i) of the Install from .zip dialog, the one place it matters.
       + '<div class="kho-khoi">'
       + (d.disabled

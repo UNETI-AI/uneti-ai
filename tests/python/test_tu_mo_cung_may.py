@@ -48,7 +48,7 @@ i_open = vbs.find('If LCase(WScript.Arguments(0)) = "/open" Then MoDashboard')
 check("vbs: /open chỉ chạy SAU khi đã bật server", 0 < i_run < i_open, (i_run, i_open))
 check("vbs: chờ /health có giới hạn (60 lần, mỗi lần 1 giây)", "For i = 1 To 60" in vbs and '"/health"' in vbs)
 check("vbs: tôn trọng JAVIS_PORT", "%JAVIS_PORT%" in vbs)
-check("vbs: mở dạng cửa sổ app như JAVIS OS.bat", "--app=" in vbs and "msedge.exe" in vbs and "chrome.exe" in vbs)
+check("vbs: mở dạng cửa sổ app như UNETI AI.bat", "--app=" in vbs and "msedge.exe" in vbs and "chrome.exe" in vbs)
 check("vbs: không có Edge/Chrome thì mở trình duyệt mặc định", "sh.Run url, 1, False" in vbs)
 check("vbs: phần mới chỉ dùng ASCII (wscript đọc file theo ANSI)",
       all(ord(c) < 128 for c in vbs[vbs.find("' 0.306.0"):]))
@@ -67,7 +67,7 @@ check("lệnh cũ không bị báo đường dẫn cũ (vẫn chạy được, c
       "val.strip() not in (expected, _autostart_legacy_command())" in src)
 ps1 = doc("javis-autostart.ps1")
 check("javis-autostart.ps1 ghi đúng chuỗi của dashboard",
-      '$cmd = "wscript.exe //nologo `"$vbs`" /open"' in ps1 and '$Name = "JavisOS"' in ps1)
+      '$cmd = "wscript.exe //nologo `"$vbs`" /open"' in ps1 and '$Name = "UNETI-AI"' in ps1)
 check("javis-autostart.ps1 gỡ cờ chặn của Task Manager như nút trong dashboard", "StartupApproved" in ps1 and "-band 1" in ps1)
 check("javis-autostart.ps1 dọn shortcut kiểu cũ (tránh hai bản giành cổng)", "Remove-Item $Lnk" in ps1)
 check("javis-autostart.ps1 chỉ dùng ASCII", all(ord(c) < 128 for c in ps1))

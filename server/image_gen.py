@@ -235,8 +235,8 @@ def _attachments_dir(vault: Path) -> Path:
     return d
 
 
-BRAND_SOFTWARE = "Javis OS"
-BRAND_SOURCE = "https://javisos.com"
+BRAND_SOFTWARE = "UNETI AI"
+BRAND_SOURCE = "https://uneti-ai.github.io/uneti-ai/"
 
 
 def _strip_c2pa_on() -> bool:

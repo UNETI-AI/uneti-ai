@@ -98,12 +98,12 @@
       + (laDienThoai() ? '<span class="sn-gh-cham" aria-hidden="true"></span>' : CON_TRO) + "</span>";
     if (laDienThoai()) {
       return '<div class="sn-gh sn-gh-dt" aria-hidden="true">'
-        + '<div class="sn-gh-ten"><span class="sn-gh-ava"></span>blogminhquy / <b>javis-os</b></div>'
-        + '<div class="sn-gh-mota">Javis OS</div>'
+        + '<div class="sn-gh-ten"><span class="sn-gh-ava"></span>uneti-ai / <b>uneti-ai</b></div>'
+        + '<div class="sn-gh-mota">UNETI AI</div>'
         + '<div class="sn-gh-hang">' + nutStar + '<span class="sn-gh-nut">' + ic("git-branch") + " Fork</span></div></div>";
     }
     return '<div class="sn-gh" aria-hidden="true">'
-      + '<div class="sn-gh-ten"><span class="sn-gh-ava"></span>blogminhquy / <b>javis-os</b> <span class="sn-gh-pub">Public</span></div>'
+      + '<div class="sn-gh-ten"><span class="sn-gh-ava"></span>uneti-ai / <b>uneti-ai</b> <span class="sn-gh-pub">Public</span></div>'
       + '<div class="sn-gh-hang"><span class="sn-gh-nut">' + ic("eye") + ' Watch</span><span class="sn-gh-nut">' + ic("git-branch")
       + " Fork</span>" + nutStar + "</div></div>";
   }
@@ -183,14 +183,14 @@
     the = el;
 
     var mo = function () {
-      try { window.open(d.url || "https://github.com/blogminhquy/javis-os", "_blank", "noopener"); } catch (e) {}
+      try { window.open(d.url || "https://github.com/uneti-ai/uneti-ai", "_blank", "noopener"); } catch (e) {}
       post("/star-nudge/action", { action: "opened" });
       el.querySelector(".sn-moi").hidden = true;
       el.querySelector(".sn-cho").hidden = false;
     };
     el.querySelector(".sn-go").onclick = mo;
     el.querySelector(".sn-molai").onclick = function () {
-      try { window.open(d.url || "https://github.com/blogminhquy/javis-os", "_blank", "noopener"); } catch (e) {}
+      try { window.open(d.url || "https://github.com/uneti-ai/uneti-ai", "_blank", "noopener"); } catch (e) {}
     };
     el.querySelector(".sn-xong").onclick = function () {
       post("/star-nudge/action", { action: "done" });
@@ -272,7 +272,7 @@
   function theUngHo() {
     return '<div class="sn-ho"><div class="sn-lv">' + linhVat("vui") + "</div>"
       + '<div class="sn-ho-chu"><b>' + esc(t("star.support_title")) + "</b><span>" + esc(t("star.support_body")) + "</span></div>"
-      + '<button type="button" class="sn-go">' + ic("star") + " " + esc(t("star.go")) + "</button></div>";
+      + '<button type="button" class="sn-go">' + ic("star") + " Xem cách đóng góp</button></div>";
   }
 
   window.JavisStar = { moment: moment, open: function () { moment("manual"); }, theUngHo: theUngHo };

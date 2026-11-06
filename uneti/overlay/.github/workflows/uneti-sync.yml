@@ -1,0 +1,28 @@
+name: Cập nhật từ Javis OS
+
+on:
+  schedule:
+    - cron: "0 20 * * 0"   # 03:00 sáng thứ Hai, giờ Việt Nam
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: write
+
+concurrency:
+  group: uneti-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Dựng bản mới và mở yêu cầu duyệt
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          python3 uneti/sync_upstream.py

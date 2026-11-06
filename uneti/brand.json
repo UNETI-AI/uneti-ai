@@ -1,0 +1,10 @@
+{
+  "name": "UNETI AI",
+  "org": "uneti-ai",
+  "repo": "uneti-ai/uneti-ai",
+  "upstream": "blogminhquy/javis-os",
+  "install_token": "UNETI-AI",
+  "bundle_id": "vn.edu.uneti.uneti-ai",
+  "app_guid": "6E2B91D4-3A7F-4C58-B1E0-9D47C2A85F31",
+  "site_url": "https://uneti-ai.github.io/uneti-ai/"
+}

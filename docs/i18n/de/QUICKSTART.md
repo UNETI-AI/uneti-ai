@@ -11,8 +11,8 @@ Bring Javis OS in wenigen Minuten zum Laufen. Vollständige Anleitungen: [docs/e
 
 Installiere Javis wie jede andere App: eine Datei herunterladen, öffnen, und du hast ein JAVIS OS-Symbol für jeden Tag. Der Installer prüft, was dem Computer fehlt (Git, Python, Node, die KI-Gehirne), und installiert nur das.
 
-- **Windows 10/11:** Lade [JavisOS-Setup.exe](https://github.com/blogminhquy/javis-os/releases/download/desktop/JavisOS-Setup.exe) herunter, doppelklicke und drücke bis zum Ende auf Next. Ein schwarzes Fenster zeigt den Fortschritt (einige Minuten). Danach liegt ein JAVIS OS-Symbol auf dem Desktop und im Startmenü.
-- **macOS 11 oder neuer:** Lade [JavisOS-macOS.dmg](https://github.com/blogminhquy/javis-os/releases/download/desktop/JavisOS-macOS.dmg) herunter, öffne es, ziehe **JAVIS OS** in **Applications** und öffne es über das Launchpad. Beim ersten Mal öffnet sich das Terminal zur Installation (es fragt eventuell einmal nach einem Javis-Admin-Konto und deinem Mac-Passwort).
+- **Windows 10/11:** Lade [JavisOS-Setup.exe](https://github.com/uneti-ai/uneti-ai/releases/download/desktop/JavisOS-Setup.exe) herunter, doppelklicke und drücke bis zum Ende auf Next. Ein schwarzes Fenster zeigt den Fortschritt (einige Minuten). Danach liegt ein JAVIS OS-Symbol auf dem Desktop und im Startmenü.
+- **macOS 11 oder neuer:** Lade [JavisOS-macOS.dmg](https://github.com/uneti-ai/uneti-ai/releases/download/desktop/JavisOS-macOS.dmg) herunter, öffne es, ziehe **JAVIS OS** in **Applications** und öffne es über das Launchpad. Beim ersten Mal öffnet sich das Terminal zur Installation (es fragt eventuell einmal nach einem Javis-Admin-Konto und deinem Mac-Passwort).
 
 Ein Klick auf das Symbol öffnet Javis in einem eigenen Fenster (ohne Adressleiste), Javis startet mit dem Computer, und der **Update**-Knopf in der App funktioniert wie gewohnt. Deine Daten liegen im Ordner `JavisOS` in deinem Benutzerordner; beim Deinstallieren bleibt dieser Ordner erhalten.
 
@@ -27,7 +27,7 @@ Beide Installer sind noch nicht signiert, daher fragt der Computer einmal nach:
 1. hPanel → VPS → **Docker Manager** → **Compose** → **Compose from URL**.
 2. Füge diese URL ein:
    ```
-   https://raw.githubusercontent.com/blogminhquy/javis-os/main/docker-compose.hostinger.yml
+   https://raw.githubusercontent.com/uneti-ai/uneti-ai/main/docker-compose.hostinger.yml
    ```
 3. (Optional, für HTTPS + eine Domain) trage dies im Feld **Environment** ein:
    ```

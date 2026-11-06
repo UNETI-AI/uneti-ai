@@ -12,7 +12,7 @@ from __future__ import annotations
 
 # Every voice prompt opens with this clause (voice_live.SYSTEM_PROMPT, GPT_LIVE_PROMPT,
 # CHATGPT_LIVE_PROMPT, voice_brain.SYSTEM_PROMPT); test_voice_persona.py keeps them in step.
-OPENING = "Bạn là Javis, trợ lý cá nhân,"
+OPENING = "Bạn là UNETI AI, trợ lý cá nhân,"
 
 BODY_CHARS = 4000     # partner file body kept in a voice prompt (a realtime prompt is read on every turn)
 MEMORY_CHARS = 2000   # partner memory (owner rules, lessons) kept in a voice prompt

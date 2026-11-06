@@ -1,10 +1,10 @@
 @echo off
 chcp 65001 >nul
-title JAVIS OS
+title UNETI AI
 cd /d "%~dp0"
 
 REM ============================================================
-REM  JAVIS OS - mo nhu mot app tren Windows (ban sao cua "JAVIS OS.app" ben Mac).
+REM  UNETI AI - mo nhu mot app tren Windows (ban sao cua "UNETI AI.app" ben Mac).
 REM  Double-click: server tu chay nen (khong cua so den) roi dashboard tu mo
 REM  thanh CUA SO RIENG (Edge/Chrome che do --app: khong thanh dia chi, co o
 REM  rieng tren taskbar). Tu khoi dong cung may: javis-autostart.bat install.

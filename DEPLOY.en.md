@@ -1,12 +1,12 @@
-# Installing Javis OS on a server / VPS
+# Installing UNETI AI on a server / VPS
 
 *[Tiếng Việt](DEPLOY.md) · **English***
 
-Javis OS is a personal AI agent plus a Second Brain. Its "brain" is the **Claude Code CLI**
+UNETI AI is a personal AI agent plus a Second Brain. Its "brain" is the **Claude Code CLI**
 (sign in once, no API key needed). There are 3 ways to run it, pick one.
 
-> ⚠️ **Safety:** Javis runs Claude with full power on the machine. When running public
-> (Docker/VPS/Hostinger), Javis **turns forced login on by itself**, so opening the app gives the
+> ⚠️ **Safety:** UNETI AI runs Claude with full power on the machine. When running public
+> (Docker/VPS/Hostinger), UNETI AI **turns forced login on by itself**, so opening the app gives the
 > **create admin / sign in** screen and nobody can drive it before a password exists. (To turn that
 > off for internal use: `JAVIS_REQUIRE_LOGIN=0`.)
 
@@ -14,11 +14,11 @@ Javis OS is a personal AI agent plus a Second Brain. Its "brain" is the **Claude
 
 ## Way 1 - Hostinger Docker Manager (1-click, the fastest) ⚡
 
-> 🛒 **No VPS yet?** [Get a Hostinger VPS here](https://www.hostinger.com?REFERRALCODE=UTRBLOGMIDSN). Docker Manager comes built in, so Javis installs in one click. Once it is ready, come back to the steps below.
+> 🛒 **No VPS yet?** [Get a Hostinger VPS here](https://www.hostinger.com?REFERRALCODE=UTRBLOGMIDSN). Docker Manager comes built in, so UNETI AI installs in one click. Once it is ready, come back to the steps below.
 
 On the Hostinger VPS go to **Docker Manager → Compose → URL**, paste the link and **Deploy**:
 ```
-https://raw.githubusercontent.com/blogminhquy/javis-os/main/docker-compose.yml
+https://raw.githubusercontent.com/uneti-ai/uneti-ai/main/docker-compose.yml
 ```
 Hostinger pulls the image and runs it. Open the app at `http://<vps-ip>:7777` (the IP is in
 hPanel → VPS) and you get the **create admin account** screen.
@@ -54,7 +54,7 @@ hPanel → VPS) and you get the **create admin account** screen.
 Docker is required. Do not have it? `curl -fsSL https://get.docker.com | sh`
 ```bash
 mkdir javis && cd javis
-curl -fsSLO https://raw.githubusercontent.com/blogminhquy/javis-os/main/docker-compose.yml
+curl -fsSLO https://raw.githubusercontent.com/uneti-ai/uneti-ai/main/docker-compose.yml
 
 docker compose run --rm javis claude auth login --claudeai   # SIGN CLAUDE IN ONCE (link + code)
 docker compose up -d                                          # pull the GHCR image and run
@@ -65,7 +65,7 @@ To build from source instead of pulling: `curl -O .../docker-compose.build.yml` 
 
 Everyday commands:
 ```bash
-docker compose logs -f     # see what Javis is doing
+docker compose logs -f     # see what UNETI AI is doing
 docker compose restart     # restart
 docker compose down        # stop
 docker compose build --pull && docker compose up -d   # update
@@ -100,7 +100,7 @@ you **must set a `DOMAIN_NAME` variable**:
 1. Find the **VPS hostname** in hPanel → VPS (for example `srv1782015.hstgr.cloud`).
 2. Docker Manager → Compose → URL:
    ```
-   https://raw.githubusercontent.com/blogminhquy/javis-os/main/docker-compose.hostinger.yml
+   https://raw.githubusercontent.com/uneti-ai/uneti-ai/main/docker-compose.hostinger.yml
    ```
 3. The new template's **Environment** box has only 3 meaningful fields:
    - `DOMAIN_NAME`: set `javis.<vps-hostname>.hstgr.cloud`
@@ -119,10 +119,10 @@ you **must set a `DOMAIN_NAME` variable**:
 > stay empty. The gateway reads the VPS name (`srvXXXX.hstgr.cloud`) and issues HTTPS for both
 > `javis.srvXXXX.hstgr.cloud` and `srvXXXX.hstgr.cloud` itself (since 0.304.0; whichever points at the machine gets a
 > certificate). **Settings → Domain** says whether the link works yet or is still waiting for its certificate. **Open** reaches
-> `http://<ip>:7777`, and the page moves to that HTTPS link as soon as it works and answers as this Javis. Add
+> `http://<ip>:7777`, and the page moves to that HTTPS link as soon as it works and answers as this UNETI AI. Add
 > `?stay=1` to the IP link to stay. Apps installed from Hostinger's Catalog (e.g. `omniroute-xxxx.srv....hstgr.cloud`)
 > are told the VPS name at install time; a "Compose from URL" deploy is not, so the Open button cannot carry that link.
-> On the Ubuntu 24 template with Traefik, set `DOMAIN_NAME` once: open Javis by IP → **Settings → Domain** shows
+> On the Ubuntu 24 template with Traefik, set `DOMAIN_NAME` once: open UNETI AI by IP → **Settings → Domain** shows
 > the line to copy.
 >
 > **Hostinger VPS on Ubuntu 26 (or any plain OS without Traefik), since 0.300.0:** paste the SAME link, nothing to
@@ -138,7 +138,7 @@ you **must set a `DOMAIN_NAME` variable**:
 
 > Without `DOMAIN_NAME` it still deploys (running temporarily on `:7777` with no HTTPS), and since 0.302.0 the
 > **Open** button goes to `http://<vps-ip>:7777` instead of `localhost` (Open follows the domain in the Traefik
-> label, which used to say `localhost`). Don't know the VPS hostname? Open Javis by IP → **Settings → Domain**: Javis
+> label, which used to say `localhost`). Don't know the VPS hostname? Open UNETI AI by IP → **Settings → Domain**: UNETI AI
 > looks it up and shows the line `DOMAIN_NAME=javis.srvXXXX.hstgr.cloud` with a copy button. No Environment box?
 > Click **Manage → edit the .yaml** and change the two label lines to `- traefik.enable=true` and
 > `- traefik.http.routers.javis.rule=Host(\`javis.srv1782015.hstgr.cloud\`)`.
@@ -171,9 +171,9 @@ You no longer set `DOMAIN` at run time; enable Caddy once then declare the domai
 
 ---
 
-## 🏢 Running SEVERAL Javis instances on one VPS (each with its own link)
+## 🏢 Running SEVERAL UNETI AI instances on one VPS (each with its own link)
 
-One VPS can run any number of Javis instances, each on its own subdomain with its own data store,
+One VPS can run any number of UNETI AI instances, each on its own subdomain with its own data store,
 and no instance sees another's brain or accounts.
 
 **Three things must DIFFER between instances.** Whichever one collides is what breaks:
@@ -206,7 +206,7 @@ for the whole machine**:
 
 ```bash
 docker network create javis-web
-curl -fsSLO https://raw.githubusercontent.com/blogminhquy/javis-os/main/docker-compose.proxy.yml
+curl -fsSLO https://raw.githubusercontent.com/uneti-ai/uneti-ai/main/docker-compose.proxy.yml
 docker compose -f docker-compose.proxy.yml -p javis-proxy up -d
 ```
 
@@ -214,8 +214,8 @@ Then give each instance **its own folder**:
 
 ```bash
 mkdir -p ~/javis-shop && cd ~/javis-shop
-curl -fsSLO https://raw.githubusercontent.com/blogminhquy/javis-os/main/docker-compose.yml
-curl -fsSLO https://raw.githubusercontent.com/blogminhquy/javis-os/main/docker-compose.multi.yml
+curl -fsSLO https://raw.githubusercontent.com/uneti-ai/uneti-ai/main/docker-compose.yml
+curl -fsSLO https://raw.githubusercontent.com/uneti-ai/uneti-ai/main/docker-compose.multi.yml
 cat > .env <<'EOF'
 JAVIS_NAME=javis-shop
 JAVIS_HOST_PORT=7777
@@ -273,16 +273,16 @@ connections, the background work, and **the Claude/ChatGPT login token** (each i
 
 ### 🌐 Remote access (Hostinger / any VPS) with a Cloudflare Tunnel
 
-Open the Javis interface from another machine with NO open ports and NO domain:
+Open the UNETI AI interface from another machine with NO open ports and NO domain:
 
-1. **Set a password FIRST (mandatory):** open Javis (through the SSH tunnel in step 5) → Dashboard →
-   **Account** → set the admin password. Javis runs Claude with full power on the machine, so it must
+1. **Set a password FIRST (mandatory):** open UNETI AI (through the SSH tunnel in step 5) → Dashboard →
+   **Account** → set the admin password. UNETI AI runs Claude with full power on the machine, so it must
    NEVER be exposed to the Internet without a password. (The server also prints a warning when running
    public without one.)
 2. Start the tunnel: `docker compose --profile tunnel up -d`
 3. Get the URL: `docker compose logs tunnel | grep trycloudflare`, then open
    `https://<random>.trycloudflare.com` in any browser and sign in with the password. Now you can view
-   and drive Javis remotely.
+   and drive UNETI AI remotely.
 
 **A stable URL (your own domain, `*.hstgr.cloud` style):** create a *named tunnel* in Cloudflare Zero
 Trust (free), take the token, put `TUNNEL_TOKEN=...` into `.env`, change the `tunnel` service's
@@ -294,7 +294,7 @@ Trust (free), take the token, put `TUNNEL_TOKEN=...` into `.env`, change the `tu
 ## Way 2 - Installing directly on Linux/macOS (no Docker)
 
 ```bash
-git clone https://github.com/blogminhquy/javis-os.git javis && cd javis
+git clone https://github.com/uneti-ai/uneti-ai.git javis && cd javis
 chmod +x install.sh && ./install.sh
 ```
 
@@ -321,7 +321,7 @@ Stop it with `stop-javis.bat`. Open http://localhost:7777
 |---|---|---|
 | `JAVIS_HOST` | The listening address. `127.0.0.1` = this machine only; `0.0.0.0` = everywhere (Docker sets this itself) | `127.0.0.1` |
 | `JAVIS_PORT` | The port | `7777` |
-| `JAVIS_STATE_DIR` | Where Javis writes state (settings, sessions, loop configuration) | `server/` (Docker: `/data/state`) |
+| `JAVIS_STATE_DIR` | Where UNETI AI writes state (settings, sessions, loop configuration) | `server/` (Docker: `/data/state`) |
 | `OBSIDIAN_VAULT_PATH` | The main Second Brain vault | `vault/` in the repo (Docker: `/data/vault`) |
 | `BRAIN_PATH` | The brain folder | `brain/` in the repo (Docker: `/data/brain`) |
 | `CLAUDE_CWD` | Fallback folder for the Claude CLI (chat runs inside the brain folder) | the repo root |
@@ -330,7 +330,7 @@ Stop it with `stop-javis.bat`. Open http://localhost:7777
 
 ## 🔄 Updating when new code lands
 
-> **The fastest, right in the app:** open **Updates** (the left rail) and the **Javis OS** panel shows
+> **The fastest, right in the app:** open **Updates** (the left rail) and the **UNETI AI** panel shows
 > the running version and checks GitHub for a newer one. When there is one, click **⬆ Update now** and
 > the app pulls the new version and restarts (~20-40s), with no terminal needed.
 > - **Docker/VPS:** the button runs through the **watchtower** service, and since 0.55.56 it
@@ -339,12 +339,12 @@ Stop it with `stop-javis.bat`. Open http://localhost:7777
 >   older compose file (Watchtower used to sit under `profiles: ["update"]`, which
 >   `docker compose up -d` does not start). Fetch the new file and bring it up again:
 >   ```bash
->   curl -fsSLO https://raw.githubusercontent.com/blogminhquy/javis-os/main/docker-compose.yml
+>   curl -fsSLO https://raw.githubusercontent.com/uneti-ai/uneti-ai/main/docker-compose.yml
 >   docker compose up -d --pull always
 >   ```
 >   Not ready to swap the compose file? Starting it on its own works too:
 >   `docker compose --profile update up -d`.
->   Only Watchtower is granted Docker access (the socket); the Javis app is NOT, which is what makes it
+>   Only Watchtower is granted Docker access (the socket); the UNETI AI app is NOT, which is what makes it
 >   safe. Going without it is fine too, and the panel then only *reports a new version* and explains how
 >   to update by hand.
 > - **The button is there but does nothing, and `javis-watchtower` keeps Restarting:** a stack
@@ -355,7 +355,7 @@ Stop it with `stop-javis.bat`. Open http://localhost:7777
 >   `ghcr.io/nicholas-fedor/watchtower:1`, which negotiates the API version with Docker.
 > - **You press update and stay on the old version, and `image:` in the compose file is an odd name**
 >   (for example `javis-cwi:pc-0.206.0`, with no `ghcr.io/...`): this is a self-built image, common when
->   an AI moved Javis from a computer to a VPS with `docker save` then `docker load`. It lives in no
+>   an AI moved UNETI AI from a computer to a VPS with `docker save` then `docker load`. It lives in no
 >   registry, so pulling or Redeploying brings back the same old version (since 0.267.0 the Updates page
 >   says so). Switch to the official image ONCE; your data stays because it lives in the mounted folders:
 >   ```bash
@@ -363,11 +363,11 @@ Stop it with `stop-javis.bat`. Open http://localhost:7777
 >   cp compose.yml compose.yml.bak     # the file may be called docker-compose.yml
 >   docker compose config | grep -A1 "target:"   # the paths inside must be /data, /brains,
 >                                                 # /home/javis/.claude, /home/javis/.codex
->   sed -i 's#^\(\s*image:\s*\).*#\1ghcr.io/blogminhquy/javis-os:latest#' compose.yml
+>   sed -i 's#^\(\s*image:\s*\).*#\1ghcr.io/uneti-ai/uneti-ai:latest#' compose.yml
 >   docker compose up -d --pull always
 >   ```
 >   The `sed` line changes EVERY `image:` line in the file, so use it only when the file has a single
->   service; with several, edit Javis's line by hand. For the update button in the app, add the
+>   service; with several, edit UNETI AI's line by hand. For the update button in the app, add the
 >   `watchtower` service exactly as in [`docker-compose.yml`](docker-compose.yml). Write errors after the
 >   switch: the mounted folders must belong to the container's user 10001, so run
 >   `sudo chown -R 10001:10001 brains data claude-auth codex-auth`.
@@ -404,7 +404,7 @@ nothing to edit.
 
 ## Signing Claude in is the only mandatory step
 
-Javis's "brain" is the Claude Code CLI. The login token lives in `~/.claude`
+UNETI AI's "brain" is the Claude Code CLI. The login token lives in `~/.claude`
 (Docker: the `claude-auth` volume). Sign in once and it survives every restart and update.
 If you already signed in on another machine, you can copy the `~/.claude` folder across.
 

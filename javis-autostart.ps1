@@ -1,8 +1,8 @@
 # ============================================================
-# JAVIS OS - tu khoi dong cung Windows (ban sao cua bin/javis-autostart.sh ben Mac).
+# UNETI AI - tu khoi dong cung Windows (ban sao cua bin/javis-autostart.sh ben Mac).
 # Goi qua javis-autostart.bat, dung goi truc tiep tru khi biet minh dang lam gi.
 #
-# Cach lam (0.306.0): ghi DUNG muc ma dashboard bat/tat (HKCU\...\Run, ten "JavisOS",
+# Cach lam (0.306.0): ghi DUNG muc ma dashboard bat/tat (HKCU\...\Run, ten "UNETI-AI",
 # khong can quyen admin), tro vao `wscript start-javis.vbs /open`: dang nhap may la server
 # tu chay NEN roi tu mo dashboard trong cua so rieng. install.ps1 goi file nay mac dinh.
 # Truoc 0.306.0 file nay dat shortcut trong thu muc Startup, con dashboard ghi Run key: hai
@@ -13,10 +13,10 @@ param([string]$Action = "status")
 
 $Root = Split-Path -Parent $MyInvocation.MyCommand.Path
 $Startup = [Environment]::GetFolderPath("Startup")
-$Lnk = Join-Path $Startup "JAVIS OS.lnk"          # muc cu (truoc 0.306.0), chi de don
+$Lnk = Join-Path $Startup "UNETI AI.lnk"          # muc cu (truoc 0.306.0), chi de don
 $RunKey = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run"
 $Approved = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run"
-$Name = "JavisOS"                                  # khop _AUTOSTART_NAME trong server/main.py
+$Name = "UNETI-AI"                                  # khop _AUTOSTART_NAME trong server/main.py
 
 switch ($Action.ToLower()) {
   "install" {

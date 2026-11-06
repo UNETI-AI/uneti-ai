@@ -1,0 +1,52 @@
+name: Đăng tin Nhà trường
+description: Dành cho quản trị viên. Tin hiện ở chuông thông báo trong mọi bản UNETI AI và công khai trên GitHub.
+title: "Tin: "
+labels: ["thong-bao"]
+body:
+  - type: markdown
+    attributes:
+      value: Chỉ đăng thông tin công khai. Tin chỉ có chữ và một nút liên kết, không kèm ảnh.
+  - type: input
+    id: tieu-de
+    attributes:
+      label: Tiêu đề
+      description: Tối đa 180 ký tự.
+    validations:
+      required: true
+  - type: textarea
+    id: tom-tat
+    attributes:
+      label: Tóm tắt
+      description: Hiện ngay trong danh sách thông báo. Tối đa 500 ký tự.
+    validations:
+      required: true
+  - type: textarea
+    id: noi-dung
+    attributes:
+      label: Nội dung
+      description: Phần chi tiết khi mở tin. Tối đa 3.000 ký tự.
+  - type: dropdown
+    id: muc-do
+    attributes:
+      label: Mức độ
+      options:
+        - Bình thường
+        - Quan trọng
+      default: 0
+    validations:
+      required: true
+  - type: input
+    id: het-han
+    attributes:
+      label: Ngày hết hạn
+      description: Sau ngày này tin tự ẩn. Ghi theo dạng 2026-12-31, để trống nếu không có hạn.
+  - type: input
+    id: chu-nut
+    attributes:
+      label: Chữ trên nút
+      description: Để trống sẽ dùng "Xem chi tiết".
+  - type: input
+    id: lien-ket
+    attributes:
+      label: Liên kết
+      description: Trang mở ra khi bấm nút, bắt đầu bằng https://

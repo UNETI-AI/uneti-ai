@@ -1,5 +1,5 @@
 ﻿; ============================================================
-; JAVIS OS - Windows installer (Inno Setup 6), builds dist\JavisOS-Setup.exe
+; UNETI AI - Windows installer (Inno Setup 6), builds dist\UNETI-AI-Setup.exe
 ;
 ;   iscc /DAppVersion=0.439.0 packaging\windows\javis-setup.iss
 ;
@@ -20,22 +20,22 @@
 #endif
 
 [Setup]
-AppId={{8F3C2A51-5D7E-4C0B-9E61-6A2D4B7C9E10}
-AppName=JAVIS OS
+AppId={{6E2B91D4-3A7F-4C58-B1E0-9D47C2A85F31}
+AppName=UNETI AI
 AppVersion={#AppVersion}
-AppVerName=JAVIS OS
+AppVerName=UNETI AI
 AppPublisher=Nguyen Minh Quy
-AppPublisherURL=https://github.com/blogminhquy/javis-os
-AppSupportURL=https://github.com/blogminhquy/javis-os/issues
-DefaultDirName={localappdata}\Programs\JAVIS OS
+AppPublisherURL=https://github.com/uneti-ai/uneti-ai
+AppSupportURL=https://github.com/uneti-ai/uneti-ai/issues
+DefaultDirName={localappdata}\Programs\UNETI AI
 DisableDirPage=yes
 DisableProgramGroupPage=yes
 PrivilegesRequired=lowest
 OutputDir=..\..\dist
-OutputBaseFilename=JavisOS-Setup
+OutputBaseFilename=UNETI-AI-Setup
 SetupIconFile=..\assets\javis.ico
 UninstallDisplayIcon={app}\javis.ico
-UninstallDisplayName=JAVIS OS
+UninstallDisplayName=UNETI AI
 Compression=lzma2
 SolidCompression=yes
 WizardStyle=modern
@@ -51,8 +51,8 @@ WizardImageFile=..\assets\wizard-100.bmp,..\assets\wizard-125.bmp,..\assets\wiza
 WizardSmallImageFile=..\assets\wizard-small-100.bmp,..\assets\wizard-small-125.bmp,..\assets\wizard-small-150.bmp,..\assets\wizard-small-175.bmp,..\assets\wizard-small-200.bmp,..\assets\wizard-small-225.bmp,..\assets\wizard-small-250.bmp
 WizardImageStretch=no
 VersionInfoCompany=Nguyen Minh Quy
-VersionInfoDescription=JAVIS OS Setup
-VersionInfoProductName=JAVIS OS
+VersionInfoDescription=UNETI AI Setup
+VersionInfoProductName=UNETI AI
 VersionInfoVersion={#AppVersion}
 ; Code signing, only when CI has a certificate (desktop-installers.yml passes /DSign and the
 ; matching /Sjavis=... command). Without it the build stays unsigned, exactly as before.
@@ -68,19 +68,19 @@ Name: "vi"; MessagesFile: "Vietnamese.isl"
 #endif
 
 [CustomMessages]
-en.DesktopIconTask=Put a JAVIS OS icon on the Desktop
-en.LaunchNow=Open JAVIS OS now
-en.StopApp=Stop JAVIS OS
+en.DesktopIconTask=Put a UNETI AI icon on the Desktop
+en.LaunchNow=Open UNETI AI now
+en.StopApp=Stop UNETI AI
 en.Bootstrapping=Checking this computer and installing what is missing (Git, Python, Node, AI brains). This takes a few minutes, follow the black window...
-en.BootstrapFailed=Setup did not finish. The black window said what was missing.%n%nFix it, then run JavisOS-Setup.exe again: steps already done are skipped.%n%nLog: %1
-en.DataKept=JAVIS OS was removed from this computer.%n%nYour brain (notes, memory, settings) is kept in:%n%1%n%nDelete that folder by hand if you want everything gone.
+en.BootstrapFailed=Setup did not finish. The black window said what was missing.%n%nFix it, then run UNETI-AI-Setup.exe again: steps already done are skipped.%n%nLog: %1
+en.DataKept=UNETI AI was removed from this computer.%n%nYour brain (notes, memory, settings) is kept in:%n%1%n%nDelete that folder by hand if you want everything gone.
 #if FileExists(AddBackslash(SourcePath) + "Vietnamese.isl")
-vi.DesktopIconTask=Đặt biểu tượng JAVIS OS ra Desktop
-vi.LaunchNow=Mở JAVIS OS ngay
-vi.StopApp=Tắt JAVIS OS
+vi.DesktopIconTask=Đặt biểu tượng UNETI AI ra Desktop
+vi.LaunchNow=Mở UNETI AI ngay
+vi.StopApp=Tắt UNETI AI
 vi.Bootstrapping=Đang kiểm tra máy và cài những gì còn thiếu (Git, Python, Node, các bộ não AI). Mất vài phút, theo dõi ở cửa sổ đen...
-vi.BootstrapFailed=Cài đặt chưa xong. Cửa sổ đen đã ghi rõ máy còn thiếu gì.%n%nSửa xong thì chạy lại JavisOS-Setup.exe, các bước đã xong sẽ được bỏ qua.%n%nNhật ký: %1
-vi.DataKept=Đã gỡ JAVIS OS khỏi máy.%n%nBộ não của bạn (ghi chú, trí nhớ, cài đặt) vẫn được giữ ở:%n%1%n%nMuốn xoá sạch thì tự xoá thư mục đó.
+vi.BootstrapFailed=Cài đặt chưa xong. Cửa sổ đen đã ghi rõ máy còn thiếu gì.%n%nSửa xong thì chạy lại UNETI-AI-Setup.exe, các bước đã xong sẽ được bỏ qua.%n%nNhật ký: %1
+vi.DataKept=Đã gỡ UNETI AI khỏi máy.%n%nBộ não của bạn (ghi chú, trí nhớ, cài đặt) vẫn được giữ ở:%n%1%n%nMuốn xoá sạch thì tự xoá thư mục đó.
 #endif
 
 [Tasks]
@@ -93,8 +93,8 @@ Source: "..\assets\javis.ico"; DestDir: "{app}"; Flags: ignoreversion
 [Icons]
 ; wscript + open-javis.vbs: no console window, and a second click only reopens the window
 ; instead of restarting the server (see the header of open-javis.vbs).
-Name: "{autoprograms}\JAVIS OS"; Filename: "{sys}\wscript.exe"; Parameters: "//nologo ""{code:CodeDir}\open-javis.vbs"""; WorkingDir: "{code:CodeDir}"; IconFilename: "{app}\javis.ico"
-Name: "{autodesktop}\JAVIS OS"; Filename: "{sys}\wscript.exe"; Parameters: "//nologo ""{code:CodeDir}\open-javis.vbs"""; WorkingDir: "{code:CodeDir}"; IconFilename: "{app}\javis.ico"; Tasks: desktopicon
+Name: "{autoprograms}\UNETI AI"; Filename: "{sys}\wscript.exe"; Parameters: "//nologo ""{code:CodeDir}\open-javis.vbs"""; WorkingDir: "{code:CodeDir}"; IconFilename: "{app}\javis.ico"
+Name: "{autodesktop}\UNETI AI"; Filename: "{sys}\wscript.exe"; Parameters: "//nologo ""{code:CodeDir}\open-javis.vbs"""; WorkingDir: "{code:CodeDir}"; IconFilename: "{app}\javis.ico"; Tasks: desktopicon
 Name: "{autoprograms}\{cm:StopApp}"; Filename: "{code:CodeDir}\stop-javis.bat"; WorkingDir: "{code:CodeDir}"; IconFilename: "{app}\javis.ico"
 
 [Run]
@@ -111,7 +111,7 @@ var
   bootstrap.ps1. }
 function CodeDir(Param: String): String;
 begin
-  Result := ExpandConstant('{%USERPROFILE}') + '\JavisOS';
+  Result := ExpandConstant('{%USERPROFILE}') + '\UNETI-AI';
 end;
 
 function BootstrapOk: Boolean;
@@ -152,7 +152,7 @@ begin
     if FileExists(stop) then
       Exec(PowerShellExe, '-NoProfile -ExecutionPolicy Bypass -File "' + stop + '"', '', SW_HIDE, ewWaitUntilTerminated, rc);
     { Same entry install.ps1 and the dashboard toggle write (_AUTOSTART_NAME in server/main.py). }
-    RegDeleteValue(HKEY_CURRENT_USER, 'Software\Microsoft\Windows\CurrentVersion\Run', 'JavisOS');
+    RegDeleteValue(HKEY_CURRENT_USER, 'Software\Microsoft\Windows\CurrentVersion\Run', 'UNETI-AI');
   end;
   if CurUninstallStep = usPostUninstall then
     SuppressibleMsgBox(FmtMessage(CustomMessage('DataKept'), [CodeDir('')]), mbInformation, MB_OK, IDOK);

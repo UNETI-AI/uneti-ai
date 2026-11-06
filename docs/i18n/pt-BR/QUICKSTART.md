@@ -11,8 +11,8 @@ Coloque o Javis OS para rodar em poucos minutos. Guias completos: [docs/en/](../
 
 Instale o Javis como qualquer outro app: baixe um arquivo, abra e pronto, você ganha um ícone JAVIS OS para clicar todo dia. O instalador verifica o que falta no computador (Git, Python, Node, os cérebros de IA) e instala só isso.
 
-- **Windows 10/11:** baixe [JavisOS-Setup.exe](https://github.com/blogminhquy/javis-os/releases/download/desktop/JavisOS-Setup.exe), dê dois cliques e aperte Next até o fim. Uma janela preta mostra o progresso (alguns minutos). No final aparece um ícone JAVIS OS na Área de Trabalho e no menu Iniciar.
-- **macOS 11 ou mais novo:** baixe [JavisOS-macOS.dmg](https://github.com/blogminhquy/javis-os/releases/download/desktop/JavisOS-macOS.dmg), abra, arraste **JAVIS OS** para **Applications** e abra pelo Launchpad. Na primeira vez o Terminal abre para instalar (pode pedir para criar uma conta de administrador do Javis e a senha do Mac uma vez).
+- **Windows 10/11:** baixe [JavisOS-Setup.exe](https://github.com/uneti-ai/uneti-ai/releases/download/desktop/JavisOS-Setup.exe), dê dois cliques e aperte Next até o fim. Uma janela preta mostra o progresso (alguns minutos). No final aparece um ícone JAVIS OS na Área de Trabalho e no menu Iniciar.
+- **macOS 11 ou mais novo:** baixe [JavisOS-macOS.dmg](https://github.com/uneti-ai/uneti-ai/releases/download/desktop/JavisOS-macOS.dmg), abra, arraste **JAVIS OS** para **Applications** e abra pelo Launchpad. Na primeira vez o Terminal abre para instalar (pode pedir para criar uma conta de administrador do Javis e a senha do Mac uma vez).
 
 Ao clicar no ícone, o Javis abre em uma janela própria (sem barra de endereço), inicia junto com o computador e o botão **Update** do app funciona normalmente. Seus dados ficam na pasta `JavisOS` dentro da sua pasta de usuário; desinstalar o app mantém essa pasta.
 
@@ -27,7 +27,7 @@ Os dois instaladores ainda não têm assinatura de código, então o computador 
 1. hPanel → VPS → **Docker Manager** → **Compose** → **Compose from URL**.
 2. Cole esta URL:
    ```
-   https://raw.githubusercontent.com/blogminhquy/javis-os/main/docker-compose.hostinger.yml
+   https://raw.githubusercontent.com/uneti-ai/uneti-ai/main/docker-compose.hostinger.yml
    ```
 3. (Opcional, para HTTPS + um domínio) defina isto na caixa **Environment**:
    ```

@@ -2541,7 +2541,7 @@
       var vi = window.JavisI18n && window.JavisI18n.lang() === "vi";
       var f = vi ? (h.vi || h.en) : (h.en || h.vi);
       if (!f) return "";
-      return "https://github.com/blogminhquy/javis-os/blob/main/docs/" + (vi && h.vi ? "" : "en/") + f;
+      return "https://github.com/uneti-ai/uneti-ai/blob/main/docs/" + (vi && h.vi ? "" : "en/") + f;
     }
     function apKenh(id) {
       chon = id; uname = ""; meta = {};

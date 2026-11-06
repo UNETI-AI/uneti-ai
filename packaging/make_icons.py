@@ -5,7 +5,7 @@
 
 Writes packaging/assets/javis.ico (Windows installer and shortcuts) and
 packaging/assets/javis.icns (macOS app bundle and the .dmg volume icon), plus a copy of
-the .icns inside the in-repo "JAVIS OS.app", and the Windows setup wizard pictures:
+the .icns inside the in-repo "UNETI AI.app", and the Windows setup wizard pictures:
 wizard-<pct>.bmp (the tall panel on the first and last page) and wizard-small-<pct>.bmp
 (the corner logo on the pages between), one per display scale Inno Setup picks from.
 The outputs are committed, so CI and users never need Pillow for this; rerun it only when
@@ -26,7 +26,7 @@ WIZ_BIG = (164, 314)
 WIZ_SMALL = (55, 55)
 SCALES = (100, 125, 150, 175, 200, 225, 250)
 BG_DARK = (31, 31, 31)        # #1F1F1F, the logo's eye colour, as in logo.svg
-ACCENT = (253, 97, 0)         # #FD6100, the logo's body colour
+ACCENT = (46, 81, 168)         # #FD6100, the logo's body colour
 FONT_CANDIDATES = ("/usr/share/fonts/opentype/inter/Inter-Bold.otf",
                    "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf")
 
@@ -48,7 +48,7 @@ def _wizard_big(logo: Image.Image, pct: int) -> Image.Image:
     top = round(h * 0.22)
     img.paste(mark, ((w - side) // 2, top), mark)
     font = _font(round(w * 0.15))
-    text = "JAVIS OS"
+    text = "UNETI AI"
     tw = d.textlength(text, font=font)
     d.text(((w - tw) / 2, top + side + round(h * 0.05)), text, font=font, fill=(255, 255, 255))
     return img
@@ -68,7 +68,7 @@ def main() -> None:
     img = Image.open(SRC).convert("RGBA")
     img.save(OUT / "javis.ico", sizes=[(16, 16), (24, 24), (32, 32), (48, 48), (64, 64), (128, 128), (256, 256)])
     img.save(OUT / "javis.icns")
-    res = ROOT / "JAVIS OS.app" / "Contents" / "Resources"
+    res = ROOT / "UNETI AI.app" / "Contents" / "Resources"
     res.mkdir(parents=True, exist_ok=True)
     shutil.copyfile(OUT / "javis.icns", res / "javis.icns")
     for pct in SCALES:

@@ -1,6 +1,6 @@
 name: Build & Publish Docker image (GHCR)
 
-# Build image Docker và đẩy lên GitHub Container Registry (ghcr.io/blogminhquy/javis-os).
+# Build image Docker và đẩy lên GitHub Container Registry (ghcr.io/uneti-ai/uneti-ai).
 # Hostinger Docker Manager / VPS chỉ cần PULL image này.
 #
 # Không còn tự chạy khi push lên main: release.yml đánh số phiên bản từ changelog.d/ trước, rồi gọi

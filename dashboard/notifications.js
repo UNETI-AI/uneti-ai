@@ -237,7 +237,7 @@
     docThu({ id: item.id }).then(render);
     // 0.191.0 (owner, 16/10/2026): a notice with no chat of its own opens in Javis Core (copied there with its source
     // and time, once); a notice that answers a chat opens that chat. No separate "Ask Javis Core" button.
-    // 0.335.0: "Store has updates" opens the Javis Store, whose banner lists what can be updated.
+    // 0.335.0: "Store has updates" opens the UNETI AI Store, whose banner lists what can be updated.
     if (item.channel === "store:updates" && (window.JavisPacks || window.JavisNapCham)) {
       closePanel();
       // packs.js nạp chậm (nap-cham.js, 0.417.0).

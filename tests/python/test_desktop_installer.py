@@ -1,4 +1,4 @@
-"""Desktop installers: JavisOS-Setup.exe (Windows) and JavisOS-macOS.dmg (macOS).
+"""Desktop installers: UNETI-AI-Setup.exe (Windows) and UNETI-AI-macOS.dmg (macOS).
 
     python tests/run.py desktop_installer
 
@@ -75,11 +75,11 @@ check("CANARY: macOS launcher hands an installed Javis to bin/javis-start.sh (op
       'exec "${JAVIS_HOME}/bin/javis-start.sh"' in launcher)
 
 # ---- one folder, agreed on everywhere ----
-check("installer CodeDir and bootstrap.ps1 default agree on %USERPROFILE%\\JavisOS",
-      "ExpandConstant('{%USERPROFILE}') + '\\JavisOS'" in iss
-      and '(Join-Path $env:USERPROFILE "JavisOS")' in boot)
-check("macOS launcher and bootstrap.sh agree on ~/JavisOS",
-      'JAVIS_HOME="${JAVIS_HOME:-$HOME/JavisOS}"' in launcher and 'JAVIS_HOME="${JAVIS_HOME:-$HOME/JavisOS}"' in boot_sh)
+check("installer CodeDir and bootstrap.ps1 default agree on %USERPROFILE%\\UNETI-AI",
+      "ExpandConstant('{%USERPROFILE}') + '\\UNETI-AI'" in iss
+      and '(Join-Path $env:USERPROFILE "UNETI-AI")' in boot)
+check("macOS launcher and bootstrap.sh agree on ~/UNETI-AI",
+      'JAVIS_HOME="${JAVIS_HOME:-$HOME/UNETI-AI}"' in launcher and 'JAVIS_HOME="${JAVIS_HOME:-$HOME/UNETI-AI}"' in boot_sh)
 check("Windows wizard does not ask for a folder (the clone path is fixed)", "DisableDirPage=yes" in iss)
 check("per-user install, no admin prompt from the wizard", "PrivilegesRequired=lowest" in iss)
 
@@ -101,7 +101,7 @@ check("uninstaller removes the same Run entry the app writes",
       m is not None and f"CurrentVersion\\Run', '{m.group(1)}'" in iss, m and m.group(1))
 check("uninstaller stops Javis first", "stop-javis.ps1" in iss and "usUninstall" in iss)
 check("uninstaller keeps the brain folder and says where it is", "DataKept" in iss and "[UninstallDelete]" in iss
-      and "JavisOS" not in iss.split("[UninstallDelete]")[1].split("[Code]")[0])
+      and "UNETI-AI" not in iss.split("[UninstallDelete]")[1].split("[Code]")[0])
 
 # ---- install.ps1 / install.sh fixes the installers rely on ----
 check("install.ps1 no longer trusts a bare `python` (Microsoft Store stub)", '(Have "python")' not in install_ps1
@@ -168,7 +168,7 @@ check(".dmg mounts with the Javis icon (.VolumeIcon.icns + custom-icon flag)",
       ".VolumeIcon.icns" in build_dmg and "-a C" in build_dmg and "UDRW" in build_dmg)
 
 # ---- one-line installs, no SmartScreen / Gatekeeper block (0.439.1) ----
-REL = "https://github.com/blogminhquy/javis-os/releases/download/desktop/"
+REL = "https://github.com/uneti-ai/uneti-ai/releases/download/desktop/"
 GET_PS1 = PK / "windows" / "get-javis.ps1"
 GET_SH = PK / "macos" / "get-javis.sh"
 gps = GET_PS1.read_text(encoding="utf-8")
@@ -177,14 +177,14 @@ check("get-javis.ps1 is pure ASCII (piped into Windows PowerShell 5.1)", GET_PS1
 check("get-javis.ps1 runs inside & { } so `irm | iex` leaves no settings in the person's session",
       gps.split("# ===", 2)[-1].lstrip().split("\n", 1)[-1].lstrip().startswith("& {"))
 check("get-javis.ps1 downloads the published setup and opens it",
-      REL + "JavisOS-Setup.exe" in gps and "Start-Process -FilePath $out" in gps)
-check("get-javis.sh downloads the published .dmg", REL + "JavisOS-macOS.dmg" in gsh)
+      REL + "UNETI-AI-Setup.exe" in gps and "Start-Process -FilePath $out" in gps)
+check("get-javis.sh downloads the published .dmg", REL + "UNETI-AI-macOS.dmg" in gsh)
 check("get-javis.sh gives the installer the keyboard back (stdin is the curl pipe)", "< /dev/tty" in gsh)
-check("get-javis.sh only replaces the app bundle, never ~/JavisOS (the brain)",
-      'rm -rf "${DEST}/JAVIS OS.app"' in gsh and not any("rm -rf" in ln and "JavisOS" in ln and ".app" not in ln
+check("get-javis.sh only replaces the app bundle, never ~/UNETI-AI (the brain)",
+      'rm -rf "${DEST}/UNETI AI.app"' in gsh and not any("rm -rf" in ln and "UNETI-AI" in ln and ".app" not in ln
                                                          for ln in gsh.splitlines()))
 check("get-javis.sh is executable", os.access(GET_SH, os.X_OK))
-raw = "https://raw.githubusercontent.com/blogminhquy/javis-os/main/"
+raw = "https://raw.githubusercontent.com/uneti-ai/uneti-ai/main/"
 for doc in ("QUICKSTART.md", "QUICKSTART.en.md"):
     d = (ROOT / doc).read_text(encoding="utf-8")
     check(f"{doc} gives the Windows one-liner", f"irm {raw}packaging/windows/get-javis.ps1 | iex" in d)
@@ -195,7 +195,7 @@ dist = ROOT / "dist" / "dmg-stage"
 if shutil.which("bash") and os.name != "nt":
     r = subprocess.run(["bash", str(BUILD_DMG)], env={**os.environ, "NO_DMG": "1"}, capture_output=True, text=True)
     check("build-dmg.sh NO_DMG=1 assembles the app", r.returncode == 0, r.stderr[-400:])
-    app = dist / "JAVIS OS.app" / "Contents"
+    app = dist / "UNETI AI.app" / "Contents"
     if r.returncode == 0:
         info = plistlib.loads((app / "Info.plist").read_bytes())
         ver = (ROOT / "VERSION").read_text().strip()
@@ -208,19 +208,19 @@ if shutil.which("bash") and os.name != "nt":
 for f in (LAUNCHER, BOOT_SH, BUILD_DMG, PK / "macos" / "get-javis.sh", ROOT / "install.sh", ROOT / "bin" / "javis-start.sh"):
     r = subprocess.run(["bash", "-n", str(f)], capture_output=True, text=True)
     check(f"bash -n {f.relative_to(ROOT)}", r.returncode == 0, r.stderr)
-check("in-repo JAVIS OS.app now has the icon its Info.plist names",
-      (ROOT / "JAVIS OS.app" / "Contents" / "Resources" / "javis.icns").exists())
+check("in-repo UNETI AI.app now has the icon its Info.plist names",
+      (ROOT / "UNETI AI.app" / "Contents" / "Resources" / "javis.icns").exists())
 
 # ---- publishing and docs agree on the download links ----
-base = "https://github.com/blogminhquy/javis-os/releases/download/desktop/"
+base = "https://github.com/uneti-ai/uneti-ai/releases/download/desktop/"
 check("workflow publishes both files on the fixed 'desktop' release",
-      "gh release upload desktop out/JavisOS-Setup.exe out/JavisOS-macOS.dmg --clobber" in wf)
+      "gh release upload desktop out/UNETI-AI-Setup.exe out/UNETI-AI-macOS.dmg --clobber" in wf)
 check("workflow publishes only from main", "github.ref == 'refs/heads/main'" in wf)
 check("the desktop release never becomes 'latest'", "--latest=false" in wf)
 for doc in ("QUICKSTART.md", "QUICKSTART.en.md"):
     s = (ROOT / doc).read_text(encoding="utf-8")
-    check(f"{doc} links the Windows installer", base + "JavisOS-Setup.exe" in s)
-    check(f"{doc} links the macOS installer", base + "JavisOS-macOS.dmg" in s)
+    check(f"{doc} links the Windows installer", base + "UNETI-AI-Setup.exe" in s)
+    check(f"{doc} links the macOS installer", base + "UNETI-AI-macOS.dmg" in s)
 
 # ---- repo rule: no long dashes ----
 for f in (ISS, BOOT_PS1, OPEN_VBS, LAUNCHER, BOOT_SH, BUILD_DMG, WF, PK / "make_icons.py", PK / "check_brains.py"):
