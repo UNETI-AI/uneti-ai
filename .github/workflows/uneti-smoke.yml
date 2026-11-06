@@ -1,0 +1,63 @@
+name: Chạy thử ứng dụng
+
+# Runs the published image on a throwaway machine with no AI connected, signs in, and saves screenshots.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  chay-thu:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Chạy bản vừa phát hành, chưa nối AI
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          image="ghcr.io/${GITHUB_REPOSITORY,,}:latest"
+          echo "$GH_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
+          pass="$(openssl rand -hex 16)"
+          echo "::add-mask::$pass"
+          echo "ADMIN_PASS=$pass" >> "$GITHUB_ENV"
+          docker run -d --name app -p 127.0.0.1:7777:7777 -e JAVIS_ADMIN_USER=quantri -e JAVIS_ADMIN_PASSWORD="$pass" "$image"
+          for i in $(seq 1 60); do
+            if curl -fsS -m 3 http://127.0.0.1:7777/health >/dev/null; then break; fi
+            sleep 5
+          done
+          curl -fsS -m 3 http://127.0.0.1:7777/health
+          echo
+          echo "Phien ban: $(docker exec app cat /app/VERSION)"
+          echo "--- Claude Code:"; docker exec app sh -c 'claude auth status 2>&1 | head -6' || true
+          echo "--- ChatGPT/Codex:"; docker exec app sh -c 'codex login status 2>&1 | head -3' || true
+
+      - name: Mở ứng dụng và chụp màn hình
+        env:
+          ADMIN_USER: quantri
+        run: |
+          d="$RUNNER_TEMP/s"
+          mkdir -p "$d" "$GITHUB_WORKSPACE/out"
+          cp uneti/smoke_screenshot.mjs "$d/"
+          cd "$d"
+          npm init -y >/dev/null
+          npm install --silent playwright
+          npx playwright install --with-deps chromium >/dev/null
+          OUT="$GITHUB_WORKSPACE/out" node smoke_screenshot.mjs
+
+      - name: Nhật ký ứng dụng
+        if: always()
+        run: docker logs --tail 30 app 2>&1 | cut -c1-200
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: chay-thu
+          path: out
