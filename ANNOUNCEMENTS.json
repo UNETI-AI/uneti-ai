@@ -1,4 +1,19 @@
 {
   "format_version": 1,
-  "announcements": []
+  "announcements": [
+    {
+      "id": "uneti-1",
+      "kind": "community",
+      "title": "Tin thử của hệ thống, sẽ được gỡ ngay",
+      "summary": "Đây là tin thử để kiểm tra luồng đăng và gỡ tin của UNETI AI.",
+      "body": "Không có nội dung cần lưu ý.",
+      "published_at": "2026-11-06",
+      "priority": "normal",
+      "expires_at": "2026-12-31",
+      "cta": {
+        "label": "Xem chi tiết",
+        "url": "https://uneti.edu.vn"
+      }
+    }
+  ]
 }
