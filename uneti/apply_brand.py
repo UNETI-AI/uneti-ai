@@ -41,17 +41,16 @@ INSTALLER_FILES = ("packaging/**/*", ".github/workflows/desktop-installers.yml",
 RENAMED_PATHS = ("JAVIS OS.bat", "JAVIS OS.app", "Start JAVIS OS.command", "Stop JAVIS OS.command")
 
 I18N_TEXT = {
-    "vi": {"noti.kind_community": "Nhà trường",
+    "vi": {"noti.kind_community": "Nhà trường", "star.rail": "Ủng hộ",
            "star.support_body": f"{NAME} là phần mềm mã nguồn mở, miễn phí. Đóng góp là tự nguyện và không "
                                 "ảnh hưởng đến quyền sử dụng."},
-    "en": {"noti.kind_community": "University",
+    "en": {"noti.kind_community": "University", "star.rail": "Support",
            "star.support_body": f"{NAME} is free and open source. Contributions are voluntary and never "
                                 "affect your right to use it."},
 }
 
 # Keys upstream does not have, added to every language; only Vietnamese differs from English.
-I18N_NEW = {"star.support_go": ("Xem cách đóng góp", "See how to contribute"),
-            "uneti.based_on": ("Dựa trên Javis OS", "Based on Javis OS")}
+I18N_NEW = {"star.support_go": ("Xem cách đóng góp", "See how to contribute")}
 
 KILL_OLD = """    try { Stop-Process -Id $c.OwningProcess -Force -ErrorAction Stop; Ok "Da tat tien trinh cu PID $($c.OwningProcess)" }
     catch { Warn "Khong tat duoc PID $($c.OwningProcess) - dong tay roi chay lai." }
@@ -81,13 +80,18 @@ PATCHES = (
     ("dashboard/star-nudge.js",
      """'<button type="button" class="sn-go">' + ic("star") + " " + esc(t("star.go")) + "</button></div>";""",
      """'<button type="button" class="sn-go">' + ic("star") + " " + esc(t("star.support_go")) + "</button></div>";"""),
+    ("dashboard/star-nudge.js", 'b.onclick = function () { moment("manual"); };',
+     f'b.onclick = function () {{ window.open("{SITE}", "_blank", "noopener"); }};'),
+    ("dashboard/star-nudge.js", 'b.title = t("star.go");', 'b.title = t("star.support_go");'),
+    ("dashboard/star-nudge.js", 'b.setAttribute("aria-label", t("star.go"));', 'b.setAttribute("aria-label", t("star.support_go"));'),
+    ("dashboard/index.html", f'class="rail-brand-text">{NAME} <i>OS</i></span>', f'class="rail-brand-text">{NAME}</span>'),
     ("dashboard/console.js", "if (_snGo) _snGo.onclick = () => window.JavisStar.open();",
      f'if (_snGo) _snGo.onclick = () => window.open("{SITE}", "_blank", "noopener");'),
     ("dashboard/chat-lenh.js", '(sess.title || "Javis")', f'(sess.title || "{NAME}")'),
     ("dashboard/chat-lenh.js", 'tw("lenh.ex_you") : "Javis")', f'tw("lenh.ex_you") : "{NAME}")'),
     ("dashboard/index.html",
      f'href="https://javisos.com" target="_blank" rel="noopener">by {NAME} Foundation</a>',
-     f'href="https://github.com/{BRAND["upstream"]}" target="_blank" rel="noopener" data-i18n="uneti.based_on">Dựa trên Javis OS</a>'),
+     f'href="https://github.com/{REPO}" target="_blank" rel="noopener">by javis.vhthanh</a>'),
 )
 
 # Upstream tests that assert wording we changed. A moved target only affects a test, so these are
@@ -97,6 +101,10 @@ SOFT_PATCHES = (
      f'b"{SITE_HOST}" in _raw_luu and b"{NAME}" in _raw_luu'),
     ("tests/python/test_image_gen.py", 'b"javisos.com" in _sau', f'b"{SITE_HOST}" in _sau'),
     ("tests/python/test_image_gen.py", 'b"javisos.com" in _byte_go', f'b"{SITE_HOST}" in _byte_go'),
+    ("tests/js/test_linh_vat.js", 'rail-brand-text">JAVIS <i>OS<\\/i><\\/span>', f'rail-brand-text">{NAME}<\\/span>'),
+    ("tests/js/test_tab_model_local.js", "/Javis chưa dùng/", f"/{NAME} chưa dùng/"),
+    # This README keeps upstream's support section, so only the sentence the test reads is renamed.
+    ("docs/i18n/vi/README.md", "năng lực nằm ở Javis, không nằm ở model", f"năng lực nằm ở {NAME}, không nằm ở model"),
     # Our README is Vietnamese; the same three facts are still checked against docs/i18n/vi/README.md.
     ("tests/python/test_cai_windows.py", 'readme_en = (ROOT / "README.md").read_text(encoding="utf-8")',
      'readme_en = "install.ps1 restart javis"'),
@@ -108,7 +116,7 @@ SOFT_PATCHES = (
 RENAMED_TESTS = ("tests/python/test_anh_codex_ve_brain.py", "tests/python/test_muc_dung_moi.py",
                  "tests/python/test_team_core_dispatch.py", "tests/python/test_loi_go_duoc.py",
                  "tests/python/test_cai_go_goi.py", "tests/python/test_engine_ngang_quyen.py",
-                 "tests/python/test_javis_core_routing.py", "tests/python/test_context_compiler_phase4.py",
+                 "tests/python/test_javis_core_routing.py", "tests/fixtures/context_compiler_contract.json",
                  "tests/js/test_linh_vat.js", "tests/js/test_pet_menu.js", "tests/js/test_tab_model_local.js",
                  "tests/js/test_tasks_stats_0428.js", "tests/js/test_the_viec_nen.js")
 

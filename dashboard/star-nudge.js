@@ -249,13 +249,13 @@
     b.type = "button";
     b.className = "rf-star";
     veNutGoc(b);
-    b.onclick = function () { moment("manual"); };
+    b.onclick = function () { window.open("https://uneti-ai.github.io/uneti-ai/", "_blank", "noopener"); };
     chan.appendChild(b);
   }
   function veNutGoc(b) {
     b.innerHTML = ic("star") + '<span class="rf-star-chu">' + esc(t("star.rail")) + "</span>";
-    b.title = t("star.go");
-    b.setAttribute("aria-label", t("star.go"));
+    b.title = t("star.support_go");
+    b.setAttribute("aria-label", t("star.support_go"));
   }
   function batDau() {
     ganNutGoc();

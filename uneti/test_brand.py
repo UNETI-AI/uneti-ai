@@ -29,9 +29,9 @@ class Branding(unittest.TestCase):
 
     def test_author_keeps_credit(self):
         self.assertIn("Nguyễn Minh Quý", text("LICENSE"))
-        self.assertIn(f"https://github.com/{UPSTREAM}", text("dashboard/index.html"))
-        self.assertIn("Dựa trên Javis OS", text("dashboard/index.html"))
         self.assertIn("Nguyễn Minh Quý", text("README.md"))
+        self.assertIn(f"https://github.com/{UPSTREAM}", text("README.md"))
+        self.assertIn(">by javis.vhthanh</a>", text("dashboard/index.html"))
 
     def test_strings_the_program_matches_stay_unchanged(self):
         self.assertEqual(text("dashboard/app.js").count("trình sửa của Javis:"), 2)
@@ -54,6 +54,7 @@ class Branding(unittest.TestCase):
         self.assertEqual(vietnamese["noti.kind_community"], "Nhà trường")
         self.assertEqual(json.loads(text("dashboard/manifest.json"))["name"], NAME)
         self.assertIn(f"<title>{NAME}</title>", text("dashboard/index.html"))
+        self.assertNotIn("<i>OS</i>", text("dashboard/index.html"))
 
     def test_installer_is_separate_from_javis_os(self):
         setup = text("packaging/windows/javis-setup.iss")
@@ -72,6 +73,8 @@ class Branding(unittest.TestCase):
     def test_support_card_opens_the_contribution_page(self):
         self.assertIn(BRAND["site_url"], text("dashboard/console.js"))
         self.assertIn('t("star.support_go")', text("dashboard/star-nudge.js"))
+        self.assertIn(BRAND["site_url"], text("dashboard/star-nudge.js"))
+        self.assertEqual(json.loads(text("dashboard/i18n/vi.json"))["star.rail"], "Ủng hộ")
         for path in (ROOT / "dashboard" / "i18n").glob("*.json"):
             self.assertIn("star.support_go", json.loads(path.read_text(encoding="utf-8")), path.name)
         self.assertEqual(json.loads(text("dashboard/i18n/vi.json"))["star.support_go"], "Xem cách đóng góp")
