@@ -72,8 +72,8 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          if ! ls changelog.d/*.md 2>/dev/null | grep -qv '/README.md$'; then
-            echo "No fragments on main, nothing to number."
+          if true; then  # UNETI AI keeps the version numbers of Javis OS, so it never numbers fragments itself.
+            echo "UNETI AI follows Javis OS version numbers, nothing to number."
             echo "released=" >> "$GITHUB_OUTPUT"
             exit 0
           fi

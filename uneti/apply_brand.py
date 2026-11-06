@@ -74,8 +74,6 @@ PATCHES = (
      f'b"{SITE_HOST}" in _raw_luu and b"{NAME}" in _raw_luu'),
     ("tests/python/test_image_gen.py", 'b"javisos.com" in _sau', f'b"{SITE_HOST}" in _sau'),
     ("tests/python/test_image_gen.py", 'b"javisos.com" in _byte_go', f'b"{SITE_HOST}" in _byte_go'),
-    # Sync branches carry upstream's changes without a changelog fragment of their own.
-    (".github/workflows/ci.yml", 'if [ "$IS_FORK" = "true" ]; then opt=--optional; else opt=; fi', "opt=--optional"),
     ("server/main.py", '_AUTOSTART_NAME = "JavisOS"', f'_AUTOSTART_NAME = "{TOKEN}"'),
     ("packaging/windows/javis-setup.iss", "8F3C2A51-5D7E-4C0B-9E61-6A2D4B7C9E10", BRAND["app_guid"]),
     ("packaging/make_icons.py", "ACCENT = (253, 97, 0)", "ACCENT = (46, 81, 168)"),

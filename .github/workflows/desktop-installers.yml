@@ -218,7 +218,7 @@ jobs:
         run: |
           set -e
           v="$(tr -d ' \r\n' < VERSION)"
-          notes="Desktop installers for UNETI AI (built from ${v}). They install the newest Javis on first run.
+          notes="Desktop installers for UNETI AI (built from ${v}). They install the newest version on first run.
 
           - Windows 10/11: UNETI-AI-Setup.exe
           - macOS 11+: UNETI-AI-macOS.dmg
