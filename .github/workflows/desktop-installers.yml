@@ -161,7 +161,10 @@ jobs:
           Set-Content (Join-Path $other "server\main.py") "import http.server, socketserver`nsocketserver.TCPServer(('127.0.0.1', 7802), http.server.SimpleHTTPRequestHandler).serve_forever()"
           $holder = Start-Process python -ArgumentList "-m", "http.server", "7777", "--bind", "127.0.0.1" -WorkingDirectory $other -PassThru
           $sameName = Start-Process python -ArgumentList "server\main.py" -WorkingDirectory $other -PassThru
-          Start-Sleep -Seconds 3
+          for ($i = 0; $i -lt 30; $i++) {
+            if ((Get-NetTCPConnection -LocalPort 7777 -State Listen -ErrorAction SilentlyContinue) -and (Get-NetTCPConnection -LocalPort 7802 -State Listen -ErrorAction SilentlyContinue)) { break }
+            Start-Sleep -Seconds 1
+          }
           Add-Content (Join-Path $dir ".env") "`nUNETI_PORT=7801"
 
           Start-Process wscript.exe -ArgumentList "//nologo `"$dir\open-uneti.vbs`"" -WorkingDirectory $env:RUNNER_TEMP
@@ -263,7 +266,10 @@ jobs:
 
           python3 -m http.server 7777 --bind 127.0.0.1 >/dev/null 2>&1 &
           holder=$!
-          sleep 2
+          for i in $(seq 1 30); do
+            if lsof -nP -iTCP:7777 -sTCP:LISTEN -t >/dev/null; then break; fi
+            sleep 1
+          done
           UNETI_PORT=7777 bash "$home/bin/uneti-stop.sh" | tee stop.log
           grep -q "another program" stop.log
           kill -0 "$holder"
@@ -271,14 +277,18 @@ jobs:
           kill "$holder"
 
           python3 - <<'PY' &
-          import http.client, time
+          import http.client, pathlib, time
           connection = http.client.HTTPConnection("127.0.0.1", 7801)
           connection.request("GET", "/health")
           connection.getresponse().read()
+          pathlib.Path("client-connected").touch()
           time.sleep(120)
           PY
           client=$!
-          sleep 2
+          for i in $(seq 1 30); do
+            if [ -f client-connected ]; then break; fi
+            sleep 1
+          done
           before="$(lsof -nP -iTCP:7801 -sTCP:LISTEN -t)"
           bash "$home/bin/uneti-stop.sh"
           sleep 15
