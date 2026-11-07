@@ -10,6 +10,11 @@ REM  thanh CUA SO RIENG (Edge/Chrome che do --app: khong thanh dia chi, co o
 REM  rieng tren taskbar). Tu khoi dong cung may: uneti-autostart.bat install.
 REM ============================================================
 
+REM Cong: dung thu tu cua server - bien moi truong, roi .env, roi 7777.
+if "%UNETI_PORT%"=="" if exist ".env" for /f "usebackq tokens=1-3 delims== " %%a in (".env") do (
+  if /i "%%a"=="UNETI_PORT" set "UNETI_PORT=%%~b"
+  if /i "%%a"=="export" if /i "%%b"=="UNETI_PORT" set "UNETI_PORT=%%~c"
+)
 if "%UNETI_PORT%"=="" set UNETI_PORT=7777
 set "URL=http://127.0.0.1:%UNETI_PORT%"
 

@@ -25,6 +25,11 @@ cd "$APP_DIR"
 # /etc/systemd/system/uneti.service cua ban thu nhat va hai ban tranh nhau cong 7777.
 SVC="${UNETI_NAME:-uneti}"
 PORT="${UNETI_PORT:-7777}"
+if [ -z "${UNETI_PORT:-}" ]; then
+  # The port, in the server's own order: the environment, then .env, then 7777.
+  PORT="${UNETI_PORT:-$(sed -nE "s/^[[:space:]]*(export[[:space:]]+)?UNETI_PORT[[:space:]]*=[[:space:]]*[\"']?([0-9]+).*/\2/p" "$APP_DIR/.env" 2>/dev/null | tail -1 || true)}"
+  PORT="${PORT:-7777}"
+fi
 case "$SVC" in
   *[!A-Za-z0-9._-]*) err "UNETI_NAME may only contain letters, digits, '.', '_' and '-' (got: $SVC)"; exit 1;;
 esac

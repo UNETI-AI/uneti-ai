@@ -70,16 +70,19 @@ if not "%UNETI_NO_AUTOSTART%"=="1" (
   if not errorlevel 1 echo     OK  Tu khoi dong cung Windows: BAT
 )
 
-REM Giai phong port 7777 neu dang bi chiem
-echo [4/4] Giai phong port 7777...
-for /f "tokens=5" %%a in ('netstat -ano ^| findstr ":7777" ^| findstr "LISTENING"') do (
-  echo     Dang tat tien trinh cu PID %%a
-  taskkill /F /PID %%a >nul 2>&1
+REM Tat ban cu cua CHINH thu muc nay. Chuong trinh khac dang giu cong thi khong tat, stop-uneti.ps1 chi bao.
+echo [4/4] Tat ban cu neu con chay...
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0stop-uneti.ps1"
+REM Cong: dung thu tu cua server - bien moi truong, roi .env, roi 7777.
+if "%UNETI_PORT%"=="" if exist ".env" for /f "usebackq tokens=1-3 delims== " %%a in (".env") do (
+  if /i "%%a"=="UNETI_PORT" set "UNETI_PORT=%%~b"
+  if /i "%%a"=="export" if /i "%%b"=="UNETI_PORT" set "UNETI_PORT=%%~c"
 )
+if "%UNETI_PORT%"=="" set UNETI_PORT=7777
 
 echo.
 echo  ==========================================
-echo   UNETI AI dang chay tai: http://localhost:7777
+echo   UNETI AI dang chay tai: http://localhost:%UNETI_PORT%
 echo   (Chon bo nao o trang Models - khong bat buoc mua API key)
 echo   Nhan Ctrl+C de dung.
 echo  ==========================================

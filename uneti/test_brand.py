@@ -2,6 +2,9 @@
 """Checks that the branded tree still works as intended: python3 uneti/test_brand.py"""
 import json
 import os
+import plistlib
+import shutil
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -99,10 +102,14 @@ class Branding(unittest.TestCase):
         self.assertTrue((ROOT / f"{NAME}.bat").exists())
         self.assertFalse((ROOT / "JAVIS OS.bat").exists())
 
-    def test_installer_leaves_other_programs_on_the_port_alone(self):
-        script = text("install.ps1")
-        self.assertIn("-match '^pythonw?$'", script)
-        self.assertEqual(script.count("Stop-Process -Id $c.OwningProcess"), 1)
+    def test_github_sign_in_says_whose_app_it_is(self):
+        vietnamese = json.loads(text("dashboard/i18n/vi.json"))["gh.signin_how"]
+        english = json.loads(text("dashboard/i18n/en.json"))["gh.signin_how"]
+        self.assertIn("github.com/apps/javis-os", vietnamese)
+        self.assertIn("github.com/apps/javis-os", english)
+        self.assertNotIn(f"GitHub App tên {NAME}", vietnamese)
+        self.assertNotIn(f"GitHub App called {NAME}", english)
+        self.assertNotIn(f'"{NAME}" GitHub App', text("server/github_oauth.py"))
 
     def test_support_card_opens_the_contribution_page(self):
         self.assertIn(BRAND["site_url"], text("dashboard/console.js"))
@@ -116,6 +123,124 @@ class Branding(unittest.TestCase):
     def test_bell_notices_kept_from_upstream(self):
         ids = [row["id"] for row in json.loads(text("ANNOUNCEMENTS.json"))["announcements"]]
         self.assertIn("community-notification-inbox-launch", ids)
+
+
+WINDOWS_LAUNCHERS = ("stop-uneti.ps1", "install.ps1", "open-uneti.vbs", "start-uneti.vbs",
+                     f"{NAME}.bat", "start-uneti.bat", "setup.bat")
+
+
+class WindowsPort(unittest.TestCase):
+    """Windows scripts cannot run here. desktop-installers.yml runs them for real on a Windows runner."""
+
+    def test_every_launcher_reads_the_port_from_the_env_file(self):
+        for rel in WINDOWS_LAUNCHERS:
+            script = text(rel)
+            self.assertIn("UNETI_PORT", script, rel)
+            self.assertIn(".env", script, rel)
+
+    def test_nothing_is_stopped_for_merely_holding_the_port(self):
+        stop = text("stop-uneti.ps1")
+        self.assertNotIn("LocalPort 7777", stop)
+        self.assertIn("Khong tat chuong trinh do", stop)
+        for rel in ("install.ps1", "setup.bat"):
+            script = text(rel)
+            self.assertNotIn("OwningProcess -Force", script, rel)
+            self.assertNotIn("taskkill /F /PID", script, rel)
+            self.assertIn("stop-uneti.ps1", script, rel)
+
+    def test_scripts_read_as_ansi_stay_ascii(self):
+        for rel in ("stop-uneti.ps1", "install.ps1", "open-uneti.vbs"):
+            self.assertTrue((ROOT / rel).read_bytes().isascii(), rel)
+
+
+@unittest.skipUnless(shutil.which("bash"), "needs bash")
+class MacScripts(unittest.TestCase):
+    """The real scripts, with launchctl, curl, open and lsof replaced by small stand-ins."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.home = Path(self.tmp.name)
+        self.app = self.home / "app"
+        (self.app / "bin").mkdir(parents=True)
+        (self.app / "server").mkdir()
+        (self.app / ".venv" / "bin").mkdir(parents=True)
+        for name in ("uneti-start.sh", "uneti-stop.sh", "uneti-autostart.sh"):
+            shutil.copy(ROOT / "bin" / name, self.app / "bin" / name)
+        self.fake = self.home / "fake"
+        self.fake.mkdir()
+        self.stub(self.app / ".venv" / "bin" / "python", "")
+        self.stub(self.fake / "launchctl", 'echo "launchctl $*" >> "$HOME/calls.log"')
+        self.stub(self.fake / "open", 'echo "open $*" >> "$HOME/calls.log"')
+        self.stub(self.fake / "curl", "exit 0")
+        self.env = dict(os.environ, HOME=str(self.home), PATH=f"{self.fake}:{os.environ['PATH']}")
+        self.env.pop("UNETI_PORT", None)
+
+    @staticmethod
+    def stub(path, body):
+        path.write_text(f"#!/bin/sh\n{body}\n", encoding="utf-8")
+        path.chmod(0o755)
+
+    def run_script(self, name, *args, **env):
+        return subprocess.run(["bash", str(self.app / "bin" / name), *args], env={**self.env, **env},
+                              capture_output=True, text=True, timeout=60, check=True)
+
+    def agent_port(self):
+        plist = plistlib.loads((self.home / "Library" / "LaunchAgents" / "com.uneti.os.plist").read_bytes())
+        arguments = plist["ProgramArguments"]
+        return arguments[arguments.index("--port") + 1]
+
+    def calls(self):
+        path = self.home / "calls.log"
+        return path.read_text(encoding="utf-8") if path.exists() else ""
+
+    def test_the_icon_moves_the_login_agent_to_the_port_in_the_env_file(self):
+        (self.app / ".env").write_text("UNETI_ADMIN_USER=a\n", encoding="utf-8")
+        self.run_script("uneti-autostart.sh", "install")
+        self.assertEqual(self.agent_port(), "7777")
+        (self.app / ".env").write_text('UNETI_ADMIN_USER=a\nexport UNETI_PORT = "8123"\r\n', encoding="utf-8")
+        self.run_script("uneti-start.sh")
+        self.assertEqual(self.agent_port(), "8123")
+
+    def test_the_icon_leaves_a_matching_agent_alone(self):
+        (self.app / ".env").write_text("UNETI_PORT=8123\n# UNETI_PORT=9999\n", encoding="utf-8")
+        self.run_script("uneti-autostart.sh", "install")
+        self.assertEqual(self.agent_port(), "8123")
+        before = self.calls()
+        self.run_script("uneti-start.sh")
+        self.assertNotIn("launchctl", self.calls()[len(before):])
+        self.assertIn("open", self.calls()[len(before):])
+
+    def test_a_port_given_to_the_installer_lands_in_the_env_file(self):
+        env_file = self.app / ".env"
+        env_file.write_text("UNETI_ADMIN_USER=a\nUNETI_PORT=7000\n", encoding="utf-8")
+        self.run_script("uneti-autostart.sh", "install", UNETI_PORT="8123")
+        self.assertEqual(env_file.read_text(encoding="utf-8"), "UNETI_ADMIN_USER=a\nUNETI_PORT=8123\n")
+        self.assertEqual(self.agent_port(), "8123")
+
+    def holder(self, cwd):
+        """A real process, and an lsof that says it listens on the port and works in `cwd`."""
+        process = subprocess.Popen(["sleep", "60"])
+        self.addCleanup(process.kill)
+        self.addCleanup(process.wait)
+        self.stub(self.fake / "lsof", f'case "$*" in *sTCP:LISTEN*) echo {process.pid};; *cwd*) echo "p{process.pid}"; echo "n{cwd}";; esac')
+        return process
+
+    def test_stop_leaves_another_program_on_the_port_running(self):
+        process = self.holder(self.home)
+        output = self.run_script("uneti-stop.sh").stdout
+        self.assertIsNone(process.poll())
+        self.assertIn("another program", output)
+
+    def test_stop_ends_this_copys_own_server(self):
+        process = self.holder((self.app / "server").resolve())
+        self.run_script("uneti-stop.sh")
+        self.assertIsNotNone(process.wait(timeout=10))
+
+    def test_stop_never_asks_for_every_connection_on_the_port(self):
+        self.assertNotIn("lsof -ti", text("bin/uneti-stop.sh"))
+        self.assertNotIn("lsof -ti", text("update.sh"))
+        self.assertNotIn('"-ti"', text("server/updater.py"))
 
 
 class Notices(unittest.TestCase):

@@ -4,7 +4,7 @@
 #   powershell -ExecutionPolicy Bypass -File install.ps1
 #
 # Cai het trong mot luot: Python deps (venv) + BON bo nao CLI chay bang goi thue bao
-# (claude, codex, agy, grok) + .env + giai phong port 7777, roi bat server.
+# (claude, codex, agy, grok) + .env + kiem tra cong, roi bat server.
 #
 # Vi sao co file nay: truoc day nguoi dung Windows phai tu di bon duong khac nhau (setup.bat
 # chi cai claude + codex; agy va grok phai tu mo PowerShell go tung lenh cua nha cung cap),
@@ -224,23 +224,28 @@ if ((-not (Test-Path ".env")) -and (Test-Path "env.example")) {
   Ok ".env da co"
 }
 
-# ---------------------------------------------------------------- [5] port 7777
-Step 5 "Giai phong port 7777"
-$conns = Get-NetTCPConnection -LocalPort 7777 -State Listen -ErrorAction SilentlyContinue
-if ($conns) {
-  foreach ($c in $conns) {
-    $p = Get-Process -Id $c.OwningProcess -ErrorAction SilentlyContinue
-    if ($p -and $p.ProcessName -match '^pythonw?$') {
-      try { Stop-Process -Id $c.OwningProcess -Force -ErrorAction Stop; Ok "Da tat tien trinh cu PID $($c.OwningProcess)" }
-      catch { Warn "Khong tat duoc PID $($c.OwningProcess) - dong tay roi chay lai." }
-    } else {
-      Warn "Cong 7777 dang duoc chuong trinh khac su dung (PID $($c.OwningProcess)). Cai dat khong tu tat chuong trinh do - dong no roi chay lai."
-      exit 1
-    }
-  }
-} else {
-  Ok "Port 7777 dang trong"
+# ---------------------------------------------------------------- [5] cong
+# Tat ban cu cua CHINH thu muc nay (neu co) roi xem cong co trong khong. Chuong trinh khac dang giu cong thi
+# KHONG tat: dung lai va bao, nguoi dung tu dong chuong trinh do hoac doi cong trong .env.
+$Port = $env:UNETI_PORT
+if (-not $Port) {
+  $m = [regex]::Matches("$(Get-Content -LiteralPath (Join-Path $Root '.env') -Raw -ErrorAction SilentlyContinue)", '(?m)^\s*(?:export\s+)?UNETI_PORT\s*=\s*["'']?(\d+)')
+  $Port = if ($m.Count) { $m[$m.Count - 1].Groups[1].Value } else { "7777" }
 }
+Step 5 "Kiem tra cong $Port"
+$stopScript = Join-Path $Root "stop-uneti.ps1"
+if (Test-Path $stopScript) { & powershell -NoProfile -ExecutionPolicy Bypass -File $stopScript | Out-Null }
+$conns = $null
+for ($i = 0; $i -lt 5; $i++) {
+  $conns = @(Get-NetTCPConnection -LocalPort $Port -State Listen -ErrorAction SilentlyContinue)
+  if (-not $conns) { break }
+  Start-Sleep -Seconds 1
+}
+if ($conns) {
+  Warn "Cong $Port dang duoc chuong trinh khac su dung (PID $($conns[0].OwningProcess)). Cai dat khong tu tat chuong trinh do - dong no, hoac them dong UNETI_PORT=8080 vao file .env, roi chay lai."
+  exit 1
+}
+Ok "Cong $Port dang trong"
 
 # ---------------------------------------------------------------- tong ket
 Refresh-Path
@@ -296,5 +301,5 @@ if (Test-Path $vbs) {
   Ok "Server dang chay"
 }
 Line ""
-Line "  Mo: http://localhost:7777"
+Line "  Mo: http://localhost:$Port"
 Line ""

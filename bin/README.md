@@ -30,7 +30,7 @@ start it like a normal app.
 
 - Every script resolves the repo location from its own path, so the repo can live
   anywhere.
-- Default port is `7777`; override with the `UNETI_PORT` environment variable.
+- Default port is `7777`; override with `UNETI_PORT` in `.env` (or the environment), then click the icon: it moves the login agent too.
 - Bound to `127.0.0.1` (local only). Because it's `localhost`, the browser allows
   the microphone, so voice works without HTTPS. Use Chrome or Edge for speech
   recognition.

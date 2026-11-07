@@ -11,7 +11,9 @@ set -u
 
 # Repo root = parent of this script's directory (bin/)
 APP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-PORT="${UNETI_PORT:-7777}"
+# The port, in the server's own order: the environment, then .env, then 7777.
+PORT="${UNETI_PORT:-$(sed -nE "s/^[[:space:]]*(export[[:space:]]+)?UNETI_PORT[[:space:]]*=[[:space:]]*[\"']?([0-9]+).*/\2/p" "${APP_DIR}/.env" 2>/dev/null | tail -1 || true)}"
+PORT="${PORT:-7777}"
 URL="http://127.0.0.1:${PORT}"
 LOG="${APP_DIR}/server/uneti.log"
 PIDF="${APP_DIR}/server/uneti.pid"
@@ -37,6 +39,21 @@ open_ui() {
   done
   open "${URL}"
 }
+
+# .env names another port than the login agent was given: rewrite the agent, which restarts the server on that port.
+AGENT="${HOME}/Library/LaunchAgents/${UNETI_LAUNCHD_LABEL:-com.uneti.os}.plist"
+if [ -f "${AGENT}" ] && ! grep -q "<string>${PORT}</string>" "${AGENT}"; then
+  [ -f "${AGENT%.plist}.open.plist" ] || export UNETI_AUTOSTART_OPEN=0
+  UNETI_PORT="${PORT}" bash "${APP_DIR}/bin/uneti-autostart.sh" install
+  if [ "${UNETI_AUTOSTART_OPEN:-1}" = "0" ]; then
+    for _ in $(seq 1 30); do
+      sleep 1
+      if curl -sf -o /dev/null "${URL}/" 2>/dev/null; then break; fi
+    done
+    open_ui
+  fi
+  exit 0
+fi
 
 # Already up? Just open it.
 if curl -sf -o /dev/null "${URL}/" 2>/dev/null; then

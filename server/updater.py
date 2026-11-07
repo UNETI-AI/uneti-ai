@@ -165,7 +165,7 @@ def _kill_pid(pid, timeout_s=15):
 def _pids_on_port(port):
     """PID đang giữ cổng (lsof có sẵn trên Mac lẫn đa số Linux). Fallback khi thiếu --server-pid."""
     try:
-        r = subprocess.run(["lsof", "-ti", f"tcp:{port}"], capture_output=True, text=True,
+        r = subprocess.run(["lsof", "-nP", f"-iTCP:{port}", "-sTCP:LISTEN", "-t"], capture_output=True, text=True,
                            creationflags=_CAM)
         return [int(x) for x in (r.stdout or "").split() if x.strip().isdigit()]
     except Exception:

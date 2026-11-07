@@ -70,33 +70,296 @@ OLD_NAME = re.compile(rb"javis", re.IGNORECASE)
 I18N_TEXT = {
     "vi": {"noti.kind_community": "Nhà trường", "star.rail": "Ủng hộ",
            "star.support_body": f"{NAME} là phần mềm mã nguồn mở, miễn phí. Đóng góp là tự nguyện và không "
-                                "ảnh hưởng đến quyền sử dụng."},
+                                "ảnh hưởng đến quyền sử dụng.",
+           # This copy signs in through the author's GitHub App, so GitHub's own pages show that app's name.
+           "gh.signin_how": f"{NAME} dùng chung GitHub App của tác giả bản gốc (github.com/apps/javis-os), nên trang "
+                            f"GitHub sẽ hiện tên của app đó, không phải {NAME}. Bấm nút, {NAME} hiện một mã ngắn. Mở "
+                            "trang GitHub, dán mã, bấm Authorize là xong, không phải tạo hay chép token. Sau đó cài app "
+                            f"vào những repo bạn muốn {NAME} làm việc, repo nào không cài thì {NAME} không thấy. App chỉ "
+                            "xin các quyền: Contents, Pull requests, Workflows (đọc và ghi), Checks, Commit statuses, "
+                            "Actions (chỉ đọc). Chạy được cả trên VPS không có trình duyệt. Muốn thu hồi thì vào GitHub, "
+                            "Settings, Applications."},
     "en": {"noti.kind_community": "University", "star.rail": "Support",
            "star.support_body": f"{NAME} is free and open source. Contributions are voluntary and never "
-                                "affect your right to use it."},
+                                "affect your right to use it.",
+           "gh.signin_how": f"{NAME} shares the GitHub App of the original author (github.com/apps/javis-os), so GitHub's "
+                            f"pages show that app's name, not {NAME}. Press the button and {NAME} shows a short code. Open "
+                            "the GitHub page, paste the code and press Authorize; there is no token to make or copy. Then "
+                            f"install the app on the repos you want {NAME} to work on; a repo without it stays invisible "
+                            f"to {NAME}. The app only asks for Contents, Pull requests, Workflows (read and write) and "
+                            "Checks, Commit statuses, Actions (read only). It works on a VPS with no browser too. To "
+                            "revoke it, go to GitHub, Settings, Applications."},
 }
 
 # Keys upstream does not have, added to every language; only Vietnamese differs from English.
 I18N_NEW = {"star.support_go": ("Xem cách đóng góp", "See how to contribute")}
 
-KILL_OLD = """    try { Stop-Process -Id $c.OwningProcess -Force -ErrorAction Stop; Ok "Da tat tien trinh cu PID $($c.OwningProcess)" }
-    catch { Warn "Khong tat duoc PID $($c.OwningProcess) - dong tay roi chay lai." }
+# The port. Upstream stops whatever holds 7777 and reads the port only from the process environment, while the server
+# also reads .env. A port is shared with the whole machine (another Javis behind wslrelay, a student's own server), and
+# a person who moves away from a busy port does it in .env. So every launcher reads the port the way the server does,
+# the environment, then .env, then 7777, and only this copy's own server is ever stopped.
+PS_PORT_REGEX = r"""'(?m)^\s*(?:export\s+)?JAVIS_PORT\s*=\s*["'']?(\d+)'"""
+
+STOP_OLD = r"""$killed = $false
+# LUU Y: python cua venv chi la LAUNCHER - no re-exec Python goc lam tien trinh CON
+# (con nay moi giu port). Vi vay chi loc theo COMMANDLINE, KHONG loc theo duong dan exe
+# (se bo sot thang con vi exe cua no la Python goc, khong phai venv).
+Get-CimInstance Win32_Process -Filter "Name='python.exe'" -ErrorAction SilentlyContinue | Where-Object {
+  $_.CommandLine -like '*server\main.py*'
+} | ForEach-Object {
+  Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue
+  Write-Host "  - Da tat python PID $($_.ProcessId)"
+  $killed = $true
+}
+# Phong ho: ai dang giu port 7777 (truong hop chay bang python khac / cai dat khac)
+Get-NetTCPConnection -LocalPort 7777 -State Listen -ErrorAction SilentlyContinue | ForEach-Object {
+  Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue
+  Write-Host "  - Da tat PID $($_.OwningProcess) (chu port 7777)"
+  $killed = $true
+}
 """
-# The upstream installer kills whatever holds the port. Only our own Python server may be stopped:
-# the port can belong to something else on the machine, such as another Javis behind wslrelay.
-KILL_NEW = """    $p = Get-Process -Id $c.OwningProcess -ErrorAction SilentlyContinue
-    if ($p -and $p.ProcessName -match '^pythonw?$') {
-      try { Stop-Process -Id $c.OwningProcess -Force -ErrorAction Stop; Ok "Da tat tien trinh cu PID $($c.OwningProcess)" }
-      catch { Warn "Khong tat duoc PID $($c.OwningProcess) - dong tay roi chay lai." }
-    } else {
-      Warn "Cong 7777 dang duoc chuong trinh khac su dung (PID $($c.OwningProcess)). Cai dat khong tu tat chuong trinh do - dong no roi chay lai."
-      exit 1
-    }
+STOP_NEW = r"""$killed = $false
+$stopped = @()
+# Chi tat server cua CHINH thu muc nay. Tren may co the con mot ban khac, hoac chuong trinh khac cung ten
+# server\main.py, hoac chuong trinh khac dang giu cong: nhung thu do khong phai viec cua file nay.
+# LUU Y: python cua venv chi la LAUNCHER - no re-exec Python goc lam tien trinh CON (con nay moi giu port),
+# nen exe cua con la Python goc. "Cua thu muc nay" = chinh no hoac tien trinh cha chay tu .venv o day.
+$venv = (Join-Path $PSScriptRoot '.venv') + '\'
+$pythons = @(Get-CimInstance Win32_Process -Filter "Name='python.exe' OR Name='pythonw.exe'" -ErrorAction SilentlyContinue)
+function Find-Python($id) { $pythons | Where-Object { $_.ProcessId -eq $id } | Select-Object -First 1 }
+function Test-FromVenv($p) { $p -and "$($p.ExecutablePath)".StartsWith($venv, [StringComparison]::OrdinalIgnoreCase) }
+function Stop-Server($id, $note) {
+  Stop-Process -Id $id -Force -ErrorAction SilentlyContinue
+  Write-Host "  - Da tat python PID $id$note"
+}
+foreach ($p in $pythons) {
+  if ("$($p.CommandLine)" -notmatch '(^|[\\/\s"])main\.py|uvicorn.+main:app') { continue }
+  if ((Test-FromVenv $p) -or (Test-FromVenv (Find-Python $p.ParentProcessId))) {
+    Stop-Server $p.ProcessId ''
+    $stopped += $p.ProcessId
+    $killed = $true
+  }
+}
+# Cong: dung thu tu cua server - bien moi truong, roi .env canh file nay, roi 7777.
+$port = $env:JAVIS_PORT
+if (-not $port) {
+  $m = [regex]::Matches("$(Get-Content -LiteralPath (Join-Path $PSScriptRoot '.env') -Raw -ErrorAction SilentlyContinue)", @PS_PORT_REGEX@)
+  $port = if ($m.Count) { $m[$m.Count - 1].Groups[1].Value } else { '7777' }
+}
+# Phong ho: con ai giu cong. Server cua ban nay ma launcher da chet (khong con tien trinh cha) thi tat;
+# con lai la chuong trinh khac: chi bao, KHONG tat.
+Get-NetTCPConnection -LocalPort $port -State Listen -ErrorAction SilentlyContinue | ForEach-Object {
+  $id = $_.OwningProcess
+  if ($stopped -contains $id) { return }
+  $p = Find-Python $id
+  if ($p -and "$($p.CommandLine)" -match 'server[\\/]main\.py' -and -not (Get-Process -Id $p.ParentProcessId -ErrorAction SilentlyContinue)) {
+    Stop-Server $id " (chu cong $port)"
+    $killed = $true
+  } else {
+    Write-Host "  (Cong $port dang thuoc chuong trinh khac, PID $id. Khong tat chuong trinh do.)"
+  }
+}
+""".replace("@PS_PORT_REGEX@", PS_PORT_REGEX)
+
+INSTALL_PORT_OLD = """# ---------------------------------------------------------------- [5] port 7777
+Step 5 "Giai phong port 7777"
+$conns = Get-NetTCPConnection -LocalPort 7777 -State Listen -ErrorAction SilentlyContinue
+if ($conns) {
+  foreach ($c in $conns) {
+    try { Stop-Process -Id $c.OwningProcess -Force -ErrorAction Stop; Ok "Da tat tien trinh cu PID $($c.OwningProcess)" }
+    catch { Warn "Khong tat duoc PID $($c.OwningProcess) - dong tay roi chay lai." }
+  }
+} else {
+  Ok "Port 7777 dang trong"
+}
+"""
+INSTALL_PORT_NEW = """# ---------------------------------------------------------------- [5] cong
+# Tat ban cu cua CHINH thu muc nay (neu co) roi xem cong co trong khong. Chuong trinh khac dang giu cong thi
+# KHONG tat: dung lai va bao, nguoi dung tu dong chuong trinh do hoac doi cong trong .env.
+$Port = $env:JAVIS_PORT
+if (-not $Port) {
+  $m = [regex]::Matches("$(Get-Content -LiteralPath (Join-Path $Root '.env') -Raw -ErrorAction SilentlyContinue)", @PS_PORT_REGEX@)
+  $Port = if ($m.Count) { $m[$m.Count - 1].Groups[1].Value } else { "7777" }
+}
+Step 5 "Kiem tra cong $Port"
+$stopScript = Join-Path $Root "stop-javis.ps1"
+if (Test-Path $stopScript) { & powershell -NoProfile -ExecutionPolicy Bypass -File $stopScript | Out-Null }
+$conns = $null
+for ($i = 0; $i -lt 5; $i++) {
+  $conns = @(Get-NetTCPConnection -LocalPort $Port -State Listen -ErrorAction SilentlyContinue)
+  if (-not $conns) { break }
+  Start-Sleep -Seconds 1
+}
+if ($conns) {
+  Warn "Cong $Port dang duoc chuong trinh khac su dung (PID $($conns[0].OwningProcess)). Cai dat khong tu tat chuong trinh do - dong no, hoac them dong JAVIS_PORT=8080 vao file .env, roi chay lai."
+  exit 1
+}
+Ok "Cong $Port dang trong"
+""".replace("@PS_PORT_REGEX@", PS_PORT_REGEX)
+
+BAT_PORT = r"""REM Cong: dung thu tu cua server - bien moi truong, roi .env, roi 7777.
+if "%JAVIS_PORT%"=="" if exist ".env" for /f "usebackq tokens=1-3 delims== " %%a in (".env") do (
+  if /i "%%a"=="JAVIS_PORT" set "JAVIS_PORT=%%~b"
+  if /i "%%a"=="export" if /i "%%b"=="JAVIS_PORT" set "JAVIS_PORT=%%~c"
+)
+if "%JAVIS_PORT%"=="" set JAVIS_PORT=7777
+"""
+
+VBS_PORT_OLD = """port = sh.ExpandEnvironmentStrings("%JAVIS_PORT%")
+If port = "%JAVIS_PORT%" Or port = "" Then port = "7777"
+"""
+# VBScript has no shared file to load, so each script carries this. ASCII only: wscript reads it as ANSI.
+VBS_READ_PORT = r"""' The port, in the server's own order: the environment, then .env next to this script, then 7777.
+Function ReadPort()
+  Dim p, path, f, re, found
+  p = sh.ExpandEnvironmentStrings("%JAVIS_PORT%")
+  If p <> "%JAVIS_PORT%" And p <> "" Then
+    ReadPort = p
+    Exit Function
+  End If
+  ReadPort = "7777"
+  path = fso.GetParentFolderName(WScript.ScriptFullName) & "\.env"
+  If Not fso.FileExists(path) Then Exit Function
+  If fso.GetFile(path).Size = 0 Then Exit Function
+  On Error Resume Next
+  Set f = fso.OpenTextFile(path, 1)
+  Set re = CreateObject("VBScript.RegExp")
+  re.Global = True
+  re.Multiline = True
+  re.Pattern = "^\s*(?:export\s+)?JAVIS_PORT\s*=\s*[""']?(\d+)"
+  Set found = re.Execute(f.ReadAll)
+  f.Close
+  If found.Count > 0 Then ReadPort = found(found.Count - 1).SubMatches(0)
+  On Error GoTo 0
+End Function
+
+"""
+
+# @ENV@ is the path of .env as the script at hand can reach it.
+SH_PORT = r"""@I@# The port, in the server's own order: the environment, then .env, then 7777.
+@I@PORT="${JAVIS_PORT:-$(sed -nE "s/^[[:space:]]*(export[[:space:]]+)?JAVIS_PORT[[:space:]]*=[[:space:]]*[\"']?([0-9]+).*/\2/p" "@ENV@" 2>/dev/null | tail -1 || true)}"
+@I@PORT="${PORT:-7777}"
+"""
+
+
+def sh_port(env_file, indent=""):
+    return SH_PORT.replace("@I@", indent).replace("@ENV@", env_file)
+
+
+# Runs on every click of the icon, so a port changed in .env also moves the login agent, whose plist states the port.
+# Without this the icon looks at the new port, finds nothing and starts a second server beside the agent's.
+MAC_FOLLOW_ENV = r"""# .env names another port than the login agent was given: rewrite the agent, which restarts the server on that port.
+AGENT="${HOME}/Library/LaunchAgents/${JAVIS_LAUNCHD_LABEL:-com.javis.os}.plist"
+if [ -f "${AGENT}" ] && ! grep -q "<string>${PORT}</string>" "${AGENT}"; then
+  [ -f "${AGENT%.plist}.open.plist" ] || export JAVIS_AUTOSTART_OPEN=0
+  JAVIS_PORT="${PORT}" bash "${APP_DIR}/bin/javis-autostart.sh" install
+  if [ "${JAVIS_AUTOSTART_OPEN:-1}" = "0" ]; then
+    for _ in $(seq 1 30); do
+      sleep 1
+      if curl -sf -o /dev/null "${URL}/" 2>/dev/null; then break; fi
+    done
+    open_ui
+  fi
+  exit 0
+fi
+
+# Already up? Just open it.
+"""
+
+# The icon and the server read .env, so a port chosen on this script's command line has to land there too.
+MAC_KEEP_PORT = r"""ACTION="${1:-install}"
+
+ENV_FILE="${APP_DIR}/.env"
+ENV_PORT="$(sed -nE "s/^[[:space:]]*(export[[:space:]]+)?JAVIS_PORT[[:space:]]*=[[:space:]]*[\"']?([0-9]+).*/\2/p" "${ENV_FILE}" 2>/dev/null | tail -1)"
+if [ "${ACTION}" != "uninstall" ] && [ "${PORT}" != "${ENV_PORT:-7777}" ]; then
+  ( umask 077
+    { grep -vE "^[[:space:]]*(export[[:space:]]+)?JAVIS_PORT[[:space:]]*=" "${ENV_FILE}" 2>/dev/null; echo "JAVIS_PORT=${PORT}"; } > "${ENV_FILE}.tmp"
+    cat "${ENV_FILE}.tmp" > "${ENV_FILE}"
+    rm -f "${ENV_FILE}.tmp" )
+fi
+"""
+
+MAC_STOP_OLD = """if [ -f "${PIDF}" ]; then
+  kill "$(cat "${PIDF}")" 2>/dev/null
+  rm -f "${PIDF}"
+fi
+# Fallback: kill whatever holds the port
+lsof -ti "tcp:${PORT}" 2>/dev/null | xargs kill 2>/dev/null || true
+"""
+# Every way of starting the server runs it from server/, so its working folder says whose it is. A plain
+# `lsof tcp:PORT` is no test: it also lists every browser that has the page open.
+MAC_STOP_NEW = """HERE="$(cd "${APP_DIR}/server" && pwd -P)"
+ours() { [ "$(lsof -a -p "$1" -d cwd -Fn 2>/dev/null | sed -n 's/^n//p')" = "${HERE}" ]; }
+
+if [ -f "${PIDF}" ]; then
+  pid="$(cat "${PIDF}")"
+  if ours "${pid}"; then kill "${pid}" 2>/dev/null; fi
+  rm -f "${PIDF}"
+fi
+for pid in $(lsof -nP -iTCP:"${PORT}" -sTCP:LISTEN -t 2>/dev/null); do
+  if ours "${pid}"; then
+    kill "${pid}" 2>/dev/null
+  else
+    echo "Port ${PORT} belongs to another program (PID ${pid}). Left running."
+  fi
+done
+"""
+
+UPDATE_STOP_OLD = """    PORT="${JAVIS_PORT:-7777}"
+    PIDS="$(lsof -ti tcp:"$PORT" 2>/dev/null || true)"
+"""
+UPDATE_STOP_NEW = sh_port(".env", "    ") + r"""    # Only this copy's server: the port can belong to another program, and every browser with the page open has it too.
+    PIDS=""
+    for p in $(lsof -nP -iTCP:"$PORT" -sTCP:LISTEN -t 2>/dev/null || true); do
+      if [ "$(lsof -a -p "$p" -d cwd -Fn 2>/dev/null | sed -n 's/^n//p')" = "$(cd server && pwd -P)" ]; then
+        PIDS="$PIDS $p"
+      fi
+    done
 """
 
 # Applied to the upstream text, before the name changes.
 PATCHES = (
-    ("install.ps1", KILL_OLD, KILL_NEW),
+    ("stop-javis.ps1", STOP_OLD, STOP_NEW),
+    ("stop-javis.bat", "(giet theo dung python cua venv + chu port 7777)", "(chi tat server cua chinh thu muc nay, khong tat chuong trinh khac)"),
+    ("install.ps1", "+ .env + giai phong port 7777, roi bat server.", "+ .env + kiem tra cong, roi bat server."),
+    ("install.ps1", INSTALL_PORT_OLD, INSTALL_PORT_NEW),
+    ("install.ps1", 'Line "  Mo: http://localhost:7777"', 'Line "  Mo: http://localhost:$Port"'),
+    ("setup.bat", """REM Giai phong port 7777 neu dang bi chiem
+echo [4/4] Giai phong port 7777...
+for /f "tokens=5" %%a in ('netstat -ano ^| findstr ":7777" ^| findstr "LISTENING"') do (
+  echo     Dang tat tien trinh cu PID %%a
+  taskkill /F /PID %%a >nul 2>&1
+)
+""", r"""REM Tat ban cu cua CHINH thu muc nay. Chuong trinh khac dang giu cong thi khong tat, stop-javis.ps1 chi bao.
+echo [4/4] Tat ban cu neu con chay...
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0stop-javis.ps1"
+""" + BAT_PORT),
+    ("setup.bat", "dang chay tai: http://localhost:7777", "dang chay tai: http://localhost:%JAVIS_PORT%"),
+    ("start-javis.bat", 'cd /d "%~dp0"\n\necho Bat Javis OS chay NEN - khong con cua so den (port 7777)...',
+     'cd /d "%~dp0"\n\n' + BAT_PORT + "echo Bat Javis OS chay NEN - khong con cua so den (port %JAVIS_PORT%)..."),
+    ("start-javis.bat", "roi mo http://localhost:7777 va bam", "roi mo http://localhost:%JAVIS_PORT% va bam"),
+    ("JAVIS OS.bat", 'if "%JAVIS_PORT%"=="" set JAVIS_PORT=7777\n', BAT_PORT),
+    ("open-javis.vbs", VBS_PORT_OLD, "port = ReadPort()\n"),
+    ("open-javis.vbs", "Function ServerUp()", VBS_READ_PORT + "Function ServerUp()"),
+    ("start-javis.vbs", "  " + VBS_PORT_OLD.replace("\n", "\n  ").rstrip(" "), "  port = ReadPort()\n"),
+    ("start-javis.vbs", "Sub MoDashboard()", VBS_READ_PORT + "Sub MoDashboard()"),
+    ("bin/javis-start.sh", 'PORT="${JAVIS_PORT:-7777}"\n', sh_port("${APP_DIR}/.env")),
+    ("bin/javis-start.sh", "# Already up? Just open it.\n", MAC_FOLLOW_ENV),
+    ("bin/javis-stop.sh", 'PORT="${JAVIS_PORT:-7777}"\n', sh_port("${APP_DIR}/.env")),
+    ("bin/javis-stop.sh", MAC_STOP_OLD, MAC_STOP_NEW),
+    ("bin/javis-autostart.sh", 'PORT="${JAVIS_PORT:-7777}"\n', sh_port("${APP_DIR}/.env")),
+    ("bin/javis-autostart.sh", 'ACTION="${1:-install}"\n', MAC_KEEP_PORT),
+    ("Start JAVIS OS.command", 'echo "JAVIS OS is running at http://127.0.0.1:7777"\n',
+     sh_port(".env") + 'echo "JAVIS OS is running at http://127.0.0.1:${PORT}"\n'),
+    # Installing again must not move a port the person already changed in .env.
+    ("install.sh", 'PORT="${JAVIS_PORT:-7777}"\n', 'PORT="${JAVIS_PORT:-7777}"\nif [ -z "${JAVIS_PORT:-}" ]; then\n'
+     + sh_port("$APP_DIR/.env", "  ") + "fi\n"),
+    ("update.sh", UPDATE_STOP_OLD, UPDATE_STOP_NEW),
+    # Listeners only: `lsof tcp:PORT` also lists every browser that has the page open, and this list gets killed.
+    ("server/updater.py", 'r = subprocess.run(["lsof", "-ti", f"tcp:{port}"], capture_output=True, text=True,',
+     'r = subprocess.run(["lsof", "-nP", f"-iTCP:{port}", "-sTCP:LISTEN", "-t"], capture_output=True, text=True,'),
+    ("bin/README.md", "override with the `JAVIS_PORT` environment variable.",
+     "override with `JAVIS_PORT` in `.env` (or the environment), then click the icon: it moves the login agent too."),
     # Lists of folders that guard what an agent may write. A miss here would leave the folder unguarded.
     ("server/team_gate.py", '".antigravity", "Javis",', f'".antigravity", "{FOLDER.decode()}",'),
     ("server/team_gate.py", '_PROTECT_SKIP = ("Javis", ".javis")', f'_PROTECT_SKIP = ("{FOLDER.decode()}", ".javis")'),
@@ -206,6 +469,13 @@ AFTER_RENAME = (
      '"author": {"name": _ten_ban_nay(_chuoi((m.get("author") or {}).get("name"), 64))},'),
     ("server/packs_store.py", '"category_label": _map_nn(m.get("category_label"), 40),',
      '"category_label": _ten_ban_nay(_map_nn(m.get("category_label"), 40)),'),
+    # The sign-in app is the author's, whatever the rename made of its name.
+    ("server/github_oauth.py", 'device flow of the "UNETI AI" GitHub App (0.430.0)', "device flow of the original author's GitHub App (0.430.0)"),
+    ("server/github_oauth.py", '# Public identifiers of the "UNETI AI" GitHub App (owner, 2026-11-01).',
+     "# Public identifiers of the original author's GitHub App, which this copy shares."),
+    ("server/github_oauth.py", "GitHub App của UNETI AI chưa bật Device Flow.", "GitHub App đăng nhập chưa bật Device Flow."),
+    ("server/github_oauth.py", "The UNETI AI GitHub App does not have Device Flow enabled.", "The sign-in GitHub App does not have Device Flow enabled."),
+    ("dashboard/github-connect.js", "(the device flow of the UNETI AI GitHub App,", "(the device flow of the original author's GitHub App,"),
 )
 
 # Upstream notices every copy should carry: security warnings, and the note that explains the bell.

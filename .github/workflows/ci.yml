@@ -132,6 +132,9 @@ jobs:
       - name: Byte-compile toàn bộ server + plugin
         run: python -m compileall -q server system/plugins
 
+      - name: Kiểm tra phần riêng của UNETI AI (uneti/test_brand.py)
+        run: python uneti/test_brand.py
+
       # Byte-compile KHÔNG chạy code nên không thấy vòng import bị gãy. Server có 3 vòng
       # đang được phá bằng import trong hàm (config<->secrets_store, oauth_mcp<->mcp_store,
       # claude_cli<->claude_sdk_engine) cộng 8 module nữa dựa vào mẹo đó. Nâng nhầm một

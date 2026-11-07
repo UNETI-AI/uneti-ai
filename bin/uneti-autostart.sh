@@ -21,9 +21,20 @@ PLIST="${HOME}/Library/LaunchAgents/${LABEL}.plist"
 # UNETI_AUTOSTART_OPEN=0 thì chỉ chạy nền, không mở gì.
 OPEN_LABEL="${LABEL}.open"
 OPEN_PLIST="${HOME}/Library/LaunchAgents/${OPEN_LABEL}.plist"
-PORT="${UNETI_PORT:-7777}"
+# The port, in the server's own order: the environment, then .env, then 7777.
+PORT="${UNETI_PORT:-$(sed -nE "s/^[[:space:]]*(export[[:space:]]+)?UNETI_PORT[[:space:]]*=[[:space:]]*[\"']?([0-9]+).*/\2/p" "${APP_DIR}/.env" 2>/dev/null | tail -1 || true)}"
+PORT="${PORT:-7777}"
 PY="${APP_DIR}/.venv/bin/python"
 ACTION="${1:-install}"
+
+ENV_FILE="${APP_DIR}/.env"
+ENV_PORT="$(sed -nE "s/^[[:space:]]*(export[[:space:]]+)?UNETI_PORT[[:space:]]*=[[:space:]]*[\"']?([0-9]+).*/\2/p" "${ENV_FILE}" 2>/dev/null | tail -1)"
+if [ "${ACTION}" != "uninstall" ] && [ "${PORT}" != "${ENV_PORT:-7777}" ]; then
+  ( umask 077
+    { grep -vE "^[[:space:]]*(export[[:space:]]+)?UNETI_PORT[[:space:]]*=" "${ENV_FILE}" 2>/dev/null; echo "UNETI_PORT=${PORT}"; } > "${ENV_FILE}.tmp"
+    cat "${ENV_FILE}.tmp" > "${ENV_FILE}"
+    rm -f "${ENV_FILE}.tmp" )
+fi
 
 if [ "${ACTION}" = "uninstall" ]; then
   launchctl unload "${PLIST}" 2>/dev/null || true

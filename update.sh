@@ -71,8 +71,16 @@ else
     echo "==> Asked launchd to restart UNETI AI. Logs: server/uneti.log"
   else
     # Mac / Linux không systemd: kill tiến trình đang giữ cổng rồi chạy lại nền (như install.sh)
-    PORT="${UNETI_PORT:-7777}"
-    PIDS="$(lsof -ti tcp:"$PORT" 2>/dev/null || true)"
+    # The port, in the server's own order: the environment, then .env, then 7777.
+    PORT="${UNETI_PORT:-$(sed -nE "s/^[[:space:]]*(export[[:space:]]+)?UNETI_PORT[[:space:]]*=[[:space:]]*[\"']?([0-9]+).*/\2/p" ".env" 2>/dev/null | tail -1 || true)}"
+    PORT="${PORT:-7777}"
+    # Only this copy's server: the port can belong to another program, and every browser with the page open has it too.
+    PIDS=""
+    for p in $(lsof -nP -iTCP:"$PORT" -sTCP:LISTEN -t 2>/dev/null || true); do
+      if [ "$(lsof -a -p "$p" -d cwd -Fn 2>/dev/null | sed -n 's/^n//p')" = "$(cd server && pwd -P)" ]; then
+        PIDS="$PIDS $p"
+      fi
+    done
     if [ -n "$PIDS" ]; then
       echo "==> Stopping the old process (PID: $PIDS)..."
       kill $PIDS 2>/dev/null || true

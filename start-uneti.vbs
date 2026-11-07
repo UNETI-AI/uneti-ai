@@ -27,10 +27,33 @@ If WScript.Arguments.Count > 0 Then
   If LCase(WScript.Arguments(0)) = "/open" Then MoDashboard
 End If
 
+' The port, in the server's own order: the environment, then .env next to this script, then 7777.
+Function ReadPort()
+  Dim p, path, f, re, found
+  p = sh.ExpandEnvironmentStrings("%UNETI_PORT%")
+  If p <> "%UNETI_PORT%" And p <> "" Then
+    ReadPort = p
+    Exit Function
+  End If
+  ReadPort = "7777"
+  path = fso.GetParentFolderName(WScript.ScriptFullName) & "\.env"
+  If Not fso.FileExists(path) Then Exit Function
+  If fso.GetFile(path).Size = 0 Then Exit Function
+  On Error Resume Next
+  Set f = fso.OpenTextFile(path, 1)
+  Set re = CreateObject("VBScript.RegExp")
+  re.Global = True
+  re.Multiline = True
+  re.Pattern = "^\s*(?:export\s+)?UNETI_PORT\s*=\s*[""']?(\d+)"
+  Set found = re.Execute(f.ReadAll)
+  f.Close
+  If found.Count > 0 Then ReadPort = found(found.Count - 1).SubMatches(0)
+  On Error GoTo 0
+End Function
+
 Sub MoDashboard()
   Dim port, url, i, http, ok, cands, c
-  port = sh.ExpandEnvironmentStrings("%UNETI_PORT%")
-  If port = "%UNETI_PORT%" Or port = "" Then port = "7777"
+  port = ReadPort()
   url = "http://127.0.0.1:" & port
   ok = False
   For i = 1 To 60

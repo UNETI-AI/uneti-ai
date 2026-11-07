@@ -18,7 +18,10 @@ on:
       - "install.sh"
       - "open-uneti.vbs"
       - "start-uneti.vbs"
+      - "stop-uneti.ps1"
+      - "UNETI AI.bat"
       - "bin/uneti-start.sh"
+      - "bin/uneti-stop.sh"
       - "bin/uneti-autostart.sh"
       - ".github/workflows/desktop-installers.yml"
   pull_request:
@@ -28,7 +31,10 @@ on:
       - "install.sh"
       - "open-uneti.vbs"
       - "start-uneti.vbs"
+      - "stop-uneti.ps1"
+      - "UNETI AI.bat"
       - "bin/uneti-start.sh"
+      - "bin/uneti-stop.sh"
       - "bin/uneti-autostart.sh"
       - ".github/workflows/desktop-installers.yml"
   workflow_dispatch:
@@ -143,6 +149,49 @@ jobs:
           Write-Host "UNETI AI is up after a fresh install"
           & (Join-Path $dir "stop-uneti.bat")
 
+      # A port changed in .env must reach the icon, and only this copy's server may ever be stopped. Both strangers are
+      # Python on purpose: one holds the default port, one runs a file with the same name as our server from elsewhere.
+      - name: Smoke test - changed port, other programs left alone
+        shell: pwsh
+        timeout-minutes: 10
+        run: |
+          $dir = Join-Path $env:RUNNER_TEMP "UNETI-AI"
+          $other = Join-Path $env:RUNNER_TEMP "other-program"
+          New-Item -ItemType Directory -Force (Join-Path $other "server") | Out-Null
+          Set-Content (Join-Path $other "server\main.py") "import http.server, socketserver`nsocketserver.TCPServer(('127.0.0.1', 7802), http.server.SimpleHTTPRequestHandler).serve_forever()"
+          $holder = Start-Process python -ArgumentList "-m", "http.server", "7777", "--bind", "127.0.0.1" -WorkingDirectory $other -PassThru
+          $sameName = Start-Process python -ArgumentList "server\main.py" -WorkingDirectory $other -PassThru
+          Start-Sleep -Seconds 3
+          Add-Content (Join-Path $dir ".env") "`nUNETI_PORT=7801"
+
+          Start-Process wscript.exe -ArgumentList "//nologo `"$dir\open-uneti.vbs`"" -WorkingDirectory $env:RUNNER_TEMP
+          $ok = $false
+          for ($i = 0; $i -lt 90; $i++) {
+            Start-Sleep -Seconds 2
+            try { if ((Invoke-WebRequest http://127.0.0.1:7801/health -UseBasicParsing -TimeoutSec 3).StatusCode -eq 200) { $ok = $true; break } } catch { }
+          }
+          if (-not $ok) { Get-Content (Join-Path $dir "server\uneti.log") -Tail 80 -ErrorAction SilentlyContinue; throw "The icon did not start UNETI AI on the port in .env" }
+          Write-Host "The icon started UNETI AI on the port in .env"
+
+          # Clicking again must only open the window: a restart would kill work running in the background.
+          $before = (Get-NetTCPConnection -LocalPort 7801 -State Listen).OwningProcess
+          Start-Process wscript.exe -ArgumentList "//nologo `"$dir\open-uneti.vbs`"" -WorkingDirectory $env:RUNNER_TEMP
+          Start-Sleep -Seconds 10
+          if ((Get-NetTCPConnection -LocalPort 7801 -State Listen).OwningProcess -ne $before) { throw "A second click restarted the server" }
+          Write-Host "A second click left the server running"
+
+          & (Join-Path $dir "stop-uneti.bat")
+          Start-Sleep -Seconds 3
+          if (Get-NetTCPConnection -LocalPort 7801 -State Listen -ErrorAction SilentlyContinue) { throw "stop-uneti.bat left this copy's server running" }
+          if ($holder.HasExited) { throw "stop-uneti.bat killed the program on port 7777" }
+          if ($sameName.HasExited) { throw "stop-uneti.bat killed another program named server\main.py" }
+          Write-Host "stop-uneti.bat stopped this copy and left the other two running"
+
+          powershell -NoProfile -ExecutionPolicy Bypass -Command "`$env:UNETI_PORT='7777'; & '$dir\stop-uneti.ps1'"
+          if ($holder.HasExited) { throw "stop-uneti.ps1 killed a stranger on its own port" }
+          Write-Host "stop-uneti.ps1 leaves a stranger on its own port alone"
+          Stop-Process -Id $holder.Id, $sameName.Id -Force
+
       - uses: actions/upload-artifact@v4
         with:
           name: UNETI-AI-Setup
@@ -193,6 +242,52 @@ jobs:
           done
           tail -80 "$UNETI_HOME/server/uneti.log" 2>/dev/null || true
           echo "UNETI AI did not answer /health"; exit 1
+
+      # A port changed in .env must move the login agent when the icon is clicked, and stopping must leave other programs
+      # alone, including a browser connected to the page, which a bare `lsof tcp:PORT` used to list.
+      - name: Smoke test - changed port, other programs left alone
+        timeout-minutes: 10
+        run: |
+          set -e
+          home="$RUNNER_TEMP/UNETI-AI"
+          printf '\nUNETI_PORT=7801\n' >> "$home/.env"
+          bash "$home/bin/uneti-start.sh"
+          up=""
+          for i in $(seq 1 60); do
+            if curl -sf -m 3 -o /dev/null http://127.0.0.1:7801/health; then up=1; break; fi
+            sleep 2
+          done
+          if [ -z "$up" ]; then tail -80 "$home/server/uneti.log" || true; echo "The icon did not move UNETI AI to the port in .env"; exit 1; fi
+          grep -q "<string>7801</string>" "$HOME/Library/LaunchAgents/com.uneti.os.plist"
+          echo "The icon moved the login agent to the port in .env"
+
+          python3 -m http.server 7777 --bind 127.0.0.1 >/dev/null 2>&1 &
+          holder=$!
+          sleep 2
+          UNETI_PORT=7777 bash "$home/bin/uneti-stop.sh" | tee stop.log
+          grep -q "another program" stop.log
+          kill -0 "$holder"
+          echo "uneti-stop.sh leaves a stranger on its port alone"
+          kill "$holder"
+
+          python3 - <<'PY' &
+          import http.client, time
+          connection = http.client.HTTPConnection("127.0.0.1", 7801)
+          connection.request("GET", "/health")
+          connection.getresponse().read()
+          time.sleep(120)
+          PY
+          client=$!
+          sleep 2
+          before="$(lsof -nP -iTCP:7801 -sTCP:LISTEN -t)"
+          bash "$home/bin/uneti-stop.sh"
+          sleep 15
+          after="$(lsof -nP -iTCP:7801 -sTCP:LISTEN -t || true)"
+          if [ "$before" = "$after" ]; then echo "uneti-stop.sh did not stop this copy's server"; exit 1; fi
+          kill -0 "$client"
+          echo "uneti-stop.sh stopped this copy's server and left a program connected to the page alone"
+          kill "$client"
+          launchctl unload "$HOME/Library/LaunchAgents/com.uneti.os.plist" || true
 
       - uses: actions/upload-artifact@v4
         with:

@@ -13,7 +13,7 @@ Hướng dẫn từng bước nằm ở [trang tải về](https://uneti-ai.gith
 
 **Lưu ý trước khi cài:** AI được kết nối sẽ có toàn quyền trên máy cài đặt, gồm đọc tệp và chạy lệnh. Chỉ cài trên máy của bạn và đọc [hướng dẫn bảo mật](docs/14-bao-mat-tai-khoan.md).
 
-Nếu máy đã dùng cổng 7777 cho chương trình khác, bộ cài sẽ dừng lại và báo, không tự tắt chương trình đó.
+Nếu máy đã dùng cổng 7777 cho chương trình khác, bộ cài sẽ dừng lại và báo, không tự tắt chương trình đó. Khi đó, tắt chương trình kia, hoặc thêm dòng `UNETI_PORT=8080` vào tệp `.env` trong thư mục cài đặt rồi chạy lại. Biểu tượng mở phần mềm sẽ tự theo cổng mới.
 
 Trên Windows, bấm đúp `UNETI AI.bat` trong thư mục cài đặt để mở phần mềm. Muốn phần mềm tự chạy khi mở máy, chạy `uneti-autostart.bat`.
 

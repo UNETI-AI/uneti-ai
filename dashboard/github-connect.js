@@ -241,7 +241,7 @@
     var bk = m.querySelector('[data-f="back"]');
     if (bk) bk.onclick = back;
   }
-  // The connect dialog (0.430.0): "Sign in with GitHub" first (the device flow of the UNETI AI GitHub App, no token to
+  // The connect dialog (0.430.0): "Sign in with GitHub" first (the device flow of the original author's GitHub App, no token to
   // make or copy), a pasted token below it for whoever prefers that, and the brain-backup token when there is one.
   function openForm(st) {
     var M = window.UnetiConnModal;

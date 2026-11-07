@@ -1,4 +1,4 @@
-"""Sign in to GitHub with one button: the OAuth device flow of the "UNETI AI" GitHub App (0.430.0).
+"""Sign in to GitHub with one button: the OAuth device flow of the original author's GitHub App (0.430.0).
 
 Why the device flow and not the redirect flow Claude uses: every UNETI AI runs at its own address (localhost, a VPS IP,
 a tunnel), so there is no single callback URL to register, and the repo is public, so it cannot carry a client
@@ -28,7 +28,7 @@ import httpx
 
 import localefmt
 
-# Public identifiers of the "UNETI AI" GitHub App (owner, 2026-11-01). A client id is not a secret: the device flow is
+# Public identifiers of the original author's GitHub App, which this copy shares. A client id is not a secret: the device flow is
 # built for apps that cannot keep one. Forks that register their own app override both through the environment.
 CLIENT_ID = "Iv23limeL0BsyXptmTz2"
 APP_SLUG = "javis-os"
@@ -88,8 +88,8 @@ def _error_text(code: str, desc: str = "") -> str:
                             "You pressed Cancel on GitHub. Press Sign in again to connect."),
         "expired_token": _c("Mã đã hết hạn. Bấm Đăng nhập lần nữa để lấy mã mới.",
                             "The code expired. Press Sign in again for a new one."),
-        "device_flow_disabled": _c("GitHub App của UNETI AI chưa bật Device Flow.",
-                                   "The UNETI AI GitHub App does not have Device Flow enabled."),
+        "device_flow_disabled": _c("GitHub App đăng nhập chưa bật Device Flow.",
+                                   "The sign-in GitHub App does not have Device Flow enabled."),
         "incorrect_client_credentials": _c("GitHub không nhận Client ID của UNETI AI.",
                                            "GitHub does not recognise the UNETI AI client id."),
     }
