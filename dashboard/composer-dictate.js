@@ -30,7 +30,14 @@
    2026-11-06: a computer gets the faded live bubble back. While the owner speaks, the words show in a faded dashed
    bubble at the foot of the chat (app.js nhapGiong, the same bubble the voice chat uses), so the owner can see the
    recognizer is hearing. The box still stays still until the recording ends. A phone gets no bubble: Android phones
-   resend the whole sentence on every result, and the bubble repeated it. Tablets count as computers here. */
+   resend the whole sentence on every result, and the bubble repeated it. Tablets count as computers here.
+
+   2026-11-06 (later): the bubble is gone. Owner: in the old version the words appeared right in the chat box, not up
+   above like an answer. A computer writes them into the box while speaking again; when the recording ends the main
+   brain rewrites the whole sentence in context (dictate.js polish, server/transcript_fix.py) and THAT sentence lands
+   in the box, or is sent when Send or Enter ended the recording. A phone still gets the text only at the end.
+
+   2026-11-08: a hidden tab no longer stops the recording (see dictate.js for how the background is handled). */
 (function () {
   "use strict";
 
@@ -81,19 +88,10 @@
   }
   function $(id) { return document.getElementById(id); }
 
-  // The faded live bubble (app.js nhapGiong) on a computer only. An iPhone, an iPod or an Android phone gets none: the
-  // phone's recognizer resends the whole sentence on each result, and the bubble showed every resend (2026-11-06).
-  // Tablets are not phones here, so an iPad keeps the bubble.
-  function phoneUA() {
-    try { return /iPhone|iPod|Android.*Mobile/i.test((navigator && navigator.userAgent) || ""); } catch (e) { return false; }
-  }
-  function showDraft(text) {
-    if (phoneUA() || typeof window.nhapGiong !== "function") return;
-    try { window.nhapGiong(text || ""); } catch (e) {}
-  }
-  function clearDraft() {
-    if (typeof window.nhapGiong !== "function") return;
-    try { window.nhapGiong(""); } catch (e) {}
+  // The last messages of the main chat, for the rewrite's context.
+  function chatContext() {
+    var D = window.UnetiDictate;
+    return D && D.recentMessages ? D.recentMessages($("chatArea"), ".msg-user:not(.msg-nhap-giong) .utext, .msg-uneti > .bubble", 4) : [];
   }
 
   // state: "idle" | "listening" | "transcribing"
@@ -228,11 +226,10 @@
     var inp = $("chatInput"), send = S.sendAfter, D = window.UnetiDictate;
     S.dict = null;
     S.sendAfter = false;
-    // The faded bubble goes first, so the real message (sent just below) takes its place and nothing is shown twice.
-    clearDraft();
-    // The text lands now, in one piece, not word by word while speaking.
-    if (S.heard && D) writeInput(D.joinText(S.base, S.heard));
+    // The rewritten sentence (or the words as heard when the rewrite failed) lands now, in one piece.
+    var words = S.heard;
     S.heard = "";
+    if (words && D) writeInput(D.joinText(S.base, words));
     earTip(D, inp);
     if (!inp) return;
     inp.readOnly = false;
@@ -257,13 +254,17 @@
     S.heard = "";
     S.sendAfter = false;
     S.levels = [];
+    var live = !(D.isPhoneUA && D.isPhoneUA());
     S.dict = D.create({
-      // Held, not shown: finished() writes it once the recording ends.
-      onText: function (text) {
+      // A computer shows the words in the box while speaking; the final (rewritten) text is written by finished().
+      onText: function (text, final) {
         if (S.state === "idle") return;
         S.heard = String(text || "");
-        showDraft(S.heard);
+        if (!final && live && S.state === "listening") writeInput(D.joinText(S.base, S.heard));
       },
+      context: chatContext,
+      // The open chat: a partner's chat (or one pinned to a model) is heard by that model's vendor (2026-11-08).
+      session: function () { return window.UnetiChatApi && window.UnetiChatApi.sid ? window.UnetiChatApi.sid() : ""; },
       onState: function (st) {
         var was = S.state;
         S.state = st;
@@ -305,7 +306,6 @@
     var base = S.base;
     S.sendAfter = false;
     S.heard = "";
-    clearDraft();
     writeInput(base);
     S.dict.cancel();
     writeInput(base);
@@ -342,8 +342,13 @@
         e.preventDefault(); e.stopPropagation(); sendNow();
       }
     }, true);
-    // A phone that locks or a tab switched away cuts the mic: keep what was heard instead of losing it.
-    document.addEventListener("visibilitychange", function () { if (document.hidden) stop(); });
+    // 2026-11-08: switching tab or app no longer stops the recording (owner: Alt Tab cut it off). It keeps going in
+    // the background; dictate.js picks up whatever the browser cut when the page comes back. Here only the level meter
+    // wakes up again: iOS suspends its AudioContext while the page is away.
+    document.addEventListener("visibilitychange", function () {
+      if (document.hidden || S.state !== "listening" || !S.ctx) return;
+      try { if (S.ctx.state !== "running" && S.ctx.resume) S.ctx.resume(); } catch (e) {}
+    });
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);

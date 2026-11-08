@@ -58,7 +58,7 @@
     if (s === "review") return "ask";
     if (s === "blocked") {
       var k = c.block_kind || "";
-      if (k === "needs_input" || k === "capability") return "ask";
+      if (k === "needs_input" || k === "capability" || k === "acceptance_failed") return "ask";
       if (k === "cancelled") return "cancel";
       return "calm";
     }
@@ -515,13 +515,19 @@
   async function getJSON(url) {
     try { var r = await fetch(url, { cache: "no-store" }); return r.ok ? await r.json() : null; } catch (e) { return null; }
   }
+  // A failed request (404 from an older server, 500) answers {"detail": ...} without "ok", which act() read as success.
+  async function asResult(r) {
+    var j = await r.json().catch(function () { return {}; });
+    if (!r.ok && (!j || j.ok === undefined)) j = { ok: false, error: (j && typeof j.detail === "string" && j.detail) || ("HTTP " + r.status) };
+    return j;
+  }
   async function postForm(url, fields) {
     var fd = new FormData();
     Object.keys(fields || {}).forEach(function (k) { if (fields[k] != null) fd.append(k, fields[k]); });
-    try { var r = await fetch(url, { method: "POST", body: fd }); return await r.json(); } catch (e) { return { ok: false, error: String(e) }; }
+    try { return asResult(await fetch(url, { method: "POST", body: fd })); } catch (e) { return { ok: false, error: String(e) }; }
   }
   async function postJSON(url, body) {
-    try { var r = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }); return await r.json(); }
+    try { return asResult(await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) })); }
     catch (e) { return { ok: false, error: String(e) }; }
   }
   function mine(body) { return postJSON(body.__url, Object.assign({ brain: brain() }, body, { __url: undefined })); }
@@ -550,13 +556,14 @@
       getJSON("/kanban?brain=" + enc + "&history=40"), getJSON("/viec/all"), getJSON("/reminders?brain=" + enc),
       getJSON("/watch?brain=" + enc), getJSON("/incidents?limit=50"), getJSON("/loops/log?brain=" + enc + "&limit=60"),
       S.agents ? Promise.resolve(null) : getJSON("/agents?brain=" + enc + "&prompt=0&system=1"),
-      getJSON("/my-tasks?brain=" + enc), getJSON("/tasks/bots?brain=" + enc)
+      getJSON("/my-tasks?brain=" + enc), getJSON("/tasks/bots?brain=" + enc), getJSON("/schedules/this-machine")
     ]);
     if (!S || S !== st) return;   // the page closed (or opened again) while these were on their way
     if (res[6]) S.agents = (res[6].agents || res[6] || []).filter(function (a) { return a && a.slug; });
     S.brains = ((res[1] && res[1].brains) || []).map(function (x) { return { name: x.label || x.name, path: x.path, def: x.is_default }; });
     S.notify = (res[2] && res[2].notify) || {};
     if (res[8]) S.bots = res[8];
+    if (res[9]) S.runsHere = res[9].runs !== false;
     S.ai = model({ kanban: res[0] || {}, viec: res[1] || {}, rems: res[2] || {}, watch: res[3] || {}, incidents: res[4] || {}, loopLog: res[5] || {}, brain: b,
       bots: S.bots || {}, agents: S.agents || [] });
     S.my = res[7] && res[7].ok ? res[7] : (S.my || { tasks: [], projects: [] });
@@ -926,6 +933,12 @@
     return { today: "nv.empty.today", over: "nv.empty.over", rep: "nv.empty.rep", done: "nv.empty.done" }[v] || "nv.empty.list";
   }
   function statsCtx() { return { tab: S.tab, brain: brain(), redraw: function () { if (S) render(); }, avatar: avatar }; }
+  // Reminders and loops sync to every machine; this switch (kept per machine) stops them firing here too.
+  function hereRow() {
+    var on = S.runsHere !== false;
+    return '<div class="nv-ask" role="status">' + ic(on ? "play" : "pause", "c-ask") + '<span class="nv-ask-t">' + esc(tw(on ? "nv.here.on" : "nv.here.off"))
+      + '</span><button type="button" class="nv-btn sm" data-act="here" data-v="' + (on ? "0" : "1") + '">' + esc(tw(on ? "nv.here.stop" : "nv.here.start")) + "</button></div>";
+  }
   function viewHtml(v) {
     var h = '<div class="nv-vh"><h2>' + esc(viewTitle(v)) + "</h2>" + (v === "over" ? overBtn() : "") + "</div>";
     var me = S.tab === "me";
@@ -933,6 +946,7 @@
     var empty = me && v !== "done" && v !== "rep" ? emptyMine(v) : '<div class="nv-empty">' + esc(tw(emptyKey(v))) + "</div>";
     if (v === "rep") {
       var R = byRepTimeline(M().recurring.filter(function (r) { return !r.habit && (!q() || r.title.toLowerCase().indexOf(q()) >= 0); }));
+      if (!me) h += hereRow();
       return h + (R.length ? R.map(function (r) { return repRow(r); }).join("") : empty);
     }
     if (v === "habit") return h + habitView();
@@ -1223,12 +1237,14 @@
         : '<button type="button" class="nv-btn pri" data-act="rrun" data-id="' + esc(it.id) + '"' + (it.on ? "" : " disabled") + ">" + ic("play") + esc(tw("nv.a.run")) + "</button>";
     } else if (it.st === "run") acts = '<button type="button" class="nv-btn" data-act="stop" data-id="' + esc(it.id) + '">' + ic("square") + esc(tw("nv.a.stop")) + "</button>";
     else if (it.src === "kanban" && it.st === "ask" && it.blockKind === "capability") acts = '<button type="button" class="nv-btn pri" data-act="grant" data-id="' + esc(it.id) + '">' + ic("key-round") + esc(tw("nv.a.grant")) + "</button>";
+    // 2026-11-08: the acceptance check failed the result. Nothing to answer, so two choices instead of a reply box.
+    else if (it.src === "kanban" && it.st === "ask" && it.blockKind === "acceptance_failed") acts = '<button type="button" class="nv-btn pri" data-act="accfix" data-id="' + esc(it.id) + '">' + ic("rotate-cw") + esc(tw("nv.a.accfix")) + '</button><button type="button" class="nv-btn" data-act="accok" data-id="' + esc(it.id) + '">' + ic("check") + esc(tw("nv.a.accok")) + "</button>";
     else if (it.src === "kanban" && it.st === "ask" && it.status === "review") acts = '<button type="button" class="nv-btn pri" data-act="approve" data-id="' + esc(it.id) + '">' + ic("check") + esc(tw("nv.a.approve")) + "</button>";
     else if (!FIN[it.st] && it.st !== "ask") acts = '<button type="button" class="nv-btn pri" data-act="run" data-id="' + esc(it.id) + '">' + ic("play") + esc(it.st === "calm" ? tw("nv.a.retry") : tw("nv.a.run")) + "</button>";
     var prog = isRep ? (it.on ? tw("nv.rep.next", { t: it.next ? whenText(it.next) : "-" }) : tw("nv.rep.off"))
       : it.st === "done" ? (it.result || tw("nv.log.empty")) : it.st === "ask" ? (it.reason || tw("nv.st.ask")) : it.st === "calm" ? (it.reason || tw("nv.st.calm"))
       : it.st === "run" ? tw("nv.st.run") : it.st === "cancel" ? tw("nv.st.cancel") : it.st === "queue" ? tw("nv.prog.queue") : tw("nv.prog.sched");
-    h += '<div class="nv-sec2"><div class="nv-cap">' + esc(it.st === "done" ? tw("nv.cap.result") : tw("nv.cap.progress")) + '</div><div class="nv-res">' + esc(prog) + "</div>" + (acts ? '<div class="nv-acts">' + acts + "</div>" : "") + "</div>";
+    h += '<div class="nv-sec2"><div class="nv-cap">' + esc(it.st === "done" ? tw("nv.cap.result") : it.blockKind === "acceptance_failed" && it.st === "ask" ? tw("nv.acc.cap") : tw("nv.cap.progress")) + '</div><div class="nv-res">' + esc(prog) + "</div>" + (acts ? '<div class="nv-acts">' + acts + "</div>" : "") + "</div>";
     if (!isRep && it.src === "kanban" && it.st === "ask" && it.blockKind === "needs_input") {
       h += '<form class="nv-sec2 nv-answer" data-answer="' + esc(it.id) + '"><label class="nv-cap" for="nvAns">' + esc(tw("nv.answer")) + '</label><textarea id="nvAns" class="nv-ta" required></textarea><div class="nv-acts"><button type="submit" class="nv-btn pri">' + esc(tw("nv.send")) + "</button></div></form>";
     }
@@ -1789,7 +1805,10 @@
         if (!window.confirm(tw("kanban.confirm_grant"))) return;
         return act(postForm("/kanban/task/grant", { brain: b, id: it.ref }), tw("nv.ok.granted"));
       case "approve": return act(postForm("/kanban/task/move", { brain: b, id: it.ref, status: "done" }), tw("nv.ok.approved"));
+      case "accfix": return act(postForm("/kanban/task/acceptance", { brain: b, id: it.ref, decision: "fix" }), tw("nv.ok.accfix"));
+      case "accok": return act(postForm("/kanban/task/acceptance", { brain: b, id: it.ref, decision: "accept" }), tw("nv.ok.accok"));
       case "resolve": return act(postJSON("/incidents/resolve", { id: id }), tw("nv.ok.resolved"));
+      case "here": return act(postForm("/schedules/this-machine", { runs: el.dataset.v }), el.dataset.v === "1" ? tw("nv.here.start_ok") : tw("nv.here.stop_ok"));
       case "gochan": if (window.UnetiNav && window.UnetiNav.go) window.UnetiNav.go("channels"); return;
       case "orch": return act(postForm("/kanban/orchestration", { brain: b, mode: el.dataset.v }), el.dataset.v === "off" ? tw("nv.orch.off_ok") : tw("nv.orch.on_ok"));
       case "overall": {

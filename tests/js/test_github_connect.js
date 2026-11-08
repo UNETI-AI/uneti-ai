@@ -56,6 +56,23 @@ check("no em dash in the module", js.indexOf("\u2014") === -1 && js.indexOf("\u2
     /UnetiConnModal/.test(pop) && pop.includes("reposHtml(local)") && pop.includes('openChecks(b.getAttribute("data-gh-checks"), back)') && pop.includes('openMetrics(b.getAttribute("data-gh-metrics"), back)'));
 }
 
+// Owner, 06/11/2026: the repo popup takes the look of the Tasks page: card rows, a switch for auto-merge, and a "..."
+// sheet holding Checks, Numbers and Remove instead of a row of buttons.
+{
+  const row = js.slice(js.indexOf("function localRow(r)"), js.indexOf("// The repos of this brain"));
+  check("each repo is a card row with a meta line", row.includes('class="gh-rrow') && row.includes("gh-rmeta") && row.includes("gh.local_chats"));
+  check("auto-merge is a switch, its state written in the meta line",
+    row.includes('class="gh-sw" role="switch" aria-checked="') && row.includes("gh.auto_merge_off") && !row.includes('type="checkbox"'));
+  check("Checks, Numbers and Remove sit in the ... sheet, Remove in red",
+    row.includes("data-gh-menu") && /function repoSheet[\s\S]*data-gh-checks[\s\S]*data-gh-metrics[\s\S]*gh-mi danger" data-gh-remove/.test(row));
+  check("the sheet closes with Escape and on the scrim", row.includes('e.key === "Escape"') && row.includes("gh-sheet-scrim\" data-gh-close"));
+  check("the row helper does not clash with the picker's repoRow", (js.match(/function localRow\(/g) || []).length === 1);
+  const css = read("dashboard/style.css");
+  check("the dialog carries its own Tasks-page styles (tasks.css loads only on that page)",
+    /\.gh-rrow \{/.test(css) && /\.gh-sw\[aria-checked="true"\]/.test(css) && /\.gh-sheet \{/.test(css) && /\.gh-sheet-scrim \{[^}]*z-index: 210/.test(css));
+  check("new texts exist in both languages", ["gh.auto_merge_off", "gh.more", "gh.close"].every(function (k) { return vi[k] && en[k]; }));
+}
+
 // 0.368.0 (owner, 28/10/2026, after Claude Code's picker): the chip and + menu open "Change repo / Change branch";
 // the repo list has "Selected" and "Repos" sections; a branch list per repo.
 {
@@ -119,6 +136,26 @@ check("no em dash in the module", js.indexOf("\u2014") === -1 && js.indexOf("\u2
   check("GitHub reloading after the Pages keeps the Pages", gh.addToConnCount("gh", 1) === 5);
   check("disconnecting GitHub takes only its own share off", gh.addToConnCount("gh", 0) === 4 && cnt.textContent === "4 accounts");
   delete global.document; delete global.window;
+}
+
+// Owner, 08/11/2026: cross review is the person's call. A per-repo switch (off by default) with a reviewer picker, and on
+// the PR panel Review now, then Fix them / Skip and merge on the findings.
+{
+  const sheet = js.slice(js.indexOf("function repoSheet(name)"), js.indexOf("// The repos of this brain"));
+  check("the ... sheet has a Cross review item", sheet.includes("data-gh-review") && sheet.includes("gh.review"));
+  const dlg = js.slice(js.indexOf("async function openReview("), js.indexOf("// Local check commands"));
+  check("the review dialog has a switch and a reviewer picker, the chat's model first",
+    dlg.includes('role="switch"') && dlg.includes('data-f="prov"') && js.includes("gh.review_default") && dlg.includes('"/github/local/review"'));
+  const det = js.slice(js.indexOf("function detailHtml(d)"), js.indexOf("function openDetail(id)"));
+  check("Review now only on an open, unmerged PR that is not already being reviewed",
+    /canReview = !!r\.pr_number && r\.integ !== "merged" && !r\.reviewing && !r\.merging/.test(det) && det.includes("data-rv-now"));
+  check("findings come with Fix them and Skip and merge, and hide the plain Merge button",
+    det.includes("data-rv-fix") && det.includes("data-rv-skip") && det.includes("canMerge && !found.length"));
+  const od = js.slice(js.indexOf("function openDetail(id)"), js.indexOf("function init()"));
+  check("the panel follows a running review", /r\.merging \|\| r\.reviewing/.test(od));
+  check("the buttons call the review routes", od.includes('"/review"') && od.includes('"/review/fix"') && od.includes('"/review/skip"'));
+  check("review texts exist in both languages", ["gh.review", "gh.review_how", "gh.review_now", "gh.review_fix", "gh.review_skip",
+    "gh.reviewing", "gh.review_fixing", "gh.review_started", "gh.review_on_meta"].every(function (k) { return vi[k] && en[k]; }));
 }
 
 const keys = Array.from(new Set((js.match(/tw\("(gh\.[a-z_]+)"/g) || []).map(m => m.slice(4, -1))));
