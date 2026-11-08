@@ -1,13 +1,15 @@
 <!-- translated-from: README.md sha256:2e10ad3d2a86 -->
 <div align="center">
 
-<img src="../../../dashboard/logo.svg" width="88" alt="Logo UNETI AI">
+<a href="https://uneti-ai.github.io/uneti-ai/"><img src="../../assets/social-preview.png" width="100%" alt="UNETI AI: Your AI Workforce. Never miss the best AI."></a>
 
 # UNETI AI
 
-### Agen AI self-hosted Anda dengan otak yang bisa diganti, dan Second Brain yang makin pintar setiap hari.
+### Tim AI Anda. Jangan pernah ketinggalan AI terbaik.
 
-Jalankan di laptop atau VPS kecil. Ajak bicara dengan suara. Pasang Claude, ChatGPT, Grok, Gemini atau salah satu dari 12 provider, semua tool tetap ada saat Anda berganti, dan biarkan ia bekerja di background selagi Anda tidur.
+UNETI AI mengubah **Claude, ChatGPT, Gemini, Grok** dan model pilihan Anda menjadi satu tim yang bekerja 24/7 di mesin atau server Anda sendiri. Setiap rekan punya peran, berbagi memori dan tool yang sama, dan terus bekerja di background. Saat model yang lebih baik rilis, cukup ganti dan semua yang sudah dipelajari tim tetap ada.
+
+**🌐 Situs web: [uneti-ai.github.io](https://uneti-ai.github.io/uneti-ai/)** · Open source · Self-hosted · 14 penyedia AI
 
 [![GitHub stars](https://img.shields.io/github/stars/uneti-ai/uneti-ai?style=flat&logo=github&label=stars)](https://github.com/uneti-ai/uneti-ai/stargazers)
 [![License: MIT](https://img.shields.io/badge/license-MIT-22c55e)](../../../LICENSE)
@@ -507,5 +509,6 @@ Tidak bisa berdonasi? Menggunakan UNETI AI, mengirim masukan, atau membuka pull 
 
 <div align="center">
 <br>
+<b><a href="https://uneti-ai.github.io/uneti-ai/">uneti-ai.github.io</a></b><br>
 Dibuat dengan ☕ di Vietnam oleh <b><a href="https://minhquy.vn">Minh Quý</a></b>
 </div>

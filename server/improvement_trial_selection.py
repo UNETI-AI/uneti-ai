@@ -32,14 +32,14 @@ _binary_observation = threading.local()
 # Audited ordinary discovery semantics. Unknown source changes require another
 # parity review, rather than silently assigning the SDK a different executable.
 _DISCOVERY_CODE = {
-    "tim_binary": "3a106ae21c4cfa126d8c36e732dffe9045226239038bff13cdb70db2860b1c2b",
-    "_duong_dan_tim_binary": "4b54e92c6b5b078adcf123159c37341bf99d304eb8195dae82431b71622d3ba2",
-    "_thu_muc_bin_windows": "84ec5dc0a1c0ec7c977e6b80383f57497509b6cd5ef6547b7b5f1a0da618254c",
-    "_home_dir": "24b1caf6dc4e69e00c37fb5ad94883c9bb1cc94d9155646631c03e31a66b8c41",
-    "_state_dir": "f53afb2999b62408e72e3db8ea9fab847dfe790be17225db245c9b33cd184faa",
-    "_doc_bin_nho": "df04b8ed0929d15f74cbce87f7a9c803c071a1f7447d53f542874e1dbbb24979",
-    "_binary_da_nho": "0a70eeed3ebe4623019425b374f3ce20acec9d539f36c882dbd8d38e50b9dcbc",
-    "ClaudeSDK._options": "796fa6983c917d6036336cf87849af082e621ccdc6f48f4439601b3df23ac82b",
+    "tim_binary": "df554ca7470a8bc3ccaf82c36f59eba8e3dfb69dbbf922d40580b5f6732dbff1",
+    "_duong_dan_tim_binary": "7a50dc0905fa8ea6b66f122eca1af86118016a6c0c7ec60c5f36a70f507c0e66",
+    "_thu_muc_bin_windows": "3eb478881b2d1d987bd867d4e5e345ab77279e81902448af12bbdacc4313b80f",
+    "_home_dir": "a3614f25ce9aa8a8a3ba751ea8a1b446dae559587bf81bc293f16c44027848c6",
+    "_state_dir": "0cae85abd321266035b53854c9baf66bd0da34a885b8f467c1987d0e1ac643d9",
+    "_doc_bin_nho": "55ab5f380d4754d8422ce73354649974477c8215d1354459c6e961b97e367890",
+    "_binary_da_nho": "efc161dcbb1d97d3553b1153bb34775ddc53f10227add9bb2ffba1cd4dde2e36",
+    "ClaudeSDK._options": "b5c049603c1760d0c5c67555285cd22ae701e507bd933dfdbcbc8445a22cc781",
 }
 
 

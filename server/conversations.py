@@ -28,6 +28,7 @@ Tên file cố ý KHÔNG phải `conversations.db`: tên đó đã thuộc về 
 """
 from __future__ import annotations
 
+import copy
 import json
 import re
 import sqlite3
@@ -63,6 +64,12 @@ NGAY_GIU_SAO_LUU = 14    # bản sao lưu trước khi cắt nhóm cũ tự xoá
 MAX_TEN = 120
 MAX_DANH_SACH = 200      # trần một trang danh sách hội thoại
 MAX_TIN_MOT_LAN = 500    # trần một trang tin nhắn
+# Display order of a conversation's messages. A live message has no `seq`, so it sorts by its id (written order), as it
+# always did. A message imported from the Zalo history into a chat that already had messages gets a `seq` below the
+# chat's first one (`first_order`), so it shows above them even though its id is newer (owner, 08/11/2026: "Nhập tin
+# cũ" skipped every chat that already had a message, so on an account the inbox already watched it imported nothing).
+# Only ever compared inside one conversation.
+ORDER_KEY = "COALESCE(seq, id)"
 
 _SCHEMA = """
 CREATE TABLE IF NOT EXISTS channel_accounts(
@@ -185,6 +192,15 @@ def _nang_cap(db: sqlite3.Connection) -> None:
         # 0.216.0: số điện thoại của khách (dạng 0xxxxxxxxx), để ô tìm kiếm của hòm thư tìm theo số.
         db.execute("ALTER TABLE customers ADD COLUMN phone TEXT NOT NULL DEFAULT ''")
     db.execute("CREATE INDEX IF NOT EXISTS ix_khach_sdt ON customers(phone) WHERE phone != ''")
+    # Owner, 2026-11-07 ("trang chatbot, hội thoại, bot và thống kê load rất lâu"): every count by time ("messages today"
+    # on the inbox and on each bot card, refreshed every 5 seconds, and the Stats tab) read the WHOLE messages table,
+    # which grows by a thousand rows per busy Zalo group. One range index per access path; built once on an old store.
+    db.execute("CREATE INDEX IF NOT EXISTS ix_msg_time ON messages(created_at)")
+    db.execute("CREATE INDEX IF NOT EXISTS ix_msg_conv_time ON messages(conversation_id, created_at)")
+    if "seq" not in {r[1] for r in db.execute("PRAGMA table_info(messages)").fetchall()}:
+        # Display order of a message imported from the history into a chat that already had messages (see ORDER_KEY).
+        db.execute("ALTER TABLE messages ADD COLUMN seq REAL")
+    db.execute(f"CREATE INDEX IF NOT EXISTS ix_msg_conv_order ON messages(conversation_id, {ORDER_KEY})")
     cot_hoi_thoai = {r[1] for r in db.execute("PRAGMA table_info(conversations)").fetchall()}
     if "pinned" not in cot_hoi_thoai:
         # 0.223.0: chủ ghim một cuộc chat lên đầu hòm thư, như ghim hội thoại ở trang Trò chuyện.
@@ -322,7 +338,7 @@ def _tai_khoan_id(kenh: str, account_id: str) -> str:
     return f"{kenh}:{account_id}"
 
 
-def ghi_su_kien(ev: dict, dem_chua_doc: bool = True) -> dict:
+def ghi_su_kien(ev: dict, dem_chua_doc: bool = True, late: bool = False, seq: Optional[float] = None) -> dict:
     """Đổ MỘT sự kiện chuẩn vào kho: tìm/tạo tài khoản kênh, khách, hội thoại rồi thêm tin.
 
     Trả về {"ok": True, "conversation_id", "message_id", "customer_id", "trung": bool}.
@@ -331,7 +347,14 @@ def ghi_su_kien(ev: dict, dem_chua_doc: bool = True) -> dict:
 
     `dem_chua_doc=False` (0.174.0): tin NHẬP LẠI từ lịch sử (Zalo cá nhân, `nhap_lich_su`) không cộng vào số chưa đọc. Đó là tin
     cũ đã đọc trên điện thoại; đếm vào là hàng trăm cuộc chat đỏ chót ngay sau một lần bấm.
+
+    `late=True`: a message written after newer ones may already be stored (recovered from the Zalo history). It only
+    becomes the conversation's last message when it is not older than the current one.
+
+    `seq`: the message's place in the conversation when it is not its id (see ORDER_KEY); only the history import sets it,
+    together with `late=True`.
     """
+    lt = 1 if late else 0
     e = chuan_hoa(ev)
     if e.get("loi"):
         return {"ok": False, "loi": e["loi"]}
@@ -402,10 +425,11 @@ def ghi_su_kien(ev: dict, dem_chua_doc: bool = True) -> dict:
                                 "message_id": int(cu["id"]), "customer_id": customer_id}
                 cur = db.execute(
                     "INSERT INTO messages(conversation_id, external_message_id, sender_type,"
-                    " sender_id, sender_name, message_type, text, metadata_json, created_at)"
-                    " VALUES(?,?,?,?,?,?,?,?,?)",
+                    " sender_id, sender_name, message_type, text, metadata_json, created_at, seq)"
+                    " VALUES(?,?,?,?,?,?,?,?,?,?)",
                     (conv_id, e["external_message_id"], e["sender_type"], e["sender_id"],
-                     e["sender_name"], e["message_type"], e["text"], _json(e["metadata"]), ts))
+                     e["sender_name"], e["message_type"], e["text"], _json(e["metadata"]), ts,
+                     None if seq is None else float(seq)))
                 msg_id = int(cur.lastrowid)
 
                 # 5. Cập nhật hội thoại: tin cuối, số tin, chưa đọc (chỉ đếm tin KHÁCH)
@@ -417,13 +441,21 @@ def ghi_su_kien(ev: dict, dem_chua_doc: bool = True) -> dict:
                 # conversation": a customer is never missed). Old messages imported from history (dem_chua_doc=False)
                 # and messages from the bot or the owner leave it hidden.
                 unhide = 1 if e["sender_type"] == "customer" and dem_chua_doc else 0
+                # A message written late (`late`: recovered from the Zalo history, see
+                # `zalo_personal_channel.catch_up`) may be older than the last one stored: it must not become the
+                # "last message" of the conversation. Live messages keep the old rule (the last written is the last).
+                newest = "(? = 0 OR last_message_at IS NULL OR ? >= last_message_at)"
                 db.execute(
-                    "UPDATE conversations SET last_message=?, last_message_at=?, last_sender_type=?,"
+                    "UPDATE conversations SET"
+                    f" last_message=CASE WHEN {newest} THEN ? ELSE last_message END,"
+                    f" last_sender_type=CASE WHEN {newest} THEN ? ELSE last_sender_type END,"
+                    f" last_message_at=CASE WHEN {newest} THEN ? ELSE last_message_at END,"
                     " unread_count=unread_count+?, message_count=message_count+1, updated_at=?,"
                     " contact=CASE WHEN ?!='' THEN ? ELSE contact END,"
                     " hidden=CASE WHEN ?=1 THEN 0 ELSE hidden END"
                     " WHERE id=?",
-                    (tom, ts, e["sender_type"], them_chua_doc, now, contact, contact, unhide, conv_id))
+                    (lt, ts, tom, lt, ts, e["sender_type"], lt, ts, ts, them_chua_doc, now, contact, contact, unhide,
+                     conv_id))
                 # 6. NHÓM chỉ giữ GIU_TIN_NHOM tin gần nhất (cùng giao dịch: không có lúc nào kho chứa thừa). `message_count` vẫn là số tin
                 # từng nhận, không giảm theo.
                 if e["chat_type"] == "group":
@@ -449,14 +481,28 @@ def co_tin(kenh: str, account_id: str, external_chat_id: str) -> bool:
     return bool(r)
 
 
+def first_order(kenh: str, account_id: str, external_chat_id: str) -> Optional[dict]:
+    """The first message of this chat in display order: `{"key": its ORDER_KEY, "at": the oldest created_at}`, None when
+    the chat has no message. For `zalo_personal_channel.nhap_lich_su`, which puts older messages above it."""
+    with _lock:
+        r = _conn().execute(
+            "SELECT MIN(COALESCE(m.seq, m.id)), MIN(m.created_at) FROM messages m"
+            " JOIN conversations c ON c.id = m.conversation_id WHERE c.channel_account_id=? AND c.external_chat_id=?",
+            (_tai_khoan_id(kenh, account_id), str(external_chat_id))).fetchone()
+    if not r or r[0] is None:
+        return None
+    return {"key": float(r[0]), "at": float(r[1])}
+
+
 def _cat_nhom_mot_cuoc(db, conv_id: int, giu: int = GIU_TIN_NHOM) -> int:
     """Xoá các tin CŨ của một cuộc chat, chỉ giữ `giu` tin mới nhất. Trả số tin đã xoá. Phải gọi trong giao dịch đang mở.
 
-    Mốc cắt là id của tin thứ `giu` tính từ mới nhất (truy vấn theo chỉ mục `ix_msg_conv`, không quét cả bảng); chưa đủ `giu` tin thì
-    không có mốc và không xoá gì."""
+    Mốc cắt là thứ tự (ORDER_KEY) của tin thứ `giu` tính từ mới nhất (theo chỉ mục `ix_msg_conv_order`, không quét cả bảng); chưa đủ
+    `giu` tin thì mốc là NULL, phép so sánh không đúng với tin nào và không xoá gì. Tin nhập từ lịch sử có thể mang thứ tự âm, nên không
+    lấy 0 làm mốc rỗng như trước."""
     cur = db.execute(
-        "DELETE FROM messages WHERE conversation_id=? AND id < COALESCE("
-        "(SELECT id FROM messages WHERE conversation_id=? ORDER BY id DESC LIMIT 1 OFFSET ?), 0)",
+        f"DELETE FROM messages WHERE conversation_id=? AND {ORDER_KEY} < "
+        f"(SELECT {ORDER_KEY} FROM messages WHERE conversation_id=? ORDER BY {ORDER_KEY} DESC LIMIT 1 OFFSET ?)",
         (int(conv_id), int(conv_id), int(giu) - 1))
     return int(cur.rowcount or 0)
 
@@ -545,7 +591,7 @@ def tin_gan_day(channel: str, account_id: str, external_chat_id: str, limit: int
         with _lock:
             rows = _conn().execute(
                 "SELECT m.* FROM messages m JOIN conversations c ON c.id=m.conversation_id"
-                " WHERE c.channel_account_id=? AND c.external_chat_id=? ORDER BY m.id DESC LIMIT ?",
+                " WHERE c.channel_account_id=? AND c.external_chat_id=? ORDER BY COALESCE(m.seq, m.id) DESC LIMIT ?",
                 (_tai_khoan_id(channel, account_id), str(external_chat_id), n)).fetchall()
         return [dict(r) for r in reversed(rows)]
     except Exception as ex:      # noqa: BLE001
@@ -595,6 +641,63 @@ def own_messages_without_id(channel: str, account_id: str, external_chat_id: str
         return [dict(r) for r in rows]
     except Exception as ex:      # noqa: BLE001
         print(f"[conversations] đọc tin chưa có mã lỗi: {type(ex).__name__}: {ex}", file=sys.stderr)
+        return []
+
+
+def known_message_ids(channel: str, account_id: str, external_chat_id: str, ids) -> Optional[set]:
+    """The ids among `ids` already stored in this chat. None when the chat has no conversation yet. Never raises
+    (a read error answers "all known", so nothing is written twice on a bad read)."""
+    wanted = [str(i) for i in (ids or []) if str(i or "")]
+    try:
+        with _lock:
+            db = _conn()
+            conv = db.execute("SELECT id FROM conversations WHERE channel_account_id=? AND external_chat_id=?",
+                              (_tai_khoan_id(channel, account_id), str(external_chat_id))).fetchone()
+            if not conv:
+                return None
+            found: set = set()
+            for i in range(0, len(wanted), 500):
+                part = wanted[i:i + 500]
+                rows = db.execute(
+                    "SELECT external_message_id FROM messages WHERE conversation_id=? AND external_message_id IN ("
+                    + ",".join("?" * len(part)) + ")", [int(conv["id"])] + part).fetchall()
+                found.update(str(r[0]) for r in rows)
+            return found
+    except Exception as ex:      # noqa: BLE001
+        print(f"[conversations] known ids read failed: {type(ex).__name__}: {ex}", file=sys.stderr)
+        return set(wanted)
+
+
+def first_message_at(channel: str, account_id: str, external_chat_id: str) -> Optional[float]:
+    """Time of the oldest message stored in this chat, None when there is none. Never raises (None on a read error)."""
+    try:
+        with _lock:
+            r = _conn().execute(
+                "SELECT MIN(m.created_at) FROM messages m JOIN conversations c ON c.id=m.conversation_id"
+                " WHERE c.channel_account_id=? AND c.external_chat_id=?",
+                (_tai_khoan_id(channel, account_id), str(external_chat_id))).fetchone()
+        return float(r[0]) if r and r[0] is not None else None
+    except Exception as ex:      # noqa: BLE001
+        print(f"[conversations] first message read failed: {type(ex).__name__}: {ex}", file=sys.stderr)
+        return None
+
+
+def own_messages_between(channel: str, account_id: str, external_chat_id: str, start: float, end: float,
+                         n: int = 50) -> list:
+    """Messages this account sent in a chat (the bot, or the owner from the inbox or the phone) with `start <=
+    created_at <= end`: `[{id, text, external_message_id}]`, newest first. Never raises."""
+    try:
+        with _lock:
+            rows = _conn().execute(
+                "SELECT m.id, m.text, m.external_message_id FROM messages m"
+                " JOIN conversations c ON c.id=m.conversation_id"
+                " WHERE c.channel_account_id=? AND c.external_chat_id=? AND m.sender_type IN ('ai', 'human')"
+                " AND m.created_at BETWEEN ? AND ? ORDER BY m.id DESC LIMIT ?",
+                (_tai_khoan_id(channel, account_id), str(external_chat_id), float(start), float(end),
+                 int(n))).fetchall()
+        return [dict(r) for r in rows]
+    except Exception as ex:      # noqa: BLE001
+        print(f"[conversations] own messages read failed: {type(ex).__name__}: {ex}", file=sys.stderr)
         return []
 
 
@@ -937,24 +1040,33 @@ def chi_tiet(conversation_id: int) -> Optional[dict]:
     return d
 
 
+# The place (ORDER_KEY) of the message a cursor names; a message gone meanwhile (group trim) falls back to its id, the place
+# it had unless it was imported. Takes the id twice.
+_CHO_CUA = f"COALESCE((SELECT {ORDER_KEY} FROM messages WHERE id=?), ?)"
+
+
 def tin_nhan(conversation_id: int, limit: int = 100, before_id: int = 0, after_id: int = 0) -> List[dict]:
     """Tin của một hội thoại, CŨ TRƯỚC MỚI SAU trong cửa sổ trả về (cửa sổ lấy từ cuối lên).
 
     `before_id` > 0: lấy các tin CŨ HƠN id đó (cuộn ngược để xem thêm).
     `after_id` > 0 (0.65.11): lấy các tin MỚI HƠN id đó, cũ trước mới sau. Nhịp làm mới 5 giây của khung tin chỉ hỏi phần này, thay vì
     tải lại cả trăm tin mỗi lần.
+
+    Thứ tự là ORDER_KEY, không phải id: tin nhập từ lịch sử vào cuộc chat đã có tin có id mới hơn nhưng đứng trên cùng. Hai con trỏ vẫn là
+    id tin (khung tin chỉ biết id): `before_id` lấy các tin đứng TRƯỚC tin đó, `after_id` lấy các tin ghi SAU nó (id lớn hơn) mà cũng đứng
+    sau nó, nên tin cũ vừa nhập không bị nối vào cuối khung đang mở.
     """
     n = max(1, min(int(limit or 100), MAX_TIN_MOT_LAN))
     args: list = [int(conversation_id)]
     sql = "SELECT * FROM messages WHERE conversation_id=?"
     moi = bool(after_id and int(after_id) > 0)
     if moi:
-        sql += " AND id>?"; args.append(int(after_id))
-        sql += " ORDER BY id ASC LIMIT ?"; args.append(n)
+        sql += f" AND id>? AND {ORDER_KEY} > {_CHO_CUA}"; args += [int(after_id)] * 3
+        sql += f" ORDER BY {ORDER_KEY} ASC LIMIT ?"; args.append(n)
     else:
         if before_id and int(before_id) > 0:
-            sql += " AND id<?"; args.append(int(before_id))
-        sql += " ORDER BY id DESC LIMIT ?"; args.append(n)
+            sql += f" AND {ORDER_KEY} < {_CHO_CUA}"; args += [int(before_id)] * 2
+        sql += f" ORDER BY {ORDER_KEY} DESC LIMIT ?"; args.append(n)
     with _lock:
         rows = _conn().execute(sql, args).fetchall()
     out = []
@@ -966,10 +1078,10 @@ def tin_nhan(conversation_id: int, limit: int = 100, before_id: int = 0, after_i
 
 
 def co_tin_cu(conversation_id: int, tin_id: int) -> bool:
-    """Còn tin nào CŨ HƠN `tin_id` trong hội thoại này không (để khung tin biết có nên hiện nút/tự tải tin cũ)."""
+    """Còn tin nào đứng TRƯỚC `tin_id` trong hội thoại này không (để khung tin biết có nên hiện nút/tự tải tin cũ)."""
     with _lock:
-        r = _conn().execute("SELECT 1 FROM messages WHERE conversation_id=? AND id<? LIMIT 1",
-                            (int(conversation_id), int(tin_id))).fetchone()
+        r = _conn().execute(f"SELECT 1 FROM messages WHERE conversation_id=? AND {ORDER_KEY} < {_CHO_CUA} LIMIT 1",
+                            (int(conversation_id), int(tin_id), int(tin_id))).fetchone()
     return r is not None
 
 
@@ -1018,6 +1130,7 @@ def delete_conversation(conversation_id: int) -> bool:
         except Exception:
             db.rollback()
             raise
+    _insights_cache.clear()      # the Stats tab must not keep counting a chat that is gone
     return cur.rowcount > 0
 
 
@@ -1278,9 +1391,10 @@ def draft_of(conv: dict) -> Optional[dict]:
 
 
 def last_customer_message_id(conversation_id: int) -> int:
+    """Id of the customer's last message in display order (an old one imported from the history has a newer id)."""
     with _lock:
-        r = _conn().execute("SELECT MAX(id) FROM messages WHERE conversation_id=? AND sender_type='customer'",
-                            (int(conversation_id),)).fetchone()
+        r = _conn().execute(f"SELECT id FROM messages WHERE conversation_id=? AND sender_type='customer'"
+                            f" ORDER BY {ORDER_KEY} DESC LIMIT 1", (int(conversation_id),)).fetchone()
     return int(r[0] or 0) if r else 0
 
 
@@ -1471,50 +1585,69 @@ def insights(since: float, until: float, account: str = "") -> dict:
     tz = localefmt.tz()
     with _lock:
         db = _conn()
-        rows = db.execute(
-            "SELECT m.conversation_id AS cid, m.sender_type AS who, m.created_at AS ts, a.channel AS channel,"
-            " c.bot_id AS bot_id, a.id AS acc FROM messages m JOIN conversations c ON c.id=m.conversation_id"
+        cur_rows = db.cursor()
+        cur_rows.row_factory = None         # plain tuples: this loop can see hundreds of thousands of rows
+        rows = cur_rows.execute(
+            "SELECT m.conversation_id, m.sender_type, m.created_at, a.channel, c.bot_id, a.id"
+            " FROM messages m JOIN conversations c ON c.id=m.conversation_id"
             " JOIN channel_accounts a ON a.id=c.channel_account_id"
             " WHERE m.created_at>=? AND m.created_at<? AND m.sender_type IN ('customer','ai','human')"
             " AND m.message_type!='reaction'" + (" AND c.channel_account_id=?" if account else "") +
             " ORDER BY m.conversation_id, m.created_at, m.id",
             (float(since), float(until)) + ((str(account),) if account else ())).fetchall()
+        # A new chat: a private chat whose very first message falls in the period, that is, it has a message in the period
+        # and none before it. Asked per chat through ix_msg_conv_time instead of grouping every message ever stored.
         moi = db.execute(
-            "SELECT COUNT(*) FROM (SELECT m.conversation_id, MIN(m.created_at) AS dau FROM messages m"
-            " JOIN conversations c ON c.id=m.conversation_id WHERE c.chat_type='private'" +
+            "SELECT COUNT(*) FROM conversations c WHERE c.chat_type='private'" +
             (" AND c.channel_account_id=?" if account else "") +
-            " GROUP BY m.conversation_id HAVING dau>=? AND dau<?)",
-            ((str(account),) if account else ()) + (float(since), float(until))).fetchone()[0]
+            " AND EXISTS (SELECT 1 FROM messages m WHERE m.conversation_id=c.id AND m.created_at>=? AND m.created_at<?)"
+            " AND NOT EXISTS (SELECT 1 FROM messages m WHERE m.conversation_id=c.id AND m.created_at<?)",
+            ((str(account),) if account else ()) + (float(since), float(until), float(since))).fetchone()[0]
     out = {"ai": 0, "human": 0, "customer": 0, "wait_avg": None, "waits": 0, "by_channel": {}, "by_bot": {}, "by_account": {},
            "wait_ai": None, "wait_human": None, "waits_ai": 0, "waits_human": 0, "ai_rest": 0,
            "chats": 0, "new_chats": int(moi or 0), "hours": [0] * 24}
+    by_channel, by_account, by_bot, hours = out["by_channel"], out["by_account"], out["by_bot"], out["hours"]
+    totals = {"customer": 0, "ai": 0, "human": 0}
+    # Hour of the day per 15-minute slot: every time zone offset is a whole number of quarter hours, so one slot never
+    # spans two local hours, and the time zone is asked once per slot instead of once per message.
+    slot_hour: dict = {}
     waits, w_ai, w_human, start, cur, khach = [], [], [], None, None, set()
-    for r in rows:
-        who, ts = str(r["who"]), float(r["ts"] or 0)
-        if r["cid"] != cur:
-            cur, start = r["cid"], None
-        ch = out["by_channel"].setdefault(str(r["channel"] or ""), {"customer": 0, "ai": 0, "human": 0})
+    ai_rest = 0
+    for cid, who, ts, channel, bot_id, acc_id in rows:
+        ts = float(ts or 0)
+        if cid != cur:
+            cur, start = cid, None
+        ch = by_channel.get(channel or "")
+        if ch is None:
+            ch = by_channel[channel or ""] = {"customer": 0, "ai": 0, "human": 0}
         ch[who] += 1
-        acc = out["by_account"].setdefault(str(r["acc"] or ""), {"customer": 0, "ai": 0, "human": 0})
+        acc = by_account.get(acc_id or "")
+        if acc is None:
+            acc = by_account[acc_id or ""] = {"customer": 0, "ai": 0, "human": 0}
         acc[who] += 1
-        out[who] += 1
-        gio = datetime.fromtimestamp(ts, tz).hour
+        totals[who] += 1
+        slot = int(ts // 900)
+        gio = slot_hour.get(slot)
+        if gio is None:
+            gio = slot_hour[slot] = datetime.fromtimestamp(slot * 900, tz).hour
         if who == "customer":
-            khach.add(r["cid"])
-            out["hours"][gio] += 1
+            khach.add(cid)
+            hours[gio] += 1
             if start is None:
                 start = ts
         else:
             if who == "ai":
-                if r["bot_id"]:
-                    out["by_bot"][str(r["bot_id"])] = out["by_bot"].get(str(r["bot_id"]), 0) + 1
+                if bot_id:
+                    by_bot[bot_id] = by_bot.get(bot_id, 0) + 1
                 if gio >= NGHI_TU or gio < NGHI_DEN:
-                    out["ai_rest"] += 1
+                    ai_rest += 1
             if start is not None:
                 w = max(0.0, ts - start)
                 waits.append(w)
                 (w_ai if who == "ai" else w_human).append(w)
                 start = None
+    out.update(totals)
+    out["ai_rest"] = ai_rest
     out["chats"] = len(khach)
     if waits:
         out["wait_avg"] = round(sum(waits) / len(waits), 1)
@@ -1522,6 +1655,32 @@ def insights(since: float, until: float, account: str = "") -> dict:
     out["wait_ai"], out["waits_ai"] = _trung_vi(w_ai), len(w_ai)
     out["wait_human"], out["waits_human"] = _trung_vi(w_human), len(w_human)
     return out
+
+
+# Stats tab cache (owner, 2026-11-07: the tab loaded slowly). A period that has ended does not change any more (a deleted
+# chat clears this), so it is kept INSIGHTS_KEEP_CLOSED seconds; the running period, whose end is "now", is kept
+# INSIGHTS_KEEP_OPEN seconds, enough to switch tabs and come back without counting a month of messages again.
+INSIGHTS_KEEP_CLOSED = 600
+INSIGHTS_KEEP_OPEN = 20
+INSIGHTS_CACHE_MAX = 32
+_insights_cache: Dict[tuple, tuple] = {}
+
+
+def insights_cached(since: float, until: float, account: str = "", now: Optional[float] = None) -> dict:
+    """`insights` through a short-lived cache. A period ending at `now` (or later) is the running one: its key leaves
+    the end out, since the end moves on every call."""
+    now = time.time() if now is None else float(now)
+    closed = float(until) < now - 1
+    key = (str(_db_path or DB_PATH), round(float(since), 3), round(float(until), 3) if closed else "open", str(account or ""))
+    hit = _insights_cache.get(key)
+    if hit and hit[0] > now:
+        return copy.deepcopy(hit[1])
+    out = insights(since, until, account)
+    if len(_insights_cache) >= INSIGHTS_CACHE_MAX:
+        for k in [k for k, v in list(_insights_cache.items()) if v[0] <= now] or list(_insights_cache)[:1]:
+            _insights_cache.pop(k, None)
+    _insights_cache[key] = (now + (INSIGHTS_KEEP_CLOSED if closed else INSIGHTS_KEEP_OPEN), out)
+    return copy.deepcopy(out)
 
 
 def stats_accounts() -> List[dict]:

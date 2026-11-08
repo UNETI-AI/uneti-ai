@@ -1,13 +1,15 @@
 <!-- translated-from: README.md sha256:2e10ad3d2a86 -->
 <div align="center">
 
-<img src="../../../dashboard/logo.svg" width="88" alt="UNETI AI Logo">
+<a href="https://uneti-ai.github.io/uneti-ai/"><img src="../../assets/social-preview.png" width="100%" alt="UNETI AI: Your AI Workforce. Never miss the best AI."></a>
 
 # UNETI AI
 
-### Dein selbst gehosteter KI-Agent mit austauschbarem Gehirn und einem Second Brain, das jeden Tag schlauer wird.
+### Dein KI-Team. Verpasse nie die beste KI.
 
-Lass ihn auf deinem Laptop oder einem kleinen VPS laufen. Sprich mit ihm per Stimme. Schließ Claude, ChatGPT, Grok, Gemini oder einen von 12 Anbietern an, behalte beim Wechsel jedes Tool und lass ihn im Hintergrund arbeiten, während du schläfst.
+UNETI AI macht aus **Claude, ChatGPT, Gemini, Grok** und den Modellen deiner Wahl ein Team, das rund um die Uhr auf deinem eigenen Rechner oder Server arbeitet. Jedes Teammitglied hat eine Rolle, teilt dasselbe Gedächtnis und dieselben Tools und arbeitet im Hintergrund weiter. Kommt ein besseres Modell, wechselst du und behältst alles, was das Team gelernt hat.
+
+**🌐 Website: [uneti-ai.github.io](https://uneti-ai.github.io/uneti-ai/)** · Open Source · Selbst gehostet · 14 KI-Anbieter
 
 [![GitHub stars](https://img.shields.io/github/stars/uneti-ai/uneti-ai?style=flat&logo=github&label=stars)](https://github.com/uneti-ai/uneti-ai/stargazers)
 [![License: MIT](https://img.shields.io/badge/license-MIT-22c55e)](../../../LICENSE)
@@ -507,5 +509,6 @@ Du kannst nicht spenden? UNETI AI zu nutzen, Feedback zu schicken oder einen Pul
 
 <div align="center">
 <br>
+<b><a href="https://uneti-ai.github.io/uneti-ai/">uneti-ai.github.io</a></b><br>
 Mit ☕ in Vietnam gemacht von <b><a href="https://minhquy.vn">Minh Quý</a></b>
 </div>

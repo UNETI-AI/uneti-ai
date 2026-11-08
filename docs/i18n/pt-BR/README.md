@@ -1,13 +1,15 @@
 <!-- translated-from: README.md sha256:2e10ad3d2a86 -->
 <div align="center">
 
-<img src="../../../dashboard/logo.svg" width="88" alt="Logo do UNETI AI">
+<a href="https://uneti-ai.github.io/uneti-ai/"><img src="../../assets/social-preview.png" width="100%" alt="UNETI AI: Your AI Workforce. Never miss the best AI."></a>
 
 # UNETI AI
 
-### Seu agente de IA self-hosted com um cérebro intercambiável e um Second Brain que fica mais inteligente a cada dia.
+### Sua equipe de IA. Nunca perca a melhor IA.
 
-Rode no seu notebook ou em uma VPS pequena. Converse com ele por voz. Conecte Claude, ChatGPT, Grok, Gemini ou qualquer um dos 12 provedores, mantenha todas as ferramentas quando trocar de um para outro e deixe ele trabalhar em segundo plano enquanto você dorme.
+O UNETI AI transforma **Claude, ChatGPT, Gemini, Grok** e os modelos que você escolher em uma equipe que trabalha 24/7 na sua própria máquina ou servidor. Cada colega tem um papel, compartilha a mesma memória e as mesmas ferramentas, e continua trabalhando em segundo plano. Quando sai um modelo melhor, você troca e mantém tudo o que eles aprenderam.
+
+**🌐 Site: [uneti-ai.github.io](https://uneti-ai.github.io/uneti-ai/)** · Código aberto · Self-hosted · 14 provedores de IA
 
 [![GitHub stars](https://img.shields.io/github/stars/uneti-ai/uneti-ai?style=flat&logo=github&label=stars)](https://github.com/uneti-ai/uneti-ai/stargazers)
 [![License: MIT](https://img.shields.io/badge/license-MIT-22c55e)](../../../LICENSE)
@@ -507,5 +509,6 @@ Não pode doar? Usar o UNETI AI, mandar feedback ou abrir um pull request també
 
 <div align="center">
 <br>
+<b><a href="https://uneti-ai.github.io/uneti-ai/">uneti-ai.github.io</a></b><br>
 Feito com ☕ no Vietnã por <b><a href="https://minhquy.vn">Minh Quý</a></b>
 </div>

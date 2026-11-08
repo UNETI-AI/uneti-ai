@@ -13,12 +13,33 @@ function setSessionRunning(sid, on) {
   if (!sid) return;
   if (on) window.UnetiRunning.add(sid); else window.UnetiRunning.delete(sid);
   try { if (window.UnetiChatSide && window.UnetiChatSide.refresh) window.UnetiChatSide.refresh(); } catch (e) {}
+  emitTurnProgress(sid);
 }
+// A chat turn started, made a step, or ended. The Jobs tab of the Partners page (agent-jobs.js) listens to show the
+// assistant's running chat turn with its plan: a chat turn is not a queued job, so the tab looked empty while the
+// assistant was clearly working (owner, 08/11/2026).
+function emitTurnProgress(sid) {
+  try { window.dispatchEvent(new CustomEvent("uneti:chat-turn", { detail: { sid: sid } })); } catch (e) {}
+}
+// { sid, running, steps, buoc } of a chat's turn (the open chat when `sid` is empty), or null when none ran here.
+window.UnetiChatLive = {
+  turn: function (sid) {
+    const id = sid || savedSessionId;
+    const t = id ? turns[id] : null;
+    if (!t) return null;
+    return { sid: id, running: !!t.running, steps: (t.buoc && t.buoc.so) || 0, buoc: t.buoc || null };
+  },
+};
 
 // Lưu & khôi phục phiên gần nhất (hội thoại + số liệu + session Claude)
 const SESSION_KEY = "uneti.session.v1";
 let convo = [];            // [{role:"user"|"uneti", text, atts}]
 let savedSessionId = null; // session_id của Claude để resume sau khi F5
+// Typed messages the server has not confirmed yet (chat_ack), kept in localStorage so a page the phone killed in the
+// background still sends them after it reloads. See _trackUnacked.
+const UNACKED_KEY = "uneti.unacked.v1";
+let _unacked = [];
+try { const a = JSON.parse(localStorage.getItem(UNACKED_KEY) || "[]"); if (Array.isArray(a)) _unacked = a; } catch (e) {}
 const stopBtn = document.getElementById("stopBtn");
 let stopTag = null;        // tag phiên chat server phát qua message hello → Stop chỉ ngắt phiên MÌNH
 
@@ -68,6 +89,8 @@ function stopCurrent() {
   if (sid && ws && ws.readyState === WebSocket.OPEN) {
     try { ws.send(JSON.stringify({ action: "stop", session_id: sid })); } catch (e) {}
   }
+  // Stopped: a message of this chat still waiting for its ack must not be sent again on the next socket.
+  if (sid && _unacked.some(u => u.sid === sid)) { _unacked = _unacked.filter(u => u.sid !== sid); _saveUnacked(); }
   if (sid) {
     // Luôn gửi thêm qua HTTP: socket có thể OPEN trên giấy mà đã chết (máy ngủ, đổi Wi-Fi), lệnh
     // Dừng gửi vào đó là rơi mất. Dừng hai lần vô hại, server huỷ theo phiên. Job không phụ thuộc
@@ -632,6 +655,8 @@ async function napCaiDatGiong() {
     voice.sttUpload = upload;
   } catch (e) {}
 }
+// 2026-11-08: a call or dictation in a partner's chat is heard by the ear of that partner's own model.
+voice.sttSession = () => savedSessionId || "";
 napCaiDatGiong();
 window.UnetiVoiceMode = { refresh: napCaiDatGiong, get: () => voiceMode };
 
@@ -1031,6 +1056,7 @@ function connect() {
   // Mất socket là trạng thái THẬT người dùng cần thấy ("ĐANG KẾT NỐI LẠI"), không phải đoán.
   ws.onclose = (e) => {
     _ghiDut(e && e.code, !!(e && e.wasClean), _wsMoLuc);
+    if (!_wsMoLuc) _checkLoginAfterRefusal();
     _wsMoLuc = 0;
     try { runActions(turn.wsDown()); } catch (e2) {}
     baoDutMang(true);
@@ -1067,6 +1093,22 @@ function _ghiDut(code, clean, moLuc) {
   _wsDut.push({ code: String(code == null ? "" : code), clean: !!clean, open_s: moLuc ? (now - moLuc) / 1000 : 0,
     at: now / 1000 });
   if (_wsDut.length > 10) _wsDut.shift();
+}
+// ---- A socket refused at the handshake: maybe the login, not the network (users, 07/11/2026) ----
+// The server refuses /ws when the session cookie is no longer valid (it expired after 30 days, a password change or a
+// reset signed every browser out). The browser only sees a socket that never opened, so the page said "Mất kết nối
+// tới máy chủ" and retried every 3 seconds forever, every list read 0, and restarting the server changed nothing.
+// Ask /auth/status (public, cheap) at most every 15 s; signed out means the sign-in screen, not "reconnecting".
+let _loginCheckAt = 0;
+async function _checkLoginAfterRefusal() {
+  if (Date.now() - _loginCheckAt < 15000) return;
+  _loginCheckAt = Date.now();
+  const s = await _fetchAuthStatus(1, 0);
+  if (!(s && s.auth_required && !s.authed)) return;
+  baoDutMang(false);
+  await initAuthGate();
+  const err = document.getElementById("authErr");
+  if (err && authOverlay && authOverlay.classList.contains("open")) err.textContent = window.t("app.ws_login_lost");
 }
 function _baoDutVeMayChu() {
   if (!_wsDut.length) return;
@@ -1122,6 +1164,9 @@ document.addEventListener("visibilitychange", () => {
 // bfcache trả trang về từ bộ nhớ (persisted): trạng thái là ảnh chụp cũ, luôn hồi sức.
 window.addEventListener("pageshow", (e) => { if (e.persisted) _resumeSauNgu(true); });
 function _resumeSauNgu(force) {
+  // A message sent before the app went to the background is still unconfirmed: the socket died under it. Reconnect
+  // now whatever the sleep length, `hello` sends it again.
+  if (ws && ws.readyState === WebSocket.OPEN && _unackedOverdue()) { _hiddenAt = 0; _dropDeadSocket(); return; }
   // Ngủ dưới 20 giây (chuyển app qua lại) thì socket thường còn sống, đừng kéo lại hội
   // thoại một cách ồn ào - trừ khi bfcache (force) vì khi đó không biết đã ngủ bao lâu.
   if (!force && (!_hiddenAt || Date.now() - _hiddenAt < 20000)) return;
@@ -1197,6 +1242,8 @@ function handleMessage(data) {
       };
       setSessionRunning(sid, true);
     });
+    // Typed messages the old socket may have swallowed go out again now (the server drops a copy it already has).
+    _resendUnacked();
     // Lượt của phiên đang xem đã xong trong lúc đứt (lỗi hoặc không có chữ thì không có gì để tải
     // lại): bỏ chip "đang suy nghĩ" còn sót, không thì nó đếm mãi trong khi nút Gửi đã mở lại.
     if (savedSessionId && !(turns[savedSessionId] && turns[savedSessionId].running)) hideActivity();
@@ -1230,6 +1277,7 @@ function handleMessage(data) {
     if(data.type==='turn_done' && data.session_id===savedSessionId && _tinChoLuot) guiTinCho();
     return;
   }
+  if (data.type === "chat_ack") { _onChatAck(data); return; }
   if (data.type === "ui_action") {
     // Tool uneti_ui (server) bảo dashboard mở trang / file / việc. ui-actions.js kiểm rồi làm
     // và tự trả ui_result về server để tool trả lời model ngay trong lượt.
@@ -1263,6 +1311,11 @@ function handleMessage(data) {
     // chat_reaction vẽ lại reaction của tin đó ở mọi bong bóng đang mở, kể cả khi đổi ở tab khác. Không đụng lượt đang chạy
     // (cả hai gói nằm ngoài KHUNG_LUOT nên không dựng lại turns[sid]).
     try { if (window.UnetiChatReactions) window.UnetiChatReactions.onFrame(data, { bubble: t && t.bubble }); } catch (e) {}
+    // 2026-11-08: a chat answered while another one is on screen (the owner switched away mid-turn): refresh its kept
+    // copy now, so going back draws the answer at once.
+    try {
+      if (data.type === "turn_saved" && sid && sid !== savedSessionId && _phienCache.has(sid)) _taiPhien(sid).catch(() => {});
+    } catch (e) {}
     return;
   }
   if (data.type === "route") {
@@ -1334,6 +1387,11 @@ function handleMessage(data) {
     if (data.type === "steer_read" && isActive && t) { try { moveTurnBelow(t); } catch (e) {} }
     return;
   }
+  if (data.type === "session_read") {
+    // 0.491.0: a chat was read (this tab or another): its red unread dot goes away in every history list.
+    try { window.dispatchEvent(new CustomEvent("uneti:session-read", { detail: data })); } catch (e) {}
+    return;
+  }
   if (data.type === "agent_read") {
     // 0.205.0: a partner chat was read or muted (this tab or another): the Partners list reads its counts again.
     try { window.dispatchEvent(new CustomEvent("uneti:agent-read", { detail: data })); } catch (e) {}
@@ -1375,16 +1433,20 @@ function handleMessage(data) {
     if (isActive) { runActions(turn.turnStart()); showActivity(escapeHtml(data.content || "")); syncActiveUI(); }
   } else if (data.type === "tool_call") {
     if (t && window.UnetiSteps) t.buoc = window.UnetiSteps.nhan(t.buoc, data);
+    emitTurnProgress(sid);
     if (isActive) {
       runActions(turn.toolCall(data.tool || ""));
       veKhoiBuoc(t, true);
       // chip = dong dang chay + dong ho, luon nam duoi khoi. Ghi cung nhan RO VIEC nhu khoi
       // ("Chay lenh: git status") thay cho "Dang goi: Bash" (0.64.44).
       const _nhan = window.UnetiSteps ? window.UnetiSteps.nhanDong(data) : (data.content || "");
-      showActivity(escapeHtml(_nhan));
+      // The engine just updated its plan: the chip says where it is in it ("Plan 2/5: Write the tests").
+      const _plan = (data.plan && window.UnetiSteps && window.UnetiSteps.planLine) ? window.UnetiSteps.planLine(t && t.buoc) : "";
+      showActivity(escapeHtml(_plan || _nhan));
     }
   } else if (data.type === "tool_result") {
     if (t && window.UnetiSteps) t.buoc = window.UnetiSteps.nhan(t.buoc, data);
+    emitTurnProgress(sid);
     if (isActive) { veKhoiBuoc(t, true); showActivity(Icons.msg("check", window.t("app.act_analyzing"), { cls: "ic-ok" })); }
   } else if (data.type === "stream") {
     if (!t) return;
@@ -1562,6 +1624,9 @@ function handleMessage(data) {
     if (sid) delete turns[sid];
     if (isActive && _tinChoLuot) guiTinCho();   // câu người dùng chen ngang: lượt cũ dừng hẳn rồi thì gửi
     if (isActive) guiCauChoLuot();               // câu nói lúc đang trả lời (cuộc gọi): gửi nếu loa đã im
+    // 2026-11-08: a finished turn may have changed what the console pages show (a skill, a connection, a setting):
+    // forget the copies they would otherwise draw first (fetch-gop.js).
+    try { if (window.UnetiFetchGop && window.UnetiFetchGop.forget) window.UnetiFetchGop.forget(); } catch (e) {}
     notifySessions();
     // Lượt vừa xong có thể đã giao việc nền. Đây là ĐÚNG khoảnh khắc người dùng đọc câu trả
     // lời "em đã giao 3 việc" và tự hỏi nó có chạy thật không - dải phải trả lời được ngay.
@@ -1569,6 +1634,14 @@ function handleMessage(data) {
     // /goal: lượt vừa đóng, đây là lúc duy nhất quyết định có tự gửi vòng tiếp không. Gọi cho cả chat
     // chạy nền (0.290.0): mục tiêu của chat đó ghi nhận vòng đã xong, mở lại chat là nó đi tiếp.
     try { if (window.UnetiLenh) window.UnetiLenh.hetLuot(sid); } catch (e) {}
+    // The likely next message in the empty box (chat-suggest.js). Not during a voice call: nobody types there.
+    try {
+      if (isActive && chatSuggest && !handsFreeActive() && convo.length && convo[convo.length - 1].role === "uneti") {
+        const _want = sid;
+        chatSuggest.request(convo.slice(-6).map(m => ({ role: m.role === "user" ? "user" : "assistant", text: m.text })))
+          .then(() => { if (savedSessionId !== _want) dropSuggest(); });
+      }
+    } catch (e) {}
   }
 }
 
@@ -1706,6 +1779,104 @@ function traTinDutMang() {
   showActivity(Icons.warn(window.t("app.ws_tra_tin")));
 }
 
+// ---- Messages sent but not yet confirmed by the server (owner, 06/11/2026) ----
+// "On the phone I type, press Enter, it spins, I swipe to another app and when I come back the whole exchange is
+// gone, not even in History. Sometimes, not always." A phone often lets the socket die in the background while the
+// page still sees it as OPEN, so ws.send() threw nothing and the message went nowhere. The spinner was local, the
+// server never got the message, and the resync on return redrew the chat from the server without it.
+// Now every typed message carries `client_msg_id` and stays here until the server answers `chat_ack`. No ack within
+// ACK_WAIT_MS means the socket is dead: drop it, and the next `hello` sends what is left again. The server stores
+// the id with the message, so a resend of a message it did get is answered with an ack and never runs twice.
+const ACK_WAIT_MS = 15000, UNACKED_TTL_MS = 30 * 60 * 1000;
+// Sockets a message may go out on without an ack before it goes back to the input box. Without a cap, a message the
+// server fails on every time (a bug, a broken disk) was resent on every reconnect, forever (users, 07/11/2026).
+const MAX_RESENDS = 3;
+function _saveUnacked() {
+  try {
+    if (_unacked.length) localStorage.setItem(UNACKED_KEY, JSON.stringify(_unacked.slice(-10)));
+    else localStorage.removeItem(UNACKED_KEY);
+  } catch (e) {}
+}
+function _trackUnacked(sid, msg, atts, payload) {
+  _unacked.push({ id: payload.client_msg_id, sid, msg, atts, payload, at: Date.now(), sentAt: 0 });
+  if (_unacked.length > 10) _unacked.shift();
+  _saveUnacked();
+}
+function _dropUnacked(id) {
+  const n = _unacked.length;
+  _unacked = _unacked.filter(u => u.id !== id);
+  if (_unacked.length !== n) _saveUnacked();
+}
+function _sendUnacked(u) {
+  u.sentAt = Date.now();
+  u.tries = (u.tries || 0) + 1;
+  _saveUnacked();
+  const sock = ws;
+  try { sock.send(JSON.stringify(u.payload)); } catch (e) {}
+  setTimeout(() => {
+    if (!_unacked.some(x => x.id === u.id)) return;
+    // Hidden page: timers are throttled and the phone may be asleep, _resumeSauNgu checks again on return.
+    if (sock === ws && ws.readyState === WebSocket.OPEN && !document.hidden) _dropDeadSocket();
+  }, ACK_WAIT_MS);
+}
+// A message waiting longer than ACK_WAIT_MS on the open socket: that socket is dead whatever readyState says.
+function _unackedOverdue() {
+  const now = Date.now();
+  return _unacked.some(u => u.sentAt && now - u.sentAt > ACK_WAIT_MS);
+}
+// From `hello`: the new socket sends again whatever the old one may have lost. Too old (the owner may have moved on)
+// goes back to the input box instead of running on its own.
+function _resendUnacked() {
+  if (!_unacked.length || !(ws && ws.readyState === WebSocket.OPEN)) return;   // held: the next hello sends them
+  const now = Date.now();
+  const stale = _unacked.filter(u => now - u.at > UNACKED_TTL_MS);
+  if (stale.length) {
+    _unacked = _unacked.filter(u => now - u.at <= UNACKED_TTL_MS);
+    _saveUnacked();
+    const mine = stale.filter(u => u.sid === savedSessionId).map(u => u.msg);
+    if (mine.length && !chatInput.value.trim()) {
+      chatInput.value = mine.join("\n");
+      ghiChuThoang(window.t("app.ws_tra_tin"));
+    }
+  }
+  const failed = _unacked.filter(u => u.tries >= MAX_RESENDS);
+  if (failed.length) {
+    _unacked = _unacked.filter(u => !(u.tries >= MAX_RESENDS));
+    _saveUnacked();
+    const mine = failed.filter(u => u.sid === savedSessionId).map(u => u.msg);
+    if (mine.length && !chatInput.value.trim()) chatInput.value = mine.join("\n");
+    if (mine.length) ghiChuThoang(window.t("app.ws_tin_loi"));
+  }
+  _unacked.forEach(u => {
+    if (!(turns[u.sid] && turns[u.sid].running)) {
+      turns[u.sid] = { text: "", bubble: null, spoke: false, running: true,
+                       id: Number(u.payload.voice_turn_id) || ++_luotSeq };
+    }
+    setSessionRunning(u.sid, true);
+    _sendUnacked(u);
+  });
+}
+function _onChatAck(d) {
+  _dropUnacked(d.client_msg_id);
+  if (!d.dup || d.running) return;
+  // The server already had this message and its turn ended while the socket was down: close the turn here and load
+  // the stored answer.
+  const sid = d.session_id;
+  if (!sid || !(turns[sid] && turns[sid].running)) return;
+  handleMessage({ type: "turn_done", session_id: sid });
+  if (sid === savedSessionId) openStoredSession(sid);
+}
+// Messages still waiting for this chat, drawn under what the server returned, so a resync while one is in flight
+// does not wipe it off the screen. `ds`: the stored messages just drawn.
+function _drawUnacked(id, ds) {
+  const recent = (ds || []).slice(-6).filter(m => m.role === "user").map(m => _chuanTinSo(chuNguoiGo(m.content || "")));
+  _unacked.forEach(u => {
+    if (u.sid !== id || recent.includes(_chuanTinSo(u.msg))) return;
+    appendUserMessage(u.msg, u.atts || [], u.at);
+    convo.push({ role: "user", text: u.msg, atts: u.atts || [], ts: u.at });
+  });
+}
+
 // Phiên cộng sự (agent:/workflow:) -> phiên Trò chuyện đã GỌI nó bằng lệnh "/". Sống trong
 // bộ nhớ trang: tải lại trang là quên, và như vậy là đúng - lúc đó người dùng không còn đang
 // theo dõi cuộc gọi ấy nữa.
@@ -1716,6 +1887,7 @@ const _gocCongSu = {};
 // dù câu trong ô nhập có nghe như đang nói về chính quy trình.
 function sendMessage(text, opts) {
   if (window.UnetiWorkspace && !window.UnetiWorkspace.canSend()) return;
+  try { dropSuggest(); } catch (e) {}   // a suggestion belongs to the reply it followed
   let msg = (text || chatInput.value).trim();
   // Lệnh / : session-command chạy tại chỗ; skill-command bung thành lời gọi skill.
   // `opts.prefix` = tin do lệnh /plan, /goal (hoặc vòng tự động của /goal) gửi: khối chỉ dẫn đã
@@ -1937,16 +2109,26 @@ function sendMessage(text, opts) {
                           voice_input: _tuGiong, voice_turn_id: String(turns[sid].id),
                           wf_run: !!(opts && opts.wfRun), ...(adaptiveMeta || {}) };
   if(adaptiveMeta) { adaptiveCurrent.set(sid,adaptiveMeta.utterance_id);adaptiveOutbox.set(adaptiveMeta.utterance_id,{payload,element:userElement,since:performance.now()}); }
+  // Held until the server confirms it (chat_ack), resent on the next socket otherwise (see _trackUnacked).
+  // Adaptive voice already has its own receipt (adaptiveOutbox).
+  let _held = null;
+  if (!adaptiveMeta) {
+    payload.client_msg_id = newSid();
+    _trackUnacked(sid, msg, atts.map(a => ({ name: a.name, kind: a.kind, url: a.url || "" })), payload);
+    _held = _unacked[_unacked.length - 1];
+  }
   const _send = () => {
     if (!ws || ws.readyState !== WebSocket.OPEN) {
       // The socket dropped while the first turn waited for the folder pin: nothing was sent,
       // so end the turn here and give the text back instead of losing it silently.
+      if (_held) _dropUnacked(_held.id);
       if (turns[sid]) turns[sid].running = false;
       setSessionRunning(sid, false); hideActivity(); syncActiveUI();
       chatInput.value = msg;
       ghiChuThoang(window.t("app.ws_mat_ket_noi"));
       return;
     }
+    if (_held) { _sendUnacked(_held); return; }
     try { ws.send(JSON.stringify(payload)); } catch (e) {}
   };
   const _w = _pinWait; _pinWait = null;
@@ -2306,20 +2488,37 @@ let sessionOpenSeq = 0;
 // tới 1-2 giây) rồi mới vẽ. Giờ khúc tin cuối của vài cuộc gần nhất được giữ trong bộ nhớ: mở lại là vẽ NGAY từ đó,
 // đồng thời hỏi máy chủ bản mới; bản mới khác thì vẽ lại, giống thì thôi (không nháy). Rê chuột hay chạm vào một
 // mục trong danh sách cũng hỏi trước (prefetchSession), nên lần mở ĐẦU cũng thường đã có sẵn.
-const _PHIEN_CACHE_MAX = 16;
-const _PHIEN_CACHE_TTL = 5 * 60 * 1000;     // quá hạn thì không vẽ từ cache nữa, chờ bản mới như cũ
+// 2026-11-08 (owner: "chuyển từ hội thoại này sang hội thoại khác bị delay mấy giây"): 50 chats instead of 16, kept
+// in this browser across reloads (chat-cache.js), and no 5-minute limit. The copy is only ever a first paint: the
+// server is asked every time and the chat redrawn when its answer differs, so an old copy cannot stay on screen.
+const _PHIEN_CACHE_MAX = 50;
+const _PHIEN_CACHE_TTL = 7 * 24 * 3600 * 1000;
 const _PREFETCH_TUOI = 15 * 1000;            // bản tải trước còn mới trong khoảng này thì khỏi hỏi lại
+const _WARM_MAX = 8;                      // chats the history list warms by itself once the page is idle
+const _WARM_FRESH_MS = 10 * 60 * 1000;        // ...unless a copy this fresh is already kept
 const _phienCache = new Map();               // id -> { sess, at }
 const _phienDangTai = new Map();             // id -> Promise<sess> (gộp các lượt hỏi trùng)
 let _phienMoLuc = null;                      // { id, len } - độ dài convo lúc mở, để biết cuộc đã đổi khi rời đi
+// The copies kept by earlier visits, read once at start (oldest first, so the newest stay last in the LRU order).
+// openStoredSession waits for this read only while it races the server's answer.
+let _keptChatsLoading = null;
+try {
+  if (window.UnetiChatCache) _keptChatsLoading = window.UnetiChatCache.all().then((ds) => {
+    for (let i = Math.min(ds.length, _PHIEN_CACHE_MAX) - 1; i >= 0; i--) {
+      if (!_phienCache.has(ds[i].id)) _phienCache.set(ds[i].id, { sess: ds[i].sess, at: ds[i].at });
+    }
+  }).catch(() => {}).finally(() => { _keptChatsLoading = null; });
+} catch (e) {}
 
 // tools=0: the chat view never shows stored tool calls, and they can be most of the payload (see sessions_get).
 function _urlPhien(id) { return `/sessions/${encodeURIComponent(id)}?limit=${TIN_MOI_LUOT}&tools=0`; }
 function _ghiCachePhien(id, sess) {
   if (!id || !sess || sess.error) return;
+  const at = Date.now();
   _phienCache.delete(id);
-  _phienCache.set(id, { sess, at: Date.now() });
+  _phienCache.set(id, { sess, at });
   while (_phienCache.size > _PHIEN_CACHE_MAX) _phienCache.delete(_phienCache.keys().next().value);
+  try { if (window.UnetiChatCache) window.UnetiChatCache.put(id, sess, at); } catch (e) {}
 }
 function _docCachePhien(id) {
   const e = _phienCache.get(id);
@@ -2349,10 +2548,34 @@ function prefetchSession(id) {
   if (e && Date.now() - e.at < _PREFETCH_TUOI) return;
   _taiPhien(id).catch(() => {});
 }
-// Rời một cuộc mà nó đã có thêm tin (mình gửi, UNETI AI trả lời): bản trong bộ nhớ đã cũ, bỏ đi để lần sau không vẽ
-// lại một khúc thiếu tin rồi mới nhảy.
+// Phones have no hover: once the history list is drawn and the page idle, warm its first chats one at a time
+// (2026-11-08). Skipped on a data-saving connection; a chat with a fresh enough copy is not asked again.
+let _warming = false;
+function prefetchMany(ids) {
+  if (_warming || !Array.isArray(ids)) return;
+  try { if (navigator.connection && navigator.connection.saveData) return; } catch (e) {}
+  const now = Date.now();
+  const todo = ids.filter((id) => {
+    const e = id && _phienCache.get(id);
+    return id && id !== savedSessionId && !_phienDangTai.has(id) && !(e && now - e.at < _WARM_FRESH_MS);
+  }).slice(0, _WARM_MAX);
+  if (!todo.length) return;
+  _warming = true;
+  const whenIdle = (fn) => (typeof requestIdleCallback === "function" ? requestIdleCallback(fn, { timeout: 2000 }) : setTimeout(fn, 400));
+  const next = () => {
+    const id = todo.shift();
+    if (!id) { _warming = false; return; }
+    whenIdle(() => { _taiPhien(id).catch(() => {}).finally(next); });
+  };
+  next();
+}
+// Rời một cuộc mà nó đã có thêm tin (mình gửi, UNETI AI trả lời): bản trong bộ nhớ đã cũ.
+// 2026-11-08: ask for the new copy right away instead of dropping the old one. Dropping it is why going back to the
+// chat being taught always waited for the server; now the copy is usually fresh again before the owner returns.
 function _quenPhienNeuDoi() {
-  if (_phienMoLuc && _phienMoLuc.id === savedSessionId && convo.length !== _phienMoLuc.len) _phienCache.delete(_phienMoLuc.id);
+  if (_phienMoLuc && _phienMoLuc.id === savedSessionId && convo.length !== _phienMoLuc.len) {
+    _taiPhien(_phienMoLuc.id).catch(() => {});
+  }
 }
 
 async function openStoredSession(id, stillCurrent, opts) {
@@ -2370,15 +2593,25 @@ async function openStoredSession(id, stillCurrent, opts) {
     _veLaiPhien(id, rong, ticket, false);
     return;
   }
+  // Stage 2 (2026-11-08): the reads a chat switch makes (messages, model bar, jobs strip, coding and GitHub chips)
+  // leave together in one batch from the second switch on (fetch-gop.js visit).
+  try { if (window.UnetiFetchGop && window.UnetiFetchGop.visit) window.UnetiFetchGop.visit("chat", { sid: id }); } catch (e) {}
   // Có bản trong bộ nhớ: vẽ ngay, rồi so với bản mới.
-  const daCo = _docCachePhien(id);
+  let daCo = _docCachePhien(id);
+  const fresh = _taiPhien(id);   // the server is asked at once, whatever is kept
+  if (!daCo && _keptChatsLoading) {
+    // Just after a reload the kept copies may still be on their way from IndexedDB: take whichever comes first.
+    await Promise.race([_keptChatsLoading, fresh.catch(() => {})]);
+    if (!conHieuLuc()) return;
+    daCo = _docCachePhien(id);
+  }
   let veRoi = "";
   if (daCo) {
     _veLaiPhien(id, daCo.sess, ticket, false);
     veRoi = _vanTayPhien(daCo.sess);
   }
   try {
-    const sess = await _taiPhien(id);
+    const sess = await fresh;
     if (!conHieuLuc() || !sess || sess.error) return;
     // Bản mới y hệt bản đã vẽ: giữ nguyên màn (không nháy, không mất chỗ cuộn).
     if (veRoi && veRoi === _vanTayPhien(sess)) return;
@@ -2392,6 +2625,7 @@ async function openStoredSession(id, stillCurrent, opts) {
 // sách, dọn dải việc nền) đã chạy ở lượt vẽ đầu, khỏi chạy lần hai.
 function _veLaiPhien(id, sess, ticket, capNhat) {
   try {
+    try { if (!capNhat) dropSuggest(); } catch (e) {}   // tests lift this function out alone
     convo = [];
     hideActivity();
     goMoiTinCu();
@@ -2400,6 +2634,7 @@ function _veLaiPhien(id, sess, ticket, capNhat) {
     _dangDungLoat = true;
     try { ngoaiAlpine(() => ds.forEach(m => { const t = veTinDaLuu(m, sess.brain, id); if (t) convo.push(t); })); }
     finally { _dangDungLoat = false; }
+    _drawUnacked(id, ds);
     _tinCu = ds.length
       ? { sid: id, brain: sess.brain, ts: ds[0].ts, id: ds[0].id, con: !!sess.has_more, dangTai: false }
       : null;
@@ -2447,6 +2682,7 @@ function resetChatView() {
   // Partners page opens one, and that used to hang the call up. A brain switch still ends it, at its own call site.
   if (handsFree) boViecPhienCu(); else tatRanhTay();
   _quenPhienNeuDoi();
+  try { dropSuggest(); } catch (e) {}   // tests lift this function out alone
   convo = [];
   hideActivity();          // dọn chip + timer trước khi xoá trắng khung
   _tinCu = null; goMoiTinCu();
@@ -2464,6 +2700,7 @@ function blankChat() {
   sessionOpenSeq++;
   if (handsFree) boViecPhienCu(); else tatRanhTay();
   _quenPhienNeuDoi();
+  try { dropSuggest(); } catch (e) {}   // tests lift this function out alone
   convo = [];
   hideActivity();
   _tinCu = null; goMoiTinCu();
@@ -2479,7 +2716,7 @@ function newChat() {
   try { chatInput.focus(); } catch (e) {}
 }
 window.UnetiSessions = { open: openStoredSession, new: newChat, blank: blankChat, brain: () => currentBrainPath(),
-                         current: () => savedSessionId, prefetch: prefetchSession };
+                         current: () => savedSessionId, prefetch: prefetchSession, prefetchMany: prefetchMany };
 // Báo các UI khác (sidebar Lịch sử trong chat workspace) biết phiên/danh sách vừa đổi
 // Performance (2026-11-05): `reason` "open" = only WHICH chat is on screen changed (a switch), no message was added.
 // Listeners that count or list messages (history list, unread and job counts) skip their network round on it.
@@ -3614,9 +3851,32 @@ loadCustomBrains();
   const saved = localStorage.getItem("uneti.graphSource");
   if (saved && [...graphSource.options].some(o => o.value === saved)) {
     graphSource.value = saved;
+  } else if (saved && saved.startsWith("path:") && saved.length > 5) {
+    // A brain inside BRAINS_DIR: its option only arrives with GET /brains (brains-ui.js), after every page has already
+    // started. Falling back to Brain Default here sent the first requests of the open page to the wrong brain, and when
+    // /brains failed (the page opened while the server restarted after an update) the whole visit stayed there: the
+    // Teams page listed the other brain's teams and created new ones in it (user report, 08/11/2026). Select the saved
+    // brain under a provisional option instead; brains-ui.js swaps it for the real one, or falls back to Brain Default
+    // out loud when the brain no longer exists.
+    const dir = saved.slice(5);
+    const name = dir.replace(/[\\/]+$/, "").split(/[\\/]/).pop() || dir;
+    const opt = document.createElement("option");
+    opt.value = saved;
+    opt.textContent = name;
+    opt.dataset.brain = "1";
+    opt.dataset.pending = "1";
+    opt.dataset.brainName = name;
+    opt.dataset.brainLabel = name;
+    const grp = graphSource.querySelector("optgroup");
+    if (grp) graphSource.insertBefore(opt, grp);
+    else graphSource.appendChild(opt);
+    graphSource.value = saved;
   } else {
     graphSource.value = "brain";
   }
+  // The chat compares every later `change` with this: it must start from the brain really in use, not from the
+  // select's value before this restore (a later switch to Brain Default would otherwise keep the old brain's chat).
+  _lastBrain = currentBrainPath();
 })();
 
 // ============================================
@@ -4339,6 +4599,7 @@ chatInput.addEventListener("input", () => {
     ? Math.round(window.innerHeight * 0.4) : 200;
   chatInput.style.height = Math.min(chatInput.scrollHeight, _cap) + "px";
   sendTypingHint();
+  try { if (chatSuggest) chatSuggest.onInput(); } catch (e) {}
 });
 // 0.382.0: tell the server the owner started typing, at most once every 20 s per conversation, so it can reopen this
 // conversation's engine process before the message lands (warm_pool.prewarm). Nothing is sent while a turn runs.
@@ -4356,7 +4617,16 @@ function sendTypingHint() {
 // Enter sends on a computer; an IME composition and a touch screen (Enter = new line) never send. The rules live in
 // chat-acts.js (UnetiActs.enterSends) so the Team chat follows the same ones.
 const chatInputComposing = window.UnetiActs.trackComposition(chatInput);
+// 2026-11-07: the likely next message shows grey in the empty box once UNETI AI answers; Tab (or the Tab chip on a
+// phone) fills it in. Shared with the Team chat (chat-suggest.js).
+const chatSuggest = window.UnetiSuggest ? window.UnetiSuggest.attach({
+  input: () => chatInput,
+  chipHost: () => { const row = document.getElementById("cpRow"); return row ? [row, row.querySelector(".cp-gap")] : null; },
+  composing: () => chatInputComposing(),
+}) : null;
+function dropSuggest() { try { if (chatSuggest) chatSuggest.clear(); } catch (e) {} }
 chatInput.addEventListener("keydown", (e) => {
+  if (chatSuggest && chatSuggest.onKeydown(e)) return;
   if (window.UnetiActs.enterSends(e, chatInputComposing())) { e.preventDefault(); sendMessage(); }
 });
 sendBtn.addEventListener("click", () => sendMessage());

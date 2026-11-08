@@ -781,7 +781,7 @@ def local_view(brain: str) -> List[Dict[str, Any]]:
         users = coding_store.sessions_using(r.get("folder_id") or "")
         out.append({"full_name": r["full_name"], "path": r["path"], "exists": Path(r["path"]).is_dir(),
                     "default_branch": r.get("default_branch") or "", "chats": len(users),
-                    "auto_merge": auto_merge_on(r), "fetched_at": r.get("fetched_at") or 0})
+                    "auto_merge": auto_merge_on(r), "review": review_settings(r), "fetched_at": r.get("fetched_at") or 0})
     return out
 
 
@@ -806,7 +806,8 @@ def prompt_block(sid: str, brain: str = "") -> str:
                  "test TÁI HIỆN lỗi trước (đỏ), sửa, rồi chạy lại đúng test đó cho xanh. KHÔNG bỏ qua, xoá hay nới "
                  "test, không sửa workflow CI để cho xanh. Sau mỗi lượt UNETI AI tự chạy bộ kiểm tra của repo; xanh thì UNETI AI "
                  "tự commit, đẩy lên nhánh của cuộc này, mở PR và theo dõi CI. CI đỏ thì UNETI AI mở một lượt sửa "
-                 "kèm log, tối đa 3 vòng.")
+                 "kèm log, tối đa 3 vòng. CI xanh thì UNETI AI tự merge nếu repo bật tự merge (mặc định bật).")
+    lines += _work_state_lines(sid, repos)
     # Spec 7.1: the repo's own rules reach every engine, not only the ones that read CLAUDE.md natively.
     # Spec 13.1: plus the lessons UNETI AI wrote down for this repo after real failures (kept in the brain).
     try:
@@ -824,6 +825,37 @@ def prompt_block(sid: str, brain: str = "") -> str:
     except Exception:
         pass
     return "\n".join(lines) + "\n"
+
+
+def _work_state_lines(sid: str, repos: List[Dict[str, Any]]) -> List[str]:
+    """What GitHub really holds for this chat right now, read from github_work's store, never from earlier answers.
+
+    Without it the model guessed: asked to "push it" after a failed push it said it was not allowed to and offered to
+    edit code just to trigger a push (owner, 06/11/2026)."""
+    try:
+        import github_work
+        out = []
+        for r in repos:
+            row = github_work.st().get(sid, r["full_name"]) or {}
+            if not row:
+                continue
+            fn = r["full_name"]
+            if github_work.ship_failed(row):
+                out.append(f"Trạng thái {fn}: code đã commit trên máy nhưng CHƯA lên GitHub. Lý do: "
+                           f"{row.get('stuck_reason') or '?'} Không cần sửa code hay làm lại gì để đẩy: UNETI AI tự đẩy lại "
+                           "ngay sau lượt này, định kỳ vài phút một lần, và ngay khi GitHub được kết nối lại; nút Đẩy lại "
+                           "ở bảng GitHub của cuộc này cũng được.")
+            elif row.get("pr_number"):
+                out.append(f"Trạng thái {fn}: nhánh {row.get('branch')}, PR #{row['pr_number']} {row.get('pr_url') or ''}, "
+                           f"CI {row.get('ci')}, PR {row.get('integ')}"
+                           + (f", đang kẹt: {row['stuck_reason']}" if row.get("exec") == "stuck" and row.get("stuck_reason")
+                              else "") + ".")
+        if out:
+            out.append("Người dùng bảo đẩy lên hay merge thì nói đúng trạng thái trên và việc UNETI AI sẽ làm tiếp; KHÔNG nói "
+                       "là mình không được làm, KHÔNG bảo họ tự chạy git, KHÔNG đề nghị sửa code chỉ để kích hoạt việc đẩy.")
+        return out
+    except Exception:
+        return []
 
 
 def forget_session(sid: str) -> Dict[str, Any]:
@@ -891,3 +923,19 @@ def set_auto_merge(brain: str, full_name: str, on: bool) -> Dict[str, Any]:
     rec["auto_merge"] = bool(on)
     _put(rec)
     return {"full_name": rec["full_name"], "auto_merge": bool(on)}
+
+
+def review_settings(rec: Dict[str, Any]) -> Dict[str, Any]:
+    """Cross review of one repo (owner, 08/11/2026: "the person decides, not UNETI AI"). Off by default; when on, UNETI AI
+    reviews each green commit before merging, on `provider` when one is pinned, else on the background model."""
+    r = rec.get("review") if isinstance(rec.get("review"), dict) else {}
+    return {"on": r.get("on") is True, "provider": str(r.get("provider") or "")}
+
+
+def set_review(brain: str, full_name: str, on: bool, provider: str = "") -> Dict[str, Any]:
+    rec = find(brain, full_name)
+    if not rec:
+        raise RepoError(_c(f"Brain này không có repo {full_name}.", f"This brain has no repo {full_name}."))
+    rec["review"] = {"on": bool(on), "provider": str(provider or "").strip()[:64]}
+    _put(rec)
+    return {"full_name": rec["full_name"], "review": review_settings(rec)}

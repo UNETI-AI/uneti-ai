@@ -570,9 +570,37 @@
   // Gọi một hàm của module nạp chậm từ chỗ khác trang: chờ nhóm của nó rồi mới gọi.
   const _goiNhom = (nhom, fn) => (window.UnetiNapCham ? window.UnetiNapCham.goi(nhom, fn) : Promise.resolve(fn()));
 
+  // 2026-11-08: pages drawn from the copy of the last visit (fetch-gop.js) are drawn again once the server's answer
+  // differs, unless the owner has already clicked or typed on the page (a redraw would undo that). Only pages that are
+  // plain lists and cards; chat pages, the file editor and the live Tasks board keep their own refresh.
+  const REDRAW_PAGES = new Set(["learn", "skills", "plugins", "mcp", "packs", "channels", "logins", "models", "settings",
+    "usage", "share", "account", "webhooks"]);
+  let _pageTouched = false, _redrawTimer = 0;
+  ["click", "keydown", "input", "change"].forEach((ev) => document.addEventListener(ev, (e) => {
+    const cv = document.getElementById("cview");
+    if (cv && e.target && cv.contains(e.target)) _pageTouched = true;
+  }, true));
+  window.addEventListener("uneti:page-data", (e) => {
+    const id = e && e.detail && e.detail.page;
+    if (!id || !REDRAW_PAGES.has(id) || !window.Alpine || Alpine.store("nav").active !== id) return;
+    clearTimeout(_redrawTimer);
+    _redrawTimer = setTimeout(() => {
+      const cv = document.getElementById("cview"), focused = document.activeElement;
+      if (Alpine.store("nav").active !== id || _pageTouched) return;
+      if (cv && focused && cv.contains(focused) && /^(INPUT|TEXTAREA|SELECT)$/.test(focused.tagName)) return;
+      const top = body() ? body().scrollTop : 0;
+      const leave = _pageLeave; _pageLeave = null;
+      if (leave) { try { leave(); } catch (err) {} }
+      Promise.resolve(renderPage(id)).then(() => { const b = body(); if (b && top) b.scrollTop = top; }).catch(() => {});
+    }, 120);
+  });
+
   async function renderPage(id) {
     let el = body();
     if (!el) return;
+    // This visit's first read of each page key may come from the last visit's copy (fetch-gop.js, 2026-11-08).
+    try { if (window.UnetiFetchGop && window.UnetiFetchGop.pageStart) window.UnetiFetchGop.pageStart(id); } catch (e) {}
+    _pageTouched = false;
     // Cả đổi TAB trong Cài đặt cũng thay cviewBody. Trả node tĩnh về trước khi tháo nó.
     parkQuickSet();
     // Thay #cviewBody bằng node MỚI mỗi lần đổi trang: renderer async của trang CŨ (đang await
@@ -3352,6 +3380,14 @@
     const prof = (id) => (R.profiles || {})[id] || { model: "", reasoning: "off" };
     const multiKey = R.multi_key || [];
     const accts = m.accounts || {};
+    ACCT_NAMES = {};
+    ACCT_ITEMS = {};
+    PLAN_CLI.forEach(pid => {
+      const l = accts[pid] || [];
+      ACCT_ITEMS[pid] = l;
+      const a = l.find(x => x.main || x.id === "main");
+      if (a && a.label) ACCT_NAMES[pid] = a.label;
+    });
     const bgCfg = R.background || { provider: "anthropic-cli", model: "", reasoning: "off" };
     const bgP = pById(bgCfg.provider) || {};
     const bgUse = R.bg_in_use || null;
@@ -3567,7 +3603,7 @@
       };
       if (p.kind === "oauth") {
         const st = on
-          ? t("models.st_connected") + (p.plan ? " · " + esc(p.plan) : "") + " · " + p.models.length + " model"
+          ? t("models.st_connected") + esc(acctNameTag(p.id)) + (p.plan ? " · " + esc(p.plan) : "") + " · " + p.models.length + " model"
           : t("models.st_not_connected") + " · " + p.models.length + " model";
         return `${cardOpen(p, ord)}
           ${provHead(p, on, "Device code", st, false, ord)}
@@ -3577,7 +3613,7 @@
           <div class="prov-action" style="flex-wrap:wrap">
             ${on && ord ? "" : on
               ? `<button class="gcard-btn ghost" data-oauth-disc="1">${esc(t("models.disconnect"))}</button>`
-              : `<button class="gcard-btn" data-oauth-login="1">${esc(t("models.login_gpt"))}</button>
+              : `${acctNameField(p.id)}<button class="gcard-btn" data-oauth-login="1">${esc(t("models.login_gpt"))}</button>
                  <button class="gcard-btn ghost" data-oauth-browser="1">${esc(t("models.via_browser"))}</button>`}
             <span id="oauthMsg" class="gcard-meta" style="margin-left:10px;flex:1;min-width:220px"></span>
           </div>
@@ -3590,7 +3626,7 @@
         // 0.30-0.32.1 từng thử (và tắc trên Windows vì không có pseudo-terminal).
         const dn = p.dang_nhap || {};
         const st = on
-          ? t("models.st_logged_in") + (p.account ? " · " + esc(p.account) : "")
+          ? t("models.st_logged_in") + esc(acctNameTag(p.id)) + (p.account ? " · " + esc(p.account) : "")
             + (p.plan ? " · " + esc(p.plan) : "") + " · " + p.models.length + " model"
           : (p.cli_found ? t("models.st_cli_no_login") : t("models.st_no_cli", { ten: "Grok Build CLI" }));
         return `${cardOpen(p, ord)}
@@ -3604,7 +3640,7 @@
             ${on && ord ? "" : on
               ? `<button class="gcard-btn ghost" data-grokcheck="1">${esc(t("qs.recheck"))}</button>
                  <button class="gcard-btn ghost" data-grokdisc="1">${esc(t("models.disconnect"))}</button>`
-              : `<button class="gcard-btn" data-groklogin="1">${esc(t("auth.submit"))}</button>
+              : `${acctNameField(p.id)}<button class="gcard-btn" data-groklogin="1">${esc(t("auth.submit"))}</button>
                  <button class="gcard-btn ghost" data-grokcheck="1">${esc(t("qs.recheck"))}</button>`}
             <span id="grokMsg" class="gcard-meta" style="margin-left:10px;flex:1;min-width:200px">${on ? "" : esc(p.auth_error || "")}</span>
           </div>
@@ -3622,7 +3658,7 @@
         const dn = p.dang_nhap || {};
         const off = !!p.uneti_off;
         const st = on
-          ? t("models.st_logged_in") + (p.auth_method ? " · " + esc(p.auth_method) : "")
+          ? t("models.st_logged_in") + esc(acctNameTag(p.id)) + (p.auth_method ? " · " + esc(p.auth_method) : "")
             + " · " + p.models.length + " model"
           : off ? t("models.agy_off")
           : (p.cli_found ? t("models.st_cli_no_login") : t("models.st_no_cli", { ten: "Antigravity CLI" }));
@@ -3641,7 +3677,7 @@
           <div class="prov-action" style="flex-wrap:wrap">
             ${off
               ? `<button class="gcard-btn" data-agyon="1">${ic("plug-zap")} ${esc(t("models.reconnect"))}</button>`
-              : on && ord ? "" : `<button class="gcard-btn ghost" data-agycheck="1">${esc(t("qs.recheck"))}</button>
+              : on && ord ? "" : `${on ? "" : acctNameField(p.id)}<button class="gcard-btn ghost" data-agycheck="1">${esc(t("qs.recheck"))}</button>
                  ${on ? `<button class="gcard-btn ghost" data-agydisc="1">${esc(t("models.disconnect"))}</button>` : ""}`}
             <span id="agyMsg" class="gcard-meta" style="margin-left:10px;flex:1;min-width:200px">${on || off ? "" : esc(p.auth_error || "")}</span>
           </div>
@@ -3748,7 +3784,7 @@
       return `${cardOpen(p, ord)}
         ${provHead(p, on, p.kind === "cli" ? "MCP/skill" : "MCP UNETI AI", (on ? t("models.st_connected") : t("models.st_not_connected")) + " · " + p.models.length + " model", false, ord)}
         ${ord && multiKey.indexOf(p.id) >= 0 ? acctList(p) : p.needs_key
-          ? `<div class="prov-action"><input class="js-input" id="pk-${p.id}" type="password" placeholder="${on ? esc(t("models.key_change_ph", { duoi: masked })) : esc(t("models.key_ph"))}"><button class="gcard-btn" data-pk="${p.id}">${on ? esc(t("models.key_change")) : esc(t("models.connect"))}</button>${on && !ord ? `<button class="gcard-btn ghost" data-disc="${p.id}">${esc(t("models.disconnect"))}</button>` : ""}</div>`
+          ? `<div class="prov-action">${!on && multiKey.indexOf(p.id) >= 0 ? acctNameField(p.id) : ""}<input class="js-input" id="pk-${p.id}" type="password" placeholder="${on ? esc(t("models.key_change_ph", { duoi: masked })) : esc(t("models.key_ph"))}"><button class="gcard-btn" data-pk="${p.id}">${on ? esc(t("models.key_change")) : esc(t("models.connect"))}</button>${on && !ord ? `<button class="gcard-btn ghost" data-disc="${p.id}">${esc(t("models.disconnect"))}</button>` : ""}</div>`
           : `<div class="prov-note">${esc(t("models.no_key_note"))}</div>`}
         ${ordActs(p, ord, { add: ord && multiKey.indexOf(p.id) >= 0 ? "key" : "" })}
       </div>`;
@@ -3762,12 +3798,12 @@
           dung: (useP.label || bgUse.provider) + " · " + (bgUse.model || defName(bgUse.provider)) }))}</div>` : "";
     const moreHtml = offList.length ? `<div class="cview-section${connList.length ? "" : " ord-first"}">
         ${connList.length ? "" : `<div class="prov-note warn">${WARN_ICON} ${esc(t("models.ord_empty"))}</div>`}
-        <button type="button" class="ord-more" id="ordMore" aria-haspopup="dialog" aria-expanded="${showOff ? "true" : "false"}">
+        <button type="button" class="ord-more" id="ordMore" aria-controls="ordOff" aria-expanded="${showOff ? "true" : "false"}">
           <span class="ord-stack">${offList.filter(p => window.UnetiProviderLogos && window.UnetiProviderLogos.has(p.id)).slice(0, 3)
             .map(p => `<span class="prov-logo mini">${window.UnetiProviderLogos.svg(p.id)}</span>`).join("") || `<span class="prov-logo mini ic-tile">${ic("plug")}</span>`}</span>
           <span class="ord-more-t"><b>${esc(t("models.connect_more"))}</b><span>${esc(offList.slice(0, 4).map(p => p.label).join(", ")
             + (offList.length > 4 ? " " + t("models.connect_more_n", { n: offList.length - 4 }) : ""))}</span></span>
-          ${ic("chevron-up", { cls: "ord-more-c" })}
+          ${ic("chevron-down", { cls: "ord-more-c" })}
         </button>
         <div class="prov-list ord-off" id="ordOff" ${showOff ? "" : "hidden"}>${offList.map(p => provCard(p, null)).join("")}</div>
       </div>` : "";
@@ -3816,9 +3852,11 @@
         const pid = b.dataset.pk;
         const inp = document.getElementById("pk-" + pid);
         const val = (inp && inp.value || "").trim();
+        const name = takeAcctName(el, pid);
+        if (name === null) return;
         if (!val) { if (inp) inp.focus(); return; }
         b.disabled = true; b.textContent = t("settings.saving");
-        await saveSetting("model", { [KEYFIELD[pid]]: val });
+        await saveSetting("model", name ? { [KEYFIELD[pid]]: val, key_label: name } : { [KEYFIELD[pid]]: val });
         renderModelsCloudTab(el);
       };
     });
@@ -3882,12 +3920,23 @@
       };
     });
     const ol = el.querySelector("[data-oauth-login]");
-    if (ol) ol.onclick = () => startOauthLogin(el);
+    // The first sign-in waits for the account's name and saves it as account 1's label before the link opens.
+    const named = (pid, go) => async () => {
+      const name = takeAcctName(el, pid);
+      if (name === null) return;
+      try { await savePlanName(pid, name); } catch (e) {}
+      go();
+    };
+    if (ol) ol.onclick = named("openai-oauth", () => startOauthLogin(el));
     const ob = el.querySelector("[data-oauth-browser]");
-    if (ob) ob.onclick = () => startOauthBrowser(el);
+    if (ob) ob.onclick = named("openai-oauth", () => startOauthBrowser(el));
     const agk = el.querySelector("[data-agycheck]");
     if (agk) agk.onclick = async () => {
       const msg = el.querySelector("#agyMsg");
+      // Antigravity signs in from a terminal, so its name is saved when the owner checks the card afterwards.
+      const name = takeAcctName(el, "antigravity-cli");
+      if (name === null) return;
+      try { await savePlanName("antigravity-cli", name); } catch (e) {}
       agk.disabled = true; const cu2 = agk.textContent; agk.textContent = t("models.trying");
       if (msg) msg.textContent = t("models.testing");
       let r = null;
@@ -3931,6 +3980,9 @@
     const gkl = el.querySelector("[data-groklogin]");
     if (gkl) gkl.onclick = async () => {
       const msg = el.querySelector("#grokMsg"), box = el.querySelector("#grokBox");
+      const name = takeAcctName(el, "grok-cli");
+      if (name === null) return;
+      try { await savePlanName("grok-cli", name); } catch (e) {}
       gkl.disabled = true; const cu = gkl.textContent; gkl.textContent = t("models.opening");
       if (msg) msg.textContent = t("models.grok_ask");
       let r = null;
@@ -4083,6 +4135,35 @@
   // every draw of the tab; each change saves at once and draws the tab again from the server's answer.
   // 0.355.0 (owner 27/10): "default" alone tells nothing, so it names the model it stands for when the server knows it.
   let MODEL_DEFAULTS = {};
+  // Owner 07/11/2026: the first sign-in of a card asks for the account's name, so two accounts never read alike. A plan
+  // card keeps it as account 1's label (plan_accounts), an API card as its first key's label. Filled on every draw.
+  let ACCT_NAMES = {};      // plan card id -> account 1's label
+  let ACCT_ITEMS = {};      // plan card id -> its account list, so saving a name keeps order and on/off
+  const acctNameField = (pid) => `<input class="js-input prov-acname" data-acname="${esc(pid)}" maxlength="60" autocomplete="off"
+    spellcheck="false" placeholder="${esc(t("models.acname_ph"))}" value="${esc(ACCT_NAMES[pid] || "")}">`;
+  // The typed name, "" when the card has no name box, or null after pointing at the empty box: the sign-in waits.
+  function takeAcctName(el, pid) {
+    const inp = el.querySelector(`[data-acname="${pid}"]`);
+    if (!inp) return "";
+    const v = inp.value.trim();
+    if (!v) {
+      inp.classList.add("need");
+      inp.placeholder = t("models.acname_need");
+      inp.focus();
+      return null;
+    }
+    inp.classList.remove("need");
+    return v;
+  }
+  async function savePlanName(pid, name) {
+    if (!name || name === ACCT_NAMES[pid]) return;
+    const items = (ACCT_ITEMS[pid] && ACCT_ITEMS[pid].length ? ACCT_ITEMS[pid] : [{ id: "main", label: "", enabled: true }])
+      .map(a => ({ id: a.id, label: a.id === "main" ? name : (a.label || ""), enabled: a.enabled !== false }));
+    ACCT_NAMES[pid] = name;
+    await saveSetting("model", { accounts: { provider: pid, items: items } });
+  }
+  // " · name" for a plan card's status line, "" when account 1 has none yet.
+  const acctNameTag = (pid) => ACCT_NAMES[pid] ? " · " + ACCT_NAMES[pid] : "";
   // A subscription CLI with nothing set picks its own model by plan, which UNETI AI cannot read: say so instead of "default".
   const PLAN_CLI = ["anthropic-cli", "openai-oauth", "grok-cli", "antigravity-cli"];
   const defName = (pid) => MODEL_DEFAULTS[pid] ? t("models.mp_default_is", { m: MODEL_DEFAULTS[pid] })
@@ -4331,12 +4412,30 @@
       };
     });
 
-    // ---- the accounts of a plan card (0.353.0): order, on/off, sign in again, remove, add ----
+    // ---- the accounts of a plan card (0.353.0): order, on/off, sign in again, rename, remove, add ----
+    // A new account needs its name before the sign-in starts (owner 07/11/2026: accounts must never read alike).
+    const needLabel = (box) => {
+      const inp = box.querySelector('[data-f="label"]');
+      if (!inp || inp.value.trim()) return true;
+      inp.classList.add("need");
+      inp.placeholder = t("models.acname_need");
+      inp.focus();
+      return false;
+    };
+    // Rename one account of a plan card; account 1 too, which is the card's own sign-in.
+    const renamePlan = (btn, pid, id, name, label) => formSheet(btn, t("models.acct_rename"), name,
+      [{ f: "label", ph: t("models.pacct_label_ph"), value: label || "" }], t("common.save"), (v, box) => {
+        if (!v("label")) return need(box, "label");
+        const l = items(pid), x = l.find(a => a.id === id);
+        if (x) x.label = v("label");
+        saveAcc(pid, l);
+      });
     async function planLogin(pid, box) {
       const msg = box.querySelector(".ord-addmsg"), step = box.querySelector(".ord-pstep");
       const go = box.querySelector("[data-pacct-go]");
       // Signed in: the sheet closes (without cancelling the finished sign-in) and the card draws the new account.
       const done = () => { delete box.dataset.acc; closePop(); c.again(); };
+      if (!box.dataset.re && !needLabel(box)) return;
       go.disabled = true;
       msg.textContent = t("models.opening");
       let r;
@@ -4438,6 +4537,7 @@
       box.querySelector("[data-pacct-cancel]").onclick = () => closePop();
       box.querySelector("[data-pacct-go]").onclick = async (ev) => {
         const go = ev.currentTarget;
+        if (!box.dataset.re && !needLabel(box)) return;
         go.disabled = true;
         let r;
         try {
@@ -4503,6 +4603,7 @@
             saveAcc(pid, l);
           } }];
         // Account 1 is the machine's own sign-in: it can be turned off here, not removed or signed in again.
+        rows.push({ ic: "pencil", label: t("models.acct_rename"), run: () => renamePlan(btn, pid, id, name, a.label) });
         if (!a.main) rows.push({ ic: "log-in", label: t("models.pacct_relogin"), run: () => planSheet(btn, pid, id, a.label || "") });
         if (i0 > 0) rows.push({ ic: "arrow-up", label: t("models.move_up"), run: () => saveAcc(pid, MO.move(items(pid), idx(), idx() - 1)) });
         if (i0 < n - 1) rows.push({ ic: "arrow-down", label: t("models.move_down"), run: () => saveAcc(pid, MO.move(items(pid), idx(), idx() + 1)) });
@@ -4515,8 +4616,8 @@
       };
     });
 
-    // ---- "Connect another provider": a sheet of the providers not signed in yet, each with its logo. Picking one
-    // opens the list below and brings that provider's card into view, where its connect form is. ----
+    // ---- "Connect another provider": one tap unfolds every provider not signed in yet, right under the button, and
+    // a second tap folds them (owner 07/11/2026: "no popup there, a click should just open all the connections"). ----
     const more = el.querySelector("#ordMore");
     const showOff = (open) => {
       const box = el.querySelector("#ordOff");
@@ -4528,24 +4629,8 @@
       return box;
     };
     if (more) more.onclick = () => {
-      const offOpen = !el.querySelector("#ordOff").hidden;
-      menuSheet(more, t("models.connect_more"), [(c.offList || []).map(p => ({ ic: isGw(p.id) ? "key-round" : "plug", label: p.label, sub: c.kindTag(p), run: () => {
-        const box = showOff(true);
-        const card = box && box.querySelector(`[data-offp="${p.id}"]`);
-        if (card) {
-          card.scrollIntoView({ block: "center", behavior: "smooth" });
-          card.classList.add("ord-flash");
-          setTimeout(() => card.classList.remove("ord-flash"), 1600);
-        }
-      } })), offOpen ? [{ ic: "chevron-up", label: t("models.connect_fold"), run: () => showOff(false) }] : []],
-      t("models.connect_more_sub", { n: (c.offList || []).length }));
-      // Each provider row shows the provider's own logo instead of a generic icon.
-      const L = window.UnetiProviderLogos;
-      if (L && openPop) openPop.el.querySelectorAll(".ord-mi").forEach((b, i) => {
-        const p = (c.offList || [])[i];
-        const s = p && L.svg(p.id);
-        if (s) { const t0 = b.querySelector(".ord-mic"); t0.innerHTML = s; t0.classList.add("logo"); }
-      });
+      const box = showOff(el.querySelector("#ordOff").hidden);
+      if (box && !box.hidden) more.scrollIntoView({ block: "start", behavior: "smooth" });
     };
 
     el.querySelectorAll("[data-ordpop]").forEach(btn => btn.onclick = () => {
@@ -4721,6 +4806,10 @@
          i >= 0 && i < n - 1 && { ic: "arrow-down", label: t("models.move_down"), run: () => save({ order: MO.move(c.order, i, i + 1) }) }],
         [q("[data-addkey]") && { ic: "key-round", label: t("models.acct_add"), sub: t("models.acct_add_d"), run: () => (isGw(pid) ? advSheet(b, null, pid) : addKeySheet(b, pid)) },
          q("[data-addacc]") && { ic: "user-plus", label: t("models.pacct_add"), sub: t("models.pacct_add_d"), run: () => planSheet(b, pid) },
+         // A plan card with one account has no list to rename it from: its name is edited here.
+         PLAN_CLI.indexOf(pid) >= 0 && (c.accts[pid] || []).length < 2 && !(pid === "anthropic-cli" && p.auth_mode === "api_key")
+           && { ic: "pencil", label: t("models.acname_edit"), sub: ACCT_NAMES[pid] || t("models.acname_none"),
+                run: () => renamePlan(b, pid, "main", p.label, ACCT_NAMES[pid]) },
          pid === "anthropic-cli" ? { ic: "refresh-cw", label: t("qs.recheck"), sub: t("models.check_d"), run: () => refreshClaudeCard(el, true) }
            : check && { ic: "refresh-cw", label: t("qs.recheck"), sub: t("models.check_d"), run: () => check.click() }],
         // Claude Code on an API key: the key is chosen with the card's own switch, there is no plan login to drop.
@@ -4802,7 +4891,7 @@
     }
     if (d.connected) {
       st.className = "prov-status on";
-      st.textContent = t("models.st_connected") + (d.email ? " · " + d.email : "") + (d.plan ? " · " + d.plan : "")
+      st.textContent = t("models.st_connected") + acctNameTag("anthropic-cli") + (d.email ? " · " + d.email : "") + (d.plan ? " · " + d.plan : "")
         + (d.stale ? " · " + t("models.st_stale") : "");
       // A card in the usage order has Disconnect in its own button row (and its ⋯ sheet), so none here.
       if (act.closest && act.closest(".ord-card")) { act.innerHTML = ""; return; }
@@ -4821,7 +4910,7 @@
       st.className = "prov-status";
       st.textContent = t("models.st_no_login");
       act.innerHTML = `<div class="prov-action">
-          <button class="gcard-btn" id="cliLogin">${esc(t("models.login_claude"))}</button>
+          ${acctNameField("anthropic-cli")}<button class="gcard-btn" id="cliLogin">${esc(t("models.login_claude"))}</button>
           <button class="gcard-btn ghost" id="cliRecheck">${esc(t("models.recheck"))}</button>${infoBtn()}</div>
         <div id="cliMsg" class="prov-msg">${d.error ? Icons.warn(d.error) : ""}</div>
         ${infoBody(`${esc(t("models.cli_login_note"))}
@@ -4892,6 +4981,9 @@
   }
 
   async function startClaudeLogin(el) {
+    const name = takeAcctName(el, "anthropic-cli");
+    if (name === null) return;
+    try { await savePlanName("anthropic-cli", name); } catch (e) {}
     const act = el.querySelector("#cliAction");
     const msg = el.querySelector("#cliMsg");
     if (msg) msg.textContent = t("models.getting_link");
@@ -7092,7 +7184,12 @@
       catch (e) { acStatus.innerHTML = WARN_ICON + " " + esc(window.t("cs.ch_net_err")); }
     };
     const lo = document.getElementById("acLogout");
-    if (lo) lo.onclick = async () => { await fetch("/auth/logout", { method: "POST" }); location.reload(); };
+    if (lo) lo.onclick = async () => {
+      await fetch("/auth/logout", { method: "POST" });
+      // 2026-11-08: chats kept in this browser for a quick first paint (chat-cache.js) leave with the session.
+      try { if (window.UnetiChatCache) await window.UnetiChatCache.clear(); } catch (e) {}
+      location.reload();
+    };
     const dis = document.getElementById("acDisable");
     // 0.224.0: the server wants the current password (+ a 2FA code) and refuses on a public
     // server, so the button is hidden there. The flow lives in app.js, shared with the settings block.
@@ -7685,172 +7782,321 @@
   // Vì sao trang này bắt buộc phải có: link chia sẻ không hết hạn và không mật khẩu, ai cầm
   // cũng xem được. Chỉ tạo được mà không có chỗ nhìn lại toàn bộ thì người dùng sẽ quên mình
   // đã mở những gì, và một link lỡ gửi nhầm sẽ sống mãi. Chủ dự án nói đúng chỗ đó ngày 18/09.
-  // Số link mỗi trang, và ngưỡng bắt đầu hiện ô tìm. Cùng một con số cho cả hai thì lạ mắt:
-  // đúng 20 link là vừa một trang mà đã phải gõ để tìm, nên ngưỡng tìm đặt thấp hơn.
-  const SHARE_MOI_TRANG = 20;
-  // Ô tìm hiện từ link thứ HAI (chủ repo 20/09: "có thêm tìm kiếm và phân trang nữa nhé" - ngưỡng
-  // 8 cũ khiến người có 5-6 link không thấy ô tìm đâu, tưởng chưa có).
-  const SHARE_NGUONG_TIM = 1;
+  // 2026-11-06 rebuild (owner: "đổi được đường dẫn", "bộ đếm thống kê view", "buton làm thành icon như phong cách trang
+  // nhiệm vụ", "nhớ có cả phân trang", "tự phản biện và tạo lại 1 trang quản lý link hữu dụng hơn"). What the page is
+  // for, in order: see which links are live and who reads them, find one fast, then copy, edit or kill it.
+  // - One low summary row: links, total views, views in the last 7 days.
+  // - Filter chips (all / files / conversations / never viewed) and a sort (newest, most viewed, recently viewed):
+  //   "never viewed" plus "oldest" is how a forgotten link gets found and revoked.
+  // - Row actions are icons like the Tasks page (open, copy, edit, revoke); revoke asks first, it cannot be undone.
+  // - Edit is one dialog for the name AND the custom address (/s/<slug>); the random token keeps working.
+  // Links per page, and the list size from which the search box shows.
+  const SHARE_PER_PAGE = 20;
+  // Ô tìm hiện từ link thứ HAI (chủ repo 20/09: "có thêm tìm kiếm và phân trang nữa nhé").
+  const SHARE_SEARCH_MIN = 1;
 
   async function renderSharePage(el) {
     const gen = _renderGen;
-    let tuKhoa = "";
+    const state = { query: "", filter: "all", sort: "new", page: 0 };
+    try {
+      const saved = JSON.parse(localStorage.getItem("uneti.share.view") || "{}");
+      if (["all", "file", "chat", "unseen"].indexOf(saved.filter) >= 0) state.filter = saved.filter;
+      if (["new", "views", "recent"].indexOf(saved.sort) >= 0) state.sort = saved.sort;
+    } catch (e) {}
     el.innerHTML = `<div class="cview-placeholder"><div class="ph-ico">${ic("loader", { cls: "ic-xl ic-spin" })}</div><div>${esc(t("common.loading"))}</div></div>`;
-    let ds = [];
+    let links = [];
     try {
       const r = await fetch("/share/list");
       const d = await r.json();
-      ds = (d && d.items) || [];
+      links = (d && d.items) || [];
     } catch (e) {
       el.innerHTML = `<div class="settings-page"><div class="settings-card compact"><p>${esc(t("app.err_net"))}</p></div></div>`;
       return;
     }
     if (gen !== _renderGen) return;
-    ve();
+    const stats = (m) => m.stats || { views: 0, visitors: 0, last: 0, week: 0, days: [] };
+    const num = (n) => Number(n || 0).toLocaleString();
+    draw();
 
-    // Bỏ dấu để gõ "ghi chu" vẫn ra "ghi-chú". Khai TẠI ĐÂY chứ không mượn _vtNoAccent ở dưới
-    // file: hàm này phải đứng một mình được (test bóc nó ra chạy riêng), và một chỗ nữa cần
-    // sửa khi đổi cách bỏ dấu vẫn rẻ hơn một phụ thuộc vô hình.
-    function khongDau(x) {
-      return String(x || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    function remember() {
+      try { localStorage.setItem("uneti.share.view", JSON.stringify({ filter: state.filter, sort: state.sort })); } catch (e) {}
+    }
+    // Strip marks so "ghi chu" finds "ghi-chú". Declared here, not borrowed: tests run this function on its own.
+    function plain(x) {
+      return String(x || "").normalize("NFD").replace(/[̀-ͯ]/g, "")
         .replace(/[đĐ]/g, "d").toLowerCase();
     }
-    // Lọc theo TÊN LINK, tên file lẫn ĐƯỜNG DẪN: nhớ tên đã đặt thì gõ tên, nhớ nó nằm thư mục
-    // nào thì gõ thư mục. Gõ nhiều từ cách nhau bởi dấu cách thì phải khớp HẾT, để thu hẹp dần.
-    function loc(tu) {
-      const k = khongDau(tu).trim();
-      if (!k) return ds;
-      const tus = k.split(/\s+/);
-      return ds.filter(m => {
-        const d = khongDau((m.ten || "") + " " + (m.path || ""));
-        return tus.every(x => d.indexOf(x) >= 0);
+    // Search by link name, path or custom address; several words must ALL match, to narrow down step by step.
+    function visible() {
+      const words = plain(state.query).trim().split(/\s+/).filter(Boolean);
+      let out = links.filter((m) => {
+        if (state.filter === "file" && m.loai === "hoi_thoai") return false;
+        if (state.filter === "chat" && m.loai !== "hoi_thoai") return false;
+        if (state.filter === "unseen" && stats(m).views > 0) return false;
+        if (!words.length) return true;
+        const hay = plain((m.ten || "") + " " + (m.path || "") + " " + (m.slug || ""));
+        return words.every((w) => hay.indexOf(w) >= 0);
       });
+      const by = {
+        new: (a, b) => (b.tao_luc || 0) - (a.tao_luc || 0),
+        views: (a, b) => stats(b).views - stats(a).views || (b.tao_luc || 0) - (a.tao_luc || 0),
+        recent: (a, b) => (stats(b).last || 0) - (stats(a).last || 0) || (b.tao_luc || 0) - (a.tao_luc || 0),
+      }[state.sort];
+      return out.slice().sort(by);
     }
 
-    function ve() {
-      if (!ds.length) {
+    function draw() {
+      if (!links.length) {
         el.innerHTML = `<div class="settings-page"><div class="settings-card compact">
           <p>${esc(t("share.empty"))}</p></div></div>`;
         return;
       }
-      // Ô tìm chỉ hiện khi danh sách đã đủ dài để phải tìm. Dưới ngưỡng đó nó là một ô trống
-      // chiếm chỗ, và mắt vẫn quét hết danh sách nhanh hơn là gõ.
-      const coTim = ds.length > SHARE_NGUONG_TIM;
-      // (i) next to the heading; local helpers since tests run this body on its own.
       const JI = window.UnetiInfo;
       const infoBtn = () => (JI ? JI.btn(t("info.more")) : "");
       const infoBody = (h) => (JI ? JI.body(h) : '<div class="info-body">' + h + "</div>");
-      el.innerHTML = `<div class="settings-page"><div class="settings-card">
-        <div class="settings-card-head"><b><span class="share-total">${ds.length}</span> ${esc(t("share.live_links"))}${infoBtn()}</b></div>
-        ${infoBody(esc(t("share.warn")))}
-        ${coTim ? `<input id="shareSearch" class="share-search" type="search" spellcheck="false"
-          autocomplete="off" placeholder="${esc(t("share.search_ph"))}" value="${esc(tuKhoa)}">
-        <div class="share-count" id="shareCount"></div>` : ""}
+      const total = links.reduce((s, m) => s + stats(m).views, 0);
+      const week = links.reduce((s, m) => s + stats(m).week, 0);
+      const showSearch = links.length > SHARE_SEARCH_MIN;
+      const chip = (v, key) => `<button type="button" class="share-chip${state.filter === v ? " on" : ""}" data-share-filter="${v}" aria-pressed="${state.filter === v}">${esc(t(key))}</button>`;
+      const opt = (v, key) => `<option value="${v}"${state.sort === v ? " selected" : ""}>${esc(t(key))}</option>`;
+      el.innerHTML = `<div class="settings-page"><div class="settings-card share-card">
+        <div class="share-sum">
+          <span class="share-stat"><b class="share-total">${links.length}</b> ${esc(t("share.live_links"))}</span>
+          <span class="share-stat">${ic("eye")}<b>${num(total)}</b> ${esc(t("share.views"))}</span>
+          <span class="share-stat">${ic("trending-up")}<b>${num(week)}</b> ${esc(t("share.in_7_days"))}</span>
+          ${infoBtn()}
+        </div>
+        ${infoBody(esc(t("share.warn")) + "<br><br>" + esc(t("share.stats_info")))}
+        ${showSearch ? `<input id="shareSearch" class="share-search" type="search" spellcheck="false"
+          autocomplete="off" placeholder="${esc(t("share.search_ph"))}" value="${esc(state.query)}">` : ""}
+        <div class="share-tools">
+          <div class="share-chips" role="group">${chip("all", "share.f_all")}${chip("file", "share.f_file")}${chip("chat", "share.f_chat")}${chip("unseen", "share.f_unseen")}</div>
+          <label class="share-sort">${ic("arrow-up-down")}<select id="shareSort" aria-label="${esc(t("share.sort"))}">${opt("new", "share.s_new")}${opt("views", "share.s_views")}${opt("recent", "share.s_recent")}</select></label>
+        </div>
+        <div class="share-count" id="shareCount"></div>
         <div class="share-list" id="shareList"></div>
       </div></div>`;
-      veDanhSach();
-      const o = el.querySelector("#shareSearch");
-      if (o) {
-        o.oninput = () => { tuKhoa = o.value; veDanhSach(); };
-        // Gõ xong mà con trỏ nhảy về đầu trang thì mỗi chữ là một lần mất chỗ. Vẽ lại CHỈ
-        // danh sách (veDanhSach), không đụng ô tìm, nên ô giữ nguyên tiêu điểm.
-      }
+      drawList();
+      const box = el.querySelector("#shareSearch");
+      // Typing redraws ONLY the list, never this card, so the box keeps focus and the caret stays put.
+      if (box) box.oninput = () => { state.query = box.value; state.page = 0; drawList(); };
+      el.querySelectorAll("[data-share-filter]").forEach((b) => {
+        b.onclick = () => { state.filter = b.dataset.shareFilter; state.page = 0; remember(); draw(); };
+      });
+      const sel = el.querySelector("#shareSort");
+      if (sel) sel.onchange = () => { state.sort = sel.value; state.page = 0; remember(); drawList(); };
     }
 
-    // Vẽ lại RIÊNG phần danh sách: lọc theo từ khoá rồi phân trang bằng pager() dùng chung
-    // (window.UnetiPager - cùng bản với trang Kỹ năng và khung nhật ký, không đẻ bản thứ hai).
-    function veDanhSach() {
+    // Filter, sort, then page with the shared pager (window.UnetiPager, same as Skills and the log panel).
+    function drawList() {
       const box = el.querySelector("#shareList");
       if (!box) return;
-      const hien = loc(tuKhoa);
-      // Dòng đếm: đang gõ thì thấy ngay còn bao nhiêu link khớp, khỏi phải lật trang đếm tay.
-      const dem = el.querySelector("#shareCount");
-      if (dem) dem.textContent = (tuKhoa || "").trim()
-        ? t("share.count", { so: hien.length, tong: ds.length }) : "";
+      const rows = visible();
+      const count = el.querySelector("#shareCount");
+      if (count) count.textContent = (state.query.trim() || state.filter !== "all")
+        ? t("share.count", { so: rows.length, tong: links.length }) : "";
+      const empty = `<div class="share-empty">${esc(t("share.no_match"))}</div>`;
       const P = (typeof window !== "undefined" && window.UnetiPager) || null;
-      const trong = `<div class="share-empty">${esc(t("share.no_match"))}</div>`;
       if (P) {
-        P(box, hien, SHARE_MOI_TRANG, (rows) => rows.map(m => hang(m)).join(""), trong);
+        P(box, rows, SHARE_PER_PAGE, (page) => page.map(row).join(""), empty,
+          { page: state.page, onPage: (p) => { state.page = p; } });
       } else {
-        box.innerHTML = hien.length ? hien.map(m => hang(m)).join("") : trong;
+        box.innerHTML = rows.length ? rows.map(row).join("") : empty;
       }
-      box.querySelectorAll("[data-share-revoke]").forEach(b => { b.onclick = () => thuHoi(b); });
-      box.querySelectorAll("[data-share-copy]").forEach(b => { b.onclick = () => chep(b); });
-      box.querySelectorAll("[data-share-rename]").forEach(b => { b.onclick = () => doiTen(b); });
+      // ONE handler on the list box, not one per button: the pager redraws the rows when the page turns, and buttons
+      // wired one by one were dead from page 2 on (bug until 2026-11-06).
+      box.onclick = (e) => {
+        const b = e && e.target && e.target.closest
+          ? e.target.closest("[data-share-revoke],[data-share-copy],[data-share-qr],[data-share-edit]") : null;
+        if (!b || b.disabled) return undefined;
+        if (b.dataset.shareRevoke) return revoke(b);
+        if (b.dataset.shareCopy) return copy(b);
+        if (b.dataset.shareQr) return qr(b.dataset.shareQr);
+        return edit(b.dataset.shareEdit);
+      };
     }
 
-    function hang(m) {
+    function ago(sec) {
+      const s = Math.max(0, Date.now() / 1000 - sec);
+      if (s < 60) return t("share.ago_now");
+      if (s < 3600) return t("share.ago_min", { n: Math.floor(s / 60) });
+      if (s < 86400) return t("share.ago_hour", { n: Math.floor(s / 3600) });
+      if (s < 30 * 86400) return t("share.ago_day", { n: Math.floor(s / 86400) });
+      return when(sec);
+    }
+    function when(sec) {
+      try { return new Date(sec * 1000).toLocaleDateString(); } catch (e) { return ""; }
+    }
+    // 14 bars, oldest first; a bar's height is its share of the busiest day. Only drawn once the link has views.
+    function spark(days) {
+      const top = Math.max.apply(null, (days || []).concat([0]));
+      if (!top) return "";
+      return `<span class="share-spark" title="${esc(t("share.chart"))}" aria-hidden="true">${days.map((n) =>
+        `<i style="height:${n ? Math.max(12, Math.round((n / top) * 100)) : 4}%"${n ? "" : ' class="z"'}></i>`).join("")}</span>`;
+    }
+
+    function row(m) {
       const url = location.origin + m.url;
-      // TÊN LINK (0.65.30: tự lấy theo tiêu đề file, đổi được) để NHẬN RA; đường dẫn đầy đủ để
-      // phân biệt hai file trùng tên ở hai thư mục. Máy chủ cũ chưa trả `ten` thì dùng tên file.
-      const ten = m.ten || String(m.path || "").split("/").pop() || m.path;
+      const name = m.ten || String(m.path || "").split("/").pop() || m.path;
+      const st = stats(m);
+      const chat = m.loai === "hoi_thoai";
+      const where = chat ? ic("messages-square") + " " + esc(t("share.chat_label")) : esc(m.path || "");
+      const seen = st.views
+        ? `<span class="share-views">${ic("eye")}<b>${num(st.views)}</b></span>`
+          + `<span>${esc(t("share.visitors", { n: num(st.visitors) }))}</span>`
+          + `<span>${esc(t("share.week", { n: num(st.week) }))}</span>`
+          + (st.last ? `<span>${esc(t("share.last_seen", { t: ago(st.last) }))}</span>` : "")
+        : `<span class="share-views none">${ic("eye-off")}${esc(t("share.never"))}</span>`;
+      const b = (attr, val, icon, key, cls) => `<button type="button" class="share-ib${cls ? " " + cls : ""}" ${attr}="${esc(val)}" aria-label="${esc(t(key) + ": " + name)}" title="${esc(t(key))}">${ic(icon)}</button>`;
       return `<div class="share-row" data-token="${esc(m.token)}">
         <div class="share-info">
-          <div class="share-name">${esc(ten)}</div>
-          <div class="share-path">${m.loai === "hoi_thoai" ? ic("messages-square") + " " + esc(t("share.chat_label")) : esc(m.path || "")}${m.tao_luc ? " · " + esc(ngayGio(m.tao_luc)) : ""}</div>
+          <div class="share-name">${esc(name)}</div>
+          <div class="share-path">${where}${m.tao_luc ? " · " + esc(when(m.tao_luc)) : ""}</div>
           <a class="share-url" href="${esc(url)}" target="_blank" rel="noopener">${esc(url)}</a>
+          <div class="share-meta">${seen}${spark(st.days)}</div>
         </div>
         <div class="share-acts">
-          <button class="gcard-btn ghost" type="button" data-share-rename="${esc(m.token)}">${esc(t("share.rename"))}</button>
-          <button class="gcard-btn" type="button" data-share-copy="${esc(url)}">${esc(t("common.copy"))}</button>
-          <button class="gcard-btn ghost" type="button" data-share-revoke="${esc(m.token)}">${esc(t("fedit.share_revoke"))}</button>
+          <a class="share-ib" href="${esc(url)}" target="_blank" rel="noopener" aria-label="${esc(t("share.a_open") + ": " + name)}" title="${esc(t("share.a_open"))}">${ic("external-link")}</a>
+          ${b("data-share-copy", url, "copy", "share.a_copy")}
+          ${b("data-share-qr", m.token, "qr-code", "share.a_qr")}
+          ${b("data-share-edit", m.token, "pencil", "share.a_edit")}
+          ${b("data-share-revoke", m.token, "trash-2", "share.a_revoke", "bad")}
         </div>
       </div>`;
     }
 
-    function ngayGio(giay) {
-      try { return new Date(giay * 1000).toLocaleString(); } catch (e) { return ""; }
-    }
-
-    function chep(b) {
+    function copy(b) {
       const url = b.dataset.shareCopy;
-      const xong = () => {
-        b.textContent = t("common.copied");
-        setTimeout(() => { b.textContent = t("common.copy"); }, 1400);
+      const done = () => {
+        b.innerHTML = ic("check");
+        b.classList.add("ok");
+        b.title = t("common.copied");
+        setTimeout(() => { b.innerHTML = ic("copy"); b.classList.remove("ok"); b.title = t("share.a_copy"); }, 1400);
       };
-      // Đường lui execCommand: navigator.clipboard không tồn tại trên HTTP trong mạng LAN.
+      writeClipboard(url, done);
+    }
+    // The QR dialog's labelled Copy button: same clipboard path, its own "copied" feedback.
+    function copyText(url, b) {
+      writeClipboard(url, () => {
+        const was = b.innerHTML;
+        b.innerHTML = ic("check") + " " + esc(t("common.copied"));
+        setTimeout(() => { b.innerHTML = was; }, 1400);
+      });
+    }
+    function writeClipboard(url, done) {
+      // execCommand fallback: navigator.clipboard does not exist over plain HTTP on a LAN.
       if (navigator.clipboard && window.isSecureContext) {
-        navigator.clipboard.writeText(url).then(xong).catch(() => {});
+        navigator.clipboard.writeText(url).then(done).catch(() => {});
       } else {
         const o = document.createElement("textarea");
         o.value = url; document.body.appendChild(o); o.select();
-        try { document.execCommand("copy"); xong(); } catch (e) {}
+        try { document.execCommand("copy"); done(); } catch (e) {}
         o.remove();
       }
     }
 
-    // Đổi tên link (0.65.30). Hộp nhập của trình duyệt chạy được cả trên iPhone mở từ màn hình
-    // chính. Để trống là quay về tên tự lấy theo tiêu đề file. Token không đổi: link đã gửi vẫn sống.
-    async function doiTen(b) {
-      const token = b.dataset.shareRename;
-      const m = ds.find(x => x.token === token);
+    // QR of the link's current address (owner, 2026-11-06): drawn by the server (/share/qr, segno), shown big enough to
+    // scan off a screen, with a PNG download for print. Same dialog shell as Edit.
+    function qr(token) {
+      const m = links.find((x) => x.token === token);
       if (!m) return;
-      const moi = window.prompt(t("share.rename_ask"), m.ten || "");
-      if (moi === null || moi === undefined) return;          // bấm Huỷ
-      b.disabled = true;
-      try {
-        const r = await (await fetch("/share/rename", {
-          method: "POST", headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ token, nhan: moi }),
-        })).json();
-        if (r && r.ok) { m.ten = r.ten; veDanhSach(); return; }
-      } catch (e) {}
-      b.disabled = false;
-      b.textContent = t("share.rename_fail");
+      const url = location.origin + m.url;
+      const src = (fmt, dl) => "/share/qr?token=" + encodeURIComponent(token) + "&origin=" + encodeURIComponent(location.origin)
+        + "&fmt=" + fmt + (dl ? "&dl=1" : "");
+      const dlg = document.createElement("div");
+      dlg.className = "share-dlg-wrap";
+      dlg.innerHTML = `<div class="share-dlg-scrim" data-dlg="close"></div>
+        <div class="share-dlg share-qr-dlg" role="dialog" aria-modal="true" aria-label="${esc(t("share.qr_title"))}">
+          <div class="share-dlg-h"><b>${esc(m.ten || t("share.qr_title"))}</b>
+            <button type="button" class="share-ib" data-dlg="close" aria-label="${esc(t("common.cancel"))}">${ic("x")}</button></div>
+          <img class="share-qr-img" src="${esc(src("svg"))}" alt="${esc(t("share.qr_title") + ": " + url)}" width="240" height="240">
+          <div class="share-qr-url">${esc(url)}</div>
+          <div class="share-dlg-acts">
+            <button type="button" class="gcard-btn ghost" data-dlg="copy">${ic("copy")} ${esc(t("share.a_copy"))}</button>
+            <a class="gcard-btn" data-dlg="png" href="${esc(src("png", true))}" download>${ic("download")} ${esc(t("share.qr_png"))}</a>
+          </div>
+        </div>`;
+      document.body.appendChild(dlg);
+      const close = () => { document.removeEventListener("keydown", onKey); dlg.remove(); };
+      const onKey = (e) => { if (e.key === "Escape") close(); };
+      document.addEventListener("keydown", onKey);
+      dlg.querySelectorAll('[data-dlg="close"]').forEach((x) => { x.onclick = close; });
+      const cp = dlg.querySelector('[data-dlg="copy"]');
+      if (cp) cp.onclick = () => copyText(url, cp);
     }
 
-    async function thuHoi(b) {
+    // One dialog for the name and the custom address. Phone: a sheet from the bottom (CSS), like the Tasks page.
+    function edit(token) {
+      const m = links.find((x) => x.token === token);
+      if (!m) return;
+      const dlg = document.createElement("div");
+      dlg.className = "share-dlg-wrap";
+      dlg.innerHTML = `<div class="share-dlg-scrim" data-dlg="close"></div>
+        <div class="share-dlg" role="dialog" aria-modal="true" aria-label="${esc(t("share.edit_title"))}">
+          <div class="share-dlg-h"><b>${esc(t("share.edit_title"))}</b>
+            <button type="button" class="share-ib" data-dlg="close" aria-label="${esc(t("common.cancel"))}">${ic("x")}</button></div>
+          <label class="share-fld"><span>${esc(t("share.f_name"))}</span>
+            <input type="text" data-dlg-name="1" maxlength="120" value="${esc(m.ten || "")}" placeholder="${esc(t("share.f_name_ph"))}"></label>
+          <label class="share-fld"><span>${esc(t("share.f_slug"))}</span>
+            <span class="share-slug"><span class="share-slug-pre">/s/</span>
+            <input type="text" data-dlg-slug="1" maxlength="64" spellcheck="false" autocapitalize="off" autocomplete="off" value="${esc(m.slug || "")}" placeholder="${esc(t("share.f_slug_ph"))}"></span></label>
+          <div class="share-dlg-note">${esc(t("share.slug_note"))}</div>
+          <div class="share-dlg-note">${esc(t("share.token_url"))}: <span class="share-tok">${esc(location.origin + (m.token_url || "/s/" + m.token))}</span></div>
+          <div class="share-dlg-err" data-dlg-err="1" role="alert"></div>
+          <div class="share-dlg-acts">
+            <button type="button" class="gcard-btn ghost" data-dlg="close">${esc(t("common.cancel"))}</button>
+            <button type="button" class="gcard-btn" data-dlg="save">${esc(t("common.save"))}</button>
+          </div>
+        </div>`;
+      document.body.appendChild(dlg);
+      const nameIn = dlg.querySelector("[data-dlg-name]");
+      const slugIn = dlg.querySelector("[data-dlg-slug]");
+      const err = dlg.querySelector("[data-dlg-err]");
+      const close = () => { document.removeEventListener("keydown", onKey); dlg.remove(); };
+      const onKey = (e) => {
+        if (e.key === "Escape") close();
+        else if (e.key === "Enter" && e.target && e.target.tagName === "INPUT") save();
+      };
+      document.addEventListener("keydown", onKey);
+      dlg.querySelectorAll('[data-dlg="close"]').forEach((x) => { x.onclick = close; });
+      const saveBtn = dlg.querySelector('[data-dlg="save"]');
+      if (saveBtn) saveBtn.onclick = () => save();
+      if (nameIn && nameIn.focus) nameIn.focus();
+      async function save() {
+        if (saveBtn) saveBtn.disabled = true;
+        try {
+          const r = await (await fetch("/share/rename", {
+            method: "POST", headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ token, nhan: nameIn ? nameIn.value : m.ten, slug: slugIn ? slugIn.value : m.slug }),
+          })).json();
+          if (r && r.ok) {
+            m.ten = r.ten; m.slug = r.slug || ""; if (r.url) m.url = r.url;
+            close();
+            drawList();
+            return;
+          }
+          if (err) err.textContent = (r && r.error) || t("share.rename_fail");
+        } catch (e) {
+          if (err) err.textContent = t("share.rename_fail");
+        }
+        if (saveBtn) saveBtn.disabled = false;
+      }
+    }
+
+    async function revoke(b) {
       const token = b.dataset.shareRevoke;
+      const m = links.find((x) => x.token === token);
+      if (!window.confirm(t("share.revoke_ask", { ten: (m && m.ten) || token }))) return;
       b.disabled = true;
       try {
         await fetch("/share/revoke", {
           method: "POST", headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ token }),
         });
-        ds = ds.filter(x => x.token !== token);
-        // Vẽ lại CẢ thẻ: con số tổng ở đầu thẻ vừa giảm đi một, mà ô tìm có thể vừa tụt xuống
-        // dưới ngưỡng hiện. Từ khoá đang gõ nằm ở `tuKhoa` nên nó sống qua lần vẽ này.
-        ve();
+        links = links.filter((x) => x.token !== token);
+        // Redraw the WHOLE card: the totals drop and the search box may fall under its threshold. The query lives in
+        // `state`, so it survives, and so does the page number (the pager clamps it when the last page empties).
+        draw();
       } catch (e) { b.disabled = false; }
     }
   }
@@ -7886,7 +8132,8 @@
     //
     // Kích cỡ và cỡ mắt là THANH TRƯỢT: lúc kéo (tam = true) con pet đổi ngay nhưng chưa ghi
     // máy chủ, thả tay mới ghi. Màu thân và màu mắt có thêm ô TỰ CHỌN kèm ô gõ mã màu.
-    const OPTS_ED = { size: true, vanh: true };
+    // image: the "Own picture" block (upload, back to the UNETI AI face, use as tab icon) sits first on this page only.
+    const OPTS_ED = { size: true, vanh: true, image: true };
     const ve = () => {
       const cur = P.get();
       // Thứ tự: HÌNH DÁNG trước (thứ người ta tới đây để đổi), rồi cỡ, màu, màu mắt, và CUỐI
@@ -7924,7 +8171,7 @@
         stt.innerHTML = Icons.warn(t("settings.pet_save_fail") + (r.lech.length ? " (" + r.lech.join(", ") + ")" : ""));
       };
       host.querySelector("#setPetToggle").onclick = () => { P.setEnabled(!cur.enabled); ve(); };
-      host.querySelector("#setPetReset").onclick = () => { P.setCfg({ shape: "star", palette: "cam", size: 72, side: "right", pos: 0.62, eye: "den", eyeSize: 1, enabled: true }); ve(); };
+      host.querySelector("#setPetReset").onclick = () => { P.setCfg({ shape: "star", palette: "cam", size: 72, side: "right", pos: 0.62, eye: "den", eyeSize: 1, enabled: true, image: "", favicon: true }); ve(); };
       P.editorBind(host.querySelector("[data-pet-editor]"), cur, (patch, tam) => P.setCfg(patch, tam), OPTS_ED);
     };
     ve();
